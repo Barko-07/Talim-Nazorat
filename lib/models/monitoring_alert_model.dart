@@ -5,9 +5,12 @@ class MonitoringAlertModel {
   final String studentId;
   final String studentName;
   final String studentGrade;
-  final String severity; // XAVF (High), DIQQAT (Medium), MA'LUMOT (Low)
+  final String severity; // 'XAVF' (High), 'DIQQAT' (Medium), 'MA’LUMOT' (Low)
   final String message;
   final String suggestedAction;
+  final String? responsiblePersonId;
+  final String? responsiblePersonName;
+  final String status; // 'Ochiq', 'Ko‘rib chiqilmoqda', 'Hal qilindi', 'Rad etildi'
   final bool isResolved;
   final String? resolvedNotes;
   final DateTime? resolvedAt;
@@ -23,6 +26,9 @@ class MonitoringAlertModel {
     required this.severity,
     required this.message,
     required this.suggestedAction,
+    this.responsiblePersonId,
+    this.responsiblePersonName,
+    this.status = 'Ochiq',
     this.isResolved = false,
     this.resolvedNotes,
     this.resolvedAt,
@@ -30,24 +36,40 @@ class MonitoringAlertModel {
   });
 
   MonitoringAlertModel copyWith({
+    String? id,
+    String? ruleCode,
+    String? ruleTitle,
+    String? studentId,
+    String? studentName,
+    String? studentGrade,
+    String? severity,
+    String? message,
+    String? suggestedAction,
+    String? responsiblePersonId,
+    String? responsiblePersonName,
+    String? status,
     bool? isResolved,
     String? resolvedNotes,
     DateTime? resolvedAt,
+    DateTime? createdAt,
   }) {
     return MonitoringAlertModel(
-      id: id,
-      ruleCode: ruleCode,
-      ruleTitle: ruleTitle,
-      studentId: studentId,
-      studentName: studentName,
-      studentGrade: studentGrade,
-      severity: severity,
-      message: message,
-      suggestedAction: suggestedAction,
+      id: id ?? this.id,
+      ruleCode: ruleCode ?? this.ruleCode,
+      ruleTitle: ruleTitle ?? this.ruleTitle,
+      studentId: studentId ?? this.studentId,
+      studentName: studentName ?? this.studentName,
+      studentGrade: studentGrade ?? this.studentGrade,
+      severity: severity ?? this.severity,
+      message: message ?? this.message,
+      suggestedAction: suggestedAction ?? this.suggestedAction,
+      responsiblePersonId: responsiblePersonId ?? this.responsiblePersonId,
+      responsiblePersonName: responsiblePersonName ?? this.responsiblePersonName,
+      status: status ?? this.status,
       isResolved: isResolved ?? this.isResolved,
       resolvedNotes: resolvedNotes ?? this.resolvedNotes,
       resolvedAt: resolvedAt ?? this.resolvedAt,
-      createdAt: createdAt,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -61,6 +83,9 @@ class MonitoringAlertModel {
         'severity': severity,
         'message': message,
         'suggestedAction': suggestedAction,
+        'responsiblePersonId': responsiblePersonId,
+        'responsiblePersonName': responsiblePersonName,
+        'status': status,
         'isResolved': isResolved,
         'resolvedNotes': resolvedNotes,
         'resolvedAt': resolvedAt?.toIso8601String(),
@@ -78,6 +103,10 @@ class MonitoringAlertModel {
         severity: json['severity'] as String,
         message: json['message'] as String,
         suggestedAction: json['suggestedAction'] as String,
+        responsiblePersonId: json['responsiblePersonId'] as String?,
+        responsiblePersonName: json['responsiblePersonName'] as String?,
+        status: json['status'] as String? ??
+            ((json['isResolved'] as bool? ?? false) ? 'Hal qilindi' : 'Ochiq'),
         isResolved: json['isResolved'] as bool? ?? false,
         resolvedNotes: json['resolvedNotes'] as String?,
         resolvedAt: json['resolvedAt'] != null

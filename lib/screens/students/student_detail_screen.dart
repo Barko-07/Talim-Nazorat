@@ -6,6 +6,7 @@ import '../../models/student_model.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/access_control_service.dart';
 import '../assessments/new_assessment_screen.dart';
 import '../iep/iep_print_screen.dart';
 
@@ -21,6 +22,7 @@ class StudentDetailScreen extends StatefulWidget {
 class _StudentDetailScreenState extends State<StudentDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final AccessControlService _access = AccessControlService();
 
   final List<String> _tabs = [
     'Umumiy ma’lumot',
@@ -45,23 +47,189 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     super.dispose();
   }
 
+  void _showArchiveDialog(BuildContext context, StudentModel student, UserModel currentUser) {
+    final reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('O‘quvchi anketasini arxivlash'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${student.fullName} anketasini faol ro‘yxatdan arxivga o‘tkazmoqchimisiz? Barcha tarixiy yozuvlar (baholashlar, ITR, mashg‘ulotlar) to‘liq saqlanadi.',
+              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: reasonController,
+              decoration: const InputDecoration(
+                labelText: 'Arxivlash sababi *',
+                hintText: 'Masalan: Boshqa maktabga ko‘chib o‘tdi yoki bosqichni yakunladi',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 2,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Bekor qilish'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () async {
+              final reason = reasonController.text.trim();
+              if (reason.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Iltimos, arxivlash sababini yozing')),
+                );
+                return;
+              }
+              Navigator.pop(ctx);
+              await context.read<AppProvider>().deactivateStudent(student.id, reason, byUser: currentUser);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('O‘quvchi muvaffaqiyatli arxivlandi')),
+                );
+              }
+            },
+            child: const Text('Arxivlash'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showUnarchiveDialog(BuildContext context, StudentModel student, UserModel currentUser) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('O‘quvchini qayta faollashtirish'),
+        content: Text(
+          '${student.fullName} anketasini arxivdan qayta faol holatga o‘tkazishni tasdiqlaysizmi?',
+          style: const TextStyle(fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Bekor qilish'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.success),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final updated = student.copyWith(
+                status: 'Faol',
+                deactivationReason: null,
+                deactivatedAt: null,
+              );
+              await context.read<AppProvider>().updateStudent(updated, byUser: currentUser);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('O‘quvchi qayta faollashtirildi')),
+                );
+              }
+            },
+            child: const Text('Faollashtirish'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAssignSpecialistDialog(BuildContext context, StudentModel student, UserModel currentUser) {
+    final app = context.read<AppProvider>();
+    final availableSpecialists = app.specialists.where((u) => !student.assignedSpecialistIds.contains(u.id)).toList();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Mutaxassis biriktirish'),
+        content: SizedBox(
+          width: 400,
+          child: availableSpecialists.isEmpty
+              ? const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text('Barcha mutaxassislar allaqachon biriktirilgan yoki mutaxassislar ro‘yxati bo‘sh.'),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: availableSpecialists.length,
+                  itemBuilder: (c, i) {
+                    final sp = availableSpecialists[i];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: sp.role.color.withOpacity(0.15),
+                        child: Icon(Icons.person, color: sp.role.color),
+                      ),
+                      title: Text(sp.fullName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                      subtitle: Text('${sp.role.label} • ${sp.institutionName ?? ''}', style: const TextStyle(fontSize: 12)),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.add_circle_outline, color: AppColors.primary),
+                        onPressed: () async {
+                          Navigator.pop(ctx);
+                          await app.assignSpecialistToStudent(student.id, sp.id, byUser: currentUser);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${sp.fullName} ushbu o‘quvchiga biriktirildi')),
+                            );
+                          }
+                        },
+                      ),
+                    );
+                  },
+                ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Yopish')),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
+    final auth = context.watch<AuthProvider>();
+    final currentUser = auth.currentUser;
+
     final student = app.students.firstWhere(
       (s) => s.id == widget.studentId,
-      orElse: () => app.students.first,
+      orElse: () => app.allStudentsIncludingArchived.firstWhere(
+        (s) => s.id == widget.studentId,
+        orElse: () => app.students.isNotEmpty ? app.students.first : app.allStudentsIncludingArchived.first,
+      ),
     );
 
     final assessments = app.assessments.where((a) => a.studentId == student.id).toList();
     final sessions = app.sessions.where((s) => s.studentId == student.id).toList();
     final iepPlans = app.iepPlans.where((p) => p.studentId == student.id).toList();
     final referrals = app.referrals.where((r) => r.studentId == student.id).toList();
-    final auditLogs = app.auditLogs.where((a) => a.details.contains(student.firstName)).toList();
+    final auditLogs = app.auditLogs.where((a) => a.details.contains(student.firstName) || a.details.contains(student.id)).toList();
+
+    final isArchived = student.status == 'Arxivlangan';
+    final canArchive = currentUser != null && _access.canArchiveStudent(currentUser, student);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(student.fullName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        actions: [
+          if (canArchive && !isArchived)
+            IconButton(
+              icon: const Icon(Icons.archive_outlined, color: AppColors.warning),
+              tooltip: 'O‘quvchini arxivlash',
+              onPressed: () => _showArchiveDialog(context, student, currentUser),
+            ),
+          if (canArchive && isArchived)
+            IconButton(
+              icon: const Icon(Icons.unarchive_outlined, color: AppColors.success),
+              tooltip: 'Arxivdan qaytarish',
+              onPressed: () => _showUnarchiveDialog(context, student, currentUser),
+            ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -76,7 +244,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
         controller: _tabController,
         children: [
           // 1. UMUMIY MA'LUMOT
-          _buildGeneralTab(student),
+          _buildGeneralTab(student, currentUser, app),
 
           // 2. BAHOLASHLAR
           _buildAssessmentsTab(assessments, student),
@@ -104,13 +272,52 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   }
 
   // --- TAB 1: UMUMIY MA'LUMOT ---
-  Widget _buildGeneralTab(StudentModel s) {
+  Widget _buildGeneralTab(StudentModel s, UserModel? currentUser, AppProvider app) {
     final df = DateFormat('dd.MM.yyyy');
+    final isArchived = s.status == 'Arxivlangan';
+    final canViewMedical = currentUser != null && _access.canViewSensitiveMedical(currentUser);
+    final canManageAssignments = currentUser != null &&
+        (_access.canManageUsers(currentUser) || currentUser.role == UserRole.coordinator);
+
+    // Biriktirilgan mutaxassislar obyektlarini topish
+    final assignedStaff = app.allUsers.where((u) => s.assignedSpecialistIds.contains(u.id)).toList();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (isArchived)
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.warningBg,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.archive, color: AppColors.warning, size: 28),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Ushbu o‘quvchi anketasi arxivlangan',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textPrimary)),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Sababi: ${s.deactivationReason ?? 'Ko‘rsatilmagan'} • Sana: ${s.deactivatedAt != null ? df.format(s.deactivatedAt!) : 'Noma’lum'}',
+                          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
           // Profil Karta
           Card(
             child: Padding(
@@ -119,13 +326,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 children: [
                   CircleAvatar(
                     radius: 36,
-                    backgroundColor: AppColors.primaryLight,
+                    backgroundColor: isArchived ? AppColors.borderLight : AppColors.primaryLight,
                     child: Text(
-                      s.firstName.substring(0, 1),
-                      style: const TextStyle(
+                      s.firstName.isNotEmpty ? s.firstName.substring(0, 1) : '?',
+                      style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primaryDark,
+                        color: isArchived ? AppColors.textMuted : AppColors.primaryDark,
                       ),
                     ),
                   ),
@@ -144,24 +351,51 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Sinfi: ${s.grade} • Tug‘ilgan kuni: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
+                          'Maktab: ${s.institutionName ?? 'Biriktirilmagan'} • Sinfi: ${s.grade}',
                           style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                         ),
-                        const SizedBox(height: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.successBg,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            'Holati: ${s.status}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.success,
+                        const SizedBox(height: 2),
+                        Text(
+                          'Tug‘ilgan kuni: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
+                          style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isArchived ? AppColors.warningBg : AppColors.successBg,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                'Holati: ${s.status}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: isArchived ? AppColors.warning : AppColors.success,
+                                ),
+                              ),
                             ),
-                          ),
+                            if (s.coordinatorName != null) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.infoBg,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  'Koordinator: ${s.coordinatorName}',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.info,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ],
                     ),
@@ -197,15 +431,82 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     title: const Text('Qo‘llab-quvvatlash darajasi', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
                     subtitle: Text(s.supportLevel, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   ),
-                  if (s.medicalNotes != null) ...[
-                    const Divider(),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.medical_services_outlined, color: AppColors.warning),
-                      title: const Text('Tibbiy xulosa va tavsiyalar', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                      subtitle: Text(s.medicalNotes!, style: const TextStyle(fontSize: 13)),
-                    ),
-                  ],
+                  const Divider(),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.medical_services_outlined, color: AppColors.warning),
+                    title: const Text('Tibbiy xulosa va tavsiyalar', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                    subtitle: canViewMedical
+                        ? Text(s.medicalNotes ?? 'Tibbiy ma’lumot kiritilmagan', style: const TextStyle(fontSize: 13))
+                        : Container(
+                            margin: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.background,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.lock_outline, size: 16, color: AppColors.textMuted),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Maxfiy tibbiy ma’lumot — faqat vakolatli tibbiy va defektologik mutaxassislar uchun ochiq',
+                                    style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontStyle: FontStyle.italic),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Biriktirilgan Mutaxassislar
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Mas’ul Mutaxassislar Jamasi',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      if (canManageAssignments && currentUser != null)
+                        TextButton.icon(
+                          icon: const Icon(Icons.person_add, size: 16),
+                          label: const Text('Biriktirish', style: TextStyle(fontSize: 12)),
+                          onPressed: () => _showAssignSpecialistDialog(context, s, currentUser),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (assignedStaff.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text('Ushbu o‘quvchiga hali maxsus mutaxassis biriktirilmagan',
+                          style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                    )
+                  else
+                    ...assignedStaff.map((staff) {
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: CircleAvatar(
+                          backgroundColor: staff.role.color.withOpacity(0.15),
+                          child: Icon(Icons.person, color: staff.role.color, size: 20),
+                        ),
+                        title: Text(staff.fullName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                        subtitle: Text('${staff.role.label} (${staff.specialization ?? staff.role.name}) • Tel: ${staff.phone ?? 'Mavjud emas'}'),
+                      );
+                    }),
                 ],
               ),
             ),

@@ -24,9 +24,19 @@ class _SessionsScreenState extends State<SessionsScreen> {
     final user = auth.currentUser;
     final students = app.students;
 
-    String selectedStdId = students.isNotEmpty ? students.first.id : '';
+    if (students.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Hozircha birorta o‘quvchi mavjud emas.'), backgroundColor: AppColors.warning),
+      );
+      return;
+    }
+
+    String selectedStdId = students.first.id;
     final topicCtrl = TextEditingController(text: 'Korreksion rivojlantiruvchi mashg‘ulot');
     final activitiesCtrl = TextEditingController();
+    String sessionType = 'Individual';
+    int durationMinutes = 45;
+    DateTime scheduledDate = DateTime.now().add(const Duration(hours: 2));
 
     showDialog(
       context: context,
@@ -36,23 +46,84 @@ class _SessionsScreenState extends State<SessionsScreen> {
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DropdownButtonFormField<String>(
                   value: selectedStdId,
-                  decoration: const InputDecoration(labelText: 'O‘quvchini tanlang'),
+                  decoration: const InputDecoration(labelText: 'O‘quvchini tanlang *'),
                   items: students.map((s) => DropdownMenuItem(value: s.id, child: Text('${s.fullName} (${s.grade})'))).toList(),
                   onChanged: (v) => setDlgState(() => selectedStdId = v!),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: topicCtrl,
-                  decoration: const InputDecoration(labelText: 'Mashg‘ulot mavzusi'),
+                  decoration: const InputDecoration(labelText: 'Mashg‘ulot mavzusi *'),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: sessionType,
+                  decoration: const InputDecoration(labelText: 'Mashg‘ulot shakli'),
+                  items: const [
+                    DropdownMenuItem(value: 'Individual', child: Text('Individual')),
+                    DropdownMenuItem(value: 'Kichik guruhda', child: Text('Kichik guruhda (2-4 bola)')),
+                  ],
+                  onChanged: (v) => setDlgState(() => sessionType = v!),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<int>(
+                  value: durationMinutes,
+                  decoration: const InputDecoration(labelText: 'Davomiyligi'),
+                  items: const [
+                    DropdownMenuItem(value: 30, child: Text('30 daqiqa')),
+                    DropdownMenuItem(value: 45, child: Text('45 daqiqa (Standart)')),
+                    DropdownMenuItem(value: 60, child: Text('60 daqiqa')),
+                  ],
+                  onChanged: (v) => setDlgState(() => durationMinutes = v!),
+                ),
+                const SizedBox(height: 12),
+                // Sana va vaqt
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.calendar_today_rounded, color: AppColors.primary),
+                  title: const Text('Mashg‘ulot vaqti', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                  subtitle: Text(DateFormat('dd.MM.yyyy HH:mm').format(scheduledDate), style: const TextStyle(fontWeight: FontWeight.bold)),
+                  trailing: OutlinedButton(
+                    onPressed: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: scheduledDate,
+                        firstDate: DateTime.now().subtract(const Duration(days: 7)),
+                        lastDate: DateTime.now().add(const Duration(days: 90)),
+                      );
+                      if (pickedDate != null && ctx.mounted) {
+                        final pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(scheduledDate),
+                        );
+                        if (pickedTime != null) {
+                          setDlgState(() {
+                            scheduledDate = DateTime(
+                              pickedDate.year,
+                              pickedDate.month,
+                              pickedDate.day,
+                              pickedTime.hour,
+                              pickedTime.minute,
+                            );
+                          });
+                        }
+                      }
+                    },
+                    child: const Text('O‘zgartirish'),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: activitiesCtrl,
                   maxLines: 2,
-                  decoration: const InputDecoration(labelText: 'Rejalashtirilgan mashqlar'),
+                  decoration: const InputDecoration(
+                    labelText: 'Rejalashtirilgan mashqlar va maqsad',
+                    hintText: 'Masalan: Artikulyatsion mashqlar, kartalar bilan ishlash...',
+                  ),
                 ),
               ],
             ),
@@ -61,6 +132,13 @@ class _SessionsScreenState extends State<SessionsScreen> {
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Bekor qilish')),
             FilledButton(
               onPressed: () async {
+                if (topicCtrl.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Iltimos, mashg‘ulot mavzusini kiriting!'), backgroundColor: AppColors.error),
+                  );
+                  return;
+                }
+
                 final student = students.firstWhere((s) => s.id == selectedStdId);
                 final newSession = SessionModel(
                   id: 'ses_${const Uuid().v4().substring(0, 8)}',
@@ -69,15 +147,114 @@ class _SessionsScreenState extends State<SessionsScreen> {
                   specialistId: user?.id ?? 'user_spec',
                   specialistName: user?.fullName ?? 'Mutaxassis',
                   specialistRole: user?.role.label ?? 'Mutaxassis',
-                  scheduledAt: DateTime.now().add(const Duration(days: 1, hours: 2)),
+                  scheduledAt: scheduledDate,
+                  durationMinutes: durationMinutes,
+                  sessionType: sessionType,
                   status: 'Rejalashtirilgan',
                   topic: topicCtrl.text.trim(),
                   activities: activitiesCtrl.text.trim(),
                 );
-                await app.addSession(newSession);
-                if (ctx.mounted) Navigator.pop(ctx);
+
+                final result = await app.addSession(newSession, byUser: user);
+                if (ctx.mounted) {
+                  Navigator.pop(ctx);
+                  if (result['success'] == false) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(result['message'] as String), backgroundColor: AppColors.error),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Mashg‘ulot muvaffaqiyatli rejalashtirildi!'), backgroundColor: AppColors.success),
+                    );
+                  }
+                }
               },
               child: const Text('Rejalashtirish'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Mashg'ulotni bajarilgan deb rasmiylashtirish dialogi (Kuzatuv xulosasi va davomat bilan)
+  void _showCompleteSessionDialog(BuildContext context, SessionModel session) {
+    final app = context.read<AppProvider>();
+    final auth = context.read<AuthProvider>();
+    final user = auth.currentUser;
+
+    final observationsCtrl = TextEditingController();
+    final nextStepsCtrl = TextEditingController();
+    bool attendanceConfirmed = true;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDlgState) => AlertDialog(
+          title: Text('${session.studentName} — Natijani qayd etish', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Mavzu: ${session.topic}', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                const SizedBox(height: 12),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: attendanceConfirmed,
+                  title: const Text('O‘quvchi mashg‘ulotda to‘liq qatnashdi', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                  onChanged: (v) => setDlgState(() => attendanceConfirmed = v ?? true),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: observationsCtrl,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Mutaxassis kuzatuvi va dars natijasi *',
+                    hintText: 'Bola topshiriqni qanday bajardi? Qanday qiyinchilik yoki yutuqlar bo‘ldi?',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: nextStepsCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Keyingi tavsiya etilgan harakat / Uyga vazifa',
+                    hintText: 'Ota-ona yoki sinf rahbariga tavsiya...',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Bekor qilish')),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.success),
+              onPressed: () async {
+                if (observationsCtrl.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Iltimos, mashg‘ulot bo‘yicha professional kuzatuv xulosangizni yozing!'),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                  return;
+                }
+
+                await app.completeSession(
+                  session.id,
+                  observations: observationsCtrl.text.trim(),
+                  nextSteps: nextStepsCtrl.text.trim().isNotEmpty ? nextStepsCtrl.text.trim() : null,
+                  byUser: user,
+                );
+
+                if (ctx.mounted) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Mashg‘ulot yakunlandi va natijalar saqlandi!'), backgroundColor: AppColors.success),
+                  );
+                }
+              },
+              child: const Text('Tasdiqlash va Saqlash'),
             ),
           ],
         ),
@@ -132,7 +309,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
 
             // Holat filtri
             Row(
-              children: ['Barchasi', 'Bajarildi', 'Rejalashtirilgan', 'Qatnashmadi'].map((f) {
+              children: ['Barchasi', 'Bajarildi', 'Rejalashtirilgan', 'Qatnashmadi', 'Bekor qilindi'].map((f) {
                 final isSel = _filter == f;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
@@ -194,9 +371,11 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            s.topic,
-                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                          Expanded(
+                                            child: Text(
+                                              s.topic,
+                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                            ),
                                           ),
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -221,40 +400,51 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                         style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                                       ),
                                       Text(
-                                        'Vaqti: ${df.format(s.scheduledAt)} (Davomiyligi: ${s.durationMinutes} daqiqa)',
+                                        'Shakli: ${s.sessionType} • Vaqti: ${df.format(s.scheduledAt)} (${s.durationMinutes} daqiqa)',
                                         style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
                                       ),
-                                      if (s.observations != null) ...[
+                                      if (s.observations != null && s.observations!.isNotEmpty) ...[
                                         const SizedBox(height: 6),
-                                        Text('Kuzatuv: ${s.observations}', style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF8FAFC),
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: Text(
+                                            'Kuzatuv xulosasi: ${s.observations}',
+                                            style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: AppColors.textPrimary),
+                                          ),
+                                        ),
+                                      ],
+                                      if (s.nextSteps != null && s.nextSteps!.isNotEmpty) ...[
+                                        const SizedBox(height: 4),
+                                        Text('Keyingi tavsiya: ${s.nextSteps}', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                                       ],
                                       if (!isDone) ...[
                                         const SizedBox(height: 10),
                                         Row(
                                           children: [
-                                            OutlinedButton.icon(
-                                              style: OutlinedButton.styleFrom(
-                                                foregroundColor: AppColors.success,
-                                                side: const BorderSide(color: AppColors.success),
-                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                            FilledButton.icon(
+                                              style: FilledButton.styleFrom(
+                                                backgroundColor: AppColors.success,
+                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                               ),
                                               icon: const Icon(Icons.check, size: 16),
-                                              label: const Text('Bajarildi deb belgilash', style: TextStyle(fontSize: 11)),
-                                              onPressed: () {
-                                                app.updateSessionStatus(s.id, 'Bajarildi', notes: 'Dars to‘liq hajmda o‘tkazildi.');
-                                              },
+                                              label: const Text('Bajarildi deb qayd etish', style: TextStyle(fontSize: 11)),
+                                              onPressed: () => _showCompleteSessionDialog(context, s),
                                             ),
                                             const SizedBox(width: 8),
                                             OutlinedButton.icon(
                                               style: OutlinedButton.styleFrom(
                                                 foregroundColor: AppColors.error,
                                                 side: const BorderSide(color: AppColors.error),
-                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                               ),
                                               icon: const Icon(Icons.close, size: 16),
                                               label: const Text('Qatnashmadi', style: TextStyle(fontSize: 11)),
                                               onPressed: () {
-                                                app.updateSessionStatus(s.id, 'Qatnashmadi', notes: 'Sababsiz qatnashmadi.');
+                                                app.updateSessionStatus(s.id, 'Qatnashmadi', notes: 'Mashg‘ulotga kelmadi.');
                                               },
                                             ),
                                           ],

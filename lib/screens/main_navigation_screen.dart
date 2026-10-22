@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../core/constants/app_colors.dart';
 import '../models/user_model.dart';
+import '../models/notification_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/app_provider.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'students/students_list_screen.dart';
+import 'students/student_detail_screen.dart';
 import 'assessments/assessments_list_screen.dart';
 import 'sessions/sessions_screen.dart';
 import 'iep/iep_list_screen.dart';
@@ -26,6 +29,165 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final auth = context.read<AuthProvider>();
+    final app = context.read<AppProvider>();
+    if (app.currentUser?.id != auth.currentUser?.id) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        app.setCurrentUser(auth.currentUser);
+      });
+    }
+  }
+
+  void _showNotificationsSheet(BuildContext context) {
+    final app = context.read<AppProvider>();
+    final auth = context.read<AuthProvider>();
+    final notifications = app.myNotifications;
+    final df = DateFormat('dd.MM HH:mm');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setSheetState) {
+          final unreadCount = app.myUnreadNotificationCount;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: SizedBox(
+              height: 480,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.notifications_active, color: AppColors.primary, size: 22),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Bildirishnomalar va Vazifalar',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          if (unreadCount > 0) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.error,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '$unreadCount ta yangi',
+                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (auth.currentUser != null && unreadCount > 0)
+                        TextButton(
+                          onPressed: () async {
+                            await app.markAllNotificationsAsRead(auth.currentUser!.id);
+                            setSheetState(() {});
+                          },
+                          child: const Text('Barchasini o‘qilgan qilish', style: TextStyle(fontSize: 12)),
+                        ),
+                    ],
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: notifications.isEmpty
+                        ? const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.notifications_off_outlined, size: 40, color: AppColors.textMuted),
+                                SizedBox(height: 8),
+                                Text('Hozircha yangi bildirishnomalar yo‘q', style: TextStyle(color: AppColors.textMuted)),
+                              ],
+                            ),
+                          )
+                        : ListView.separated(
+                            itemCount: notifications.length,
+                            separatorBuilder: (_, __) => const Divider(height: 1),
+                            itemBuilder: (c, i) {
+                              final notif = notifications[i];
+                              return ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: CircleAvatar(
+                                  backgroundColor: notif.isRead ? AppColors.borderLight : AppColors.primaryLight,
+                                  child: Icon(
+                                    notif.type == 'ALERT'
+                                        ? Icons.warning_amber_rounded
+                                        : notif.type == 'REFERRAL'
+                                            ? Icons.alt_route
+                                            : Icons.assignment,
+                                    color: notif.isRead
+                                        ? AppColors.textMuted
+                                        : (notif.type == 'ALERT' ? AppColors.error : AppColors.primary),
+                                    size: 20,
+                                  ),
+                                ),
+                                title: Text(
+                                  notif.title,
+                                  style: TextStyle(
+                                    fontWeight: notif.isRead ? FontWeight.normal : FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(notif.body, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                    const SizedBox(height: 2),
+                                    Text(df.format(notif.createdAt), style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                                  ],
+                                ),
+                                trailing: !notif.isRead
+                                    ? Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.primary,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      )
+                                    : null,
+                                onTap: () async {
+                                  if (!notif.isRead) {
+                                    await app.markNotificationAsRead(notif.id);
+                                    setSheetState(() {});
+                                  }
+                                  if (notif.relatedStudentId != null) {
+                                    Navigator.pop(ctx);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => StudentDetailScreen(studentId: notif.relatedStudentId!),
+                                      ),
+                                    );
+                                  }
+                                },
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   final List<Widget> _screens = const [
     DashboardScreen(),
@@ -59,7 +221,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final auth = context.watch<AuthProvider>();
     final app = context.watch<AppProvider>();
     final user = auth.currentUser;
-    final alertCount = app.unresolvedAlerts.length;
+    final unreadNotifCount = app.myUnreadNotificationCount;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -99,17 +261,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ],
         ),
         actions: [
-          // Monitoring alert belgisi
+          // Bildirishnomalar belgisi
           Stack(
             alignment: Alignment.center,
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_none_rounded),
-                onPressed: () {
-                  setState(() => _selectedIndex = 5); // Monitoringga o'tish
-                },
+                tooltip: 'Bildirishnomalar',
+                onPressed: () => _showNotificationsSheet(context),
               ),
-              if (alertCount > 0)
+              if (unreadNotifCount > 0)
                 Positioned(
                   top: 8,
                   right: 8,
@@ -121,7 +282,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
                     constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
                     child: Text(
-                      '$alertCount',
+                      '$unreadNotifCount',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,

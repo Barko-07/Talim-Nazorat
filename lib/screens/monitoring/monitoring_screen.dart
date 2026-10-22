@@ -17,45 +17,66 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
 
   void _showResolveDialog(BuildContext context, MonitoringAlertModel alert) {
     final notesCtrl = TextEditingController(text: 'Chora ko‘rildi: mutaxassislar konsiliumi chaqirildi va reja moslashtirildi.');
+    String selectedStatus = 'Hal qilindi';
     final app = context.read<AppProvider>();
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Signallarni Ko‘rib Chiqish va Yopish', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('O‘quvchi: ${alert.studentName} (${alert.studentGrade})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-            const SizedBox(height: 4),
-            Text(alert.message, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-            const SizedBox(height: 16),
-            TextField(
-              controller: notesCtrl,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Qabul qilingan chora va xulosalar *',
-                hintText: 'Ushbu muammo bo‘yicha qanday pedagogik qaror qabul qilindi...',
-              ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return AlertDialog(
+            title: const Text('Signalni ko‘rib chiqish va holatini yangilash', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('O‘quvchi: ${alert.studentName} (${alert.studentGrade})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const SizedBox(height: 4),
+                Text('[${alert.ruleCode}] ${alert.ruleTitle}', style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Text(alert.message, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                const SizedBox(height: 14),
+                DropdownButtonFormField<String>(
+                  value: selectedStatus,
+                  decoration: const InputDecoration(labelText: 'Yangi holati *', border: OutlineInputBorder()),
+                  items: const [
+                    DropdownMenuItem(value: 'Ko‘rib chiqilmoqda', child: Text('Ko‘rib chiqilmoqda')),
+                    DropdownMenuItem(value: 'Hal qilindi', child: Text('Hal qilindi (Yopish)')),
+                    DropdownMenuItem(value: 'Rad etildi', child: Text('Rad etildi (Asossiz deb topildi)')),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) setModalState(() => selectedStatus = val);
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: notesCtrl,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Qabul qilingan chora va xulosalar *',
+                    hintText: 'Ushbu muammo bo‘yicha qanday pedagogik qaror qabul qilindi...',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Bekor qilish')),
-          FilledButton(
-            onPressed: () async {
-              await app.resolveAlert(alert.id, notesCtrl.text.trim());
-              if (ctx.mounted) {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Signal muvaffaqiyatli ko‘rib chiqildi va yopildi.')),
-                );
-              }
-            },
-            child: const Text('Yechimni tasdiqlash'),
-          ),
-        ],
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Bekor qilish')),
+              FilledButton(
+                onPressed: () async {
+                  await app.resolveAlert(alert.id, notesCtrl.text.trim());
+                  if (ctx.mounted) {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Signal muvaffaqiyatli saqlandi.')),
+                    );
+                  }
+                },
+                child: const Text('Saqlash'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -97,7 +118,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 Row(
                   children: [
                     FilterChip(
-                      label: Text('Faqat faollar ($unresolvedCount)', style: TextStyle(fontSize: 12, color: _showOnlyUnresolved ? Colors.white : AppColors.textSecondary)),
+                      label: Text('Faqat ochiqlar ($unresolvedCount)', style: TextStyle(fontSize: 12, color: _showOnlyUnresolved ? Colors.white : AppColors.textSecondary)),
                       selected: _showOnlyUnresolved,
                       selectedColor: AppColors.primary,
                       onSelected: (v) => setState(() => _showOnlyUnresolved = v),
@@ -108,7 +129,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 5 TA DOIMIY MONITORING QOIDALARI BLOKI
+            // 6 TA DOIMIY MONITORING QOIDALARI BLOKI
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(18),
@@ -116,15 +137,16 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      '5 ta doimiy ishlovchi avtomatik nazorat qoidasi:',
+                      '6 ta doimiy ishlovchi avtomatik nazorat qoidasi (DB ma’lumotlari asosida):',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     const SizedBox(height: 12),
-                    _buildRuleItem('Qoida 1', 'O‘tkazib yuborilgan darslar', '14 kunda 3+ sababsiz qoldirish'),
-                    _buildRuleItem('Qoida 2', 'Kechikkan baholashlar', 'Davriy nazorat 60 kundan oshganda'),
-                    _buildRuleItem('Qoida 3', 'Rivojlanish turg‘unligi (Stagnatsiya)', 'Ketma-ket 3 ta baholashda siljish bo‘lmasa'),
-                    _buildRuleItem('Qoida 4', 'Ko‘rsatkich pasayishi', 'Oldingi baholashga nisbatan >15% pasayish'),
-                    _buildRuleItem('Qoida 5', 'Muddati o‘tgan ITR maqsadlari', 'Belgilangan muddatda bajarilmagan oraliq vazifalar'),
+                    _buildRuleItem('Qoida 1', 'O‘tkazib yuborilgan mashg‘ulotlar', 'Ketma-ket 2+ marta qoldirilgan yoki bekor qilingan darslar'),
+                    _buildRuleItem('Qoida 2', 'Kechikkan davriy baholashlar', 'Davriy nazorat muddati 60 kundan oshib ketganda'),
+                    _buildRuleItem('Qoida 3', 'Rivojlanish turg‘unligi (Stagnatsiya)', 'Oxirgi 3 ta qiyosiy baholashda siljish bo‘lmasa (0 ball o‘sish)'),
+                    _buildRuleItem('Qoida 4', 'Ko‘rsatkichlarning pasayishi (Regressiya)', 'O‘xshash mezonlar bo‘yicha >15% ko‘rsatkich pasayishi'),
+                    _buildRuleItem('Qoida 5', 'Muddati o‘tgan ITR maqsadlari', 'Belgilangan muddatda bajarilmagan individual ta’limiy maqsadlar'),
+                    _buildRuleItem('Qoida 6', 'Dars kuzatuv xulosasi kiritilmaganligi', 'Bajarilgan mashg‘ulotda professional pedagogik kuzatuv qayd etilmagan'),
                   ],
                 ),
               ),
@@ -133,7 +155,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
 
             // SIGNALLAR RO'YXATI
             Text(
-              'Aniqlangan signallar (${alerts.length} ta):',
+              'Aniqlangan monitoring signallari (${alerts.length} ta):',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
             ),
             const SizedBox(height: 12),
@@ -142,7 +164,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               const Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 40),
-                  child: Text('Hozirda faol monitoring signallari mavjud emas. Tizim barqaror.'),
+                  child: Text('Hozirda monitoring signallari mavjud emas. Barcha ko‘rsatkichlar me’yorda.'),
                 ),
               )
             else
@@ -212,7 +234,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      alt.ruleTitle,
+                      '[${alt.ruleCode}] ${alt.ruleTitle}',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                   ],
@@ -224,9 +246,20 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            Text(
-              'O‘quvchi: ${alt.studentName} (${alt.studentGrade})',
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'O‘quvchi: ${alt.studentName} (${alt.studentGrade})',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                  ),
+                ),
+                if (alt.responsiblePersonName != null)
+                  Text(
+                    'Mas’ul: ${alt.responsiblePersonName!}',
+                    style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                  ),
+              ],
             ),
             const SizedBox(height: 4),
             Text(
@@ -235,29 +268,47 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Tavsiya etilgan harakat: ${alt.suggestedAction}',
+              'Tavsiya: ${alt.suggestedAction}',
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
             ),
-            if (alt.isResolved) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: alt.isResolved ? AppColors.successBg : AppColors.infoBg,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'Holati: ${alt.status}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: alt.isResolved ? AppColors.success : AppColors.info,
+                    ),
+                  ),
+                ),
+                if (!alt.isResolved)
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    ),
+                    icon: const Icon(Icons.check_circle_outline, size: 16),
+                    label: const Text('Ko‘rib chiqish va yechim kiritish', style: TextStyle(fontSize: 12)),
+                    onPressed: () => _showResolveDialog(context, alt),
+                  ),
+              ],
+            ),
+            if (alt.resolvedNotes != null && alt.resolvedNotes!.isNotEmpty) ...[
               const SizedBox(height: 8),
               Container(
+                width: double.infinity,
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(color: AppColors.successBg, borderRadius: BorderRadius.circular(6)),
-                child: Text('Ko‘rib chiqildi: ${alt.resolvedNotes ?? ''}', style: const TextStyle(fontSize: 11, color: AppColors.success)),
-              ),
-            ] else ...[
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerRight,
-                child: FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  ),
-                  icon: const Icon(Icons.check_circle_outline, size: 16),
-                  label: const Text('Ko‘rib chiqish va yechim kiritish', style: TextStyle(fontSize: 12)),
-                  onPressed: () => _showResolveDialog(context, alt),
-                ),
+                child: Text('Yechim bayonnomasi: ${alt.resolvedNotes!}', style: const TextStyle(fontSize: 11, color: AppColors.success)),
               ),
             ],
           ],

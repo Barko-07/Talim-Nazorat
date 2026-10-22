@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 enum UserRole {
   superAdmin,
   institutionAdmin,
+  coordinator,
   psychologist,
   speechTherapist,
   specialEducation,
   teacher,
   reviewer,
+  parent,
 }
 
 extension UserRoleExtension on UserRole {
@@ -17,6 +19,8 @@ extension UserRoleExtension on UserRole {
         return 'Tizim administratori';
       case UserRole.institutionAdmin:
         return 'Muassasa rahbari';
+      case UserRole.coordinator:
+        return 'Ta’lim koordinatori / Mas’ul';
       case UserRole.psychologist:
         return 'Amaliyotchi psixolog';
       case UserRole.speechTherapist:
@@ -27,6 +31,8 @@ extension UserRoleExtension on UserRole {
         return 'Fan o‘qituvchisi / Sinf rahbari';
       case UserRole.reviewer:
         return 'Kuzatuvchi / Metodist';
+      case UserRole.parent:
+        return 'Ota-ona / Vasiy';
     }
   }
 
@@ -36,6 +42,8 @@ extension UserRoleExtension on UserRole {
         return 'Tizim boshqaruvi va ma’muriyat';
       case UserRole.institutionAdmin:
         return 'Muassasa rahbariyati va nazorat';
+      case UserRole.coordinator:
+        return 'ITR koordinatsiyasi va konsilium';
       case UserRole.psychologist:
         return 'Psixologiya va kognitiv diagnostika';
       case UserRole.speechTherapist:
@@ -46,6 +54,8 @@ extension UserRoleExtension on UserRole {
         return 'Pedagogik monitoring va ta’lim';
       case UserRole.reviewer:
         return 'Metodik ekspertiza va monitoring';
+      case UserRole.parent:
+        return 'Farzand ta’limi va uy vazifalari';
     }
   }
 
@@ -55,6 +65,8 @@ extension UserRoleExtension on UserRole {
         return 'Barcha muassasalar, kadrlar va monitoring qoidalari ustidan to‘liq ma’muriy nazorat.';
       case UserRole.institutionAdmin:
         return 'Maktab miqyosida o‘quvchilar, mutaxassislar yuklamasi va konsilium hisobotlari.';
+      case UserRole.coordinator:
+        return 'Ko‘p tarmoqli mutaxassislar xulosalarini umumlashtirish, ITR rejalari, monitoring va yo‘naltirishlarni muvofiqlashtirish.';
       case UserRole.psychologist:
         return 'Kognitiv jarayonlar, diqqat, xotira, emotsional-irodaviy soha va xulq-atvor diagnostikasi.';
       case UserRole.speechTherapist:
@@ -65,6 +77,8 @@ extension UserRoleExtension on UserRole {
         return 'Sinfdagi dars faoliyati, o‘quv motivatsiyasi, topshiriqlar ijrosi va ijtimoiy munosabatlar.';
       case UserRole.reviewer:
         return 'Tashqi tahliliy monitoring, ta’lim samaradorligi audit jurnali (faqat o‘qish huquqi).';
+      case UserRole.parent:
+        return 'Farzandning individual ta’lim rejasi, o‘zlashtirish sur’ati va mutaxassislar tavsiyalarini kuzatish.';
     }
   }
 
@@ -74,6 +88,8 @@ extension UserRoleExtension on UserRole {
         return Icons.admin_panel_settings_rounded;
       case UserRole.institutionAdmin:
         return Icons.account_balance_rounded;
+      case UserRole.coordinator:
+        return Icons.assignment_turned_in_rounded;
       case UserRole.psychologist:
         return Icons.psychology_rounded;
       case UserRole.speechTherapist:
@@ -84,6 +100,8 @@ extension UserRoleExtension on UserRole {
         return Icons.menu_book_rounded;
       case UserRole.reviewer:
         return Icons.visibility_rounded;
+      case UserRole.parent:
+        return Icons.family_restroom_rounded;
     }
   }
 
@@ -93,6 +111,8 @@ extension UserRoleExtension on UserRole {
         return const Color(0xFF1E293B); // Slate
       case UserRole.institutionAdmin:
         return const Color(0xFF0F766E); // Teal
+      case UserRole.coordinator:
+        return const Color(0xFF7C3AED); // Purple
       case UserRole.psychologist:
         return const Color(0xFF6366F1); // Indigo
       case UserRole.speechTherapist:
@@ -103,11 +123,13 @@ extension UserRoleExtension on UserRole {
         return const Color(0xFF059669); // Emerald
       case UserRole.reviewer:
         return const Color(0xFF64748B); // Slate Muted
+      case UserRole.parent:
+        return const Color(0xFFEA580C); // Orange
     }
   }
 
   bool get canCreateAssessments {
-    return this != UserRole.reviewer;
+    return this != UserRole.reviewer && this != UserRole.parent;
   }
 
   List<String> get assessmentCategories {
@@ -139,6 +161,7 @@ extension UserRoleExtension on UserRole {
           'Dars topshiriqlarini o‘zlashtirish',
           'Sinf jamoasida ijtimoiy muloqot',
         ];
+      case UserRole.coordinator:
       case UserRole.superAdmin:
       case UserRole.institutionAdmin:
         return [
@@ -149,6 +172,7 @@ extension UserRoleExtension on UserRole {
           'O‘quv-pedagogik faoliyat',
         ];
       case UserRole.reviewer:
+      case UserRole.parent:
         return [];
     }
   }
@@ -198,6 +222,8 @@ extension UserRoleExtension on UserRole {
         return 'SUPER_ADMIN';
       case UserRole.institutionAdmin:
         return 'INSTITUTION_ADMIN';
+      case UserRole.coordinator:
+        return 'COORDINATOR';
       case UserRole.psychologist:
         return 'PSYCHOLOGIST';
       case UserRole.speechTherapist:
@@ -208,6 +234,8 @@ extension UserRoleExtension on UserRole {
         return 'TEACHER';
       case UserRole.reviewer:
         return 'REVIEWER';
+      case UserRole.parent:
+        return 'PARENT';
     }
   }
 
@@ -217,6 +245,8 @@ extension UserRoleExtension on UserRole {
         return UserRole.superAdmin;
       case 'INSTITUTION_ADMIN':
         return UserRole.institutionAdmin;
+      case 'COORDINATOR':
+        return UserRole.coordinator;
       case 'PSYCHOLOGIST':
         return UserRole.psychologist;
       case 'SPEECH_THERAPIST':
@@ -225,6 +255,8 @@ extension UserRoleExtension on UserRole {
         return UserRole.specialEducation;
       case 'TEACHER':
         return UserRole.teacher;
+      case 'PARENT':
+        return UserRole.parent;
       default:
         return UserRole.reviewer;
     }
@@ -246,6 +278,7 @@ class UserModel {
   final int experienceYears;
   final String? password;
   final bool isActive;
+  final List<String> assignedStudentIds;
 
   UserModel({
     required this.id,
@@ -262,7 +295,44 @@ class UserModel {
     this.experienceYears = 3,
     this.password,
     this.isActive = true,
+    this.assignedStudentIds = const [],
   });
+
+  UserModel copyWith({
+    String? id,
+    String? email,
+    String? fullName,
+    UserRole? role,
+    String? region,
+    String? district,
+    String? institutionId,
+    String? institutionName,
+    String? phone,
+    String? specialization,
+    String? qualificationCategory,
+    int? experienceYears,
+    String? password,
+    bool? isActive,
+    List<String>? assignedStudentIds,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      fullName: fullName ?? this.fullName,
+      role: role ?? this.role,
+      region: region ?? this.region,
+      district: district ?? this.district,
+      institutionId: institutionId ?? this.institutionId,
+      institutionName: institutionName ?? this.institutionName,
+      phone: phone ?? this.phone,
+      specialization: specialization ?? this.specialization,
+      qualificationCategory: qualificationCategory ?? this.qualificationCategory,
+      experienceYears: experienceYears ?? this.experienceYears,
+      password: password ?? this.password,
+      isActive: isActive ?? this.isActive,
+      assignedStudentIds: assignedStudentIds ?? this.assignedStudentIds,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -279,6 +349,7 @@ class UserModel {
         'experienceYears': experienceYears,
         'password': password,
         'isActive': isActive,
+        'assignedStudentIds': assignedStudentIds,
       };
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
@@ -296,5 +367,9 @@ class UserModel {
         experienceYears: json['experienceYears'] as int? ?? 3,
         password: json['password'] as String?,
         isActive: json['isActive'] as bool? ?? true,
+        assignedStudentIds: (json['assignedStudentIds'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            const [],
       );
 }

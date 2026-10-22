@@ -138,6 +138,16 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
         );
       }).toList();
 
+      // Haqiqiy oldingi baholashni bazadan qidirish (soxta ball kiritmaslik)
+      final pastAssessments = app.assessments.where(
+        (a) => a.studentId == student.id && a.category == _category && !a.isDraft,
+      ).toList();
+      double? realPreviousScore;
+      if (pastAssessments.isNotEmpty) {
+        pastAssessments.sort((a, b) => b.assessmentDate.compareTo(a.assessmentDate));
+        realPreviousScore = pastAssessments.first.totalScore;
+      }
+
       final assessment = AssessmentModel(
         id: 'ass_${const Uuid().v4().substring(0, 8)}',
         studentId: student.id,
@@ -157,8 +167,10 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
             : 'Mashg‘ulotlarni belgilangan tartibda davom ettirish.',
         totalScore: total,
         maxScore: maxTotal,
-        previousScore: (total - 6.0).clamp(0.0, maxTotal), // Dinamika ko'rsatkichi
+        previousScore: realPreviousScore,
         criteria: results,
+        followUpAction: _recommendationsCtrl.text.trim(),
+        reviewDate: DateTime.now().add(const Duration(days: 30)),
       );
 
       await app.addAssessment(assessment);
@@ -282,6 +294,29 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                             style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                           ),
                         ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Tibbiy tashxis emasligi haqida rasmiy eslatma
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.infoBg,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: AppColors.info, size: 18),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'Eslatma: Ushbu baholash kasbiy pedagogik-psixologik kuzatuv hisoblanadi va tibbiy tashxis qo‘yish uchun asos bo‘lmaydi.',
+                        style: TextStyle(fontSize: 11, color: AppColors.textPrimary, height: 1.3),
                       ),
                     ),
                   ],

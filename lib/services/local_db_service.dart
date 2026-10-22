@@ -9,6 +9,9 @@ import '../models/iep_model.dart';
 import '../models/monitoring_alert_model.dart';
 import '../models/referral_model.dart';
 import '../models/audit_log_model.dart';
+import '../models/notification_model.dart';
+import 'access_control_service.dart';
+import 'monitoring_rule_engine.dart';
 import 'seed_data.dart';
 
 class LocalDbService {
@@ -17,8 +20,10 @@ class LocalDbService {
   LocalDbService._internal();
 
   final _uuid = const Uuid();
+  final _accessControl = AccessControlService();
+  final _ruleEngine = MonitoringRuleEngine();
 
-  // Xotiradagi kesh jadvallari (Tezkor murojaat)
+  // Xotiradagi kesh jadvallari (Doimiy SharedPreferences bilan sinxron)
   List<UserModel> _users = [];
   List<StudentModel> _students = [];
   List<AssessmentModel> _assessments = [];
@@ -27,6 +32,7 @@ class LocalDbService {
   List<MonitoringAlertModel> _alerts = [];
   List<ReferralModel> _referrals = [];
   List<AuditLogModel> _auditLogs = [];
+  List<NotificationModel> _notifications = [];
 
   bool _isInitialized = false;
 
@@ -34,10 +40,10 @@ class LocalDbService {
     if (_isInitialized) return;
 
     final prefs = await SharedPreferences.getInstance();
-    final isSeeded = prefs.getBool('app_db_seeded_v1') ?? false;
+    final isSeeded = prefs.getBool('app_db_seeded_v2') ?? false;
 
     if (!isSeeded) {
-      // Birinchi marta ishga tushganda sifatli o'zbekcha namuna ma'lumotlar bilan to'ldirish
+      // Yangilangan Chortoq va Koordinator ma'lumotlari bilan boshlang'ich to'ldirish
       _users = List.from(SeedData.users);
       _students = List.from(SeedData.students);
       _assessments = List.from(SeedData.assessments);
@@ -46,13 +52,16 @@ class LocalDbService {
       _alerts = List.from(SeedData.monitoringAlerts);
       _referrals = List.from(SeedData.referrals);
       _auditLogs = List.from(SeedData.auditLogs);
+      _notifications = List.from(SeedData.notifications);
 
       await _persistAll();
-      await prefs.setBool('app_db_seeded_v1', true);
+      await prefs.setBool('app_db_seeded_v2', true);
     } else {
-      // Diskdan yuklab olish
       _loadFromPrefs(prefs);
     }
+
+    // Monitoring qoidalarini bazadagi mavjud real faktlar bo'yicha baholash
+    _reEvaluateRules();
 
     _isInitialized = true;
   }
@@ -114,8 +123,14 @@ class LocalDbService {
               .map((e) => AuditLogModel.fromJson(e))
               .toList()
           : List.from(SeedData.auditLogs);
-    } catch (e) {
-      // Zaxira reja
+
+      final notifRaw = prefs.getString('db_notifications');
+      _notifications = notifRaw != null
+          ? (jsonDecode(notifRaw) as List)
+              .map((e) => NotificationModel.fromJson(e))
+              .toList()
+          : List.from(SeedData.notifications);
+    } catch (_) {
       _users = List.from(SeedData.users);
       _students = List.from(SeedData.students);
       _assessments = List.from(SeedData.assessments);
@@ -124,6 +139,7 @@ class LocalDbService {
       _alerts = List.from(SeedData.monitoringAlerts);
       _referrals = List.from(SeedData.referrals);
       _auditLogs = List.from(SeedData.auditLogs);
+      _notifications = List.from(SeedData.notifications);
     }
   }
 
@@ -137,17 +153,28 @@ class LocalDbService {
     await prefs.setString('db_alerts', jsonEncode(_alerts.map((e) => e.toJson()).toList()));
     await prefs.setString('db_referrals', jsonEncode(_referrals.map((e) => e.toJson()).toList()));
     await prefs.setString('db_audit', jsonEncode(_auditLogs.map((e) => e.toJson()).toList()));
+    await prefs.setString('db_notifications', jsonEncode(_notifications.map((e) => e.toJson()).toList()));
   }
 
-  // --- FOYDALANUVCHILAR VA ROLLOR ---
-  List<UserModel> getUsers() => List.unmodifiable(_users);
+  void _reEvaluateRules() {
+    _alerts = _ruleEngine.evaluateRules(
+      students: _students,
+      assessments: _assessments,
+      sessions: _sessions,
+      iepPlans: _iepPlans,
+      existingAlerts: _alerts,
+    );
+  }
 
-  UserModel? findUserByEmail(String email) {
-    try {
-      return _users.firstWhere((u) => u.email.toLowerCase() == email.toLowerCase().trim());
-    } catch (_) {
-      return null;
+  // ==================== FOYDALANUVCHILAR VA XAVFSIZLIK ====================
+  List<UserModel> getUsers({UserModel? forUser}) {
+    if (forUser == null || forUser.role == UserRole.superAdmin) {
+      return List.unmodifiable(_users);
     }
+    // Maktab doirasida xodimlarni ko'rsatish
+    return _users.where((u) {
+      return _accessControl.isSameInstitution(forUser, u.institutionId, u.institutionName);
+    }).toList();
   }
 
   UserModel? findUserByEmailOrPhone(String identifier) {
@@ -155,9 +182,7 @@ class LocalDbService {
     final digitsOnly = cleanId.replaceAll(RegExp(r'\D'), '');
 
     for (final u in _users) {
-      if (u.email.toLowerCase() == cleanId) {
-        return u;
-      }
+      if (u.email.toLowerCase() == cleanId) return u;
       if (u.phone != null) {
         final userDigits = u.phone!.replaceAll(RegExp(r'\D'), '');
         if (digitsOnly.isNotEmpty &&
@@ -171,18 +196,6 @@ class LocalDbService {
     return null;
   }
 
-  Future<void> registerUser(UserModel user) async {
-    _users.insert(0, user);
-    await _persistAll();
-    await addAuditLog(
-      userFullName: user.fullName,
-      userRole: user.role.label,
-      action: 'REGISTER',
-      entity: 'User',
-      details: '${user.fullName} (${user.role.label}) tizimda yangi ro‘yxatdan o‘tdi',
-    );
-  }
-
   UserModel? getUserById(String id) {
     try {
       return _users.firstWhere((u) => u.id == id);
@@ -191,54 +204,202 @@ class LocalDbService {
     }
   }
 
-  // --- BOLALAR (STUDENTS) ---
-  List<StudentModel> getStudents({String? query, String? grade, String? status}) {
+  Future<void> registerUser(UserModel user) async {
+    _users.insert(0, user);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: user.fullName,
+      userRole: user.role.label,
+      action: 'REGISTER',
+      entity: 'User',
+      details: '${user.fullName} (${user.role.label}) tizimda ro‘yxatdan o‘tdi. Muassasa: ${user.institutionName ?? 'Belgilanmagan'}',
+    );
+  }
+
+  Future<void> updateUser(UserModel updated, {UserModel? byUser}) async {
+    final index = _users.indexWhere((u) => u.id == updated.id);
+    if (index != -1) {
+      _users[index] = updated;
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? updated.fullName,
+        userRole: byUser?.role.label ?? updated.role.label,
+        action: 'UPDATE',
+        entity: 'User',
+        details: '${updated.fullName} ma’lumotlari tahrirlandi.',
+      );
+    }
+  }
+
+  Future<void> toggleUserActive(String userId, bool isActive, {UserModel? byUser}) async {
+    final index = _users.indexWhere((u) => u.id == userId);
+    if (index != -1) {
+      _users[index] = _users[index].copyWith(isActive: isActive);
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? 'Administrator',
+        userRole: byUser?.role.label ?? 'Tizim administratori',
+        action: 'PERMISSION_CHANGE',
+        entity: 'User',
+        details: '${_users[index].fullName} hisobi ${isActive ? 'faollashtirildi' : 'bloklandi'}.',
+      );
+    }
+  }
+
+  // ==================== BOLALAR (STUDENTS) ====================
+  List<StudentModel> getStudents({
+    UserModel? forUser,
+    String? query,
+    String? grade,
+    String? status,
+    bool includeArchived = false,
+  }) {
     return _students.where((s) {
-      if (query != null && query.isNotEmpty) {
-        final q = query.toLowerCase();
+      // 1. Huquq va maktab izolyatsiyasi tekshiruvi
+      if (forUser != null && !_accessControl.canViewStudent(forUser, s)) {
+        return false;
+      }
+      // 2. Arxivlanganlar filtri
+      if (!includeArchived && s.status == 'Arxivlangan' && status != 'Arxivlangan') {
+        return false;
+      }
+      // 3. Qidiruv
+      if (query != null && query.trim().isNotEmpty) {
+        final q = query.toLowerCase().trim();
         final matchesName = s.fullName.toLowerCase().contains(q);
         final matchesNeed = s.primaryNeed.toLowerCase().contains(q);
-        if (!matchesName && !matchesNeed) return false;
+        final matchesGrade = s.grade.toLowerCase().contains(q);
+        if (!matchesName && !matchesNeed && !matchesGrade) return false;
       }
+      // 4. Sinf va status
       if (grade != null && grade.isNotEmpty && s.grade != grade) return false;
       if (status != null && status.isNotEmpty && s.status != status) return false;
       return true;
     }).toList();
   }
 
-  StudentModel? getStudentById(String id) {
+  StudentModel? getStudentById(String id, {UserModel? forUser}) {
     try {
-      return _students.firstWhere((s) => s.id == id);
+      final s = _students.firstWhere((st) => st.id == id);
+      if (forUser != null && !_accessControl.canViewStudent(forUser, s)) {
+        return null;
+      }
+      return s;
     } catch (_) {
       return null;
     }
   }
 
-  Future<void> addStudent(StudentModel student) async {
+  Future<void> addStudent(StudentModel student, {UserModel? byUser}) async {
     _students.insert(0, student);
+    _reEvaluateRules();
     await _persistAll();
     await addAuditLog(
-      userFullName: 'Tizim foydalanuvchisi',
-      userRole: 'Administrator',
+      userFullName: byUser?.fullName ?? 'Foydalanuvchi',
+      userRole: byUser?.role.label ?? 'Xodim',
       action: 'CREATE',
       entity: 'Student',
-      details: '${student.fullName} bazaga qo‘shildi',
+      details: '${student.fullName} (${student.grade}, ${student.institutionName}) bazaga qo‘shildi',
     );
   }
 
-  Future<void> updateStudent(StudentModel updated) async {
+  Future<void> updateStudent(StudentModel updated, {UserModel? byUser}) async {
     final index = _students.indexWhere((s) => s.id == updated.id);
     if (index != -1) {
       _students[index] = updated;
+      _reEvaluateRules();
       await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? 'Foydalanuvchi',
+        userRole: byUser?.role.label ?? 'Xodim',
+        action: 'UPDATE',
+        entity: 'Student',
+        details: '${updated.fullName} anketasi tahrirlandi',
+      );
     }
   }
 
-  // --- BAHOLASHLAR (ASSESSMENTS) ---
-  List<AssessmentModel> getAssessments({String? studentId, String? category}) {
+  Future<void> deactivateStudent(String studentId, String reason, {UserModel? byUser}) async {
+    final index = _students.indexWhere((s) => s.id == studentId);
+    if (index != -1) {
+      final cur = _students[index];
+      _students[index] = cur.copyWith(
+        status: 'Arxivlangan',
+        deactivationReason: reason,
+        deactivatedAt: DateTime.now(),
+      );
+      _reEvaluateRules();
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? 'Administrator',
+        userRole: byUser?.role.label ?? 'Administrator',
+        action: 'ARCHIVE',
+        entity: 'Student',
+        details: '${cur.fullName} arxivlandi. Sabab: $reason',
+      );
+    }
+  }
+
+  Future<void> assignSpecialistToStudent(String studentId, String specialistId, {UserModel? byUser}) async {
+    final sIndex = _students.indexWhere((s) => s.id == studentId);
+    final uIndex = _users.indexWhere((u) => u.id == specialistId);
+    if (sIndex != -1 && uIndex != -1) {
+      final student = _students[sIndex];
+      final specialist = _users[uIndex];
+
+      final updatedSpecIds = List<String>.from(student.assignedSpecialistIds);
+      if (!updatedSpecIds.contains(specialistId)) {
+        updatedSpecIds.add(specialistId);
+      }
+
+      final updatedStudentIds = List<String>.from(specialist.assignedStudentIds);
+      if (!updatedStudentIds.contains(studentId)) {
+        updatedStudentIds.add(studentId);
+      }
+
+      _students[sIndex] = student.copyWith(assignedSpecialistIds: updatedSpecIds);
+      _users[uIndex] = specialist.copyWith(assignedStudentIds: updatedStudentIds);
+
+      await createNotification(
+        NotificationModel(
+          id: 'notif_${_uuid.v4().substring(0, 8)}',
+          recipientUserId: specialistId,
+          title: 'Yangi o‘quvchi biriktirildi',
+          body: '${student.fullName} sizning nazoratingizga biriktirildi.',
+          type: 'ASSIGNMENT',
+          relatedRecordId: student.id,
+          relatedStudentId: student.id,
+          relatedStudentName: student.fullName,
+          createdAt: DateTime.now(),
+        ),
+      );
+
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? 'Administrator',
+        userRole: byUser?.role.label ?? 'Administrator',
+        action: 'PERMISSION_CHANGE',
+        entity: 'Assignment',
+        details: '${specialist.fullName} ${student.fullName}ga mutaxassis sifatida biriktirildi',
+      );
+    }
+  }
+
+  // ==================== BAHOLASHLAR (ASSESSMENTS) ====================
+  List<AssessmentModel> getAssessments({
+    UserModel? forUser,
+    String? studentId,
+    String? category,
+  }) {
     return _assessments.where((a) {
       if (studentId != null && a.studentId != studentId) return false;
       if (category != null && a.category != category) return false;
+      if (forUser != null) {
+        final student = getStudentById(a.studentId);
+        if (student != null && !_accessControl.canViewStudent(forUser, student)) {
+          return false;
+        }
+      }
       return true;
     }).toList();
   }
@@ -251,61 +412,134 @@ class LocalDbService {
     }
   }
 
-  Future<void> addAssessment(AssessmentModel assessment) async {
+  Future<void> addAssessment(AssessmentModel assessment, {UserModel? byUser}) async {
     _assessments.insert(0, assessment);
+    _reEvaluateRules();
     await _persistAll();
     await addAuditLog(
-      userFullName: assessment.specialistName,
-      userRole: assessment.specialistRole,
+      userFullName: byUser?.fullName ?? assessment.specialistName,
+      userRole: byUser?.role.label ?? assessment.specialistRole,
       action: 'CREATE',
       entity: 'Assessment',
-      details: '${assessment.studentName} uchun baholash o‘tkazildi: ${assessment.title}',
+      details: '${assessment.studentName} uchun ${assessment.category} baholash: ${assessment.title} (${assessment.totalScore}/${assessment.maxScore} ball)',
     );
   }
 
-  // --- MASHG'ULOTLAR (SESSIONS) ---
-  List<SessionModel> getSessions({String? studentId, String? specialistId}) {
+  // ==================== MASHG'ULOTLAR (SESSIONS) ====================
+  List<SessionModel> getSessions({
+    UserModel? forUser,
+    String? studentId,
+    String? specialistId,
+  }) {
     return _sessions.where((s) {
       if (studentId != null && s.studentId != studentId) return false;
       if (specialistId != null && s.specialistId != specialistId) return false;
+      if (forUser != null) {
+        final student = getStudentById(s.studentId);
+        if (student != null && !_accessControl.canViewStudent(forUser, student)) {
+          return false;
+        }
+      }
       return true;
     }).toList();
   }
 
-  Future<void> addSession(SessionModel session) async {
+  Future<Map<String, dynamic>> addSession(SessionModel session, {UserModel? byUser}) async {
+    // 1. Takroriy seans tekshiruvi (Bir xil o'quvchi va mutaxassis uchun bir xil vaqtda seans bormi?)
+    final duplicate = _sessions.any((s) =>
+        s.studentId == session.studentId &&
+        s.specialistId == session.specialistId &&
+        s.scheduledAt.year == session.scheduledAt.year &&
+        s.scheduledAt.month == session.scheduledAt.month &&
+        s.scheduledAt.day == session.scheduledAt.day &&
+        s.scheduledAt.hour == session.scheduledAt.hour &&
+        s.scheduledAt.minute == session.scheduledAt.minute);
+
+    if (duplicate) {
+      return {'success': false, 'message': 'Ushbu vaqtda bu mutaxassis va o‘quvchi uchun allaqachon mashg‘ulot rejalashtirilgan.'};
+    }
+
     _sessions.insert(0, session);
+    _reEvaluateRules();
     await _persistAll();
+    await addAuditLog(
+      userFullName: byUser?.fullName ?? session.specialistName,
+      userRole: byUser?.role.label ?? session.specialistRole,
+      action: 'CREATE',
+      entity: 'Session',
+      details: '${session.studentName} bilan ${session.topic} mashg‘uloti rejalashtirildi',
+    );
+    return {'success': true};
   }
 
-  Future<void> updateSessionStatus(String sessionId, String status, {String? notes}) async {
+  Future<void> completeSession(
+    String sessionId, {
+    required String observations,
+    String? nextSteps,
+    UserModel? byUser,
+  }) async {
     final index = _sessions.indexWhere((s) => s.id == sessionId);
     if (index != -1) {
-      final current = _sessions[index];
-      _sessions[index] = SessionModel(
-        id: current.id,
-        studentId: current.studentId,
-        studentName: current.studentName,
-        specialistId: current.specialistId,
-        specialistName: current.specialistName,
-        specialistRole: current.specialistRole,
-        scheduledAt: current.scheduledAt,
-        durationMinutes: current.durationMinutes,
-        status: status,
-        topic: current.topic,
-        activities: current.activities,
-        observations: notes ?? current.observations,
-        nextSteps: current.nextSteps,
+      final cur = _sessions[index];
+      _sessions[index] = cur.copyWith(
+        status: 'Bajarildi',
+        attendanceConfirmed: true,
+        observations: observations,
+        nextSteps: nextSteps ?? cur.nextSteps,
       );
+      _reEvaluateRules();
       await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? cur.specialistName,
+        userRole: byUser?.role.label ?? cur.specialistRole,
+        action: 'UPDATE',
+        entity: 'Session',
+        details: '${cur.studentName} bilan ${cur.topic} mashg‘uloti bajarilgan deb tasdiqlandi',
+      );
     }
   }
 
-  // --- INDIVIDUAL TA'LIM REJASI (ITR / IEP) ---
-  List<IndividualEducationPlanModel> getIepPlans({String? studentId}) {
-    if (studentId != null) {
-      return _iepPlans.where((p) => p.studentId == studentId).toList();
+  Future<void> updateSessionStatus(
+    String sessionId,
+    String status, {
+    String? notes,
+    UserModel? byUser,
+  }) async {
+    final index = _sessions.indexWhere((s) => s.id == sessionId);
+    if (index != -1) {
+      final cur = _sessions[index];
+      _sessions[index] = cur.copyWith(
+        status: status,
+        observations: notes ?? cur.observations,
+        attendanceConfirmed: status == 'Bajarildi',
+      );
+      _reEvaluateRules();
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? cur.specialistName,
+        userRole: byUser?.role.label ?? cur.specialistRole,
+        action: 'UPDATE',
+        entity: 'Session',
+        details: '${cur.studentName} bilan mashg‘ulot holati: $status ga o‘zgardi',
+      );
     }
-    return List.unmodifiable(_iepPlans);
+  }
+
+  // ==================== INDIVIDUAL TA'LIM REJASI (ITR / IEP) ====================
+  List<IndividualEducationPlanModel> getIepPlans({
+    UserModel? forUser,
+    String? studentId,
+  }) {
+    return _iepPlans.where((p) {
+      if (studentId != null && p.studentId != studentId) return false;
+      if (forUser != null) {
+        final student = getStudentById(p.studentId);
+        if (student != null && !_accessControl.canViewStudent(forUser, student)) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
   }
 
   IndividualEducationPlanModel? getIepById(String id) {
@@ -316,7 +550,42 @@ class LocalDbService {
     }
   }
 
-  Future<void> updateObjectiveProgress(String iepId, String objectiveId, int progress) async {
+  Future<void> addIepPlan(IndividualEducationPlanModel plan, {UserModel? byUser}) async {
+    _iepPlans.insert(0, plan);
+    _reEvaluateRules();
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser?.fullName ?? plan.responsibleTeacherName,
+      userRole: byUser?.role.label ?? 'Koordinator',
+      action: 'CREATE',
+      entity: 'IEP',
+      details: '${plan.studentName} uchun ITR rejasi yaratildi (${plan.objectives.length} ta maqsad)',
+    );
+  }
+
+  Future<void> updateIepPlan(IndividualEducationPlanModel plan, {UserModel? byUser}) async {
+    final index = _iepPlans.indexWhere((p) => p.id == plan.id);
+    if (index != -1) {
+      _iepPlans[index] = plan;
+      _reEvaluateRules();
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? plan.responsibleTeacherName,
+        userRole: byUser?.role.label ?? 'Koordinator',
+        action: 'UPDATE',
+        entity: 'IEP',
+        details: '${plan.studentName} ning ITR rejasi yangilandi',
+      );
+    }
+  }
+
+  Future<void> updateObjectiveProgress(
+    String iepId,
+    String objectiveId,
+    int progress, {
+    String? evidenceNotes,
+    UserModel? byUser,
+  }) async {
     final pIndex = _iepPlans.indexWhere((p) => p.id == iepId);
     if (pIndex != -1) {
       final plan = _iepPlans[pIndex];
@@ -327,89 +596,176 @@ class LocalDbService {
               : progress > 0
                   ? 'Jarayonda'
                   : 'Rejalashtirilgan';
-          return PlanObjectiveModel(
-            id: obj.id,
-            title: obj.title,
-            domain: obj.domain,
-            targetDate: obj.targetDate,
-            status: newStatus,
+          return obj.copyWith(
             progressPercent: progress,
-            successCriteria: obj.successCriteria,
+            status: newStatus,
+            evidenceNotes: evidenceNotes ?? obj.evidenceNotes,
           );
         }
         return obj;
       }).toList();
 
-      _iepPlans[pIndex] = IndividualEducationPlanModel(
-        id: plan.id,
-        studentId: plan.studentId,
-        studentName: plan.studentName,
-        studentGrade: plan.studentGrade,
-        institutionName: plan.institutionName,
-        title: plan.title,
-        academicYear: plan.academicYear,
-        startDate: plan.startDate,
-        reviewDate: plan.reviewDate,
-        responsibleTeacherId: plan.responsibleTeacherId,
-        responsibleTeacherName: plan.responsibleTeacherName,
-        status: plan.status,
-        baselineSummary: plan.baselineSummary,
-        longTermGoals: plan.longTermGoals,
-        objectives: newObjectives,
-      );
+      _iepPlans[pIndex] = plan.copyWith(objectives: newObjectives);
+      _reEvaluateRules();
       await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? 'Mutaxassis',
+        userRole: byUser?.role.label ?? 'Xodim',
+        action: 'UPDATE',
+        entity: 'IEP_Objective',
+        details: '${plan.studentName} ITR maqsadi bo‘yicha progress: $progress% qilib belgilandi',
+      );
     }
   }
 
-  // --- MONITORING OGOHLANTIRISHLARI (TRIAGE) ---
-  List<MonitoringAlertModel> getAlerts({bool? onlyUnresolved}) {
-    if (onlyUnresolved == true) {
-      return _alerts.where((a) => !a.isResolved).toList();
-    }
-    return List.unmodifiable(_alerts);
+  // ==================== MONITORING VA ALERT TRIAGE ====================
+  List<MonitoringAlertModel> getAlerts({
+    UserModel? forUser,
+    bool? onlyUnresolved,
+  }) {
+    _reEvaluateRules();
+    return _alerts.where((a) {
+      if (onlyUnresolved == true && a.isResolved) return false;
+      if (forUser != null) {
+        final student = getStudentById(a.studentId);
+        if (student != null && !_accessControl.canViewStudent(forUser, student)) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
   }
 
-  Future<void> resolveAlert(String alertId, String notes) async {
+  Future<void> resolveAlert(String alertId, String notes, {UserModel? byUser}) async {
     final index = _alerts.indexWhere((a) => a.id == alertId);
     if (index != -1) {
-      _alerts[index] = _alerts[index].copyWith(
+      final cur = _alerts[index];
+      _alerts[index] = cur.copyWith(
         isResolved: true,
+        status: 'Hal qilindi',
         resolvedNotes: notes,
         resolvedAt: DateTime.now(),
       );
       await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? 'Mutaxassis',
+        userRole: byUser?.role.label ?? 'Xodim',
+        action: 'RESOLVE',
+        entity: 'Alert',
+        details: 'Monitoring signali (${cur.ruleTitle}) hal etildi: $notes',
+      );
     }
   }
 
-  // --- YO'NALTIRISHLAR (REFERRALS) ---
-  List<ReferralModel> getReferrals() => List.unmodifiable(_referrals);
+  // ==================== YO'NALTIRISHLAR (REFERRALS) ====================
+  List<ReferralModel> getReferrals({UserModel? forUser}) {
+    return _referrals.where((r) {
+      if (forUser != null) {
+        if (!_accessControl.canProcessReferral(forUser, r)) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
+  }
 
-  Future<void> addReferral(ReferralModel referral) async {
+  Future<void> addReferral(ReferralModel referral, {UserModel? byUser}) async {
     _referrals.insert(0, referral);
+    await _persistAll();
+
+    // Agar yo'naltirilgan mutaxassis mavjud bo'lsa unga notifikatsiya jo'natish
+    if (referral.toSpecialistId != null && referral.toSpecialistId!.isNotEmpty) {
+      await createNotification(
+        NotificationModel(
+          id: 'notif_${_uuid.v4().substring(0, 8)}',
+          recipientUserId: referral.toSpecialistId!,
+          title: 'Yangi yo‘naltirish (${referral.priority})',
+          body: '${referral.fromSpecialistName} ${referral.studentName}ni ko‘rikdan o‘tkazish uchun yo‘naltirdi.',
+          type: 'REFERRAL',
+          relatedRecordId: referral.id,
+          relatedStudentId: referral.studentId,
+          relatedStudentName: referral.studentName,
+          createdAt: DateTime.now(),
+        ),
+      );
+    }
+
+    await addAuditLog(
+      userFullName: byUser?.fullName ?? referral.fromSpecialistName,
+      userRole: byUser?.role.label ?? 'Mutaxassis',
+      action: 'CREATE',
+      entity: 'Referral',
+      details: '${referral.studentName} -> ${referral.toSpecialistType} xizmatiga yo‘naltirildi. Sabab: ${referral.reason}',
+    );
+  }
+
+  Future<void> updateReferralStatus(
+    String referralId,
+    String newStatus, {
+    String? outcomeNotes,
+    String? followUpAction,
+    DateTime? followUpDate,
+    UserModel? byUser,
+  }) async {
+    final index = _referrals.indexWhere((r) => r.id == referralId);
+    if (index != -1) {
+      final cur = _referrals[index];
+      _referrals[index] = cur.copyWith(
+        status: newStatus,
+        outcomeNotes: outcomeNotes ?? cur.outcomeNotes,
+        followUpAction: followUpAction ?? cur.followUpAction,
+        followUpDate: followUpDate ?? cur.followUpDate,
+        updatedAt: DateTime.now(),
+      );
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? 'Mutaxassis',
+        userRole: byUser?.role.label ?? 'Xodim',
+        action: 'UPDATE',
+        entity: 'Referral',
+        details: 'Yo‘naltirish holati: $newStatus deb belgilandi (${cur.studentName})',
+      );
+    }
+  }
+
+  // ==================== IN-APP NOTIFIKATSIYALAR ====================
+  List<NotificationModel> getNotifications(String userId) {
+    return _notifications.where((n) => n.recipientUserId == userId).toList();
+  }
+
+  int getUnreadNotificationCount(String userId) {
+    return _notifications.where((n) => n.recipientUserId == userId && !n.isRead).length;
+  }
+
+  Future<void> createNotification(NotificationModel notification) async {
+    _notifications.insert(0, notification);
     await _persistAll();
   }
 
-  Future<void> updateReferralStatus(String referralId, String newStatus) async {
-    final index = _referrals.indexWhere((r) => r.id == referralId);
+  Future<void> markNotificationAsRead(String notificationId) async {
+    final index = _notifications.indexWhere((n) => n.id == notificationId);
     if (index != -1) {
-      final current = _referrals[index];
-      _referrals[index] = ReferralModel(
-        id: current.id,
-        studentId: current.studentId,
-        studentName: current.studentName,
-        fromSpecialistName: current.fromSpecialistName,
-        toSpecialistType: current.toSpecialistType,
-        reason: current.reason,
-        priority: current.priority,
-        status: newStatus,
-        createdAt: current.createdAt,
-      );
+      _notifications[index] = _notifications[index].copyWith(isRead: true);
       await _persistAll();
     }
   }
 
-  // --- AUDIT JURNALI ---
-  List<AuditLogModel> getAuditLogs() => List.unmodifiable(_auditLogs);
+  Future<void> markAllNotificationsAsRead(String userId) async {
+    for (int i = 0; i < _notifications.length; i++) {
+      if (_notifications[i].recipientUserId == userId && !_notifications[i].isRead) {
+        _notifications[i] = _notifications[i].copyWith(isRead: true);
+      }
+    }
+    await _persistAll();
+  }
+
+  // ==================== AUDIT JURNALI ====================
+  List<AuditLogModel> getAuditLogs({UserModel? forUser}) {
+    if (forUser != null && !_accessControl.canViewAuditLogs(forUser)) {
+      return [];
+    }
+    return List.unmodifiable(_auditLogs);
+  }
 
   Future<void> addAuditLog({
     required String userFullName,

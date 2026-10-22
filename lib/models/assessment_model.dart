@@ -36,7 +36,7 @@ class AssessmentModel {
   final String specialistRole;
   final DateTime assessmentDate;
   final String type; // Standart balli (Rubrikali), Sifatli pedagogik kuzatuv
-  final String category; // Nutq, Kognitiv, Sensor, Xulq-atvor
+  final String category; // Nutq, Kognitiv, Sensor, Xulq-atvor, O'quv
   final String title;
   final String notes;
   final String recommendations;
@@ -44,6 +44,9 @@ class AssessmentModel {
   final double maxScore;
   final double? previousScore;
   final List<AssessmentCriterionResult> criteria;
+  final String? followUpAction;
+  final DateTime? reviewDate;
+  final bool isDraft;
 
   AssessmentModel({
     required this.id,
@@ -62,6 +65,9 @@ class AssessmentModel {
     required this.maxScore,
     this.previousScore,
     this.criteria = const [],
+    this.followUpAction,
+    this.reviewDate,
+    this.isDraft = false,
   });
 
   double get percentage => maxScore > 0 ? (totalScore / maxScore) * 100 : 0;
@@ -72,6 +78,50 @@ class AssessmentModel {
     if (diff > 5) return 'O‘sish';
     if (diff < -5) return 'Pasayish';
     return 'Barqarorlik';
+  }
+
+  AssessmentModel copyWith({
+    String? id,
+    String? studentId,
+    String? studentName,
+    String? specialistId,
+    String? specialistName,
+    String? specialistRole,
+    DateTime? assessmentDate,
+    String? type,
+    String? category,
+    String? title,
+    String? notes,
+    String? recommendations,
+    double? totalScore,
+    double? maxScore,
+    double? previousScore,
+    List<AssessmentCriterionResult>? criteria,
+    String? followUpAction,
+    DateTime? reviewDate,
+    bool? isDraft,
+  }) {
+    return AssessmentModel(
+      id: id ?? this.id,
+      studentId: studentId ?? this.studentId,
+      studentName: studentName ?? this.studentName,
+      specialistId: specialistId ?? this.specialistId,
+      specialistName: specialistName ?? this.specialistName,
+      specialistRole: specialistRole ?? this.specialistRole,
+      assessmentDate: assessmentDate ?? this.assessmentDate,
+      type: type ?? this.type,
+      category: category ?? this.category,
+      title: title ?? this.title,
+      notes: notes ?? this.notes,
+      recommendations: recommendations ?? this.recommendations,
+      totalScore: totalScore ?? this.totalScore,
+      maxScore: maxScore ?? this.maxScore,
+      previousScore: previousScore ?? this.previousScore,
+      criteria: criteria ?? this.criteria,
+      followUpAction: followUpAction ?? this.followUpAction,
+      reviewDate: reviewDate ?? this.reviewDate,
+      isDraft: isDraft ?? this.isDraft,
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -91,6 +141,9 @@ class AssessmentModel {
         'maxScore': maxScore,
         'previousScore': previousScore,
         'criteria': criteria.map((c) => c.toJson()).toList(),
+        'followUpAction': followUpAction,
+        'reviewDate': reviewDate?.toIso8601String(),
+        'isDraft': isDraft,
       };
 
   factory AssessmentModel.fromJson(Map<String, dynamic> json) =>
@@ -115,5 +168,10 @@ class AssessmentModel {
                     AssessmentCriterionResult.fromJson(c as Map<String, dynamic>))
                 .toList() ??
             [],
+        followUpAction: json['followUpAction'] as String?,
+        reviewDate: json['reviewDate'] != null
+            ? DateTime.parse(json['reviewDate'] as String)
+            : null,
+        isDraft: json['isDraft'] as bool? ?? false,
       );
 }
