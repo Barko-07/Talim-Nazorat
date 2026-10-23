@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+
 import '../models/user_model.dart';
 import '../services/local_db_service.dart';
 
@@ -50,7 +51,10 @@ class AuthProvider extends ChangeNotifier {
     if (identifier.trim().isEmpty) {
       _isLoading = false;
       notifyListeners();
-      return {'success': false, 'message': 'Telefon raqamingiz yoki elektron pochtangizni kiriting.'};
+      return {
+        'success': false,
+        'message': 'Telefon raqamingiz yoki elektron pochtangizni kiriting.',
+      };
     }
 
     if (password.trim().isEmpty) {
@@ -66,15 +70,18 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return {
         'success': false,
-        'message': 'Ushbu telefon raqam yoki pochta bo‘yicha hisob topilmadi. Iltimos, ro‘yxatdan o‘ting.'
+        'message': 'Ushbu telefon raqam yoki pochta bo‘yicha hisob topilmadi. Iltimos, ro‘yxatdan o‘ting.',
       };
     }
 
     // Soha muvofiqligi tekshiruvi (bitta sohani tanlagandan keyin boshqasiga kirishni taqiqlash)
     if (requiredRole != null) {
-      final isRoleMatch = user.role == requiredRole ||
-          ((requiredRole == UserRole.superAdmin || requiredRole == UserRole.institutionAdmin) &&
-              (user.role == UserRole.superAdmin || user.role == UserRole.institutionAdmin));
+      final isRoleMatch =
+          user.role == requiredRole ||
+          ((requiredRole == UserRole.superAdmin ||
+                  requiredRole == UserRole.institutionAdmin) &&
+              (user.role == UserRole.superAdmin ||
+                  user.role == UserRole.institutionAdmin));
 
       if (!isRoleMatch) {
         _isLoading = false;
@@ -89,10 +96,14 @@ class AuthProvider extends ChangeNotifier {
 
     // Parol tekshiruvi: Agar yangi ro'yxatdan o'tgan bo'lsa o'z paroli, aks holda 'Parol2026!'
     final expectedPassword = user.password ?? 'Parol2026!';
-    if (password.trim() != expectedPassword && password.trim() != 'Parol2026!') {
+    if (password.trim() != expectedPassword &&
+        password.trim() != 'Parol2026!') {
       _isLoading = false;
       notifyListeners();
-      return {'success': false, 'message': 'Kiritilgan parol noto‘g‘ri. Iltimos, qayta urinib ko‘ring.'};
+      return {
+        'success': false,
+        'message': 'Kiritilgan parol noto‘g‘ri. Iltimos, qayta urinib ko‘ring.',
+      };
     }
 
     _currentUser = user;
@@ -136,13 +147,19 @@ class AuthProvider extends ChangeNotifier {
     if (_db.findUserByEmailOrPhone(phone) != null) {
       _isLoading = false;
       notifyListeners();
-      return {'success': false, 'message': 'Ushbu telefon raqam bilan allaqachon hisob ochilgan.'};
+      return {
+        'success': false,
+        'message': 'Ushbu telefon raqam bilan allaqachon hisob ochilgan.',
+      };
     }
 
     if (email.isNotEmpty && _db.findUserByEmailOrPhone(email) != null) {
       _isLoading = false;
       notifyListeners();
-      return {'success': false, 'message': 'Ushbu elektron pochta allaqachon ro‘yxatdan o‘tgan.'};
+      return {
+        'success': false,
+        'message': 'Ushbu elektron pochta allaqachon ro‘yxatdan o‘tgan.',
+      };
     }
 
     final newId = 'usr_${const Uuid().v4().substring(0, 8)}';
@@ -159,8 +176,11 @@ class AuthProvider extends ChangeNotifier {
       specialization: specialization.trim(),
       qualificationCategory: qualificationCategory,
       experienceYears: experienceYears,
-      institutionId: 'inst_namangan_${district.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_').toLowerCase()}',
-      institutionName: institutionName.trim().isNotEmpty ? institutionName.trim() : '14-sonli inklyuziv maktab',
+      institutionId:
+          'inst_namangan_${district.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_').toLowerCase()}',
+      institutionName: institutionName.trim().isNotEmpty
+          ? institutionName.trim()
+          : '14-sonli inklyuziv maktab',
       password: password.trim(),
       isActive: true,
     );
@@ -177,18 +197,28 @@ class AuthProvider extends ChangeNotifier {
     return {'success': true, 'message': 'Muvaffaqiyatli ro‘yxatdan o‘tdingiz!'};
   }
 
-  Future<Map<String, dynamic>> changePassword(String currentPassword, String newPassword) async {
+  Future<Map<String, dynamic>> changePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
     if (_currentUser == null) {
       return {'success': false, 'message': 'Foydalanuvchi tizimga kirmagan.'};
     }
 
     final expectedPassword = _currentUser!.password ?? 'Parol2026!';
-    if (currentPassword.trim() != expectedPassword && currentPassword.trim() != 'Parol2026!') {
-      return {'success': false, 'message': 'Amaldagi parol noto‘g‘ri kiritildi.'};
+    if (currentPassword.trim() != expectedPassword &&
+        currentPassword.trim() != 'Parol2026!') {
+      return {
+        'success': false,
+        'message': 'Amaldagi parol noto‘g‘ri kiritildi.',
+      };
     }
 
     if (newPassword.trim().length < 6) {
-      return {'success': false, 'message': 'Yangi parol kamida 6 ta belgidan iborat bo‘lishi shart.'};
+      return {
+        'success': false,
+        'message': 'Yangi parol kamida 6 ta belgidan iborat bo‘lishi shart.',
+      };
     }
 
     final updated = _currentUser!.copyWith(password: newPassword.trim());
@@ -204,7 +234,10 @@ class AuthProvider extends ChangeNotifier {
       details: '${_currentUser!.fullName} parolini muvaffaqiyatli yangiladi',
     );
 
-    return {'success': true, 'message': 'Parolingiz muvaffaqiyatli o‘zgartirildi.'};
+    return {
+      'success': true,
+      'message': 'Parolingiz muvaffaqiyatli o‘zgartirildi.',
+    };
   }
 
   Future<void> switchRole(UserModel targetUser) async {

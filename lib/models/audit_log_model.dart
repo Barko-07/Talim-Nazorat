@@ -18,22 +18,22 @@ class AuditLogModel {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'userFullName': userFullName,
-        'userRole': userRole,
-        'action': action,
-        'entity': entity,
-        'details': details,
-        'timestamp': timestamp.toIso8601String(),
-      };
+    'id': id,
+    'userFullName': userFullName,
+    'userRole': userRole,
+    'action': action,
+    'entity': entity,
+    'details': details,
+    'timestamp': timestamp.toIso8601String(),
+  };
 
   factory AuditLogModel.fromJson(Map<String, dynamic> json) => AuditLogModel(
-        id: json['id'] as String,
-        userFullName: json['userFullName'] as String,
-        userRole: json['userRole'] as String,
-        action: json['action'] as String,
-        entity: json['entity'] as String,
-        details: json['details'] as String,
-        timestamp: DateTime.parse(json['timestamp'] as String),
-      );
+    id: json['id'] as String,
+    userFullName: json['userFullName'] as String,
+    userRole: json['userRole'] as String,
+    action: json['action'] as String,
+    entity: json['entity'] as String,
+    details: json['details'] as String,
+    timestamp: DateTime.parse(json['timestamp'] as String),
+  );
 }

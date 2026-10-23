@@ -45,21 +45,24 @@ void main() {
       expect(student.age, greaterThanOrEqualTo(9));
     });
 
-    test('LocalDbService initializes with seed data and zero Supabase', () async {
-      final db = LocalDbService();
-      await db.init();
+    test(
+      'LocalDbService initializes with seed data and zero Supabase',
+      () async {
+        final db = LocalDbService();
+        await db.init();
 
-      final students = db.getStudents();
-      expect(students.isNotEmpty, true);
-      expect(students.length, greaterThanOrEqualTo(6));
+        final students = db.getStudents();
+        expect(students.isNotEmpty, true);
+        expect(students.length, greaterThanOrEqualTo(6));
 
-      final users = db.getUsers();
-      expect(users.isNotEmpty, true);
-      expect(users.any((u) => u.email == 'admin@talim.uz'), true);
+        final users = db.getUsers();
+        expect(users.isNotEmpty, true);
+        expect(users.any((u) => u.email == 'admin@talim.uz'), true);
 
-      final alerts = db.getAlerts();
-      expect(alerts.isNotEmpty, true);
-    });
+        final alerts = db.getAlerts();
+        expect(alerts.isNotEmpty, true);
+      },
+    );
 
     test('NamanganData provides all 14 administrative districts and realistic school data', () {
       expect(NamanganData.defaultRegion, 'Namangan viloyati');
@@ -83,28 +86,39 @@ void main() {
       ];
 
       for (final district in requiredDistricts) {
-        expect(NamanganData.districts.contains(district), true, reason: '$district mavjud bo‘lishi lozim');
+        expect(
+          NamanganData.districts.contains(district),
+          true,
+          reason: '$district mavjud bo‘lishi lozim',
+        );
         final schools = NamanganData.getSchoolsForDistrict(district);
-        expect(schools.isNotEmpty, true, reason: '$district da kamida 1 ta maktab bo‘lishi lozim');
+        expect(
+          schools.isNotEmpty,
+          true,
+          reason: '$district da kamida 1 ta maktab bo‘lishi lozim',
+        );
       }
     });
 
-    test('UserModel stores locked profession, Namangan region and district', () {
-      final user = UserModel(
-        id: 'u_namangan_1',
-        email: 'logoped.chust@talim.uz',
-        fullName: 'Ziyodaxon Rahimova',
-        role: UserRole.speechTherapist,
-        region: 'Namangan viloyati',
-        district: 'Chust tumani',
-        institutionName: '12-sonli inklyuziv maktab',
-      );
+    test(
+      'UserModel stores locked profession, Namangan region and district',
+      () {
+        final user = UserModel(
+          id: 'u_namangan_1',
+          email: 'logoped.chust@talim.uz',
+          fullName: 'Ziyodaxon Rahimova',
+          role: UserRole.speechTherapist,
+          region: 'Namangan viloyati',
+          district: 'Chust tumani',
+          institutionName: '12-sonli inklyuziv maktab',
+        );
 
-      expect(user.role, UserRole.speechTherapist);
-      expect(user.role.professionTitle, 'Logopediya va nutq rivojlanishi');
-      expect(user.region, 'Namangan viloyati');
-      expect(user.district, 'Chust tumani');
-      expect(user.institutionName, '12-sonli inklyuziv maktab');
-    });
+        expect(user.role, UserRole.speechTherapist);
+        expect(user.role.professionTitle, 'Logopediya va nutq rivojlanishi');
+        expect(user.region, 'Namangan viloyati');
+        expect(user.district, 'Chust tumani');
+        expect(user.institutionName, '12-sonli inklyuziv maktab');
+      },
+    );
   });
 }

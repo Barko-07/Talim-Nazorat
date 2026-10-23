@@ -6,21 +6,29 @@ import '../models/iep_model.dart';
 import '../models/referral_model.dart';
 
 class AccessControlService {
-  static final AccessControlService _instance = AccessControlService._internal();
+  static final AccessControlService _instance =
+      AccessControlService._internal();
   factory AccessControlService() => _instance;
   AccessControlService._internal();
 
   // ==================== MAKTAB / TASHKILOT BO'YICHA IZOLYATSIYA ====================
   /// Foydalanuvchi va o'quvchi bir xil muassasaga tegishlimi?
-  bool isSameInstitution(UserModel user, String? institutionId, String? institutionName) {
-    if (user.role == UserRole.superAdmin) return true; // Tizim administratori butun viloyatni ko'radi
+  bool isSameInstitution(
+    UserModel user,
+    String? institutionId,
+    String? institutionName,
+  ) {
+    if (user.role == UserRole.superAdmin) {
+      return true; // Tizim administratori butun viloyatni ko'radi
+    }
     if (user.institutionId != null && institutionId != null) {
       if (user.institutionId == institutionId) return true;
     }
     if (user.institutionName != null && institutionName != null) {
       final uName = user.institutionName!.trim().toLowerCase();
       final tName = institutionName.trim().toLowerCase();
-      if (uName.isNotEmpty && (uName == tName || uName.contains(tName) || tName.contains(uName))) {
+      if (uName.isNotEmpty &&
+          (uName == tName || uName.contains(tName) || tName.contains(uName))) {
         return true;
       }
     }
@@ -34,7 +42,11 @@ class AccessControlService {
     if (user.role == UserRole.superAdmin) return true;
 
     // Maktab izolyatsiyasi tekshiruvi
-    final sameSchool = isSameInstitution(user, student.institutionId, student.institutionName);
+    final sameSchool = isSameInstitution(
+      user,
+      student.institutionId,
+      student.institutionName,
+    );
     if (!sameSchool) return false;
 
     // Maktab rahbari, koordinator yoki sinf o'qituvchisi butun maktab o'quvchilarini ko'ra oladi
@@ -61,14 +73,23 @@ class AccessControlService {
   bool canEditStudent(UserModel user, StudentModel? student) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin) return true;
-    if (user.role == UserRole.institutionAdmin || user.role == UserRole.coordinator) {
+    if (user.role == UserRole.institutionAdmin ||
+        user.role == UserRole.coordinator) {
       if (student == null) return true;
-      return isSameInstitution(user, student.institutionId, student.institutionName);
+      return isSameInstitution(
+        user,
+        student.institutionId,
+        student.institutionName,
+      );
     }
     if (user.role == UserRole.teacher) {
       // Sinf rahbari o'z sinfidagi o'quvchini tahrirlay oladi
       if (student == null) return true;
-      return isSameInstitution(user, student.institutionId, student.institutionName);
+      return isSameInstitution(
+        user,
+        student.institutionId,
+        student.institutionName,
+      );
     }
     return false;
   }
@@ -88,7 +109,11 @@ class AccessControlService {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin) return true;
     if (user.role == UserRole.institutionAdmin) {
-      return isSameInstitution(user, student.institutionId, student.institutionName);
+      return isSameInstitution(
+        user,
+        student.institutionId,
+        student.institutionName,
+      );
     }
     return false;
   }
@@ -97,8 +122,16 @@ class AccessControlService {
   /// Baholash o'tkazish ruxsati
   bool canCreateAssessment(UserModel user, StudentModel student) {
     if (!user.isActive) return false;
-    if (user.role == UserRole.reviewer || user.role == UserRole.parent) return false;
-    if (!isSameInstitution(user, student.institutionId, student.institutionName)) return false;
+    if (user.role == UserRole.reviewer || user.role == UserRole.parent) {
+      return false;
+    }
+    if (!isSameInstitution(
+      user,
+      student.institutionId,
+      student.institutionName,
+    )) {
+      return false;
+    }
 
     // Mutaxassislar (Psixolog, Logoped, Defektolog, O'qituvchi, Koordinator, Admin)
     return user.role.canCreateAssessments;
@@ -117,14 +150,23 @@ class AccessControlService {
   /// Mashg'ulot rejalashtirish
   bool canScheduleSession(UserModel user, StudentModel student) {
     if (!user.isActive) return false;
-    if (user.role == UserRole.reviewer || user.role == UserRole.parent) return false;
-    return isSameInstitution(user, student.institutionId, student.institutionName);
+    if (user.role == UserRole.reviewer || user.role == UserRole.parent) {
+      return false;
+    }
+    return isSameInstitution(
+      user,
+      student.institutionId,
+      student.institutionName,
+    );
   }
 
   /// Mashg'ulotni bajarilgan deb belgilash (Faqat mas'ul mutaxassis yoki Admin)
   bool canCompleteSession(UserModel user, SessionModel session) {
     if (!user.isActive) return false;
-    if (user.role == UserRole.superAdmin || user.role == UserRole.institutionAdmin) return true;
+    if (user.role == UserRole.superAdmin ||
+        user.role == UserRole.institutionAdmin) {
+      return true;
+    }
     return session.specialistId == user.id;
   }
 
@@ -133,13 +175,20 @@ class AccessControlService {
   bool canManageIep(UserModel user, IndividualEducationPlanModel? plan) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin) return true;
-    if (user.role == UserRole.institutionAdmin || user.role == UserRole.coordinator) return true;
+    if (user.role == UserRole.institutionAdmin ||
+        user.role == UserRole.coordinator) {
+      return true;
+    }
     if (plan != null && plan.responsibleTeacherId == user.id) return true;
     return false;
   }
 
   /// ITR maqsadlaridagi progressni yangilash
-  bool canUpdateObjectiveProgress(UserModel user, IndividualEducationPlanModel plan, PlanObjectiveModel objective) {
+  bool canUpdateObjectiveProgress(
+    UserModel user,
+    IndividualEducationPlanModel plan,
+    PlanObjectiveModel objective,
+  ) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin ||
         user.role == UserRole.institutionAdmin ||
@@ -161,12 +210,15 @@ class AccessControlService {
   /// Yo'naltirishni ko'rib chiqish va qabul qilish/yakunlash
   bool canProcessReferral(UserModel user, ReferralModel referral) {
     if (!user.isActive) return false;
-    if (user.role == UserRole.superAdmin || user.role == UserRole.institutionAdmin || user.role == UserRole.coordinator) {
+    if (user.role == UserRole.superAdmin ||
+        user.role == UserRole.institutionAdmin ||
+        user.role == UserRole.coordinator) {
       return true;
     }
     if (referral.fromSpecialistId == user.id) return true;
     if (referral.toSpecialistId == user.id) return true;
-    if (referral.toSpecialistType == user.role.label || referral.toSpecialistType == user.specialization) {
+    if (referral.toSpecialistType == user.role.label ||
+        referral.toSpecialistType == user.specialization) {
       return true;
     }
     return false;
@@ -176,7 +228,8 @@ class AccessControlService {
   /// Yangi xodim qo'shish, rol va maktab biriktirish
   bool canManageUsers(UserModel user) {
     if (!user.isActive) return false;
-    return user.role == UserRole.superAdmin || user.role == UserRole.institutionAdmin;
+    return user.role == UserRole.superAdmin ||
+        user.role == UserRole.institutionAdmin;
   }
 
   /// Audit jurnalini ko'rish

@@ -157,10 +157,11 @@ class NamanganData {
   };
 
   static List<String> getSchoolsForDistrict(String district) {
-    return districtSchools[district] ?? [
-      '1-sonli umumiy o‘rta ta’lim maktabi',
-      '14-sonli inklyuziv maktab',
-      '25-sonli umumiy o‘rta ta’lim maktabi',
-    ];
+    return districtSchools[district] ??
+        [
+          '1-sonli umumiy o‘rta ta’lim maktabi',
+          '14-sonli inklyuziv maktab',
+          '25-sonli umumiy o‘rta ta’lim maktabi',
+        ];
   }
 }

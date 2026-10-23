@@ -1,7 +1,8 @@
 class PlanObjectiveModel {
   final String id;
   final String title;
-  final String domain; // Nutq, Kognitiv, O'quv, Ijtimoiy-hissiy, Sensor-motorika
+  final String
+  domain; // Nutq, Kognitiv, O'quv, Ijtimoiy-hissiy, Sensor-motorika
   final String? startingLevel; // Boshlang'ich daraja
   final String? targetLevel; // Kutilayotgan maqsadli daraja
   final String? measurementCriteria; // O'lchov mezoni
@@ -56,8 +57,10 @@ class PlanObjectiveModel {
       startingLevel: startingLevel ?? this.startingLevel,
       targetLevel: targetLevel ?? this.targetLevel,
       measurementCriteria: measurementCriteria ?? this.measurementCriteria,
-      responsibleSpecialistId: responsibleSpecialistId ?? this.responsibleSpecialistId,
-      responsibleSpecialistName: responsibleSpecialistName ?? this.responsibleSpecialistName,
+      responsibleSpecialistId:
+          responsibleSpecialistId ?? this.responsibleSpecialistId,
+      responsibleSpecialistName:
+          responsibleSpecialistName ?? this.responsibleSpecialistName,
       startDate: startDate ?? this.startDate,
       targetDate: targetDate ?? this.targetDate,
       status: status ?? this.status,
@@ -68,21 +71,21 @@ class PlanObjectiveModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'domain': domain,
-        'startingLevel': startingLevel,
-        'targetLevel': targetLevel,
-        'measurementCriteria': measurementCriteria,
-        'responsibleSpecialistId': responsibleSpecialistId,
-        'responsibleSpecialistName': responsibleSpecialistName,
-        'startDate': startDate?.toIso8601String(),
-        'targetDate': targetDate.toIso8601String(),
-        'status': status,
-        'progressPercent': progressPercent,
-        'successCriteria': successCriteria,
-        'evidenceNotes': evidenceNotes,
-      };
+    'id': id,
+    'title': title,
+    'domain': domain,
+    'startingLevel': startingLevel,
+    'targetLevel': targetLevel,
+    'measurementCriteria': measurementCriteria,
+    'responsibleSpecialistId': responsibleSpecialistId,
+    'responsibleSpecialistName': responsibleSpecialistName,
+    'startDate': startDate?.toIso8601String(),
+    'targetDate': targetDate.toIso8601String(),
+    'status': status,
+    'progressPercent': progressPercent,
+    'successCriteria': successCriteria,
+    'evidenceNotes': evidenceNotes,
+  };
 
   factory PlanObjectiveModel.fromJson(Map<String, dynamic> json) =>
       PlanObjectiveModel(
@@ -189,7 +192,8 @@ class IndividualEducationPlanModel {
       startDate: startDate ?? this.startDate,
       reviewDate: reviewDate ?? this.reviewDate,
       responsibleTeacherId: responsibleTeacherId ?? this.responsibleTeacherId,
-      responsibleTeacherName: responsibleTeacherName ?? this.responsibleTeacherName,
+      responsibleTeacherName:
+          responsibleTeacherName ?? this.responsibleTeacherName,
       coordinatorId: coordinatorId ?? this.coordinatorId,
       coordinatorName: coordinatorName ?? this.coordinatorName,
       status: status ?? this.status,
@@ -201,25 +205,25 @@ class IndividualEducationPlanModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'studentId': studentId,
-        'studentName': studentName,
-        'studentGrade': studentGrade,
-        'institutionName': institutionName,
-        'title': title,
-        'academicYear': academicYear,
-        'startDate': startDate.toIso8601String(),
-        'reviewDate': reviewDate.toIso8601String(),
-        'responsibleTeacherId': responsibleTeacherId,
-        'responsibleTeacherName': responsibleTeacherName,
-        'coordinatorId': coordinatorId,
-        'coordinatorName': coordinatorName,
-        'status': status,
-        'baselineSummary': baselineSummary,
-        'longTermGoals': longTermGoals,
-        'supportStrategies': supportStrategies,
-        'objectives': objectives.map((o) => o.toJson()).toList(),
-      };
+    'id': id,
+    'studentId': studentId,
+    'studentName': studentName,
+    'studentGrade': studentGrade,
+    'institutionName': institutionName,
+    'title': title,
+    'academicYear': academicYear,
+    'startDate': startDate.toIso8601String(),
+    'reviewDate': reviewDate.toIso8601String(),
+    'responsibleTeacherId': responsibleTeacherId,
+    'responsibleTeacherName': responsibleTeacherName,
+    'coordinatorId': coordinatorId,
+    'coordinatorName': coordinatorName,
+    'status': status,
+    'baselineSummary': baselineSummary,
+    'longTermGoals': longTermGoals,
+    'supportStrategies': supportStrategies,
+    'objectives': objectives.map((o) => o.toJson()).toList(),
+  };
 
   factory IndividualEducationPlanModel.fromJson(Map<String, dynamic> json) =>
       IndividualEducationPlanModel(
@@ -227,7 +231,8 @@ class IndividualEducationPlanModel {
         studentId: json['studentId'] as String,
         studentName: json['studentName'] as String? ?? '',
         studentGrade: json['studentGrade'] as String? ?? '',
-        institutionName: json['institutionName'] as String? ?? '14-Inklyuziv maktab',
+        institutionName:
+            json['institutionName'] as String? ?? '14-Inklyuziv maktab',
         title: json['title'] as String,
         academicYear: json['academicYear'] as String,
         startDate: DateTime.parse(json['startDate'] as String),
@@ -240,9 +245,11 @@ class IndividualEducationPlanModel {
         baselineSummary: json['baselineSummary'] as String,
         longTermGoals: json['longTermGoals'] as String,
         supportStrategies: json['supportStrategies'] as String?,
-        objectives: (json['objectives'] as List<dynamic>?)
-                ?.map((o) =>
-                    PlanObjectiveModel.fromJson(o as Map<String, dynamic>))
+        objectives:
+            (json['objectives'] as List<dynamic>?)
+                ?.map(
+                  (o) => PlanObjectiveModel.fromJson(o as Map<String, dynamic>),
+                )
                 .toList() ??
             [],
       );

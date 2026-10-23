@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+
 import '../core/constants/app_colors.dart';
 import '../models/user_model.dart';
-import '../models/notification_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/app_provider.dart';
 import 'dashboard/dashboard_screen.dart';
@@ -70,23 +70,37 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.notifications_active, color: AppColors.primary, size: 22),
+                          const Icon(
+                            Icons.notifications_active,
+                            color: AppColors.primary,
+                            size: 22,
+                          ),
                           const SizedBox(width: 8),
                           const Text(
                             'Bildirishnomalar va Vazifalar',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                           if (unreadCount > 0) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.error,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 '$unreadCount ta yangi',
-                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -95,10 +109,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       if (auth.currentUser != null && unreadCount > 0)
                         TextButton(
                           onPressed: () async {
-                            await app.markAllNotificationsAsRead(auth.currentUser!.id);
+                            await app.markAllNotificationsAsRead(
+                              auth.currentUser!.id,
+                            );
                             setSheetState(() {});
                           },
-                          child: const Text('Barchasini o‘qilgan qilish', style: TextStyle(fontSize: 12)),
+                          child: const Text(
+                            'Barchasini o‘qilgan qilish',
+                            style: TextStyle(fontSize: 12),
+                          ),
                         ),
                     ],
                   ),
@@ -109,46 +128,72 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.notifications_off_outlined, size: 40, color: AppColors.textMuted),
+                                Icon(
+                                  Icons.notifications_off_outlined,
+                                  size: 40,
+                                  color: AppColors.textMuted,
+                                ),
                                 SizedBox(height: 8),
-                                Text('Hozircha yangi bildirishnomalar yo‘q', style: TextStyle(color: AppColors.textMuted)),
+                                Text(
+                                  'Hozircha yangi bildirishnomalar yo‘q',
+                                  style: TextStyle(color: AppColors.textMuted),
+                                ),
                               ],
                             ),
                           )
                         : ListView.separated(
                             itemCount: notifications.length,
-                            separatorBuilder: (_, __) => const Divider(height: 1),
+                            separatorBuilder: (_, _) =>
+                                const Divider(height: 1),
                             itemBuilder: (c, i) {
                               final notif = notifications[i];
                               return ListTile(
                                 contentPadding: EdgeInsets.zero,
                                 leading: CircleAvatar(
-                                  backgroundColor: notif.isRead ? AppColors.borderLight : AppColors.primaryLight,
+                                  backgroundColor: notif.isRead
+                                      ? AppColors.borderLight
+                                      : AppColors.primaryLight,
                                   child: Icon(
                                     notif.type == 'ALERT'
                                         ? Icons.warning_amber_rounded
                                         : notif.type == 'REFERRAL'
-                                            ? Icons.alt_route
-                                            : Icons.assignment,
+                                        ? Icons.alt_route
+                                        : Icons.assignment,
                                     color: notif.isRead
                                         ? AppColors.textMuted
-                                        : (notif.type == 'ALERT' ? AppColors.error : AppColors.primary),
+                                        : (notif.type == 'ALERT'
+                                              ? AppColors.error
+                                              : AppColors.primary),
                                     size: 20,
                                   ),
                                 ),
                                 title: Text(
                                   notif.title,
                                   style: TextStyle(
-                                    fontWeight: notif.isRead ? FontWeight.normal : FontWeight.bold,
+                                    fontWeight: notif.isRead
+                                        ? FontWeight.normal
+                                        : FontWeight.bold,
                                     fontSize: 13,
                                   ),
                                 ),
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(notif.body, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                    Text(
+                                      notif.body,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
                                     const SizedBox(height: 2),
-                                    Text(df.format(notif.createdAt), style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                                    Text(
+                                      df.format(notif.createdAt),
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        color: AppColors.textMuted,
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 trailing: !notif.isRead
@@ -162,16 +207,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                       )
                                     : null,
                                 onTap: () async {
+                                  final navigator = Navigator.of(context);
+                                  final sheetNav = Navigator.of(ctx);
+                                  final studentId = notif.relatedStudentId;
                                   if (!notif.isRead) {
                                     await app.markNotificationAsRead(notif.id);
                                     setSheetState(() {});
                                   }
-                                  if (notif.relatedStudentId != null) {
-                                    Navigator.pop(ctx);
-                                    Navigator.push(
-                                      context,
+                                  if (studentId != null) {
+                                    sheetNav.pop();
+                                    navigator.push(
                                       MaterialPageRoute(
-                                        builder: (_) => StudentDetailScreen(studentId: notif.relatedStudentId!),
+                                        builder: (_) => StudentDetailScreen(
+                                          studentId: studentId,
+                                        ),
                                       ),
                                     );
                                   }
@@ -203,16 +252,56 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   ];
 
   final List<Map<String, dynamic>> _navItems = const [
-    {'title': 'Boshqaruv', 'icon': Icons.dashboard_outlined, 'activeIcon': Icons.dashboard_rounded},
-    {'title': 'Bolalar bazasi', 'icon': Icons.people_outline_rounded, 'activeIcon': Icons.people_rounded},
-    {'title': 'Baholashlar', 'icon': Icons.assignment_outlined, 'activeIcon': Icons.assignment_rounded},
-    {'title': 'Mashg‘ulotlar', 'icon': Icons.calendar_today_outlined, 'activeIcon': Icons.calendar_today_rounded},
-    {'title': 'ITR rejalari', 'icon': Icons.menu_book_outlined, 'activeIcon': Icons.menu_book_rounded},
-    {'title': 'Monitoring', 'icon': Icons.shield_outlined, 'activeIcon': Icons.shield_rounded},
-    {'title': 'Hisobotlar', 'icon': Icons.bar_chart_outlined, 'activeIcon': Icons.bar_chart_rounded},
-    {'title': 'Mutaxassislar', 'icon': Icons.badge_outlined, 'activeIcon': Icons.badge_rounded},
-    {'title': 'Yo‘naltirishlar', 'icon': Icons.alt_route_rounded, 'activeIcon': Icons.alt_route_rounded},
-    {'title': 'Sozlamalar', 'icon': Icons.settings_outlined, 'activeIcon': Icons.settings_rounded},
+    {
+      'title': 'Boshqaruv',
+      'icon': Icons.dashboard_outlined,
+      'activeIcon': Icons.dashboard_rounded,
+    },
+    {
+      'title': 'Bolalar bazasi',
+      'icon': Icons.people_outline_rounded,
+      'activeIcon': Icons.people_rounded,
+    },
+    {
+      'title': 'Baholashlar',
+      'icon': Icons.assignment_outlined,
+      'activeIcon': Icons.assignment_rounded,
+    },
+    {
+      'title': 'Mashg‘ulotlar',
+      'icon': Icons.calendar_today_outlined,
+      'activeIcon': Icons.calendar_today_rounded,
+    },
+    {
+      'title': 'ITR rejalari',
+      'icon': Icons.menu_book_outlined,
+      'activeIcon': Icons.menu_book_rounded,
+    },
+    {
+      'title': 'Monitoring',
+      'icon': Icons.shield_outlined,
+      'activeIcon': Icons.shield_rounded,
+    },
+    {
+      'title': 'Hisobotlar',
+      'icon': Icons.bar_chart_outlined,
+      'activeIcon': Icons.bar_chart_rounded,
+    },
+    {
+      'title': 'Mutaxassislar',
+      'icon': Icons.badge_outlined,
+      'activeIcon': Icons.badge_rounded,
+    },
+    {
+      'title': 'Yo‘naltirishlar',
+      'icon': Icons.alt_route_rounded,
+      'activeIcon': Icons.alt_route_rounded,
+    },
+    {
+      'title': 'Sozlamalar',
+      'icon': Icons.settings_outlined,
+      'activeIcon': Icons.settings_rounded,
+    },
   ];
 
   @override
@@ -226,37 +315,53 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
+        titleSpacing: 16,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1.0),
+          child: Divider(height: 1, thickness: 1, color: AppColors.border),
+        ),
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(8),
+                color: AppColors.primaryLight,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
               ),
-              child: const Icon(Icons.school_rounded, color: Colors.white, size: 20),
+              child: const Icon(
+                Icons.account_balance_rounded,
+                color: AppColors.primary,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'TA’LIM NAZORAT',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'TA’LIM NAZORAT',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.3,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                Text(
-                  user?.institutionName ?? '14-Inklyuziv maktab',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textMuted,
-                    fontWeight: FontWeight.normal,
+                  Text(
+                    user?.institutionName ?? '5-sonli umumiy o‘rta ta’lim maktabi',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textMuted,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -266,7 +371,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.notifications_none_rounded),
+                icon: const Icon(Icons.notifications_none_rounded, color: AppColors.textSecondary),
                 tooltip: 'Bildirishnomalar',
                 onPressed: () => _showNotificationsSheet(context),
               ),
@@ -280,7 +385,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       color: AppColors.error,
                       shape: BoxShape.circle,
                     ),
-                    constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
                     child: Text(
                       '$unreadNotifCount',
                       textAlign: TextAlign.center,
@@ -299,7 +407,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           PopupMenuButton<String>(
             tooltip: 'Foydalanuvchi menyusi',
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
                   CircleAvatar(
@@ -308,7 +416,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     child: Text(
                       (user?.fullName ?? 'U').substring(0, 1),
                       style: const TextStyle(
-                        color: AppColors.primaryDark,
+                        color: AppColors.primary,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
                       ),
@@ -336,7 +444,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         ),
                       ],
                     ),
-                    const Icon(Icons.arrow_drop_down, color: AppColors.textMuted),
+                    const Icon(
+                      Icons.arrow_drop_down,
+                      color: AppColors.textMuted,
+                    ),
                   ],
                 ],
               ),
@@ -358,7 +469,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 enabled: false,
                 child: Text(
                   '${user?.fullName}\n${user?.role.label}',
-                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
               const PopupMenuDivider(),
@@ -384,64 +498,219 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               ),
             ],
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
         ],
       ),
       drawer: isDesktop
           ? null
           : Drawer(
-              child: ListView(
-                padding: EdgeInsets.zero,
+              backgroundColor: Colors.white,
+              child: Column(
                 children: [
-                  DrawerHeader(
-                    decoration: const BoxDecoration(color: AppColors.primary),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
+                  // Modern Governmental Drawer Header
+                  SafeArea(
+                    bottom: false,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                      decoration: const BoxDecoration(
+                        color: AppColors.background,
+                        border: Border(bottom: BorderSide(color: AppColors.border)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.account_balance_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'TA’LIM NAZORAT',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.2,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Yagona monitoring tizimi',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: AppColors.textMuted,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          // Foydalanuvchi kartochkasi
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: AppColors.primaryLight,
+                                  child: Text(
+                                    (user?.fullName ?? 'U').substring(0, 1),
+                                    style: const TextStyle(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        user?.fullName ?? 'Mutaxassis',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primaryLight,
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          user?.role.label ?? '',
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Menyular ro'yxati
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                      itemCount: _navItems.length,
+                      itemBuilder: (context, idx) {
+                        final item = _navItems[idx];
+                        final isSel = _selectedIndex == idx;
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 2),
+                          decoration: BoxDecoration(
+                            color: isSel ? AppColors.primaryLight : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ListTile(
+                            dense: true,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            leading: Icon(
+                              isSel ? item['activeIcon'] : item['icon'],
+                              color: isSel ? AppColors.primary : AppColors.textSecondary,
+                              size: 20,
+                            ),
+                            title: Text(
+                              item['title'],
+                              style: TextStyle(
+                                fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+                                color: isSel ? AppColors.primary : AppColors.textPrimary,
+                                fontSize: 13,
+                              ),
+                            ),
+                            selected: isSel,
+                            onTap: () {
+                              setState(() => _selectedIndex = idx);
+                              Navigator.pop(context);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  // Drawer Bottom Footer
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: const BoxDecoration(
+                      border: Border(top: BorderSide(color: AppColors.border)),
+                    ),
+                    child: Row(
                       children: [
-                        const CircleAvatar(
-                          radius: 24,
-                          backgroundColor: Colors.white,
-                          child: Icon(Icons.school, color: AppColors.primary, size: 28),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'TA’LIM NAZORAT',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                'MyGov Standart v2.4.0',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: AppColors.textMuted,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                'Axborot xavfsizligi kafolatlangan',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        Text(
-                          user?.fullName ?? '',
-                          style: const TextStyle(color: Colors.white70, fontSize: 12),
+                        IconButton(
+                          tooltip: 'Chiqish',
+                          icon: const Icon(Icons.logout, size: 18, color: AppColors.error),
+                          onPressed: () async {
+                            await auth.logout();
+                            if (context.mounted) {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),
                   ),
-                  ...List.generate(_navItems.length, (idx) {
-                    final item = _navItems[idx];
-                    final isSel = _selectedIndex == idx;
-                    return ListTile(
-                      leading: Icon(
-                        isSel ? item['activeIcon'] : item['icon'],
-                        color: isSel ? AppColors.primary : AppColors.textSecondary,
-                      ),
-                      title: Text(
-                        item['title'],
-                        style: TextStyle(
-                          fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
-                          color: isSel ? AppColors.primary : AppColors.textPrimary,
-                        ),
-                      ),
-                      selected: isSel,
-                      onTap: () {
-                        setState(() => _selectedIndex = idx);
-                        Navigator.pop(context);
-                      },
-                    );
-                  }),
                 ],
               ),
             ),
@@ -451,11 +720,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           if (isDesktop)
             NavigationRail(
               selectedIndex: _selectedIndex,
-              onDestinationSelected: (idx) => setState(() => _selectedIndex = idx),
+              onDestinationSelected: (idx) =>
+                  setState(() => _selectedIndex = idx),
               labelType: NavigationRailLabelType.all,
               backgroundColor: Colors.white,
               selectedIconTheme: const IconThemeData(color: AppColors.primary),
-              unselectedIconTheme: const IconThemeData(color: AppColors.textSecondary),
+              unselectedIconTheme: const IconThemeData(
+                color: AppColors.textSecondary,
+              ),
               selectedLabelTextStyle: const TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.bold,
@@ -473,7 +745,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 );
               }).toList(),
             ),
-          if (isDesktop) const VerticalDivider(thickness: 1, width: 1, color: AppColors.border),
+          if (isDesktop)
+            const VerticalDivider(
+              thickness: 1,
+              width: 1,
+              color: AppColors.border,
+            ),
 
           // Asosiy kontent
           Expanded(child: _screens[_selectedIndex]),
@@ -481,47 +758,54 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
       bottomNavigationBar: isDesktop
           ? null
-          : BottomNavigationBar(
-              currentIndex: _selectedIndex > 4 ? 0 : _selectedIndex,
-              onTap: (idx) {
-                if (idx == 4) {
-                  // "Barchasi" drawer menyusini ochish
-                  _scaffoldKey.currentState?.openDrawer();
-                } else {
-                  setState(() => _selectedIndex = idx);
-                }
-              },
-              type: BottomNavigationBarType.fixed,
-              selectedItemColor: AppColors.primary,
-              unselectedItemColor: AppColors.textMuted,
-              selectedFontSize: 11,
-              unselectedFontSize: 10,
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.dashboard_outlined),
-                  activeIcon: Icon(Icons.dashboard_rounded),
-                  label: 'Boshqaruv',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.people_outline_rounded),
-                  activeIcon: Icon(Icons.people_rounded),
-                  label: 'Bolalar',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.assignment_outlined),
-                  activeIcon: Icon(Icons.assignment_rounded),
-                  label: 'Baholash',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.calendar_today_outlined),
-                  activeIcon: Icon(Icons.calendar_today_rounded),
-                  label: 'Mashg‘ulot',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.menu_rounded),
-                  label: 'Barchasi',
-                ),
-              ],
+          : Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(top: BorderSide(color: AppColors.border, width: 1)),
+              ),
+              child: BottomNavigationBar(
+                currentIndex: _selectedIndex > 4 ? 0 : _selectedIndex,
+                onTap: (idx) {
+                  if (idx == 4) {
+                    _scaffoldKey.currentState?.openDrawer();
+                  } else {
+                    setState(() => _selectedIndex = idx);
+                  }
+                },
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: Colors.white,
+                elevation: 0,
+                selectedItemColor: AppColors.primary,
+                unselectedItemColor: AppColors.textMuted,
+                selectedFontSize: 11,
+                unselectedFontSize: 10,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.dashboard_outlined),
+                    activeIcon: Icon(Icons.dashboard_rounded),
+                    label: 'Boshqaruv',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.people_outline_rounded),
+                    activeIcon: Icon(Icons.people_rounded),
+                    label: 'Bolalar',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.assignment_outlined),
+                    activeIcon: Icon(Icons.assignment_rounded),
+                    label: 'Baholash',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.calendar_today_outlined),
+                    activeIcon: Icon(Icons.calendar_today_rounded),
+                    label: 'Mashg‘ulot',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.menu_rounded),
+                    label: 'Barchasi',
+                  ),
+                ],
+              ),
             ),
     );
   }

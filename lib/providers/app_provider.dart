@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/student_model.dart';
 import '../models/assessment_model.dart';
 import '../models/session_model.dart';
@@ -58,27 +59,31 @@ class AppProvider extends ChangeNotifier {
 
   // ==================== GETTERS ====================
   List<StudentModel> get students => _db.getStudents(
-        forUser: _currentUser,
-        query: _searchQuery,
-        grade: _selectedGrade,
-        status: _selectedStatus,
-      );
+    forUser: _currentUser,
+    query: _searchQuery,
+    grade: _selectedGrade,
+    status: _selectedStatus,
+  );
 
-  List<StudentModel> get allStudentsIncludingArchived => _db.getStudents(
-        forUser: _currentUser,
-        includeArchived: true,
-      );
+  List<StudentModel> get allStudentsIncludingArchived =>
+      _db.getStudents(forUser: _currentUser, includeArchived: true);
 
-  List<AssessmentModel> get assessments => _db.getAssessments(forUser: _currentUser);
+  List<AssessmentModel> get assessments =>
+      _db.getAssessments(forUser: _currentUser);
   List<SessionModel> get sessions => _db.getSessions(forUser: _currentUser);
-  List<IndividualEducationPlanModel> get iepPlans => _db.getIepPlans(forUser: _currentUser);
+  List<IndividualEducationPlanModel> get iepPlans =>
+      _db.getIepPlans(forUser: _currentUser);
   List<MonitoringAlertModel> get alerts => _db.getAlerts(forUser: _currentUser);
-  List<MonitoringAlertModel> get unresolvedAlerts => _db.getAlerts(forUser: _currentUser, onlyUnresolved: true);
+  List<MonitoringAlertModel> get unresolvedAlerts =>
+      _db.getAlerts(forUser: _currentUser, onlyUnresolved: true);
   List<MonitoringAlertModel> getAlerts({bool onlyUnresolved = false}) =>
       onlyUnresolved ? unresolvedAlerts : alerts;
   List<ReferralModel> get referrals => _db.getReferrals(forUser: _currentUser);
   List<AuditLogModel> get auditLogs => _db.getAuditLogs(forUser: _currentUser);
-  List<UserModel> get specialists => _db.getUsers(forUser: _currentUser).where((u) => u.role != UserRole.superAdmin).toList();
+  List<UserModel> get specialists => _db
+      .getUsers(forUser: _currentUser)
+      .where((u) => u.role != UserRole.superAdmin)
+      .toList();
   List<UserModel> get allUsers => _db.getUsers(forUser: _currentUser);
 
   List<NotificationModel> get myNotifications {
@@ -129,23 +134,42 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deactivateStudent(String studentId, String reason, {UserModel? byUser}) async {
+  Future<void> deactivateStudent(
+    String studentId,
+    String reason, {
+    UserModel? byUser,
+  }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.deactivateStudent(studentId, reason, byUser: byUser ?? _currentUser);
+    await _db.deactivateStudent(
+      studentId,
+      reason,
+      byUser: byUser ?? _currentUser,
+    );
     _isLoading = false;
     notifyListeners();
   }
 
-  Future<void> assignSpecialistToStudent(String studentId, String specialistId, {UserModel? byUser}) async {
+  Future<void> assignSpecialistToStudent(
+    String studentId,
+    String specialistId, {
+    UserModel? byUser,
+  }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.assignSpecialistToStudent(studentId, specialistId, byUser: byUser ?? _currentUser);
+    await _db.assignSpecialistToStudent(
+      studentId,
+      specialistId,
+      byUser: byUser ?? _currentUser,
+    );
     _isLoading = false;
     notifyListeners();
   }
 
-  Future<void> addAssessment(AssessmentModel assessment, {UserModel? byUser}) async {
+  Future<void> addAssessment(
+    AssessmentModel assessment, {
+    UserModel? byUser,
+  }) async {
     _isLoading = true;
     notifyListeners();
     await _db.addAssessment(assessment, byUser: byUser ?? _currentUser);
@@ -153,7 +177,10 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Map<String, dynamic>> addSession(SessionModel session, {UserModel? byUser}) async {
+  Future<Map<String, dynamic>> addSession(
+    SessionModel session, {
+    UserModel? byUser,
+  }) async {
     _isLoading = true;
     notifyListeners();
     final res = await _db.addSession(session, byUser: byUser ?? _currentUser);
@@ -168,16 +195,34 @@ class AppProvider extends ChangeNotifier {
     String? nextSteps,
     UserModel? byUser,
   }) async {
-    await _db.completeSession(id, observations: observations, nextSteps: nextSteps, byUser: byUser ?? _currentUser);
+    await _db.completeSession(
+      id,
+      observations: observations,
+      nextSteps: nextSteps,
+      byUser: byUser ?? _currentUser,
+    );
     notifyListeners();
   }
 
-  Future<void> updateSessionStatus(String id, String status, {String? notes, UserModel? byUser}) async {
-    await _db.updateSessionStatus(id, status, notes: notes, byUser: byUser ?? _currentUser);
+  Future<void> updateSessionStatus(
+    String id,
+    String status, {
+    String? notes,
+    UserModel? byUser,
+  }) async {
+    await _db.updateSessionStatus(
+      id,
+      status,
+      notes: notes,
+      byUser: byUser ?? _currentUser,
+    );
     notifyListeners();
   }
 
-  Future<void> addIepPlan(IndividualEducationPlanModel plan, {UserModel? byUser}) async {
+  Future<void> addIepPlan(
+    IndividualEducationPlanModel plan, {
+    UserModel? byUser,
+  }) async {
     _isLoading = true;
     notifyListeners();
     await _db.addIepPlan(plan, byUser: byUser ?? _currentUser);
@@ -185,7 +230,10 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateIepPlan(IndividualEducationPlanModel plan, {UserModel? byUser}) async {
+  Future<void> updateIepPlan(
+    IndividualEducationPlanModel plan, {
+    UserModel? byUser,
+  }) async {
     _isLoading = true;
     notifyListeners();
     await _db.updateIepPlan(plan, byUser: byUser ?? _currentUser);
@@ -210,7 +258,11 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> resolveAlert(String alertId, String notes, {UserModel? byUser}) async {
+  Future<void> resolveAlert(
+    String alertId,
+    String notes, {
+    UserModel? byUser,
+  }) async {
     await _db.resolveAlert(alertId, notes, byUser: byUser ?? _currentUser);
     notifyListeners();
   }
@@ -254,14 +306,23 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleUserActive(String userId, bool isActive, {UserModel? byUser}) async {
-    await _db.toggleUserActive(userId, isActive, byUser: byUser ?? _currentUser);
+  Future<void> toggleUserActive(
+    String userId,
+    bool isActive, {
+    UserModel? byUser,
+  }) async {
+    await _db.toggleUserActive(
+      userId,
+      isActive,
+      byUser: byUser ?? _currentUser,
+    );
     notifyListeners();
   }
 
   // ==================== CSV EXPORT ====================
   String exportStudentsCsv() => _exportService.generateStudentsCsv(students);
-  String exportAssessmentsCsv() => _exportService.generateAssessmentsCsv(assessments);
+  String exportAssessmentsCsv() =>
+      _exportService.generateAssessmentsCsv(assessments);
   String exportSessionsCsv() => _exportService.generateSessionsCsv(sessions);
   String exportIepCsv() => _exportService.generateIepCsv(iepPlans);
   String exportAlertsCsv() => _exportService.generateAlertsCsv(alerts);

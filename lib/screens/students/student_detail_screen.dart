@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../models/student_model.dart';
 import '../../models/user_model.dart';
@@ -47,8 +48,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     super.dispose();
   }
 
-  void _showArchiveDialog(BuildContext context, StudentModel student, UserModel currentUser) {
+  void _showArchiveDialog(
+    BuildContext context,
+    StudentModel student,
+    UserModel currentUser,
+  ) {
     final reasonController = TextEditingController();
+    final messenger = ScaffoldMessenger.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -59,7 +65,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           children: [
             Text(
               '${student.fullName} anketasini faol ro‘yxatdan arxivga o‘tkazmoqchimisiz? Barcha tarixiy yozuvlar (baholashlar, ITR, mashg‘ulotlar) to‘liq saqlanadi.',
-              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -83,18 +92,24 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             onPressed: () async {
               final reason = reasonController.text.trim();
               if (reason.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Iltimos, arxivlash sababini yozing')),
+                messenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Iltimos, arxivlash sababini yozing'),
+                  ),
                 );
                 return;
               }
               Navigator.pop(ctx);
-              await context.read<AppProvider>().deactivateStudent(student.id, reason, byUser: currentUser);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('O‘quvchi muvaffaqiyatli arxivlandi')),
-                );
-              }
+              await context.read<AppProvider>().deactivateStudent(
+                student.id,
+                reason,
+                byUser: currentUser,
+              );
+              messenger.showSnackBar(
+                const SnackBar(
+                  content: Text('O‘quvchi muvaffaqiyatli arxivlandi'),
+                ),
+              );
             },
             child: const Text('Arxivlash'),
           ),
@@ -103,7 +118,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     );
   }
 
-  void _showUnarchiveDialog(BuildContext context, StudentModel student, UserModel currentUser) {
+  void _showUnarchiveDialog(
+    BuildContext context,
+    StudentModel student,
+    UserModel currentUser,
+  ) {
+    final messenger = ScaffoldMessenger.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -126,12 +146,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 deactivationReason: null,
                 deactivatedAt: null,
               );
-              await context.read<AppProvider>().updateStudent(updated, byUser: currentUser);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('O‘quvchi qayta faollashtirildi')),
-                );
-              }
+              await context.read<AppProvider>().updateStudent(
+                updated,
+                byUser: currentUser,
+              );
+              messenger.showSnackBar(
+                const SnackBar(content: Text('O‘quvchi qayta faollashtirildi')),
+              );
             },
             child: const Text('Faollashtirish'),
           ),
@@ -140,9 +161,16 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     );
   }
 
-  void _showAssignSpecialistDialog(BuildContext context, StudentModel student, UserModel currentUser) {
+  void _showAssignSpecialistDialog(
+    BuildContext context,
+    StudentModel student,
+    UserModel currentUser,
+  ) {
     final app = context.read<AppProvider>();
-    final availableSpecialists = app.specialists.where((u) => !student.assignedSpecialistIds.contains(u.id)).toList();
+    final messenger = ScaffoldMessenger.of(context);
+    final availableSpecialists = app.specialists
+        .where((u) => !student.assignedSpecialistIds.contains(u.id))
+        .toList();
 
     showDialog(
       context: context,
@@ -153,7 +181,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           child: availableSpecialists.isEmpty
               ? const Padding(
                   padding: EdgeInsets.all(16),
-                  child: Text('Barcha mutaxassislar allaqachon biriktirilgan yoki mutaxassislar ro‘yxati bo‘sh.'),
+                  child: Text(
+                    'Barcha mutaxassislar allaqachon biriktirilgan yoki mutaxassislar ro‘yxati bo‘sh.',
+                  ),
                 )
               : ListView.builder(
                   shrinkWrap: true,
@@ -162,21 +192,39 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     final sp = availableSpecialists[i];
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: sp.role.color.withOpacity(0.15),
+                        backgroundColor: sp.role.color.withValues(alpha: 0.15),
                         child: Icon(Icons.person, color: sp.role.color),
                       ),
-                      title: Text(sp.fullName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                      subtitle: Text('${sp.role.label} • ${sp.institutionName ?? ''}', style: const TextStyle(fontSize: 12)),
+                      title: Text(
+                        sp.fullName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${sp.role.label} • ${sp.institutionName ?? ''}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
                       trailing: IconButton(
-                        icon: const Icon(Icons.add_circle_outline, color: AppColors.primary),
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          color: AppColors.primary,
+                        ),
                         onPressed: () async {
                           Navigator.pop(ctx);
-                          await app.assignSpecialistToStudent(student.id, sp.id, byUser: currentUser);
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('${sp.fullName} ushbu o‘quvchiga biriktirildi')),
-                            );
-                          }
+                          await app.assignSpecialistToStudent(
+                            student.id,
+                            sp.id,
+                            byUser: currentUser,
+                          );
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                '${sp.fullName} ushbu o‘quvchiga biriktirildi',
+                              ),
+                            ),
+                          );
                         },
                       ),
                     );
@@ -184,7 +232,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Yopish')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Yopish'),
+          ),
         ],
       ),
     );
@@ -200,34 +251,62 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
       (s) => s.id == widget.studentId,
       orElse: () => app.allStudentsIncludingArchived.firstWhere(
         (s) => s.id == widget.studentId,
-        orElse: () => app.students.isNotEmpty ? app.students.first : app.allStudentsIncludingArchived.first,
+        orElse: () => app.students.isNotEmpty
+            ? app.students.first
+            : app.allStudentsIncludingArchived.first,
       ),
     );
 
-    final assessments = app.assessments.where((a) => a.studentId == student.id).toList();
-    final sessions = app.sessions.where((s) => s.studentId == student.id).toList();
-    final iepPlans = app.iepPlans.where((p) => p.studentId == student.id).toList();
-    final referrals = app.referrals.where((r) => r.studentId == student.id).toList();
-    final auditLogs = app.auditLogs.where((a) => a.details.contains(student.firstName) || a.details.contains(student.id)).toList();
+    final assessments = app.assessments
+        .where((a) => a.studentId == student.id)
+        .toList();
+    final sessions = app.sessions
+        .where((s) => s.studentId == student.id)
+        .toList();
+    final iepPlans = app.iepPlans
+        .where((p) => p.studentId == student.id)
+        .toList();
+    final referrals = app.referrals
+        .where((r) => r.studentId == student.id)
+        .toList();
+    final auditLogs = app.auditLogs
+        .where(
+          (a) =>
+              a.details.contains(student.firstName) ||
+              a.details.contains(student.id),
+        )
+        .toList();
 
     final isArchived = student.status == 'Arxivlangan';
-    final canArchive = currentUser != null && _access.canArchiveStudent(currentUser, student);
+    final canArchive =
+        currentUser != null && _access.canArchiveStudent(currentUser, student);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(student.fullName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text(
+          student.fullName,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
         actions: [
           if (canArchive && !isArchived)
             IconButton(
-              icon: const Icon(Icons.archive_outlined, color: AppColors.warning),
+              icon: const Icon(
+                Icons.archive_outlined,
+                color: AppColors.warning,
+              ),
               tooltip: 'O‘quvchini arxivlash',
-              onPressed: () => _showArchiveDialog(context, student, currentUser),
+              onPressed: () =>
+                  _showArchiveDialog(context, student, currentUser),
             ),
           if (canArchive && isArchived)
             IconButton(
-              icon: const Icon(Icons.unarchive_outlined, color: AppColors.success),
+              icon: const Icon(
+                Icons.unarchive_outlined,
+                color: AppColors.success,
+              ),
               tooltip: 'Arxivdan qaytarish',
-              onPressed: () => _showUnarchiveDialog(context, student, currentUser),
+              onPressed: () =>
+                  _showUnarchiveDialog(context, student, currentUser),
             ),
         ],
         bottom: TabBar(
@@ -236,7 +315,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
           indicatorColor: AppColors.primary,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
           tabs: _tabs.map((title) => Tab(text: title)).toList(),
         ),
       ),
@@ -272,15 +354,24 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   }
 
   // --- TAB 1: UMUMIY MA'LUMOT ---
-  Widget _buildGeneralTab(StudentModel s, UserModel? currentUser, AppProvider app) {
+  Widget _buildGeneralTab(
+    StudentModel s,
+    UserModel? currentUser,
+    AppProvider app,
+  ) {
     final df = DateFormat('dd.MM.yyyy');
     final isArchived = s.status == 'Arxivlangan';
-    final canViewMedical = currentUser != null && _access.canViewSensitiveMedical(currentUser);
-    final canManageAssignments = currentUser != null &&
-        (_access.canManageUsers(currentUser) || currentUser.role == UserRole.coordinator);
+    final canViewMedical =
+        currentUser != null && _access.canViewSensitiveMedical(currentUser);
+    final canManageAssignments =
+        currentUser != null &&
+        (_access.canManageUsers(currentUser) ||
+            currentUser.role == UserRole.coordinator);
 
     // Biriktirilgan mutaxassislar obyektlarini topish
-    final assignedStaff = app.allUsers.where((u) => s.assignedSpecialistIds.contains(u.id)).toList();
+    final assignedStaff = app.allUsers
+        .where((u) => s.assignedSpecialistIds.contains(u.id))
+        .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -294,7 +385,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               decoration: BoxDecoration(
                 color: AppColors.warningBg,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+                border: Border.all(
+                  color: AppColors.warning.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 children: [
@@ -304,12 +397,21 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Ushbu o‘quvchi anketasi arxivlangan',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textPrimary)),
+                        const Text(
+                          'Ushbu o‘quvchi anketasi arxivlangan',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
                         const SizedBox(height: 2),
                         Text(
                           'Sababi: ${s.deactivationReason ?? 'Ko‘rsatilmagan'} • Sana: ${s.deactivatedAt != null ? df.format(s.deactivatedAt!) : 'Noma’lum'}',
-                          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -326,13 +428,19 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 children: [
                   CircleAvatar(
                     radius: 36,
-                    backgroundColor: isArchived ? AppColors.borderLight : AppColors.primaryLight,
+                    backgroundColor: isArchived
+                        ? AppColors.borderLight
+                        : AppColors.primaryLight,
                     child: Text(
-                      s.firstName.isNotEmpty ? s.firstName.substring(0, 1) : '?',
+                      s.firstName.isNotEmpty
+                          ? s.firstName.substring(0, 1)
+                          : '?',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: isArchived ? AppColors.textMuted : AppColors.primaryDark,
+                        color: isArchived
+                            ? AppColors.textMuted
+                            : AppColors.primaryDark,
                       ),
                     ),
                   ),
@@ -351,21 +459,32 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Maktab: ${s.institutionName ?? 'Biriktirilmagan'} • Sinfi: ${s.grade}',
-                          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                          'Maktab: ${s.institutionName} • Sinfi: ${s.grade}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           'Tug‘ilgan kuni: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
-                          style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textMuted,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
-                                color: isArchived ? AppColors.warningBg : AppColors.successBg,
+                                color: isArchived
+                                    ? AppColors.warningBg
+                                    : AppColors.successBg,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -373,14 +492,19 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color: isArchived ? AppColors.warning : AppColors.success,
+                                  color: isArchived
+                                      ? AppColors.warning
+                                      : AppColors.success,
                                 ),
                               ),
                             ),
                             if (s.coordinatorName != null) ...[
                               const SizedBox(width: 8),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.infoBg,
                                   borderRadius: BorderRadius.circular(6),
@@ -420,24 +544,63 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   const SizedBox(height: 12),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.psychology, color: AppColors.primary),
-                    title: const Text('Asosiy ta’limiy ehtiyoj', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                    subtitle: Text(s.primaryNeed, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                    leading: const Icon(
+                      Icons.psychology,
+                      color: AppColors.primary,
+                    ),
+                    title: const Text(
+                      'Asosiy ta’limiy ehtiyoj',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                    subtitle: Text(
+                      s.primaryNeed,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                   const Divider(),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.verified, color: AppColors.info),
-                    title: const Text('Qo‘llab-quvvatlash darajasi', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                    subtitle: Text(s.supportLevel, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                    title: const Text(
+                      'Qo‘llab-quvvatlash darajasi',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                    subtitle: Text(
+                      s.supportLevel,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                   const Divider(),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.medical_services_outlined, color: AppColors.warning),
-                    title: const Text('Tibbiy xulosa va tavsiyalar', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                    leading: const Icon(
+                      Icons.medical_services_outlined,
+                      color: AppColors.warning,
+                    ),
+                    title: const Text(
+                      'Tibbiy xulosa va tavsiyalar',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
                     subtitle: canViewMedical
-                        ? Text(s.medicalNotes ?? 'Tibbiy ma’lumot kiritilmagan', style: const TextStyle(fontSize: 13))
+                        ? Text(
+                            s.medicalNotes ?? 'Tibbiy ma’lumot kiritilmagan',
+                            style: const TextStyle(fontSize: 13),
+                          )
                         : Container(
                             margin: const EdgeInsets.only(top: 4),
                             padding: const EdgeInsets.all(8),
@@ -448,12 +611,20 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             ),
                             child: const Row(
                               children: [
-                                Icon(Icons.lock_outline, size: 16, color: AppColors.textMuted),
+                                Icon(
+                                  Icons.lock_outline,
+                                  size: 16,
+                                  color: AppColors.textMuted,
+                                ),
                                 SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     'Maxfiy tibbiy ma’lumot — faqat vakolatli tibbiy va defektologik mutaxassislar uchun ochiq',
-                                    style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontStyle: FontStyle.italic),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textMuted,
+                                      fontStyle: FontStyle.italic,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -478,13 +649,23 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     children: [
                       const Text(
                         'Mas’ul Mutaxassislar Jamasi',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
                       ),
-                      if (canManageAssignments && currentUser != null)
+                      if (canManageAssignments)
                         TextButton.icon(
                           icon: const Icon(Icons.person_add, size: 16),
-                          label: const Text('Biriktirish', style: TextStyle(fontSize: 12)),
-                          onPressed: () => _showAssignSpecialistDialog(context, s, currentUser),
+                          label: const Text(
+                            'Biriktirish',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          onPressed: () => _showAssignSpecialistDialog(
+                            context,
+                            s,
+                            currentUser,
+                          ),
                         ),
                     ],
                   ),
@@ -492,19 +673,38 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   if (assignedStaff.isEmpty)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8),
-                      child: Text('Ushbu o‘quvchiga hali maxsus mutaxassis biriktirilmagan',
-                          style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                      child: Text(
+                        'Ushbu o‘quvchiga hali maxsus mutaxassis biriktirilmagan',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
                     )
                   else
                     ...assignedStaff.map((staff) {
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: CircleAvatar(
-                          backgroundColor: staff.role.color.withOpacity(0.15),
-                          child: Icon(Icons.person, color: staff.role.color, size: 20),
+                          backgroundColor: staff.role.color.withValues(
+                            alpha: 0.15,
+                          ),
+                          child: Icon(
+                            Icons.person,
+                            color: staff.role.color,
+                            size: 20,
+                          ),
                         ),
-                        title: Text(staff.fullName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                        subtitle: Text('${staff.role.label} (${staff.specialization ?? staff.role.name}) • Tel: ${staff.phone ?? 'Mavjud emas'}'),
+                        title: Text(
+                          staff.fullName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                        subtitle: Text(
+                          '${staff.role.label} (${staff.specialization ?? staff.role.name}) • Tel: ${staff.phone ?? 'Mavjud emas'}',
+                        ),
                       );
                     }),
                 ],
@@ -533,10 +733,21 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         contentPadding: EdgeInsets.zero,
                         leading: const CircleAvatar(
                           backgroundColor: AppColors.borderLight,
-                          child: Icon(Icons.person, color: AppColors.textSecondary),
+                          child: Icon(
+                            Icons.person,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
-                        title: Text(g.fullName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                        subtitle: Text('${g.relationship} • Tel: ${g.phone}\nManzil: ${g.address ?? 'Ko‘rsatilmagan'}'),
+                        title: Text(
+                          g.fullName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        subtitle: Text(
+                          '${g.relationship} • Tel: ${g.phone}\nManzil: ${g.address ?? 'Ko‘rsatilmagan'}',
+                        ),
                       );
                     }),
                 ],
@@ -568,21 +779,32 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             children: [
               Text(
                 'O‘tkazilgan baholashlar: ${assessments.length} ta',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: AppColors.textPrimary,
+                ),
               ),
               if (currentRole.canCreateAssessments)
                 FilledButton.icon(
                   style: FilledButton.styleFrom(
                     backgroundColor: currentRole.color,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
                   ),
                   icon: const Icon(Icons.add_task_rounded, size: 16),
-                  label: Text('Yangi ${currentRole.label} baholashi', style: const TextStyle(fontSize: 12)),
+                  label: Text(
+                    'Yangi ${currentRole.label} baholashi',
+                    style: const TextStyle(fontSize: 12),
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => NewAssessmentScreen(initialStudentId: student.id),
+                        builder: (_) =>
+                            NewAssessmentScreen(initialStudentId: student.id),
                       ),
                     );
                   },
@@ -597,22 +819,33 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.assignment_outlined, size: 48, color: AppColors.textMuted),
+                      const Icon(
+                        Icons.assignment_outlined,
+                        size: 48,
+                        color: AppColors.textMuted,
+                      ),
                       const SizedBox(height: 12),
                       const Text(
                         'Ushbu o‘quvchiga hali baholash o‘tkazilmagan',
-                        style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       if (currentRole.canCreateAssessments) ...[
                         const SizedBox(height: 12),
                         OutlinedButton.icon(
                           icon: const Icon(Icons.add, size: 18),
-                          label: Text('${currentRole.label} sifatida baholash kiritish'),
+                          label: Text(
+                            '${currentRole.label} sifatida baholash kiritish',
+                          ),
                           onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => NewAssessmentScreen(initialStudentId: student.id),
+                                builder: (_) => NewAssessmentScreen(
+                                  initialStudentId: student.id,
+                                ),
                               ),
                             );
                           },
@@ -624,7 +857,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               : ListView.separated(
                   padding: const EdgeInsets.all(20),
                   itemCount: assessments.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final a = assessments[index];
                     return Card(
@@ -638,22 +871,33 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         a.title,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
                                         'Yo‘nalish: ${a.category}',
-                                        style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600),
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: AppColors.successBg,
                                     borderRadius: BorderRadius.circular(8),
@@ -672,15 +916,26 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                const Icon(Icons.badge_outlined, size: 14, color: AppColors.textMuted),
+                                const Icon(
+                                  Icons.badge_outlined,
+                                  size: 14,
+                                  color: AppColors.textMuted,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   'Mutaxassis: ${a.specialistName}',
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textPrimary,
+                                  ),
                                 ),
                                 const SizedBox(width: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: AppColors.background,
                                     borderRadius: BorderRadius.circular(4),
@@ -688,13 +943,19 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   ),
                                   child: Text(
                                     a.specialistRole,
-                                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
+                                    ),
                                   ),
                                 ),
                                 const Spacer(),
                                 Text(
                                   df.format(a.assessmentDate),
-                                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textMuted,
+                                  ),
                                 ),
                               ],
                             ),
@@ -708,11 +969,21 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Xulosa: ${a.notes}', style: const TextStyle(fontSize: 13, height: 1.4)),
+                                  Text(
+                                    'Xulosa: ${a.notes}',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      height: 1.4,
+                                    ),
+                                  ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Tavsiya: ${a.recommendations}',
-                                    style: const TextStyle(fontSize: 12, color: AppColors.primaryDark, fontStyle: FontStyle.italic),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.primaryDark,
+                                      fontStyle: FontStyle.italic,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -737,7 +1008,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     return ListView.separated(
       padding: const EdgeInsets.all(20),
       itemCount: sessions.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final s = sessions[index];
         final isDone = s.status == 'Bajarildi';
@@ -747,8 +1018,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               isDone ? Icons.check_circle : Icons.schedule,
               color: isDone ? AppColors.success : AppColors.info,
             ),
-            title: Text(s.topic, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-            subtitle: Text('${s.specialistName} • ${df.format(s.scheduledAt)}\n${s.activities ?? ''}'),
+            title: Text(
+              s.topic,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
+            subtitle: Text(
+              '${s.specialistName} • ${df.format(s.scheduledAt)}\n${s.activities ?? ''}',
+            ),
             trailing: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -771,9 +1047,15 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   }
 
   // --- TAB 4: INDIVIDUAL TA'LIM REJASI (ITR) ---
-  Widget _buildIepTab(BuildContext context, List<dynamic> iepPlans, StudentModel student) {
+  Widget _buildIepTab(
+    BuildContext context,
+    List<dynamic> iepPlans,
+    StudentModel student,
+  ) {
     if (iepPlans.isEmpty) {
-      return const Center(child: Text('Ushbu o‘quvchiga ITR rejasi ochilmagan'));
+      return const Center(
+        child: Text('Ushbu o‘quvchiga ITR rejasi ochilmagan'),
+      );
     }
     final plan = iepPlans.first;
     final app = context.watch<AppProvider>();
@@ -792,12 +1074,18 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   children: [
                     Text(
                       plan.title,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       'O‘quv yili: ${plan.academicYear} • Mas’ul: ${plan.responsibleTeacherName}',
-                      style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ],
                 ),
@@ -809,7 +1097,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => IepPrintScreen(plan: plan, student: student),
+                      builder: (_) =>
+                          IepPrintScreen(plan: plan, student: student),
                     ),
                   );
                 },
@@ -839,11 +1128,17 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         Expanded(
                           child: Text(
                             obj.title,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primaryLight,
                             borderRadius: BorderRadius.circular(6),
@@ -860,8 +1155,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text('Soha: ${obj.domain} • Mezon: ${obj.successCriteria ?? ''}',
-                        style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                    Text(
+                      'Soha: ${obj.domain} • Mezon: ${obj.successCriteria ?? ''}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
                     const SizedBox(height: 8),
 
                     // Inline Progress Slider
@@ -873,7 +1173,11 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       activeColor: AppColors.primary,
                       label: '${obj.progressPercent}%',
                       onChanged: (val) {
-                        app.updateObjectiveProgress(plan.id, obj.id, val.toInt());
+                        app.updateObjectiveProgress(
+                          plan.id,
+                          obj.id,
+                          val.toInt(),
+                        );
                       },
                     ),
                   ],
@@ -899,11 +1203,18 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  Text('Rivojlanish tendensiyasi xulosasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(
+                    'Rivojlanish tendensiyasi xulosasi',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
                   SizedBox(height: 10),
                   Text(
                     'Oxirgi 3 ta diagnostika natijalariga ko‘ra, o‘quvchida barqaror ijobiy dinamika (+14%) kuzatilmoqda. Ayniqsa, nutqiy muloqot va fonematik idrok sohasida sezilarli siljish mavjud.',
-                    style: TextStyle(fontSize: 13, height: 1.5, color: AppColors.textSecondary),
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -916,19 +1227,38 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Monitoring baholarining vaqt bo‘yicha o‘zgarishi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text(
+                    'Monitoring baholarining vaqt bo‘yicha o‘zgarishi',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                   const SizedBox(height: 16),
                   ...assessments.map((a) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: Row(
                         children: [
-                          const Icon(Icons.timeline, color: AppColors.primary, size: 20),
+                          const Icon(
+                            Icons.timeline,
+                            color: AppColors.primary,
+                            size: 20,
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: Text('${a.category}: ${a.title}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                            child: Text(
+                              '${a.category}: ${a.title}',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                          Text('${a.totalScore.toInt()} ball (${a.trend})', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+                          Text(
+                            '${a.totalScore.toInt()} ball (${a.trend})',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
                         ],
                       ),
                     );
@@ -945,7 +1275,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   // --- TAB 6: YO'NALTIRISHLAR ---
   Widget _buildReferralsTab(List<dynamic> referrals) {
     if (referrals.isEmpty) {
-      return const Center(child: Text('Tashqi yoki ichki yo‘naltirishlar mavjud emas'));
+      return const Center(
+        child: Text('Tashqi yoki ichki yo‘naltirishlar mavjud emas'),
+      );
     }
     return ListView.builder(
       padding: const EdgeInsets.all(20),
@@ -956,8 +1288,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           margin: const EdgeInsets.only(bottom: 10),
           child: ListTile(
             leading: const Icon(Icons.alt_route, color: AppColors.primary),
-            title: Text('${r.toSpecialistType}ga yo‘naltirish', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            subtitle: Text('Yuborgan: ${r.fromSpecialistName}\nSababi: ${r.reason}'),
+            title: Text(
+              '${r.toSpecialistType}ga yo‘naltirish',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+            subtitle: Text(
+              'Yuborgan: ${r.fromSpecialistName}\nSababi: ${r.reason}',
+            ),
             trailing: Chip(
               label: Text(r.status, style: const TextStyle(fontSize: 11)),
               backgroundColor: AppColors.primaryLight,
@@ -976,8 +1313,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
         Card(
           child: ListTile(
             leading: const Icon(Icons.picture_as_pdf, color: AppColors.error),
-            title: const Text('PMPK Xulosasi va Yo‘llanmasi (PDF)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            subtitle: const Text('Shahar pedagogik-tibbiy komissiyasi • 14.08.2026'),
+            title: const Text(
+              'PMPK Xulosasi va Yo‘llanmasi (PDF)',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+            subtitle: const Text(
+              'Shahar pedagogik-tibbiy komissiyasi • 14.08.2026',
+            ),
             trailing: IconButton(
               icon: const Icon(Icons.download_rounded),
               onPressed: () {
@@ -992,7 +1334,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
         Card(
           child: ListTile(
             leading: const Icon(Icons.picture_as_pdf, color: AppColors.error),
-            title: const Text('Tibbiy Ko‘rik Karta Ma’lumotnomasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            title: const Text(
+              'Tibbiy Ko‘rik Karta Ma’lumotnomasi',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
             subtitle: const Text('12-sonli bolalar poliklinikasi • 20.08.2026'),
             trailing: IconButton(
               icon: const Icon(Icons.download_rounded),
@@ -1011,18 +1356,23 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   // --- TAB 8: AUDIT TARIXI ---
   Widget _buildAuditTab(List<dynamic> logs) {
     if (logs.isEmpty) {
-      return const Center(child: Text('Ushbu o‘quvchi bo‘yicha hozircha audit yozuvlari yo‘q'));
+      return const Center(
+        child: Text('Ushbu o‘quvchi bo‘yicha hozircha audit yozuvlari yo‘q'),
+      );
     }
     return ListView.separated(
       padding: const EdgeInsets.all(20),
       itemCount: logs.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final log = logs[index];
         return Card(
           child: ListTile(
             leading: const Icon(Icons.history, color: AppColors.textMuted),
-            title: Text(log.details, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            title: Text(
+              log.details,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            ),
             subtitle: Text('${log.userFullName} (${log.userRole})'),
             trailing: Text(
               DateFormat('dd.MM HH:mm').format(log.timestamp),

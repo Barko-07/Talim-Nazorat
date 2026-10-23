@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../models/iep_model.dart';
-import '../../models/student_model.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -25,13 +25,17 @@ class _IepListScreenState extends State<IepListScreen> {
     final students = app.students;
     if (students.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Avval o‘quvchi ro‘yxatdan o‘tgan bo‘lishi kerak')),
+        const SnackBar(
+          content: Text('Avval o‘quvchi ro‘yxatdan o‘tgan bo‘lishi kerak'),
+        ),
       );
       return;
     }
 
     String selectedStudentId = students.first.id;
-    final titleController = TextEditingController(text: '2026-2027 o‘quv yili uchun ITR');
+    final titleController = TextEditingController(
+      text: '2026-2027 o‘quv yili uchun ITR',
+    );
     final academicYearController = TextEditingController(text: '2026-2027');
     final baselineController = TextEditingController();
     final goalsController = TextEditingController();
@@ -40,7 +44,9 @@ class _IepListScreenState extends State<IepListScreen> {
     String selectedDomain = 'Kognitiv';
     final objStartingLevelController = TextEditingController(text: '20%');
     final objTargetLevelController = TextEditingController(text: '80%');
-    final objCriteriaController = TextEditingController(text: 'Mustaqil ravishda 10 tadan 8 tasini to‘g‘ri bajarish');
+    final objCriteriaController = TextEditingController(
+      text: 'Mustaqil ravishda 10 tadan 8 tasini to‘g‘ri bajarish',
+    );
 
     DateTime startDate = DateTime.now();
     DateTime reviewDate = DateTime.now().add(const Duration(days: 90));
@@ -59,11 +65,23 @@ class _IepListScreenState extends State<IepListScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('O‘quvchini tanlang *', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    const Text(
+                      'O‘quvchini tanlang *',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       value: selectedStudentId,
-                      decoration: const InputDecoration(border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                      ),
                       items: students.map((s) {
                         return DropdownMenuItem(
                           value: s.id,
@@ -71,14 +89,19 @@ class _IepListScreenState extends State<IepListScreen> {
                         );
                       }).toList(),
                       onChanged: (val) {
-                        if (val != null) setModalState(() => selectedStudentId = val);
+                        if (val != null) {
+                          setModalState(() => selectedStudentId = val);
+                        }
                       },
                     ),
                     const SizedBox(height: 14),
 
                     TextField(
                       controller: titleController,
-                      decoration: const InputDecoration(labelText: 'ITR Nomi *', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                        labelText: 'ITR Nomi *',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                     const SizedBox(height: 12),
 
@@ -87,20 +110,28 @@ class _IepListScreenState extends State<IepListScreen> {
                         Expanded(
                           child: TextField(
                             controller: academicYearController,
-                            decoration: const InputDecoration(labelText: 'O‘quv yili *', border: OutlineInputBorder()),
+                            decoration: const InputDecoration(
+                              labelText: 'O‘quv yili *',
+                              border: OutlineInputBorder(),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: OutlinedButton.icon(
                             icon: const Icon(Icons.calendar_month, size: 16),
-                            label: Text('Ko‘rib chiqish: ${df.format(reviewDate)}', style: const TextStyle(fontSize: 12)),
+                            label: Text(
+                              'Ko‘rib chiqish: ${df.format(reviewDate)}',
+                              style: const TextStyle(fontSize: 12),
+                            ),
                             onPressed: () async {
                               final picked = await showDatePicker(
                                 context: context,
                                 initialDate: reviewDate,
                                 firstDate: DateTime.now(),
-                                lastDate: DateTime.now().add(const Duration(days: 365)),
+                                lastDate: DateTime.now().add(
+                                  const Duration(days: 365),
+                                ),
                               );
                               if (picked != null) {
                                 setModalState(() => reviewDate = picked);
@@ -137,7 +168,8 @@ class _IepListScreenState extends State<IepListScreen> {
                     TextField(
                       controller: strategiesController,
                       decoration: const InputDecoration(
-                        labelText: 'Qo‘llab-quvvatlash choralari va moslashtirishlar',
+                        labelText:
+                            'Qo‘llab-quvvatlash choralari va moslashtirishlar',
                         hintText: 'Pedagogik usullar, yordamchi jihozlar, adaptatsiyalar',
                         border: OutlineInputBorder(),
                       ),
@@ -146,14 +178,22 @@ class _IepListScreenState extends State<IepListScreen> {
                     const SizedBox(height: 16),
 
                     const Divider(),
-                    const Text('Birinchi o‘lchanadigan oraliq maqsad:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primary)),
+                    const Text(
+                      'Birinchi o‘lchanadigan oraliq maqsad:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: AppColors.primary,
+                      ),
+                    ),
                     const SizedBox(height: 8),
 
                     TextField(
                       controller: objTitleController,
                       decoration: const InputDecoration(
                         labelText: 'Oraliq maqsad tavsifi *',
-                        hintText: 'Masalan: Lug‘at boyligini 20 ta so‘zga oshirish',
+                        hintText:
+                            'Masalan: Lug‘at boyligini 20 ta so‘zga oshirish',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -164,16 +204,36 @@ class _IepListScreenState extends State<IepListScreen> {
                         Expanded(
                           child: DropdownButtonFormField<String>(
                             value: selectedDomain,
-                            decoration: const InputDecoration(labelText: 'Soha', border: OutlineInputBorder()),
+                            decoration: const InputDecoration(
+                              labelText: 'Soha',
+                              border: OutlineInputBorder(),
+                            ),
                             items: const [
-                              DropdownMenuItem(value: 'Kognitiv', child: Text('Kognitiv')),
-                              DropdownMenuItem(value: 'Nutq', child: Text('Nutq va muloqot')),
-                              DropdownMenuItem(value: 'O‘quv', child: Text('O‘quv ko‘nikmalari')),
-                              DropdownMenuItem(value: 'Ijtimoiy-hissiy', child: Text('Ijtimoiy-hissiy')),
-                              DropdownMenuItem(value: 'Sensor-motorika', child: Text('Sensor-motorika')),
+                              DropdownMenuItem(
+                                value: 'Kognitiv',
+                                child: Text('Kognitiv'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Nutq',
+                                child: Text('Nutq va muloqot'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'O‘quv',
+                                child: Text('O‘quv ko‘nikmalari'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Ijtimoiy-hissiy',
+                                child: Text('Ijtimoiy-hissiy'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Sensor-motorika',
+                                child: Text('Sensor-motorika'),
+                              ),
                             ],
                             onChanged: (val) {
-                              if (val != null) setModalState(() => selectedDomain = val);
+                              if (val != null) {
+                                setModalState(() => selectedDomain = val);
+                              }
                             },
                           ),
                         ),
@@ -181,14 +241,20 @@ class _IepListScreenState extends State<IepListScreen> {
                         Expanded(
                           child: TextField(
                             controller: objStartingLevelController,
-                            decoration: const InputDecoration(labelText: 'Boshlang‘ich daraja', border: OutlineInputBorder()),
+                            decoration: const InputDecoration(
+                              labelText: 'Boshlang‘ich daraja',
+                              border: OutlineInputBorder(),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: TextField(
                             controller: objTargetLevelController,
-                            decoration: const InputDecoration(labelText: 'Maqsadli daraja', border: OutlineInputBorder()),
+                            decoration: const InputDecoration(
+                              labelText: 'Maqsadli daraja',
+                              border: OutlineInputBorder(),
+                            ),
                           ),
                         ),
                       ],
@@ -208,19 +274,28 @@ class _IepListScreenState extends State<IepListScreen> {
               ),
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Bekor qilish')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Bekor qilish'),
+              ),
               FilledButton(
                 onPressed: () async {
                   if (titleController.text.trim().isEmpty ||
                       baselineController.text.trim().isEmpty ||
                       goalsController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Iltimos, barcha majburiy maydonlarni to‘ldiring')),
+                      const SnackBar(
+                        content: Text(
+                          'Iltimos, barcha majburiy maydonlarni to‘ldiring',
+                        ),
+                      ),
                     );
                     return;
                   }
 
-                  final targetStudent = students.firstWhere((s) => s.id == selectedStudentId);
+                  final targetStudent = students.firstWhere(
+                    (s) => s.id == selectedStudentId,
+                  );
                   final planId = 'iep_${DateTime.now().millisecondsSinceEpoch}';
 
                   final initialObjective = PlanObjectiveModel(
@@ -246,15 +321,17 @@ class _IepListScreenState extends State<IepListScreen> {
                     studentId: targetStudent.id,
                     studentName: targetStudent.fullName,
                     studentGrade: targetStudent.grade,
-                    institutionName: targetStudent.institutionName ?? currentUser.institutionName ?? '14-sonli maktab',
+                    institutionName: targetStudent.institutionName,
                     title: titleController.text.trim(),
                     academicYear: academicYearController.text.trim(),
                     startDate: startDate,
                     reviewDate: reviewDate,
                     responsibleTeacherId: currentUser.id,
                     responsibleTeacherName: currentUser.fullName,
-                    coordinatorId: targetStudent.coordinatorId ?? currentUser.id,
-                    coordinatorName: targetStudent.coordinatorName ?? currentUser.fullName,
+                    coordinatorId:
+                        targetStudent.coordinatorId ?? currentUser.id,
+                    coordinatorName:
+                        targetStudent.coordinatorName ?? currentUser.fullName,
                     status: 'Faol',
                     baselineSummary: baselineController.text.trim(),
                     longTermGoals: goalsController.text.trim(),
@@ -262,11 +339,16 @@ class _IepListScreenState extends State<IepListScreen> {
                     objectives: [initialObjective],
                   );
 
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
                   Navigator.pop(ctx);
                   await app.addIepPlan(newPlan, byUser: currentUser);
                   if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Individual Ta’lim Rejasi muvaffaqiyatli yaratildi')),
+                    scaffoldMessenger.showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Individual Ta’lim Rejasi muvaffaqiyatli yaratildi',
+                        ),
+                      ),
                     );
                   }
                 },
@@ -279,7 +361,11 @@ class _IepListScreenState extends State<IepListScreen> {
     );
   }
 
-  void _showAddObjectiveDialog(BuildContext context, IndividualEducationPlanModel plan, UserModel currentUser) {
+  void _showAddObjectiveDialog(
+    BuildContext context,
+    IndividualEducationPlanModel plan,
+    UserModel currentUser,
+  ) {
     final titleController = TextEditingController();
     String selectedDomain = 'Kognitiv';
     final startLevelController = TextEditingController(text: '0%');
@@ -300,21 +386,44 @@ class _IepListScreenState extends State<IepListScreen> {
                   children: [
                     TextField(
                       controller: titleController,
-                      decoration: const InputDecoration(labelText: 'Maqsad nomi *', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                        labelText: 'Maqsad nomi *',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
                       value: selectedDomain,
-                      decoration: const InputDecoration(labelText: 'Soha', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                        labelText: 'Soha',
+                        border: OutlineInputBorder(),
+                      ),
                       items: const [
-                        DropdownMenuItem(value: 'Kognitiv', child: Text('Kognitiv')),
-                        DropdownMenuItem(value: 'Nutq', child: Text('Nutq va muloqot')),
-                        DropdownMenuItem(value: 'O‘quv', child: Text('O‘quv ko‘nikmalari')),
-                        DropdownMenuItem(value: 'Ijtimoiy-hissiy', child: Text('Ijtimoiy-hissiy')),
-                        DropdownMenuItem(value: 'Sensor-motorika', child: Text('Sensor-motorika')),
+                        DropdownMenuItem(
+                          value: 'Kognitiv',
+                          child: Text('Kognitiv'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Nutq',
+                          child: Text('Nutq va muloqot'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'O‘quv',
+                          child: Text('O‘quv ko‘nikmalari'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Ijtimoiy-hissiy',
+                          child: Text('Ijtimoiy-hissiy'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Sensor-motorika',
+                          child: Text('Sensor-motorika'),
+                        ),
                       ],
                       onChanged: (val) {
-                        if (val != null) setModalState(() => selectedDomain = val);
+                        if (val != null) {
+                          setModalState(() => selectedDomain = val);
+                        }
                       },
                     ),
                     const SizedBox(height: 12),
@@ -323,14 +432,20 @@ class _IepListScreenState extends State<IepListScreen> {
                         Expanded(
                           child: TextField(
                             controller: startLevelController,
-                            decoration: const InputDecoration(labelText: 'Boshlang‘ich daraja', border: OutlineInputBorder()),
+                            decoration: const InputDecoration(
+                              labelText: 'Boshlang‘ich daraja',
+                              border: OutlineInputBorder(),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: TextField(
                             controller: targetLevelController,
-                            decoration: const InputDecoration(labelText: 'Maqsadli daraja', border: OutlineInputBorder()),
+                            decoration: const InputDecoration(
+                              labelText: 'Maqsadli daraja',
+                              border: OutlineInputBorder(),
+                            ),
                           ),
                         ),
                       ],
@@ -338,14 +453,20 @@ class _IepListScreenState extends State<IepListScreen> {
                     const SizedBox(height: 12),
                     TextField(
                       controller: criteriaController,
-                      decoration: const InputDecoration(labelText: 'Muvaffaqiyat o‘lchov mezoni *', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                        labelText: 'Muvaffaqiyat o‘lchov mezoni *',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Bekor qilish')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Bekor qilish'),
+              ),
               FilledButton(
                 onPressed: () async {
                   if (titleController.text.trim().isEmpty) {
@@ -375,11 +496,17 @@ class _IepListScreenState extends State<IepListScreen> {
                     objectives: [...plan.objectives, newObj],
                   );
 
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
                   Navigator.pop(ctx);
-                  await context.read<AppProvider>().updateIepPlan(updated, byUser: currentUser);
+                  await context.read<AppProvider>().updateIepPlan(
+                    updated,
+                    byUser: currentUser,
+                  );
                   if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Yangi oraliq maqsad ITRga qo‘shildi')),
+                    scaffoldMessenger.showSnackBar(
+                      const SnackBar(
+                        content: Text('Yangi oraliq maqsad ITRga qo‘shildi'),
+                      ),
                     );
                   }
                 },
@@ -399,7 +526,8 @@ class _IepListScreenState extends State<IepListScreen> {
     final currentUser = auth.currentUser;
     final plans = app.iepPlans;
 
-    final canCreateIep = currentUser != null &&
+    final canCreateIep =
+        currentUser != null &&
         (currentUser.role == UserRole.superAdmin ||
             currentUser.role == UserRole.institutionAdmin ||
             currentUser.role == UserRole.coordinator ||
@@ -429,7 +557,10 @@ class _IepListScreenState extends State<IepListScreen> {
                     const SizedBox(height: 2),
                     Text(
                       'Alohida ta’lim ehtiyoji bo‘lgan o‘quvchilarning shaxsiy ta’limiy rejalari (${plans.length} ta)',
-                      style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ],
                 ),
@@ -449,15 +580,23 @@ class _IepListScreenState extends State<IepListScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.menu_book_outlined, size: 48, color: AppColors.textMuted),
+                          const Icon(
+                            Icons.menu_book_outlined,
+                            size: 48,
+                            color: AppColors.textMuted,
+                          ),
                           const SizedBox(height: 12),
-                          const Text('Hozircha ITR rejalari mavjud emas', style: TextStyle(fontWeight: FontWeight.w600)),
+                          const Text(
+                            'Hozircha ITR rejalari mavjud emas',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
                           if (canCreateIep) ...[
                             const SizedBox(height: 12),
                             OutlinedButton.icon(
                               icon: const Icon(Icons.add, size: 16),
                               label: const Text('ITR rejasi tuzish'),
-                              onPressed: () => _showCreateIepDialog(context, currentUser),
+                              onPressed: () =>
+                                  _showCreateIepDialog(context, currentUser),
                             ),
                           ],
                         ],
@@ -465,15 +604,18 @@ class _IepListScreenState extends State<IepListScreen> {
                     )
                   : ListView.separated(
                       itemCount: plans.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 14),
+                      separatorBuilder: (_, _) => const SizedBox(height: 14),
                       itemBuilder: (context, index) {
                         final p = plans[index];
                         final student = app.students.firstWhere(
                           (s) => s.id == p.studentId,
-                          orElse: () => app.allStudentsIncludingArchived.firstWhere(
-                            (s) => s.id == p.studentId,
-                            orElse: () => app.students.isNotEmpty ? app.students.first : app.allStudentsIncludingArchived.first,
-                          ),
+                          orElse: () =>
+                              app.allStudentsIncludingArchived.firstWhere(
+                                (s) => s.id == p.studentId,
+                                orElse: () => app.students.isNotEmpty
+                                    ? app.students.first
+                                    : app.allStudentsIncludingArchived.first,
+                              ),
                         );
                         return _buildIepCard(context, p, student, currentUser);
                       },
@@ -485,10 +627,16 @@ class _IepListScreenState extends State<IepListScreen> {
     );
   }
 
-  Widget _buildIepCard(BuildContext context, IndividualEducationPlanModel p, dynamic student, UserModel? currentUser) {
+  Widget _buildIepCard(
+    BuildContext context,
+    IndividualEducationPlanModel p,
+    dynamic student,
+    UserModel? currentUser,
+  ) {
     final app = context.watch<AppProvider>();
     final df = DateFormat('dd.MM.yyyy');
-    final canEdit = currentUser != null &&
+    final canEdit =
+        currentUser != null &&
         (_access.canManageUsers(currentUser) ||
             currentUser.role == UserRole.coordinator ||
             currentUser.role == UserRole.specialEducation ||
@@ -512,11 +660,17 @@ class _IepListScreenState extends State<IepListScreen> {
                           Expanded(
                             child: Text(
                               p.title,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.primaryLight,
                               borderRadius: BorderRadius.circular(8),
@@ -535,11 +689,17 @@ class _IepListScreenState extends State<IepListScreen> {
                       const SizedBox(height: 4),
                       Text(
                         'O‘quvchi: ${p.studentName} (${p.studentGrade}-sinf) • O‘quv yili: ${p.academicYear}',
-                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       Text(
                         'Mas’ul: ${p.responsibleTeacherName} • Muddat: ${df.format(p.startDate)} — ${df.format(p.reviewDate)}',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -552,7 +712,8 @@ class _IepListScreenState extends State<IepListScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => IepPrintScreen(plan: p, student: student),
+                        builder: (_) =>
+                            IepPrintScreen(plan: p, student: student),
                       ),
                     );
                   },
@@ -571,12 +732,29 @@ class _IepListScreenState extends State<IepListScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Boshlang‘ich daraja (Baseline): ${p.baselineSummary}', style: const TextStyle(fontSize: 12, height: 1.3)),
+                  Text(
+                    'Boshlang‘ich daraja (Baseline): ${p.baselineSummary}',
+                    style: const TextStyle(fontSize: 12, height: 1.3),
+                  ),
                   const SizedBox(height: 4),
-                  Text('Uzoq muddatli maqsad: ${p.longTermGoals}', style: const TextStyle(fontSize: 12, color: AppColors.primaryDark, fontWeight: FontWeight.w600)),
-                  if (p.supportStrategies != null && p.supportStrategies!.isNotEmpty) ...[
+                  Text(
+                    'Uzoq muddatli maqsad: ${p.longTermGoals}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.primaryDark,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (p.supportStrategies != null &&
+                      p.supportStrategies!.isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text('Qo‘llab-quvvatlash: ${p.supportStrategies!}', style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                    Text(
+                      'Qo‘llab-quvvatlash: ${p.supportStrategies!}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -589,13 +767,20 @@ class _IepListScreenState extends State<IepListScreen> {
               children: [
                 Text(
                   'O‘lchanadigan maqsadlar (${p.completedObjectivesCount}/${p.totalObjectivesCount} bajarildi):',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
                 ),
                 if (canEdit)
                   TextButton.icon(
                     icon: const Icon(Icons.add, size: 14),
-                    label: const Text('Maqsad qo‘shish', style: TextStyle(fontSize: 12)),
-                    onPressed: () => _showAddObjectiveDialog(context, p, currentUser),
+                    label: const Text(
+                      'Maqsad qo‘shish',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    onPressed: () =>
+                        _showAddObjectiveDialog(context, p, currentUser),
                   ),
               ],
             ),
@@ -611,10 +796,19 @@ class _IepListScreenState extends State<IepListScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(obj.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                          Text(
+                            obj.title,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                           Text(
                             '${obj.domain} • Mezon: ${obj.measurementCriteria ?? obj.successCriteria ?? ''}',
-                            style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textMuted,
+                            ),
                           ),
                         ],
                       ),
@@ -642,7 +836,13 @@ class _IepListScreenState extends State<IepListScreen> {
                     ),
                     SizedBox(
                       width: 45,
-                      child: Text('${obj.progressPercent}%', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      child: Text(
+                        '${obj.progressPercent}%',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -654,4 +854,3 @@ class _IepListScreenState extends State<IepListScreen> {
     );
   }
 }
-

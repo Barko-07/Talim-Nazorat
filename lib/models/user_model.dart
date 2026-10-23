@@ -181,37 +181,113 @@ extension UserRoleExtension on UserRole {
     switch (this) {
       case UserRole.psychologist:
         return [
-          {'name': 'Diqqatni jamlash va yo‘naltirish qobiliyati', 'max': 25.0, 'default': 20.0},
-          {'name': 'Ko‘rgazmali-obrazli va mantiqiy tafakkur', 'max': 25.0, 'default': 19.0},
-          {'name': 'Xotira hajmi va eslab qolish tezligi', 'max': 25.0, 'default': 21.0},
-          {'name': 'Hissiy o‘zini boshqarish va intilish', 'max': 25.0, 'default': 18.0},
+          {
+            'name': 'Diqqatni jamlash va yo‘naltirish qobiliyati',
+            'max': 25.0,
+            'default': 20.0,
+          },
+          {
+            'name': 'Ko‘rgazmali-obrazli va mantiqiy tafakkur',
+            'max': 25.0,
+            'default': 19.0,
+          },
+          {
+            'name': 'Xotira hajmi va eslab qolish tezligi',
+            'max': 25.0,
+            'default': 21.0,
+          },
+          {
+            'name': 'Hissiy o‘zini boshqarish va intilish',
+            'max': 25.0,
+            'default': 18.0,
+          },
         ];
       case UserRole.speechTherapist:
         return [
-          {'name': 'Artikulyatsion apparat harakatchanligi', 'max': 25.0, 'default': 18.0},
-          {'name': 'Fonematik tahlil va tovush farqlash', 'max': 25.0, 'default': 17.0},
-          {'name': 'Aktiv va passiv so‘z boyligi hajmi', 'max': 25.0, 'default': 20.0},
-          {'name': 'Bog‘lanishli monologik va dialogik nutq', 'max': 25.0, 'default': 19.0},
+          {
+            'name': 'Artikulyatsion apparat harakatchanligi',
+            'max': 25.0,
+            'default': 18.0,
+          },
+          {
+            'name': 'Fonematik tahlil va tovush farqlash',
+            'max': 25.0,
+            'default': 17.0,
+          },
+          {
+            'name': 'Aktiv va passiv so‘z boyligi hajmi',
+            'max': 25.0,
+            'default': 20.0,
+          },
+          {
+            'name': 'Bog‘lanishli monologik va dialogik nutq',
+            'max': 25.0,
+            'default': 19.0,
+          },
         ];
       case UserRole.specialEducation:
         return [
-          {'name': 'Sensor qabul qilish (rang, hajm, shakl)', 'max': 25.0, 'default': 21.0},
-          {'name': 'Mayda motorika va barmoqlar epchilligi', 'max': 25.0, 'default': 18.0},
-          {'name': 'Fazoviy va tana sxemasini to‘g‘ri anglash', 'max': 25.0, 'default': 20.0},
-          {'name': 'Kundalik amaliy faoliyatda mustaqillik', 'max': 25.0, 'default': 22.0},
+          {
+            'name': 'Sensor qabul qilish (rang, hajm, shakl)',
+            'max': 25.0,
+            'default': 21.0,
+          },
+          {
+            'name': 'Mayda motorika va barmoqlar epchilligi',
+            'max': 25.0,
+            'default': 18.0,
+          },
+          {
+            'name': 'Fazoviy va tana sxemasini to‘g‘ri anglash',
+            'max': 25.0,
+            'default': 20.0,
+          },
+          {
+            'name': 'Kundalik amaliy faoliyatda mustaqillik',
+            'max': 25.0,
+            'default': 22.0,
+          },
         ];
       case UserRole.teacher:
         return [
-          {'name': 'Dars mashg‘ulotlaridagi faollik', 'max': 25.0, 'default': 20.0},
-          {'name': 'O‘qituvchi ko‘rsatmalariga rioya qilish', 'max': 25.0, 'default': 22.0},
-          {'name': 'O‘quv qurollaridan to‘g‘ri foydalanish', 'max': 25.0, 'default': 21.0},
-          {'name': 'Sinfdoshlar bilan hamkorlik munosabati', 'max': 25.0, 'default': 19.0},
+          {
+            'name': 'Dars mashg‘ulotlaridagi faollik',
+            'max': 25.0,
+            'default': 20.0,
+          },
+          {
+            'name': 'O‘qituvchi ko‘rsatmalariga rioya qilish',
+            'max': 25.0,
+            'default': 22.0,
+          },
+          {
+            'name': 'O‘quv qurollaridan to‘g‘ri foydalanish',
+            'max': 25.0,
+            'default': 21.0,
+          },
+          {
+            'name': 'Sinfdoshlar bilan hamkorlik munosabati',
+            'max': 25.0,
+            'default': 19.0,
+          },
         ];
       default:
         return [
-          {'name': 'Ko‘rsatmalarni tushunish va idrok', 'max': 30.0, 'default': 22.0},
-          {'name': 'Mustaqil amaliy ijro samarasi', 'max': 35.0, 'default': 26.0},
-          {'name': 'Muloqot va ijtimoiy moslashuv', 'max': 35.0, 'default': 25.0},
+          {
+            'name': 'Ko‘rsatmalarni tushunish va idrok',
+            'max': 30.0,
+            'default': 22.0,
+          },
+          {
+            'name': 'Mustaqil amaliy ijro samarasi',
+            'max': 35.0,
+            'default': 26.0,
+          },
+          {
+            'name': 'Muloqot va ijtimoiy moslashuv',
+            'max': 35.0,
+            'default': 25.0,
+          },
         ];
     }
   }
@@ -274,7 +350,8 @@ class UserModel {
   final String? institutionName;
   final String? phone;
   final String? specialization;
-  final String? qualificationCategory; // Oliy toifa, 1-toifa, 2-toifa, Mutaxassis
+  final String?
+  qualificationCategory; // Oliy toifa, 1-toifa, 2-toifa, Mutaxassis
   final int experienceYears;
   final String? password;
   final bool isActive;
@@ -326,7 +403,8 @@ class UserModel {
       institutionName: institutionName ?? this.institutionName,
       phone: phone ?? this.phone,
       specialization: specialization ?? this.specialization,
-      qualificationCategory: qualificationCategory ?? this.qualificationCategory,
+      qualificationCategory:
+          qualificationCategory ?? this.qualificationCategory,
       experienceYears: experienceYears ?? this.experienceYears,
       password: password ?? this.password,
       isActive: isActive ?? this.isActive,
@@ -335,41 +413,43 @@ class UserModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'email': email,
-        'fullName': fullName,
-        'role': role.code,
-        'region': region,
-        'district': district,
-        'institutionId': institutionId,
-        'institutionName': institutionName,
-        'phone': phone,
-        'specialization': specialization,
-        'qualificationCategory': qualificationCategory,
-        'experienceYears': experienceYears,
-        'password': password,
-        'isActive': isActive,
-        'assignedStudentIds': assignedStudentIds,
-      };
+    'id': id,
+    'email': email,
+    'fullName': fullName,
+    'role': role.code,
+    'region': region,
+    'district': district,
+    'institutionId': institutionId,
+    'institutionName': institutionName,
+    'phone': phone,
+    'specialization': specialization,
+    'qualificationCategory': qualificationCategory,
+    'experienceYears': experienceYears,
+    'password': password,
+    'isActive': isActive,
+    'assignedStudentIds': assignedStudentIds,
+  };
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-        id: json['id'] as String,
-        email: json['email'] as String,
-        fullName: json['fullName'] as String,
-        role: UserRoleExtension.fromCode(json['role'] as String),
-        region: json['region'] as String? ?? 'Namangan viloyati',
-        district: json['district'] as String?,
-        institutionId: json['institutionId'] as String?,
-        institutionName: json['institutionName'] as String?,
-        phone: json['phone'] as String?,
-        specialization: json['specialization'] as String?,
-        qualificationCategory: json['qualificationCategory'] as String? ?? 'Mutaxassis',
-        experienceYears: json['experienceYears'] as int? ?? 3,
-        password: json['password'] as String?,
-        isActive: json['isActive'] as bool? ?? true,
-        assignedStudentIds: (json['assignedStudentIds'] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            const [],
-      );
+    id: json['id'] as String,
+    email: json['email'] as String,
+    fullName: json['fullName'] as String,
+    role: UserRoleExtension.fromCode(json['role'] as String),
+    region: json['region'] as String? ?? 'Namangan viloyati',
+    district: json['district'] as String?,
+    institutionId: json['institutionId'] as String?,
+    institutionName: json['institutionName'] as String?,
+    phone: json['phone'] as String?,
+    specialization: json['specialization'] as String?,
+    qualificationCategory:
+        json['qualificationCategory'] as String? ?? 'Mutaxassis',
+    experienceYears: json['experienceYears'] as int? ?? 3,
+    password: json['password'] as String?,
+    isActive: json['isActive'] as bool? ?? true,
+    assignedStudentIds:
+        (json['assignedStudentIds'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        const [],
+  );
 }

@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+
 import '../models/user_model.dart';
 import '../models/student_model.dart';
 import '../models/assessment_model.dart';
@@ -71,64 +73,64 @@ class LocalDbService {
       final usersRaw = prefs.getString('db_users');
       _users = usersRaw != null
           ? (jsonDecode(usersRaw) as List)
-              .map((e) => UserModel.fromJson(e))
-              .toList()
+                .map((e) => UserModel.fromJson(e))
+                .toList()
           : List.from(SeedData.users);
 
       final studentsRaw = prefs.getString('db_students');
       _students = studentsRaw != null
           ? (jsonDecode(studentsRaw) as List)
-              .map((e) => StudentModel.fromJson(e))
-              .toList()
+                .map((e) => StudentModel.fromJson(e))
+                .toList()
           : List.from(SeedData.students);
 
       final assessmentsRaw = prefs.getString('db_assessments');
       _assessments = assessmentsRaw != null
           ? (jsonDecode(assessmentsRaw) as List)
-              .map((e) => AssessmentModel.fromJson(e))
-              .toList()
+                .map((e) => AssessmentModel.fromJson(e))
+                .toList()
           : List.from(SeedData.assessments);
 
       final sessionsRaw = prefs.getString('db_sessions');
       _sessions = sessionsRaw != null
           ? (jsonDecode(sessionsRaw) as List)
-              .map((e) => SessionModel.fromJson(e))
-              .toList()
+                .map((e) => SessionModel.fromJson(e))
+                .toList()
           : List.from(SeedData.sessions);
 
       final iepRaw = prefs.getString('db_iep');
       _iepPlans = iepRaw != null
           ? (jsonDecode(iepRaw) as List)
-              .map((e) => IndividualEducationPlanModel.fromJson(e))
-              .toList()
+                .map((e) => IndividualEducationPlanModel.fromJson(e))
+                .toList()
           : List.from(SeedData.iepPlans);
 
       final alertsRaw = prefs.getString('db_alerts');
       _alerts = alertsRaw != null
           ? (jsonDecode(alertsRaw) as List)
-              .map((e) => MonitoringAlertModel.fromJson(e))
-              .toList()
+                .map((e) => MonitoringAlertModel.fromJson(e))
+                .toList()
           : List.from(SeedData.monitoringAlerts);
 
       final referralsRaw = prefs.getString('db_referrals');
       _referrals = referralsRaw != null
           ? (jsonDecode(referralsRaw) as List)
-              .map((e) => ReferralModel.fromJson(e))
-              .toList()
+                .map((e) => ReferralModel.fromJson(e))
+                .toList()
           : List.from(SeedData.referrals);
 
       final auditRaw = prefs.getString('db_audit');
       _auditLogs = auditRaw != null
           ? (jsonDecode(auditRaw) as List)
-              .map((e) => AuditLogModel.fromJson(e))
-              .toList()
+                .map((e) => AuditLogModel.fromJson(e))
+                .toList()
           : List.from(SeedData.auditLogs);
 
       final notifRaw = prefs.getString('db_notifications');
       _notifications = notifRaw != null
           ? (jsonDecode(notifRaw) as List)
-              .map((e) => NotificationModel.fromJson(e))
-              .toList()
+                .map((e) => NotificationModel.fromJson(e))
+                .toList()
           : List.from(SeedData.notifications);
     } catch (_) {
       _users = List.from(SeedData.users);
@@ -145,15 +147,42 @@ class LocalDbService {
 
   Future<void> _persistAll() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('db_users', jsonEncode(_users.map((e) => e.toJson()).toList()));
-    await prefs.setString('db_students', jsonEncode(_students.map((e) => e.toJson()).toList()));
-    await prefs.setString('db_assessments', jsonEncode(_assessments.map((e) => e.toJson()).toList()));
-    await prefs.setString('db_sessions', jsonEncode(_sessions.map((e) => e.toJson()).toList()));
-    await prefs.setString('db_iep', jsonEncode(_iepPlans.map((e) => e.toJson()).toList()));
-    await prefs.setString('db_alerts', jsonEncode(_alerts.map((e) => e.toJson()).toList()));
-    await prefs.setString('db_referrals', jsonEncode(_referrals.map((e) => e.toJson()).toList()));
-    await prefs.setString('db_audit', jsonEncode(_auditLogs.map((e) => e.toJson()).toList()));
-    await prefs.setString('db_notifications', jsonEncode(_notifications.map((e) => e.toJson()).toList()));
+    await prefs.setString(
+      'db_users',
+      jsonEncode(_users.map((e) => e.toJson()).toList()),
+    );
+    await prefs.setString(
+      'db_students',
+      jsonEncode(_students.map((e) => e.toJson()).toList()),
+    );
+    await prefs.setString(
+      'db_assessments',
+      jsonEncode(_assessments.map((e) => e.toJson()).toList()),
+    );
+    await prefs.setString(
+      'db_sessions',
+      jsonEncode(_sessions.map((e) => e.toJson()).toList()),
+    );
+    await prefs.setString(
+      'db_iep',
+      jsonEncode(_iepPlans.map((e) => e.toJson()).toList()),
+    );
+    await prefs.setString(
+      'db_alerts',
+      jsonEncode(_alerts.map((e) => e.toJson()).toList()),
+    );
+    await prefs.setString(
+      'db_referrals',
+      jsonEncode(_referrals.map((e) => e.toJson()).toList()),
+    );
+    await prefs.setString(
+      'db_audit',
+      jsonEncode(_auditLogs.map((e) => e.toJson()).toList()),
+    );
+    await prefs.setString(
+      'db_notifications',
+      jsonEncode(_notifications.map((e) => e.toJson()).toList()),
+    );
   }
 
   void _reEvaluateRules() {
@@ -173,7 +202,11 @@ class LocalDbService {
     }
     // Maktab doirasida xodimlarni ko'rsatish
     return _users.where((u) {
-      return _accessControl.isSameInstitution(forUser, u.institutionId, u.institutionName);
+      return _accessControl.isSameInstitution(
+        forUser,
+        u.institutionId,
+        u.institutionName,
+      );
     }).toList();
   }
 
@@ -212,7 +245,8 @@ class LocalDbService {
       userRole: user.role.label,
       action: 'REGISTER',
       entity: 'User',
-      details: '${user.fullName} (${user.role.label}) tizimda ro‘yxatdan o‘tdi. Muassasa: ${user.institutionName ?? 'Belgilanmagan'}',
+      details:
+          '${user.fullName} (${user.role.label}) tizimda ro‘yxatdan o‘tdi. Muassasa: ${user.institutionName ?? 'Belgilanmagan'}',
     );
   }
 
@@ -231,7 +265,11 @@ class LocalDbService {
     }
   }
 
-  Future<void> toggleUserActive(String userId, bool isActive, {UserModel? byUser}) async {
+  Future<void> toggleUserActive(
+    String userId,
+    bool isActive, {
+    UserModel? byUser,
+  }) async {
     final index = _users.indexWhere((u) => u.id == userId);
     if (index != -1) {
       _users[index] = _users[index].copyWith(isActive: isActive);
@@ -241,7 +279,8 @@ class LocalDbService {
         userRole: byUser?.role.label ?? 'Tizim administratori',
         action: 'PERMISSION_CHANGE',
         entity: 'User',
-        details: '${_users[index].fullName} hisobi ${isActive ? 'faollashtirildi' : 'bloklandi'}.',
+        details:
+            '${_users[index].fullName} hisobi ${isActive ? 'faollashtirildi' : 'bloklandi'}.',
       );
     }
   }
@@ -260,7 +299,9 @@ class LocalDbService {
         return false;
       }
       // 2. Arxivlanganlar filtri
-      if (!includeArchived && s.status == 'Arxivlangan' && status != 'Arxivlangan') {
+      if (!includeArchived &&
+          s.status == 'Arxivlangan' &&
+          status != 'Arxivlangan') {
         return false;
       }
       // 3. Qidiruv
@@ -273,7 +314,9 @@ class LocalDbService {
       }
       // 4. Sinf va status
       if (grade != null && grade.isNotEmpty && s.grade != grade) return false;
-      if (status != null && status.isNotEmpty && s.status != status) return false;
+      if (status != null && status.isNotEmpty && s.status != status) {
+        return false;
+      }
       return true;
     }).toList();
   }
@@ -299,7 +342,8 @@ class LocalDbService {
       userRole: byUser?.role.label ?? 'Xodim',
       action: 'CREATE',
       entity: 'Student',
-      details: '${student.fullName} (${student.grade}, ${student.institutionName}) bazaga qo‘shildi',
+      details:
+          '${student.fullName} (${student.grade}, ${student.institutionName}) bazaga qo‘shildi',
     );
   }
 
@@ -319,7 +363,11 @@ class LocalDbService {
     }
   }
 
-  Future<void> deactivateStudent(String studentId, String reason, {UserModel? byUser}) async {
+  Future<void> deactivateStudent(
+    String studentId,
+    String reason, {
+    UserModel? byUser,
+  }) async {
     final index = _students.indexWhere((s) => s.id == studentId);
     if (index != -1) {
       final cur = _students[index];
@@ -340,7 +388,11 @@ class LocalDbService {
     }
   }
 
-  Future<void> assignSpecialistToStudent(String studentId, String specialistId, {UserModel? byUser}) async {
+  Future<void> assignSpecialistToStudent(
+    String studentId,
+    String specialistId, {
+    UserModel? byUser,
+  }) async {
     final sIndex = _students.indexWhere((s) => s.id == studentId);
     final uIndex = _users.indexWhere((u) => u.id == specialistId);
     if (sIndex != -1 && uIndex != -1) {
@@ -352,13 +404,19 @@ class LocalDbService {
         updatedSpecIds.add(specialistId);
       }
 
-      final updatedStudentIds = List<String>.from(specialist.assignedStudentIds);
+      final updatedStudentIds = List<String>.from(
+        specialist.assignedStudentIds,
+      );
       if (!updatedStudentIds.contains(studentId)) {
         updatedStudentIds.add(studentId);
       }
 
-      _students[sIndex] = student.copyWith(assignedSpecialistIds: updatedSpecIds);
-      _users[uIndex] = specialist.copyWith(assignedStudentIds: updatedStudentIds);
+      _students[sIndex] = student.copyWith(
+        assignedSpecialistIds: updatedSpecIds,
+      );
+      _users[uIndex] = specialist.copyWith(
+        assignedStudentIds: updatedStudentIds,
+      );
 
       await createNotification(
         NotificationModel(
@@ -380,7 +438,8 @@ class LocalDbService {
         userRole: byUser?.role.label ?? 'Administrator',
         action: 'PERMISSION_CHANGE',
         entity: 'Assignment',
-        details: '${specialist.fullName} ${student.fullName}ga mutaxassis sifatida biriktirildi',
+        details:
+            '${specialist.fullName} ${student.fullName}ga mutaxassis sifatida biriktirildi',
       );
     }
   }
@@ -396,7 +455,8 @@ class LocalDbService {
       if (category != null && a.category != category) return false;
       if (forUser != null) {
         final student = getStudentById(a.studentId);
-        if (student != null && !_accessControl.canViewStudent(forUser, student)) {
+        if (student != null &&
+            !_accessControl.canViewStudent(forUser, student)) {
           return false;
         }
       }
@@ -412,7 +472,10 @@ class LocalDbService {
     }
   }
 
-  Future<void> addAssessment(AssessmentModel assessment, {UserModel? byUser}) async {
+  Future<void> addAssessment(
+    AssessmentModel assessment, {
+    UserModel? byUser,
+  }) async {
     _assessments.insert(0, assessment);
     _reEvaluateRules();
     await _persistAll();
@@ -421,7 +484,8 @@ class LocalDbService {
       userRole: byUser?.role.label ?? assessment.specialistRole,
       action: 'CREATE',
       entity: 'Assessment',
-      details: '${assessment.studentName} uchun ${assessment.category} baholash: ${assessment.title} (${assessment.totalScore}/${assessment.maxScore} ball)',
+      details:
+          '${assessment.studentName} uchun ${assessment.category} baholash: ${assessment.title} (${assessment.totalScore}/${assessment.maxScore} ball)',
     );
   }
 
@@ -436,7 +500,8 @@ class LocalDbService {
       if (specialistId != null && s.specialistId != specialistId) return false;
       if (forUser != null) {
         final student = getStudentById(s.studentId);
-        if (student != null && !_accessControl.canViewStudent(forUser, student)) {
+        if (student != null &&
+            !_accessControl.canViewStudent(forUser, student)) {
           return false;
         }
       }
@@ -444,19 +509,27 @@ class LocalDbService {
     }).toList();
   }
 
-  Future<Map<String, dynamic>> addSession(SessionModel session, {UserModel? byUser}) async {
+  Future<Map<String, dynamic>> addSession(
+    SessionModel session, {
+    UserModel? byUser,
+  }) async {
     // 1. Takroriy seans tekshiruvi (Bir xil o'quvchi va mutaxassis uchun bir xil vaqtda seans bormi?)
-    final duplicate = _sessions.any((s) =>
-        s.studentId == session.studentId &&
-        s.specialistId == session.specialistId &&
-        s.scheduledAt.year == session.scheduledAt.year &&
-        s.scheduledAt.month == session.scheduledAt.month &&
-        s.scheduledAt.day == session.scheduledAt.day &&
-        s.scheduledAt.hour == session.scheduledAt.hour &&
-        s.scheduledAt.minute == session.scheduledAt.minute);
+    final duplicate = _sessions.any(
+      (s) =>
+          s.studentId == session.studentId &&
+          s.specialistId == session.specialistId &&
+          s.scheduledAt.year == session.scheduledAt.year &&
+          s.scheduledAt.month == session.scheduledAt.month &&
+          s.scheduledAt.day == session.scheduledAt.day &&
+          s.scheduledAt.hour == session.scheduledAt.hour &&
+          s.scheduledAt.minute == session.scheduledAt.minute,
+    );
 
     if (duplicate) {
-      return {'success': false, 'message': 'Ushbu vaqtda bu mutaxassis va o‘quvchi uchun allaqachon mashg‘ulot rejalashtirilgan.'};
+      return {
+        'success': false,
+        'message': 'Ushbu vaqtda bu mutaxassis va o‘quvchi uchun allaqachon mashg‘ulot rejalashtirilgan.',
+      };
     }
 
     _sessions.insert(0, session);
@@ -467,7 +540,8 @@ class LocalDbService {
       userRole: byUser?.role.label ?? session.specialistRole,
       action: 'CREATE',
       entity: 'Session',
-      details: '${session.studentName} bilan ${session.topic} mashg‘uloti rejalashtirildi',
+      details:
+          '${session.studentName} bilan ${session.topic} mashg‘uloti rejalashtirildi',
     );
     return {'success': true};
   }
@@ -494,7 +568,8 @@ class LocalDbService {
         userRole: byUser?.role.label ?? cur.specialistRole,
         action: 'UPDATE',
         entity: 'Session',
-        details: '${cur.studentName} bilan ${cur.topic} mashg‘uloti bajarilgan deb tasdiqlandi',
+        details:
+            '${cur.studentName} bilan ${cur.topic} mashg‘uloti bajarilgan deb tasdiqlandi',
       );
     }
   }
@@ -520,7 +595,8 @@ class LocalDbService {
         userRole: byUser?.role.label ?? cur.specialistRole,
         action: 'UPDATE',
         entity: 'Session',
-        details: '${cur.studentName} bilan mashg‘ulot holati: $status ga o‘zgardi',
+        details:
+            '${cur.studentName} bilan mashg‘ulot holati: $status ga o‘zgardi',
       );
     }
   }
@@ -534,7 +610,8 @@ class LocalDbService {
       if (studentId != null && p.studentId != studentId) return false;
       if (forUser != null) {
         final student = getStudentById(p.studentId);
-        if (student != null && !_accessControl.canViewStudent(forUser, student)) {
+        if (student != null &&
+            !_accessControl.canViewStudent(forUser, student)) {
           return false;
         }
       }
@@ -550,7 +627,10 @@ class LocalDbService {
     }
   }
 
-  Future<void> addIepPlan(IndividualEducationPlanModel plan, {UserModel? byUser}) async {
+  Future<void> addIepPlan(
+    IndividualEducationPlanModel plan, {
+    UserModel? byUser,
+  }) async {
     _iepPlans.insert(0, plan);
     _reEvaluateRules();
     await _persistAll();
@@ -559,11 +639,15 @@ class LocalDbService {
       userRole: byUser?.role.label ?? 'Koordinator',
       action: 'CREATE',
       entity: 'IEP',
-      details: '${plan.studentName} uchun ITR rejasi yaratildi (${plan.objectives.length} ta maqsad)',
+      details:
+          '${plan.studentName} uchun ITR rejasi yaratildi (${plan.objectives.length} ta maqsad)',
     );
   }
 
-  Future<void> updateIepPlan(IndividualEducationPlanModel plan, {UserModel? byUser}) async {
+  Future<void> updateIepPlan(
+    IndividualEducationPlanModel plan, {
+    UserModel? byUser,
+  }) async {
     final index = _iepPlans.indexWhere((p) => p.id == plan.id);
     if (index != -1) {
       _iepPlans[index] = plan;
@@ -594,8 +678,8 @@ class LocalDbService {
           final newStatus = progress >= 100
               ? 'Bajarildi'
               : progress > 0
-                  ? 'Jarayonda'
-                  : 'Rejalashtirilgan';
+              ? 'Jarayonda'
+              : 'Rejalashtirilgan';
           return obj.copyWith(
             progressPercent: progress,
             status: newStatus,
@@ -613,7 +697,8 @@ class LocalDbService {
         userRole: byUser?.role.label ?? 'Xodim',
         action: 'UPDATE',
         entity: 'IEP_Objective',
-        details: '${plan.studentName} ITR maqsadi bo‘yicha progress: $progress% qilib belgilandi',
+        details:
+            '${plan.studentName} ITR maqsadi bo‘yicha progress: $progress% qilib belgilandi',
       );
     }
   }
@@ -628,7 +713,8 @@ class LocalDbService {
       if (onlyUnresolved == true && a.isResolved) return false;
       if (forUser != null) {
         final student = getStudentById(a.studentId);
-        if (student != null && !_accessControl.canViewStudent(forUser, student)) {
+        if (student != null &&
+            !_accessControl.canViewStudent(forUser, student)) {
           return false;
         }
       }
@@ -636,7 +722,11 @@ class LocalDbService {
     }).toList();
   }
 
-  Future<void> resolveAlert(String alertId, String notes, {UserModel? byUser}) async {
+  Future<void> resolveAlert(
+    String alertId,
+    String notes, {
+    UserModel? byUser,
+  }) async {
     final index = _alerts.indexWhere((a) => a.id == alertId);
     if (index != -1) {
       final cur = _alerts[index];
@@ -674,13 +764,15 @@ class LocalDbService {
     await _persistAll();
 
     // Agar yo'naltirilgan mutaxassis mavjud bo'lsa unga notifikatsiya jo'natish
-    if (referral.toSpecialistId != null && referral.toSpecialistId!.isNotEmpty) {
+    if (referral.toSpecialistId != null &&
+        referral.toSpecialistId!.isNotEmpty) {
       await createNotification(
         NotificationModel(
           id: 'notif_${_uuid.v4().substring(0, 8)}',
           recipientUserId: referral.toSpecialistId!,
           title: 'Yangi yo‘naltirish (${referral.priority})',
-          body: '${referral.fromSpecialistName} ${referral.studentName}ni ko‘rikdan o‘tkazish uchun yo‘naltirdi.',
+          body:
+              '${referral.fromSpecialistName} ${referral.studentName}ni ko‘rikdan o‘tkazish uchun yo‘naltirdi.',
           type: 'REFERRAL',
           relatedRecordId: referral.id,
           relatedStudentId: referral.studentId,
@@ -695,7 +787,8 @@ class LocalDbService {
       userRole: byUser?.role.label ?? 'Mutaxassis',
       action: 'CREATE',
       entity: 'Referral',
-      details: '${referral.studentName} -> ${referral.toSpecialistType} xizmatiga yo‘naltirildi. Sabab: ${referral.reason}',
+      details:
+          '${referral.studentName} -> ${referral.toSpecialistType} xizmatiga yo‘naltirildi. Sabab: ${referral.reason}',
     );
   }
 
@@ -723,7 +816,8 @@ class LocalDbService {
         userRole: byUser?.role.label ?? 'Xodim',
         action: 'UPDATE',
         entity: 'Referral',
-        details: 'Yo‘naltirish holati: $newStatus deb belgilandi (${cur.studentName})',
+        details:
+            'Yo‘naltirish holati: $newStatus deb belgilandi (${cur.studentName})',
       );
     }
   }
@@ -734,7 +828,9 @@ class LocalDbService {
   }
 
   int getUnreadNotificationCount(String userId) {
-    return _notifications.where((n) => n.recipientUserId == userId && !n.isRead).length;
+    return _notifications
+        .where((n) => n.recipientUserId == userId && !n.isRead)
+        .length;
   }
 
   Future<void> createNotification(NotificationModel notification) async {
@@ -752,7 +848,8 @@ class LocalDbService {
 
   Future<void> markAllNotificationsAsRead(String userId) async {
     for (int i = 0; i < _notifications.length; i++) {
-      if (_notifications[i].recipientUserId == userId && !_notifications[i].isRead) {
+      if (_notifications[i].recipientUserId == userId &&
+          !_notifications[i].isRead) {
         _notifications[i] = _notifications[i].copyWith(isRead: true);
       }
     }

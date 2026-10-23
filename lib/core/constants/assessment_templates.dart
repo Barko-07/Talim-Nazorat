@@ -156,7 +156,8 @@ class AssessmentTemplates {
         AssessmentTemplateField(
           key: 'life_independence',
           label: 'O‘z-o‘ziga xizmat va amaliy mustaqillik',
-          hint: 'Kiyinish, ovqatlanish, buyumlarni tartibga solish mustaqilligi',
+          hint:
+              'Kiyinish, ovqatlanish, buyumlarni tartibga solish mustaqilligi',
           maxScore: 25.0,
           defaultScore: 22.0,
         ),
@@ -213,9 +214,6 @@ class AssessmentTemplates {
   ];
 
   static AssessmentTemplate getTemplateForRole(UserRole role) {
-    return all.firstWhere(
-      (t) => t.targetRole == role,
-      orElse: () => all.first,
-    );
+    return all.firstWhere((t) => t.targetRole == role, orElse: () => all.first);
   }
 }

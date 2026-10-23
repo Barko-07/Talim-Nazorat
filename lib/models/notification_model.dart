@@ -3,7 +3,8 @@ class NotificationModel {
   final String recipientUserId;
   final String title;
   final String body;
-  final String type; // 'ASSESSMENT', 'SESSION', 'IEP', 'REFERRAL', 'ALERT', 'ASSIGNMENT'
+  final String
+  type; // 'ASSESSMENT', 'SESSION', 'IEP', 'REFERRAL', 'ALERT', 'ASSIGNMENT'
   final String? relatedRecordId;
   final String? relatedStudentId;
   final String? relatedStudentName;
@@ -23,9 +24,7 @@ class NotificationModel {
     required this.createdAt,
   });
 
-  NotificationModel copyWith({
-    bool? isRead,
-  }) {
+  NotificationModel copyWith({bool? isRead}) {
     return NotificationModel(
       id: id,
       recipientUserId: recipientUserId,
@@ -41,17 +40,17 @@ class NotificationModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'recipientUserId': recipientUserId,
-        'title': title,
-        'body': body,
-        'type': type,
-        'relatedRecordId': relatedRecordId,
-        'relatedStudentId': relatedStudentId,
-        'relatedStudentName': relatedStudentName,
-        'isRead': isRead,
-        'createdAt': createdAt.toIso8601String(),
-      };
+    'id': id,
+    'recipientUserId': recipientUserId,
+    'title': title,
+    'body': body,
+    'type': type,
+    'relatedRecordId': relatedRecordId,
+    'relatedStudentId': relatedStudentId,
+    'relatedStudentName': relatedStudentName,
+    'isRead': isRead,
+    'createdAt': createdAt.toIso8601String(),
+  };
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) =>
       NotificationModel(

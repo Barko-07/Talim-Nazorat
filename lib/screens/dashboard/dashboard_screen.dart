@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -24,7 +25,6 @@ class DashboardScreen extends StatelessWidget {
     final user = auth.currentUser;
 
     final alerts = app.unresolvedAlerts;
-    final students = app.students;
     final sessions = app.sessions;
     final assessments = app.assessments;
 
@@ -39,9 +39,14 @@ class DashboardScreen extends StatelessWidget {
               builder: (context, constraints) {
                 final isNarrow = constraints.maxWidth < 550;
                 return Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: AppColors.border, width: 1),
+                  ),
                   color: Colors.white,
                   child: Padding(
-                    padding: const EdgeInsets.all(18),
+                    padding: const EdgeInsets.all(14),
                     child: isNarrow
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,68 +54,52 @@ class DashboardScreen extends StatelessWidget {
                               Row(
                                 children: [
                                   CircleAvatar(
-                                    radius: 26,
+                                    radius: 22,
                                     backgroundColor: AppColors.primaryLight,
                                     child: Text(
                                       (user?.fullName ?? 'U').substring(0, 1),
                                       style: const TextStyle(
-                                        fontSize: 20,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryDark,
+                                        color: AppColors.primary,
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 14),
+                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Assalomu alaykum, ${user?.fullName ?? ''}!',
                                           style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w800,
                                             color: AppColors.textPrimary,
                                           ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        const SizedBox(height: 2),
-                                        Wrap(
-                                          spacing: 6,
-                                          runSpacing: 4,
-                                          crossAxisAlignment: WrapCrossAlignment.center,
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.primary.withValues(alpha: 0.12),
-                                                borderRadius: BorderRadius.circular(6),
-                                              ),
-                                              child: Text(
-                                                user?.role.label ?? '',
-                                                style: const TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.primary,
-                                                ),
-                                              ),
+                                        const SizedBox(height: 3),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 7,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primaryLight,
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
+                                          child: Text(
+                                            user?.role.label ?? '',
+                                            style: const TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primary,
                                             ),
-                                            if (user?.qualificationCategory != null)
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.borderLight,
-                                                  borderRadius: BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                  user!.qualificationCategory!,
-                                                  style: const TextStyle(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppColors.textSecondary,
-                                                  ),
-                                                ),
-                                              ),
-                                          ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -121,21 +110,57 @@ class DashboardScreen extends StatelessWidget {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: Text(
-                                      'Muassasa: ${user?.institutionName ?? ''}',
-                                      style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.account_balance_outlined,
+                                          size: 14,
+                                          color: AppColors.textMuted,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            user?.institutionName ?? '5-sonli maktab',
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              color: AppColors.textMuted,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
+                                  const SizedBox(width: 8),
                                   FilledButton.icon(
                                     style: FilledButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      backgroundColor: AppColors.primary,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
+                                      visualDensity: VisualDensity.compact,
                                     ),
-                                    icon: const Icon(Icons.person_add_rounded, size: 16),
-                                    label: const Text('Bola qo‘shish', style: TextStyle(fontSize: 12)),
+                                    icon: const Icon(
+                                      Icons.person_add_rounded,
+                                      size: 15,
+                                    ),
+                                    label: const Text(
+                                      'Bola qo‘shish',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (_) => const AddStudentScreen()),
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const AddStudentScreen(),
+                                        ),
                                       );
                                     },
                                   ),
@@ -146,18 +171,18 @@ class DashboardScreen extends StatelessWidget {
                         : Row(
                             children: [
                               CircleAvatar(
-                                radius: 28,
+                                radius: 24,
                                 backgroundColor: AppColors.primaryLight,
                                 child: Text(
                                   (user?.fullName ?? 'U').substring(0, 1),
                                   style: const TextStyle(
-                                    fontSize: 22,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.primaryDark,
+                                    color: AppColors.primary,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 16),
+                              const SizedBox(width: 14),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,21 +190,21 @@ class DashboardScreen extends StatelessWidget {
                                     Text(
                                       'Assalomu alaykum, ${user?.fullName ?? ''}!',
                                       style: const TextStyle(
-                                        fontSize: 18,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
-                                    Wrap(
-                                      spacing: 6,
-                                      runSpacing: 4,
-                                      crossAxisAlignment: WrapCrossAlignment.center,
+                                    Row(
                                       children: [
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 7,
+                                            vertical: 2,
+                                          ),
                                           decoration: BoxDecoration(
-                                            color: AppColors.primary.withValues(alpha: 0.12),
+                                            color: AppColors.primaryLight,
                                             borderRadius: BorderRadius.circular(6),
                                           ),
                                           child: Text(
@@ -191,25 +216,13 @@ class DashboardScreen extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        if (user?.qualificationCategory != null)
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.borderLight,
-                                              borderRadius: BorderRadius.circular(6),
-                                            ),
-                                            child: Text(
-                                              user!.qualificationCategory!,
-                                              style: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w600,
-                                                color: AppColors.textSecondary,
-                                              ),
-                                            ),
-                                          ),
+                                        const SizedBox(width: 8),
                                         Text(
                                           '• ${user?.institutionName ?? ''}',
-                                          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            color: AppColors.textMuted,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -217,12 +230,25 @@ class DashboardScreen extends StatelessWidget {
                                 ),
                               ),
                               FilledButton.icon(
-                                icon: const Icon(Icons.person_add_rounded, size: 16),
-                                label: const Text('Bola qo‘shish'),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                                icon: const Icon(
+                                  Icons.person_add_rounded,
+                                  size: 16,
+                                ),
+                                label: const Text('Bola qo‘shish', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (_) => const AddStudentScreen()),
+                                    MaterialPageRoute(
+                                      builder: (_) => const AddStudentScreen(),
+                                    ),
                                   );
                                 },
                               ),
@@ -232,36 +258,43 @@ class DashboardScreen extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
 
             // 1. DIQQAT TALAB HOLATLAR (Agar signal bo'lsa)
             if (alerts.isNotEmpty) ...[
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.warningBg,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.warning.withValues(alpha: 0.5)),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.warningBorder,
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: AppColors.warning,
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: AppColors.warning.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 20),
+                      child: const Icon(
+                        Icons.warning_amber_rounded,
+                        color: AppColors.warning,
+                        size: 18,
+                      ),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Diqqat talab holatlar aniqlandi (${alerts.length} ta)',
+                            'Diqqat talab holatlar (${alerts.length} ta)',
                             style: const TextStyle(
-                              fontSize: 14,
+                              fontSize: 13,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
                             ),
@@ -270,7 +303,7 @@ class DashboardScreen extends StatelessWidget {
                           Text(
                             alerts.first.message,
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 11,
                               color: AppColors.textSecondary,
                             ),
                             maxLines: 2,
@@ -279,25 +312,34 @@ class DashboardScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
                     OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        side: BorderSide(color: AppColors.warning.withValues(alpha: 0.5)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        visualDensity: VisualDensity.compact,
                       ),
                       onPressed: () {
-                        // Monitoringga o'tish
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const MonitoringScreen()),
+                          MaterialPageRoute(
+                            builder: (_) => const MonitoringScreen(),
+                          ),
                         );
                       },
-                      child: const Text('Ko‘rish', style: TextStyle(fontSize: 12)),
+                      child: const Text(
+                        'Ko‘rish',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.warning),
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
             ],
 
             // 2. 4 TA ASOSIY KPI KARTALARI
@@ -308,9 +350,9 @@ class DashboardScreen extends StatelessWidget {
                   crossAxisCount: isWide ? 4 : 2,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 14,
-                  childAspectRatio: isWide ? 1.5 : 1.3,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: isWide ? 1.5 : 1.25,
                   children: [
                     _buildKpiCard(
                       title: 'Jami o‘quvchilar',
@@ -338,7 +380,8 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     _buildKpiCard(
                       title: 'O‘rtacha o‘sish',
-                      value: '+${app.averageDevelopmentGrowth.toStringAsFixed(1)}%',
+                      value:
+                          '+${app.averageDevelopmentGrowth.toStringAsFixed(1)}%',
                       subtitle: 'Oxirgi chorakda',
                       icon: Icons.trending_up_rounded,
                       color: AppColors.success,
@@ -376,12 +419,18 @@ class DashboardScreen extends StatelessWidget {
                             SizedBox(height: 2),
                             Text(
                               'Nutq, kognitiv va ijtimoiy sohalar kesimida o‘rtacha ballar',
-                              style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textMuted,
+                              ),
                             ),
                           ],
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primaryLight,
                             borderRadius: BorderRadius.circular(8),
@@ -419,7 +468,10 @@ class DashboardScreen extends StatelessWidget {
                                 reservedSize: 32,
                                 getTitlesWidget: (val, meta) => Text(
                                   '${val.toInt()}',
-                                  style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: AppColors.textMuted,
+                                  ),
                                 ),
                               ),
                             ),
@@ -427,14 +479,22 @@ class DashboardScreen extends StatelessWidget {
                               sideTitles: SideTitles(
                                 showTitles: true,
                                 getTitlesWidget: (val, meta) {
-                                  final months = ['Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
+                                  final months = [
+                                    'Sentyabr',
+                                    'Oktyabr',
+                                    'Noyabr',
+                                    'Dekabr',
+                                  ];
                                   final idx = val.toInt();
                                   if (idx >= 0 && idx < months.length) {
                                     return Padding(
                                       padding: const EdgeInsets.only(top: 8.0),
                                       child: Text(
                                         months[idx],
-                                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.textSecondary,
+                                        ),
                                       ),
                                     );
                                   }
@@ -442,8 +502,12 @@ class DashboardScreen extends StatelessWidget {
                                 },
                               ),
                             ),
-                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            topTitles: const AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            rightTitles: const AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
                           ),
                           borderData: FlBorderData(show: false),
                           minX: 0,
@@ -464,7 +528,9 @@ class DashboardScreen extends StatelessWidget {
                               dotData: const FlDotData(show: true),
                               belowBarData: BarAreaData(
                                 show: true,
-                                color: AppColors.primary.withValues(alpha: 0.15),
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.15,
+                                ),
                               ),
                             ),
                           ],
@@ -498,7 +564,10 @@ class DashboardScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         if (assessments.isEmpty)
-                          const Text('Hozircha baholashlar yo‘q', style: TextStyle(fontSize: 12))
+                          const Text(
+                            'Hozircha baholashlar yo‘q',
+                            style: TextStyle(fontSize: 12),
+                          )
                         else
                           ...assessments.take(3).map((a) {
                             return Padding(
@@ -511,20 +580,31 @@ class DashboardScreen extends StatelessWidget {
                                       color: AppColors.primaryLight,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: const Icon(Icons.assignment, color: AppColors.primary, size: 18),
+                                    child: const Icon(
+                                      Icons.assignment,
+                                      color: AppColors.primary,
+                                      size: 18,
+                                    ),
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           a.studentName,
-                                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                          ),
                                         ),
                                         Text(
                                           '${a.title} • ${a.specialistRole}',
-                                          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            color: AppColors.textMuted,
+                                          ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -532,7 +612,10 @@ class DashboardScreen extends StatelessWidget {
                                     ),
                                   ),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: AppColors.successBg,
                                       borderRadius: BorderRadius.circular(6),
@@ -571,7 +654,10 @@ class DashboardScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         if (sessions.isEmpty)
-                          const Text('Rejalashtirilgan darslar yo‘q', style: TextStyle(fontSize: 12))
+                          const Text(
+                            'Rejalashtirilgan darslar yo‘q',
+                            style: TextStyle(fontSize: 12),
+                          )
                         else
                           ...sessions.take(3).map((s) {
                             final isDone = s.status == 'Bajarildi';
@@ -582,27 +668,40 @@ class DashboardScreen extends StatelessWidget {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: isDone ? AppColors.successBg : AppColors.infoBg,
+                                      color: isDone
+                                          ? AppColors.successBg
+                                          : AppColors.infoBg,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
-                                      isDone ? Icons.check_circle : Icons.schedule,
-                                      color: isDone ? AppColors.success : AppColors.info,
+                                      isDone
+                                          ? Icons.check_circle
+                                          : Icons.schedule,
+                                      color: isDone
+                                          ? AppColors.success
+                                          : AppColors.info,
                                       size: 18,
                                     ),
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           s.studentName,
-                                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                          ),
                                         ),
                                         Text(
                                           s.topic,
-                                          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            color: AppColors.textMuted,
+                                          ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -614,7 +713,9 @@ class DashboardScreen extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
-                                      color: isDone ? AppColors.success : AppColors.info,
+                                      color: isDone
+                                          ? AppColors.success
+                                          : AppColors.info,
                                     ),
                                   ),
                                 ],
@@ -822,7 +923,11 @@ class DashboardScreen extends StatelessWidget {
                     color: AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.stars_rounded, color: AppColors.primary, size: 22),
+                  child: const Icon(
+                    Icons.stars_rounded,
+                    color: AppColors.primary,
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -839,7 +944,10 @@ class DashboardScreen extends StatelessWidget {
                       ),
                       Text(
                         sectionSubtitle,
-                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -855,7 +963,9 @@ class DashboardScreen extends StatelessWidget {
                         children: actions.map((act) {
                           return Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
                               child: _buildActionTile(context, act),
                             ),
                           );
@@ -899,7 +1009,11 @@ class DashboardScreen extends StatelessWidget {
                   color: (act['color'] as Color).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(act['icon'] as IconData, color: act['color'] as Color, size: 22),
+                child: Icon(
+                  act['icon'] as IconData,
+                  color: act['color'] as Color,
+                  size: 22,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -926,7 +1040,11 @@ class DashboardScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textMuted),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: AppColors.textMuted,
+              ),
             ],
           ),
         ),
@@ -943,8 +1061,13 @@ class DashboardScreen extends StatelessWidget {
     required Color bgColor,
   }) {
     return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: AppColors.border, width: 1),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(14.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -956,7 +1079,7 @@ class DashboardScreen extends StatelessWidget {
                   child: Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textSecondary,
                     ),
@@ -970,7 +1093,7 @@ class DashboardScreen extends StatelessWidget {
                     color: bgColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: color, size: 18),
+                  child: Icon(icon, color: color, size: 16),
                 ),
               ],
             ),
@@ -980,17 +1103,22 @@ class DashboardScreen extends StatelessWidget {
                 Text(
                   value,
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: AppColors.textPrimary,
+                    letterSpacing: -0.5,
                   ),
                 ),
+                const SizedBox(height: 1),
                 Text(
                   subtitle,
                   style: const TextStyle(
-                    fontSize: 11,
+                    fontSize: 10,
                     color: AppColors.textMuted,
+                    fontWeight: FontWeight.w500,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

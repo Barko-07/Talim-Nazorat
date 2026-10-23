@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../models/iep_model.dart';
 import '../../models/student_model.dart';
@@ -8,11 +9,7 @@ class IepPrintScreen extends StatelessWidget {
   final IndividualEducationPlanModel plan;
   final StudentModel student;
 
-  const IepPrintScreen({
-    super.key,
-    required this.plan,
-    required this.student,
-  });
+  const IepPrintScreen({super.key, required this.plan, required this.student});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +18,10 @@ class IepPrintScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Rasmiy ITR Blanki (Chop etish formati)', style: TextStyle(fontSize: 15)),
+        title: const Text(
+          'Rasmiy ITR Blanki (Chop etish formati)',
+          style: TextStyle(fontSize: 15),
+        ),
         backgroundColor: Colors.white,
         actions: [
           IconButton(
@@ -49,7 +49,11 @@ class IepPrintScreen extends StatelessWidget {
                 color: Colors.white,
                 border: Border.all(color: Colors.black26),
                 boxShadow: const [
-                  BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4)),
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
                 ],
               ),
               child: Column(
@@ -59,13 +63,20 @@ class IepPrintScreen extends StatelessWidget {
                   const Text(
                     'O‘ZBEKISTON RESPUBLIKASI MAKTABGACHA VA MAKTAB TA’LIMI VAZIRLIGI',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     plan.institutionName.toUpperCase(),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   const Divider(thickness: 2, color: Colors.black),
@@ -74,22 +85,38 @@ class IepPrintScreen extends StatelessWidget {
                   const Text(
                     'INDIVIDUAL TA’LIM REJASI (ITR)',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1,
+                    ),
                   ),
                   Text(
                     '${plan.academicYear} o‘quv yili uchun',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                   const SizedBox(height: 24),
 
                   // 1. O'quvchi haqida ma'lumotlar jadvali
                   _buildSectionHeader('1. O‘QUVCHI HAQIDA UMUMIY MA’LUMOT'),
                   const SizedBox(height: 8),
-                  _buildInfoRow('O‘quvchining to‘liq F.I.Sh.:', student.fullName),
-                  _buildInfoRow('Tug‘ilgan sanasi:', '${df.format(student.dateOfBirth)} (${student.age} yosh)'),
+                  _buildInfoRow(
+                    'O‘quvchining to‘liq F.I.Sh.:',
+                    student.fullName,
+                  ),
+                  _buildInfoRow(
+                    'Tug‘ilgan sanasi:',
+                    '${df.format(student.dateOfBirth)} (${student.age} yosh)',
+                  ),
                   _buildInfoRow('Sinfi / Guruhi:', student.grade),
-                  _buildInfoRow('Asosiy ta’limiy ehtiyoj:', student.primaryNeed),
+                  _buildInfoRow(
+                    'Asosiy ta’limiy ehtiyoj:',
+                    student.primaryNeed,
+                  ),
                   _buildInfoRow('Yordam darajasi:', student.supportLevel),
                   _buildInfoRow(
                     'Qonuniy vasiysi:',
@@ -100,7 +127,9 @@ class IepPrintScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // 2. Boshlang'ich daraja
-                  _buildSectionHeader('2. BOSHLANG‘ICH RIVOJLANISH DARAJASI (BASELINE)'),
+                  _buildSectionHeader(
+                    '2. BOSHLANG‘ICH RIVOJLANISH DARAJASI (BASELINE)',
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     plan.baselineSummary,
@@ -118,7 +147,9 @@ class IepPrintScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // 4. Maqsadlar jadvali
-                  _buildSectionHeader('4. REJALASHTIRILGAN O‘LCHANADIGAN MAQSADLAR VA IJRO MEZONLARI'),
+                  _buildSectionHeader(
+                    '4. REJALASHTIRILGAN O‘LCHANADIGAN MAQSADLAR VA IJRO MEZONLARI',
+                  ),
                   const SizedBox(height: 8),
                   Table(
                     border: TableBorder.all(color: Colors.black54),
@@ -133,22 +164,104 @@ class IepPrintScreen extends StatelessWidget {
                       const TableRow(
                         decoration: BoxDecoration(color: Color(0xFFEEEEEE)),
                         children: [
-                          Padding(padding: EdgeInsets.all(6), child: Text('№', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                          Padding(padding: EdgeInsets.all(6), child: Text('Maqsad mazmuni', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                          Padding(padding: EdgeInsets.all(6), child: Text('Soha', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                          Padding(padding: EdgeInsets.all(6), child: Text('Muddat', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                          Padding(padding: EdgeInsets.all(6), child: Text('Ijro (%)', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                          Padding(
+                            padding: EdgeInsets.all(6),
+                            child: Text(
+                              '№',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(6),
+                            child: Text(
+                              'Maqsad mazmuni',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(6),
+                            child: Text(
+                              'Soha',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(6),
+                            child: Text(
+                              'Muddat',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(6),
+                            child: Text(
+                              'Ijro (%)',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       ...List.generate(plan.objectives.length, (idx) {
                         final obj = plan.objectives[idx];
                         return TableRow(
                           children: [
-                            Padding(padding: const EdgeInsets.all(6), child: Text('${idx + 1}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 11))),
-                            Padding(padding: const EdgeInsets.all(6), child: Text('${obj.title}\n(${obj.successCriteria ?? ''})', style: const TextStyle(fontSize: 11))),
-                            Padding(padding: const EdgeInsets.all(6), child: Text(obj.domain, style: const TextStyle(fontSize: 11))),
-                            Padding(padding: const EdgeInsets.all(6), child: Text(df.format(obj.targetDate), style: const TextStyle(fontSize: 11))),
-                            Padding(padding: const EdgeInsets.all(6), child: Text('${obj.progressPercent}% (${obj.status})', textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
+                            Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: Text(
+                                '${idx + 1}',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: Text(
+                                '${obj.title}\n(${obj.successCriteria ?? ''})',
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: Text(
+                                obj.domain,
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: Text(
+                                df.format(obj.targetDate),
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: Text(
+                                '${obj.progressPercent}% (${obj.status})',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                           ],
                         );
                       }),
@@ -157,7 +270,10 @@ class IepPrintScreen extends StatelessWidget {
                   const SizedBox(height: 32),
 
                   // Imzo bloklari
-                  const Text('TASDIQLAYMAN:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  const Text(
+                    'TASDIQLAYMAN:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,21 +281,48 @@ class IepPrintScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Mas’ul o‘qituvchi: ${plan.responsibleTeacherName}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                          Text(
+                            'Mas’ul o‘qituvchi: ${plan.responsibleTeacherName}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           const SizedBox(height: 4),
-                          const Text('Imzo: ___________________', style: TextStyle(fontSize: 11)),
+                          const Text(
+                            'Imzo: ___________________',
+                            style: TextStyle(fontSize: 11),
+                          ),
                           const SizedBox(height: 4),
-                          Text('Sana: ${df.format(DateTime.now())}', style: const TextStyle(fontSize: 11)),
+                          Text(
+                            'Sana: ${df.format(DateTime.now())}',
+                            style: const TextStyle(fontSize: 11),
+                          ),
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: const [
-                          Text('Maktab direktori / O‘IBDO‘:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                          Text(
+                            'Maktab direktori / O‘IBDO‘:',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           SizedBox(height: 4),
-                          Text('Imzo: ___________________', style: TextStyle(fontSize: 11)),
+                          Text(
+                            'Imzo: ___________________',
+                            style: TextStyle(fontSize: 11),
+                          ),
                           SizedBox(height: 4),
-                          Text('M.O‘. (Muhr o‘rni)', style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic)),
+                          Text(
+                            'M.O‘. (Muhr o‘rni)',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -204,7 +347,11 @@ class IepPrintScreen extends StatelessWidget {
       color: const Color(0xFFE2E8F0),
       child: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 0.5),
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 11,
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }
@@ -217,7 +364,10 @@ class IepPrintScreen extends StatelessWidget {
         children: [
           SizedBox(
             width: 190,
-            child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            ),
           ),
           Expanded(child: Text(value, style: const TextStyle(fontSize: 12))),
         ],

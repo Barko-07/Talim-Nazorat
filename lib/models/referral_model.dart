@@ -70,7 +70,8 @@ class ReferralModel {
       toSpecialistId: toSpecialistId ?? this.toSpecialistId,
       toSpecialistName: toSpecialistName ?? this.toSpecialistName,
       reason: reason ?? this.reason,
-      supportingObservations: supportingObservations ?? this.supportingObservations,
+      supportingObservations:
+          supportingObservations ?? this.supportingObservations,
       priority: priority ?? this.priority,
       status: status ?? this.status,
       outcomeNotes: outcomeNotes ?? this.outcomeNotes,
@@ -82,48 +83,48 @@ class ReferralModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'studentId': studentId,
-        'studentName': studentName,
-        'fromSpecialistId': fromSpecialistId,
-        'fromSpecialistName': fromSpecialistName,
-        'fromSpecialistRole': fromSpecialistRole,
-        'toSpecialistType': toSpecialistType,
-        'toSpecialistId': toSpecialistId,
-        'toSpecialistName': toSpecialistName,
-        'reason': reason,
-        'supportingObservations': supportingObservations,
-        'priority': priority,
-        'status': status,
-        'outcomeNotes': outcomeNotes,
-        'followUpAction': followUpAction,
-        'followUpDate': followUpDate?.toIso8601String(),
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt?.toIso8601String(),
-      };
+    'id': id,
+    'studentId': studentId,
+    'studentName': studentName,
+    'fromSpecialistId': fromSpecialistId,
+    'fromSpecialistName': fromSpecialistName,
+    'fromSpecialistRole': fromSpecialistRole,
+    'toSpecialistType': toSpecialistType,
+    'toSpecialistId': toSpecialistId,
+    'toSpecialistName': toSpecialistName,
+    'reason': reason,
+    'supportingObservations': supportingObservations,
+    'priority': priority,
+    'status': status,
+    'outcomeNotes': outcomeNotes,
+    'followUpAction': followUpAction,
+    'followUpDate': followUpDate?.toIso8601String(),
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt?.toIso8601String(),
+  };
 
   factory ReferralModel.fromJson(Map<String, dynamic> json) => ReferralModel(
-        id: json['id'] as String,
-        studentId: json['studentId'] as String,
-        studentName: json['studentName'] as String? ?? '',
-        fromSpecialistId: json['fromSpecialistId'] as String? ?? '',
-        fromSpecialistName: json['fromSpecialistName'] as String,
-        fromSpecialistRole: json['fromSpecialistRole'] as String?,
-        toSpecialistType: json['toSpecialistType'] as String,
-        toSpecialistId: json['toSpecialistId'] as String?,
-        toSpecialistName: json['toSpecialistName'] as String?,
-        reason: json['reason'] as String,
-        supportingObservations: json['supportingObservations'] as String?,
-        priority: json['priority'] as String,
-        status: json['status'] as String,
-        outcomeNotes: json['outcomeNotes'] as String?,
-        followUpAction: json['followUpAction'] as String?,
-        followUpDate: json['followUpDate'] != null
-            ? DateTime.parse(json['followUpDate'] as String)
-            : null,
-        createdAt: DateTime.parse(json['createdAt'] as String),
-        updatedAt: json['updatedAt'] != null
-            ? DateTime.parse(json['updatedAt'] as String)
-            : null,
-      );
+    id: json['id'] as String,
+    studentId: json['studentId'] as String,
+    studentName: json['studentName'] as String? ?? '',
+    fromSpecialistId: json['fromSpecialistId'] as String? ?? '',
+    fromSpecialistName: json['fromSpecialistName'] as String,
+    fromSpecialistRole: json['fromSpecialistRole'] as String?,
+    toSpecialistType: json['toSpecialistType'] as String,
+    toSpecialistId: json['toSpecialistId'] as String?,
+    toSpecialistName: json['toSpecialistName'] as String?,
+    reason: json['reason'] as String,
+    supportingObservations: json['supportingObservations'] as String?,
+    priority: json['priority'] as String,
+    status: json['status'] as String,
+    outcomeNotes: json['outcomeNotes'] as String?,
+    followUpAction: json['followUpAction'] as String?,
+    followUpDate: json['followUpDate'] != null
+        ? DateTime.parse(json['followUpDate'] as String)
+        : null,
+    createdAt: DateTime.parse(json['createdAt'] as String),
+    updatedAt: json['updatedAt'] != null
+        ? DateTime.parse(json['updatedAt'] as String)
+        : null,
+  );
 }

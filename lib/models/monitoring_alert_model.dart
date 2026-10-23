@@ -10,7 +10,8 @@ class MonitoringAlertModel {
   final String suggestedAction;
   final String? responsiblePersonId;
   final String? responsiblePersonName;
-  final String status; // 'Ochiq', 'Ko‘rib chiqilmoqda', 'Hal qilindi', 'Rad etildi'
+  final String
+  status; // 'Ochiq', 'Ko‘rib chiqilmoqda', 'Hal qilindi', 'Rad etildi'
   final bool isResolved;
   final String? resolvedNotes;
   final DateTime? resolvedAt;
@@ -64,7 +65,8 @@ class MonitoringAlertModel {
       message: message ?? this.message,
       suggestedAction: suggestedAction ?? this.suggestedAction,
       responsiblePersonId: responsiblePersonId ?? this.responsiblePersonId,
-      responsiblePersonName: responsiblePersonName ?? this.responsiblePersonName,
+      responsiblePersonName:
+          responsiblePersonName ?? this.responsiblePersonName,
       status: status ?? this.status,
       isResolved: isResolved ?? this.isResolved,
       resolvedNotes: resolvedNotes ?? this.resolvedNotes,
@@ -74,23 +76,23 @@ class MonitoringAlertModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'ruleCode': ruleCode,
-        'ruleTitle': ruleTitle,
-        'studentId': studentId,
-        'studentName': studentName,
-        'studentGrade': studentGrade,
-        'severity': severity,
-        'message': message,
-        'suggestedAction': suggestedAction,
-        'responsiblePersonId': responsiblePersonId,
-        'responsiblePersonName': responsiblePersonName,
-        'status': status,
-        'isResolved': isResolved,
-        'resolvedNotes': resolvedNotes,
-        'resolvedAt': resolvedAt?.toIso8601String(),
-        'createdAt': createdAt.toIso8601String(),
-      };
+    'id': id,
+    'ruleCode': ruleCode,
+    'ruleTitle': ruleTitle,
+    'studentId': studentId,
+    'studentName': studentName,
+    'studentGrade': studentGrade,
+    'severity': severity,
+    'message': message,
+    'suggestedAction': suggestedAction,
+    'responsiblePersonId': responsiblePersonId,
+    'responsiblePersonName': responsiblePersonName,
+    'status': status,
+    'isResolved': isResolved,
+    'resolvedNotes': resolvedNotes,
+    'resolvedAt': resolvedAt?.toIso8601String(),
+    'createdAt': createdAt.toIso8601String(),
+  };
 
   factory MonitoringAlertModel.fromJson(Map<String, dynamic> json) =>
       MonitoringAlertModel(
@@ -105,7 +107,8 @@ class MonitoringAlertModel {
         suggestedAction: json['suggestedAction'] as String,
         responsiblePersonId: json['responsiblePersonId'] as String?,
         responsiblePersonName: json['responsiblePersonName'] as String?,
-        status: json['status'] as String? ??
+        status:
+            json['status'] as String? ??
             ((json['isResolved'] as bool? ?? false) ? 'Hal qilindi' : 'Ochiq'),
         isResolved: json['isResolved'] as bool? ?? false,
         resolvedNotes: json['resolvedNotes'] as String?,

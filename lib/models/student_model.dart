@@ -34,22 +34,22 @@ class GuardianModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'fullName': fullName,
-        'relationship': relationship,
-        'phone': phone,
-        'email': email,
-        'address': address,
-      };
+    'id': id,
+    'fullName': fullName,
+    'relationship': relationship,
+    'phone': phone,
+    'email': email,
+    'address': address,
+  };
 
   factory GuardianModel.fromJson(Map<String, dynamic> json) => GuardianModel(
-        id: json['id'] as String,
-        fullName: json['fullName'] as String,
-        relationship: json['relationship'] as String,
-        phone: json['phone'] as String,
-        email: json['email'] as String?,
-        address: json['address'] as String?,
-      );
+    id: json['id'] as String,
+    fullName: json['fullName'] as String,
+    relationship: json['relationship'] as String,
+    phone: json['phone'] as String,
+    email: json['email'] as String?,
+    address: json['address'] as String?,
+  );
 }
 
 class StudentModel {
@@ -64,7 +64,8 @@ class StudentModel {
   final String grade; // 1-A sinf, 2-B sinf
   final String status; // Faol, Ta'tilda, Arxivlangan, Bitirgan
   final String primaryNeed; // Ta'limiy ehtiyoj toifasi
-  final String supportLevel; // 1-daraja (Yengil), 2-daraja (O'rta), 3-daraja (Intensiv)
+  final String
+  supportLevel; // 1-daraja (Yengil), 2-daraja (O'rta), 3-daraja (Intensiv)
   final String? medicalNotes;
   final String? psychologicalNotes;
   final List<GuardianModel> guardians;
@@ -152,7 +153,8 @@ class StudentModel {
       medicalNotes: medicalNotes ?? this.medicalNotes,
       psychologicalNotes: psychologicalNotes ?? this.psychologicalNotes,
       guardians: guardians ?? this.guardians,
-      assignedSpecialistIds: assignedSpecialistIds ?? this.assignedSpecialistIds,
+      assignedSpecialistIds:
+          assignedSpecialistIds ?? this.assignedSpecialistIds,
       coordinatorId: coordinatorId ?? this.coordinatorId,
       coordinatorName: coordinatorName ?? this.coordinatorName,
       deactivationReason: deactivationReason ?? this.deactivationReason,
@@ -162,58 +164,61 @@ class StudentModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'institutionId': institutionId,
-        'institutionName': institutionName,
-        'firstName': firstName,
-        'lastName': lastName,
-        'middleName': middleName,
-        'dateOfBirth': dateOfBirth.toIso8601String(),
-        'gender': gender,
-        'grade': grade,
-        'status': status,
-        'primaryNeed': primaryNeed,
-        'supportLevel': supportLevel,
-        'medicalNotes': medicalNotes,
-        'psychologicalNotes': psychologicalNotes,
-        'guardians': guardians.map((g) => g.toJson()).toList(),
-        'assignedSpecialistIds': assignedSpecialistIds,
-        'coordinatorId': coordinatorId,
-        'coordinatorName': coordinatorName,
-        'deactivationReason': deactivationReason,
-        'deactivatedAt': deactivatedAt?.toIso8601String(),
-        'createdAt': createdAt.toIso8601String(),
-      };
+    'id': id,
+    'institutionId': institutionId,
+    'institutionName': institutionName,
+    'firstName': firstName,
+    'lastName': lastName,
+    'middleName': middleName,
+    'dateOfBirth': dateOfBirth.toIso8601String(),
+    'gender': gender,
+    'grade': grade,
+    'status': status,
+    'primaryNeed': primaryNeed,
+    'supportLevel': supportLevel,
+    'medicalNotes': medicalNotes,
+    'psychologicalNotes': psychologicalNotes,
+    'guardians': guardians.map((g) => g.toJson()).toList(),
+    'assignedSpecialistIds': assignedSpecialistIds,
+    'coordinatorId': coordinatorId,
+    'coordinatorName': coordinatorName,
+    'deactivationReason': deactivationReason,
+    'deactivatedAt': deactivatedAt?.toIso8601String(),
+    'createdAt': createdAt.toIso8601String(),
+  };
 
   factory StudentModel.fromJson(Map<String, dynamic> json) => StudentModel(
-        id: json['id'] as String,
-        institutionId: json['institutionId'] as String,
-        institutionName: json['institutionName'] as String? ?? '14-Inklyuziv maktab',
-        firstName: json['firstName'] as String,
-        lastName: json['lastName'] as String,
-        middleName: json['middleName'] as String?,
-        dateOfBirth: DateTime.parse(json['dateOfBirth'] as String),
-        gender: json['gender'] as String,
-        grade: json['grade'] as String,
-        status: json['status'] as String,
-        primaryNeed: json['primaryNeed'] as String,
-        supportLevel: json['supportLevel'] as String,
-        medicalNotes: json['medicalNotes'] as String?,
-        psychologicalNotes: json['psychologicalNotes'] as String?,
-        guardians: (json['guardians'] as List<dynamic>?)
-                ?.map((g) => GuardianModel.fromJson(g as Map<String, dynamic>))
-                .toList() ??
-            [],
-        assignedSpecialistIds: (json['assignedSpecialistIds'] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            [],
-        coordinatorId: json['coordinatorId'] as String?,
-        coordinatorName: json['coordinatorName'] as String?,
-        deactivationReason: json['deactivationReason'] as String?,
-        deactivatedAt: json['deactivatedAt'] != null
-            ? DateTime.parse(json['deactivatedAt'] as String)
-            : null,
-        createdAt: DateTime.parse(json['createdAt'] as String),
-      );
+    id: json['id'] as String,
+    institutionId: json['institutionId'] as String,
+    institutionName:
+        json['institutionName'] as String? ?? '14-Inklyuziv maktab',
+    firstName: json['firstName'] as String,
+    lastName: json['lastName'] as String,
+    middleName: json['middleName'] as String?,
+    dateOfBirth: DateTime.parse(json['dateOfBirth'] as String),
+    gender: json['gender'] as String,
+    grade: json['grade'] as String,
+    status: json['status'] as String,
+    primaryNeed: json['primaryNeed'] as String,
+    supportLevel: json['supportLevel'] as String,
+    medicalNotes: json['medicalNotes'] as String?,
+    psychologicalNotes: json['psychologicalNotes'] as String?,
+    guardians:
+        (json['guardians'] as List<dynamic>?)
+            ?.map((g) => GuardianModel.fromJson(g as Map<String, dynamic>))
+            .toList() ??
+        [],
+    assignedSpecialistIds:
+        (json['assignedSpecialistIds'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [],
+    coordinatorId: json['coordinatorId'] as String?,
+    coordinatorName: json['coordinatorName'] as String?,
+    deactivationReason: json['deactivationReason'] as String?,
+    deactivatedAt: json['deactivatedAt'] != null
+        ? DateTime.parse(json['deactivatedAt'] as String)
+        : null,
+    createdAt: DateTime.parse(json['createdAt'] as String),
+  );
 }

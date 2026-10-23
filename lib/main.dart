@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/app_provider.dart';
@@ -37,9 +38,7 @@ class TalimNazoratApp extends StatelessWidget {
         builder: (context, auth, _) {
           if (auth.isLoading) {
             return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
+              body: Center(child: CircularProgressIndicator()),
             );
           }
           if (auth.isAuthenticated) {

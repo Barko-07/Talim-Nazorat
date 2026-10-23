@@ -60,3 +60,8 @@ undecorated_symbol_table
 
 # Coverage
 coverage/
+
+# IDE Agent custom skills
+.agents/
+skills-lock.json
+

@@ -12,11 +12,11 @@ class AssessmentCriterionResult {
   });
 
   Map<String, dynamic> toJson() => {
-        'criterionName': criterionName,
-        'score': score,
-        'maxScore': maxScore,
-        'notes': notes,
-      };
+    'criterionName': criterionName,
+    'score': score,
+    'maxScore': maxScore,
+    'notes': notes,
+  };
 
   factory AssessmentCriterionResult.fromJson(Map<String, dynamic> json) =>
       AssessmentCriterionResult(
@@ -125,26 +125,26 @@ class AssessmentModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'studentId': studentId,
-        'studentName': studentName,
-        'specialistId': specialistId,
-        'specialistName': specialistName,
-        'specialistRole': specialistRole,
-        'assessmentDate': assessmentDate.toIso8601String(),
-        'type': type,
-        'category': category,
-        'title': title,
-        'notes': notes,
-        'recommendations': recommendations,
-        'totalScore': totalScore,
-        'maxScore': maxScore,
-        'previousScore': previousScore,
-        'criteria': criteria.map((c) => c.toJson()).toList(),
-        'followUpAction': followUpAction,
-        'reviewDate': reviewDate?.toIso8601String(),
-        'isDraft': isDraft,
-      };
+    'id': id,
+    'studentId': studentId,
+    'studentName': studentName,
+    'specialistId': specialistId,
+    'specialistName': specialistName,
+    'specialistRole': specialistRole,
+    'assessmentDate': assessmentDate.toIso8601String(),
+    'type': type,
+    'category': category,
+    'title': title,
+    'notes': notes,
+    'recommendations': recommendations,
+    'totalScore': totalScore,
+    'maxScore': maxScore,
+    'previousScore': previousScore,
+    'criteria': criteria.map((c) => c.toJson()).toList(),
+    'followUpAction': followUpAction,
+    'reviewDate': reviewDate?.toIso8601String(),
+    'isDraft': isDraft,
+  };
 
   factory AssessmentModel.fromJson(Map<String, dynamic> json) =>
       AssessmentModel(
@@ -163,9 +163,13 @@ class AssessmentModel {
         totalScore: (json['totalScore'] as num).toDouble(),
         maxScore: (json['maxScore'] as num).toDouble(),
         previousScore: (json['previousScore'] as num?)?.toDouble(),
-        criteria: (json['criteria'] as List<dynamic>?)
-                ?.map((c) =>
-                    AssessmentCriterionResult.fromJson(c as Map<String, dynamic>))
+        criteria:
+            (json['criteria'] as List<dynamic>?)
+                ?.map(
+                  (c) => AssessmentCriterionResult.fromJson(
+                    c as Map<String, dynamic>,
+                  ),
+                )
                 .toList() ??
             [],
         followUpAction: json['followUpAction'] as String?,

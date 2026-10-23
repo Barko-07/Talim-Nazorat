@@ -5,7 +5,8 @@ import '../models/session_model.dart';
 import '../models/iep_model.dart';
 
 class MonitoringRuleEngine {
-  static final MonitoringRuleEngine _instance = MonitoringRuleEngine._internal();
+  static final MonitoringRuleEngine _instance =
+      MonitoringRuleEngine._internal();
   factory MonitoringRuleEngine() => _instance;
   MonitoringRuleEngine._internal();
 
@@ -31,9 +32,15 @@ class MonitoringRuleEngine {
     for (final student in students) {
       if (student.status == 'Arxivlangan') continue;
 
-      final studentSessions = sessions.where((s) => s.studentId == student.id).toList();
-      final studentAssessments = assessments.where((a) => a.studentId == student.id).toList();
-      final studentPlans = iepPlans.where((p) => p.studentId == student.id).toList();
+      final studentSessions = sessions
+          .where((s) => s.studentId == student.id)
+          .toList();
+      final studentAssessments = assessments
+          .where((a) => a.studentId == student.id)
+          .toList();
+      final studentPlans = iepPlans
+          .where((p) => p.studentId == student.id)
+          .toList();
 
       // ==================== QOIDA 1: QATNASHILMAGAN MASHG'ULOTLAR ====================
       // 2 yoki undan ortiq o'tkazib yuborilgan mashg'ulotlar
@@ -49,7 +56,8 @@ class MonitoringRuleEngine {
             studentName: student.fullName,
             studentGrade: student.grade,
             severity: missedSessions.length >= 3 ? 'XAVF' : 'DIQQAT',
-            message: '${student.fullName} rejalashtirilgan ${missedSessions.length} ta korreksion mashg‘ulotga kelmadi.',
+            message:
+                '${student.fullName} rejalashtirilgan ${missedSessions.length} ta korreksion mashg‘ulotga kelmadi.',
             suggestedAction: 'Ota-ona bilan bog‘lanib qatnashmaslik sababini aniqlash va dars jadvalini qayta ko‘rib chiqish.',
             responsiblePersonName: missedSessions.first.specialistName,
             responsiblePersonId: missedSessions.first.specialistId,
@@ -65,7 +73,8 @@ class MonitoringRuleEngine {
         return a.reviewDate != null && a.reviewDate!.isBefore(now);
       }).toList();
       final rule2Key = '${student.id}_OVERDUE_ASSESSMENT';
-      if (overdueAssessments.isNotEmpty && !resolvedRuleKeys.contains(rule2Key)) {
+      if (overdueAssessments.isNotEmpty &&
+          !resolvedRuleKeys.contains(rule2Key)) {
         final lastDue = overdueAssessments.first;
         generatedAlerts.add(
           MonitoringAlertModel(
@@ -76,7 +85,8 @@ class MonitoringRuleEngine {
             studentName: student.fullName,
             studentGrade: student.grade,
             severity: 'DIQQAT',
-            message: '${lastDue.title} bo‘yicha oraliq monitoring tekshiruv muddati yetib kelgan.',
+            message:
+                '${lastDue.title} bo‘yicha oraliq monitoring tekshiruv muddati yetib kelgan.',
             suggestedAction: 'Mutaxassis tomonidan bolaning dolzarb ko‘nikmalari qayta baholanib, reja yangilanishi lozim.',
             responsiblePersonName: lastDue.specialistName,
             responsiblePersonId: lastDue.specialistId,
@@ -94,7 +104,8 @@ class MonitoringRuleEngine {
         final latest = sortedAss[0];
         final previous = sortedAss[1];
 
-        if (latest.category == previous.category && latest.maxScore == previous.maxScore) {
+        if (latest.category == previous.category &&
+            latest.maxScore == previous.maxScore) {
           final diff = latest.totalScore - previous.totalScore;
           final rule3Key = '${student.id}_NO_PROGRESS_ASSESSMENT';
           if (diff == 0 && !resolvedRuleKeys.contains(rule3Key)) {
@@ -107,7 +118,8 @@ class MonitoringRuleEngine {
                 studentName: student.fullName,
                 studentGrade: student.grade,
                 severity: 'DIQQAT',
-                message: '${latest.category} yo‘nalishida ketma-ket 2 ta baholashda ko‘rsatkich o‘zgarmay qoldi (${latest.totalScore} ball).',
+                message:
+                    '${latest.category} yo‘nalishida ketma-ket 2 ta baholashda ko‘rsatkich o‘zgarmay qoldi (${latest.totalScore} ball).',
                 suggestedAction: 'Qo‘llanilayotgan pedagogik metodika va mashqlar murakkabligini konsiliumda qayta ko‘rib chiqish.',
                 responsiblePersonName: latest.specialistName,
                 responsiblePersonId: latest.specialistId,
@@ -129,7 +141,8 @@ class MonitoringRuleEngine {
                 studentName: student.fullName,
                 studentGrade: student.grade,
                 severity: 'XAVF',
-                message: '${latest.category} bo‘yicha oldingi baholashga nisbatan natija pasaygan (${diff.toStringAsFixed(1)} ball).',
+                message:
+                    '${latest.category} bo‘yicha oldingi baholashga nisbatan natija pasaygan (${diff.toStringAsFixed(1)} ball).',
                 suggestedAction: 'Shifokor-pediatr va psixolog ishtirokida bolaning umumiy holatini zudlik bilan o‘rganish.',
                 responsiblePersonName: latest.specialistName,
                 responsiblePersonId: latest.specialistId,
@@ -149,7 +162,8 @@ class MonitoringRuleEngine {
         }).toList();
 
         final rule5Key = '${student.id}_OVERDUE_IEP_OBJECTIVE';
-        if (overdueObjectives.isNotEmpty && !resolvedRuleKeys.contains(rule5Key)) {
+        if (overdueObjectives.isNotEmpty &&
+            !resolvedRuleKeys.contains(rule5Key)) {
           final firstObj = overdueObjectives.first;
           generatedAlerts.add(
             MonitoringAlertModel(
@@ -160,7 +174,8 @@ class MonitoringRuleEngine {
               studentName: student.fullName,
               studentGrade: student.grade,
               severity: 'DIQQAT',
-              message: 'ITR dagi "${firstObj.title}" vazifasi muddati o‘tgan bo‘lsa-da, hali yakunlanmagan (${firstObj.progressPercent}%).',
+              message:
+                  'ITR dagi "${firstObj.title}" vazifasi muddati o‘tgan bo‘lsa-da, hali yakunlanmagan (${firstObj.progressPercent}%).',
               suggestedAction: 'Koordinator boshchiligida maqsadni kichikroq bosqichlarga ajratish yoki muddatni rasmiylashtirish.',
               responsiblePersonName: plan.responsibleTeacherName,
               responsiblePersonId: plan.responsibleTeacherId,
@@ -173,10 +188,12 @@ class MonitoringRuleEngine {
 
       // ==================== QOIDA 6: IZOHSIZ MASHG'ULOTLAR ====================
       final completedWithoutNotes = studentSessions.where((s) {
-        return s.isCompleted && (s.observations == null || s.observations!.trim().isEmpty);
+        return s.isCompleted &&
+            (s.observations == null || s.observations!.trim().isEmpty);
       }).toList();
       final rule6Key = '${student.id}_MISSING_OBSERVATION';
-      if (completedWithoutNotes.isNotEmpty && !resolvedRuleKeys.contains(rule6Key)) {
+      if (completedWithoutNotes.isNotEmpty &&
+          !resolvedRuleKeys.contains(rule6Key)) {
         final sample = completedWithoutNotes.first;
         generatedAlerts.add(
           MonitoringAlertModel(
@@ -187,7 +204,8 @@ class MonitoringRuleEngine {
             studentName: student.fullName,
             studentGrade: student.grade,
             severity: 'MA’LUMOT',
-            message: '${sample.topic} mashg‘uloti yakunlangan, biroq mutaxassis kuzatuv izohi yozilmagan.',
+            message:
+                '${sample.topic} mashg‘uloti yakunlangan, biroq mutaxassis kuzatuv izohi yozilmagan.',
             suggestedAction: 'O‘tkazilgan korreksion ish natijalari va tavsiyalarni mashg‘ulot profiliga qayd etish.',
             responsiblePersonName: sample.specialistName,
             responsiblePersonId: sample.specialistId,

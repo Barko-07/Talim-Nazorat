@@ -7,7 +7,8 @@ class SessionModel {
   final String specialistRole;
   final DateTime scheduledAt;
   final int durationMinutes;
-  final String status; // 'Bajarildi', 'Rejalashtirilgan', 'Qatnashmadi', 'Bekor qilindi'
+  final String
+  status; // 'Bajarildi', 'Rejalashtirilgan', 'Qatnashmadi', 'Bekor qilindi'
   final String topic;
   final String sessionType; // 'Individual', 'Kichik guruhda'
   final String? goalDescription; // Aloqador ITR maqsadi
@@ -79,40 +80,40 @@ class SessionModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'studentId': studentId,
-        'studentName': studentName,
-        'specialistId': specialistId,
-        'specialistName': specialistName,
-        'specialistRole': specialistRole,
-        'scheduledAt': scheduledAt.toIso8601String(),
-        'durationMinutes': durationMinutes,
-        'status': status,
-        'topic': topic,
-        'sessionType': sessionType,
-        'goalDescription': goalDescription,
-        'activities': activities,
-        'observations': observations,
-        'nextSteps': nextSteps,
-        'attendanceConfirmed': attendanceConfirmed,
-      };
+    'id': id,
+    'studentId': studentId,
+    'studentName': studentName,
+    'specialistId': specialistId,
+    'specialistName': specialistName,
+    'specialistRole': specialistRole,
+    'scheduledAt': scheduledAt.toIso8601String(),
+    'durationMinutes': durationMinutes,
+    'status': status,
+    'topic': topic,
+    'sessionType': sessionType,
+    'goalDescription': goalDescription,
+    'activities': activities,
+    'observations': observations,
+    'nextSteps': nextSteps,
+    'attendanceConfirmed': attendanceConfirmed,
+  };
 
   factory SessionModel.fromJson(Map<String, dynamic> json) => SessionModel(
-        id: json['id'] as String,
-        studentId: json['studentId'] as String,
-        studentName: json['studentName'] as String? ?? '',
-        specialistId: json['specialistId'] as String,
-        specialistName: json['specialistName'] as String? ?? '',
-        specialistRole: json['specialistRole'] as String? ?? '',
-        scheduledAt: DateTime.parse(json['scheduledAt'] as String),
-        durationMinutes: json['durationMinutes'] as int? ?? 45,
-        status: json['status'] as String,
-        topic: json['topic'] as String,
-        sessionType: json['sessionType'] as String? ?? 'Individual',
-        goalDescription: json['goalDescription'] as String?,
-        activities: json['activities'] as String?,
-        observations: json['observations'] as String?,
-        nextSteps: json['nextSteps'] as String?,
-        attendanceConfirmed: json['attendanceConfirmed'] as bool? ?? false,
-      );
+    id: json['id'] as String,
+    studentId: json['studentId'] as String,
+    studentName: json['studentName'] as String? ?? '',
+    specialistId: json['specialistId'] as String,
+    specialistName: json['specialistName'] as String? ?? '',
+    specialistRole: json['specialistRole'] as String? ?? '',
+    scheduledAt: DateTime.parse(json['scheduledAt'] as String),
+    durationMinutes: json['durationMinutes'] as int? ?? 45,
+    status: json['status'] as String,
+    topic: json['topic'] as String,
+    sessionType: json['sessionType'] as String? ?? 'Individual',
+    goalDescription: json['goalDescription'] as String?,
+    activities: json['activities'] as String?,
+    observations: json['observations'] as String?,
+    nextSteps: json['nextSteps'] as String?,
+    attendanceConfirmed: json['attendanceConfirmed'] as bool? ?? false,
+  );
 }
