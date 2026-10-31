@@ -128,11 +128,18 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     required String subtitle,
   }) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 2),
-          child: Icon(icon, size: 22, color: AppColors.primary),
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: AppColors.glassWellFill,
+            borderRadius: BorderRadius.circular(11),
+            border: Border.all(color: AppColors.glassInnerBorder, width: 1.0),
+          ),
+          alignment: Alignment.center,
+          child: Icon(icon, size: 18, color: AppColors.primary),
         ),
         const SizedBox(width: 13),
         Expanded(
@@ -142,18 +149,20 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               Text(
                 title,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15.5,
                   color: AppColors.textPrimary,
-                  letterSpacing: -0.25,
+                  letterSpacing: -0.1,
+                  wordSpacing: 0.35,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
                 style: const TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 12.3,
                   color: AppColors.textMuted,
+                  height: 1.35,
                 ),
               ),
             ],

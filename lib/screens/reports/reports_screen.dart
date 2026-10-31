@@ -256,17 +256,16 @@ class ReportsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AdaptivePageHeader(
-              icon: LucideIcons.chartColumn,
-              title: 'Hisobotlar va tahliliy yig‘ma',
+              title: 'Tahliliy hisobotlar',
               subtitle:
-                  'Davlat ta’lim standartlari va pedagogik monitoring bo‘yicha rasmiy ko‘rsatkichlar',
-              action: FilledButton.icon(
-                icon: const Icon(LucideIcons.download, size: 16),
-                label: const Text('CSV Eksport'),
+                  'Pedagogik monitoring bo‘yicha rasmiy ko‘rsatkichlar',
+              action: HeaderActionButton(
+                icon: LucideIcons.download,
+                label: 'CSV eksport',
                 onPressed: () => _showCsvExportDialog(context),
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 18),
 
             // 1. Moslashuvchan statistika kartalari (0% overflow, erkin ikonkalar va kesib olingan shisha)
             ResponsiveGlassGrid(

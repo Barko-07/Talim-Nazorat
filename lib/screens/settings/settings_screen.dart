@@ -30,21 +30,13 @@ class SettingsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AdaptivePageHeader(
-              icon: LucideIcons.settings,
-              title: 'Tizim va profil sozlamalari',
+              title: 'Tizim sozlamalari',
               subtitle:
-                  'Foydalanuvchi profili, kasbiy javobgarlik doirasi va xavfsizlik konfiguratsiyasi',
-              action: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.error,
-                  side: const BorderSide(
-                    color: AppColors.errorBorder,
-                    width: 1.0,
-                  ),
-                  backgroundColor: AppColors.errorBg,
-                ),
-                icon: const Icon(LucideIcons.logOut, size: 15),
-                label: const Text('Tizimdan chiqish'),
+                  'Foydalanuvchi profili va xavfsizlik konfiguratsiyasi',
+              action: HeaderActionButton(
+                variant: HeaderActionVariant.danger,
+                icon: LucideIcons.logOut,
+                label: 'Tizimdan chiqish',
                 onPressed: () async {
                   await auth.logout();
                   if (context.mounted) {
@@ -57,41 +49,39 @@ class SettingsScreen extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 18),
 
-            // 1. Joriy Foydalanuvchi Profili (Cut-Out Frosted Hero Card)
+            // 1. Joriy Foydalanuvchi Profili (Minimalist Soft-Glass Hero Card)
             GlassSurface(
               borderRadius: 18,
               blur: 16,
-              opacity: 0.95,
-              padding: const EdgeInsets.all(22),
+              opacity: 0.96,
+              padding: const EdgeInsets.all(20),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    width: 58,
-                    height: 58,
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [AppColors.primary, AppColors.primaryDark],
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(13),
+                      border: Border.all(
+                        color: AppColors.primaryTint,
+                        width: 1.0,
                       ),
-                      border: Border.all(color: Colors.white, width: 1.5),
-                      boxShadow: AppColors.primaryGlow,
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      (user?.fullName ?? 'U').substring(0, 1),
+                      (user?.fullName ?? 'U').substring(0, 1).toUpperCase(),
                       style: const TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 23,
-                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 18),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,10 +89,11 @@ class SettingsScreen extends StatelessWidget {
                         Text(
                           user?.fullName ?? 'Mutaxassis',
                           style: const TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 17.5,
                             color: AppColors.textPrimary,
-                            letterSpacing: -0.35,
+                            letterSpacing: -0.1,
+                            wordSpacing: 0.4,
                           ),
                         ),
                         const SizedBox(height: 7),

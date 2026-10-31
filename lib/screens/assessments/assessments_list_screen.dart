@@ -51,14 +51,13 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
-            icon: LucideIcons.clipboardCheck,
-            title: 'Kasbiy baholashlar jurnali',
+            title: 'Kasbiy baholashlar',
             subtitle:
-                '${currentRole.label} • Jami ${filtered.length} ta diagnostik monitoring qaydi',
+                '${currentRole.label} • ${filtered.length} ta diagnostik qayd',
             action: currentRole.canCreateAssessments
-                ? FilledButton.icon(
-                    icon: const Icon(LucideIcons.plus, size: 16),
-                    label: const Text('Yangi baholash'),
+                ? HeaderActionButton(
+                    icon: LucideIcons.plus,
+                    label: 'Yangi baholash',
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -69,13 +68,14 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                     },
                   )
                 : const StatusPill(
-                    label: 'Faqat ko‘rish rejimi',
+                    label: 'Ko‘rish rejimi',
                     color: AppColors.textMuted,
-                    backgroundColor: AppColors.glassWellFill,
+                    backgroundColor: Colors.white,
+                    borderColor: AppColors.border,
                     icon: LucideIcons.eye,
                   ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
           ModernPillFilterBar(
             items: _categories,

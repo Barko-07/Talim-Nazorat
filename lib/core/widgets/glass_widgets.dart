@@ -417,12 +417,163 @@ class ResponsivePageContainer extends StatelessWidget {
   }
 }
 
-/// Barcha ekranlar uchun mobil/desktop moslashuvchan sahifa sarlavhasi (qutisiz erkin ikonka)
+/// Sahifa tepa qismi uchun minimalist va silliq harakat tugmasi (Shadcn / Linear uslubida)
+enum HeaderActionVariant { primary, secondary, danger }
+
+class HeaderActionButton extends StatefulWidget {
+  final String label;
+  final String? compactLabel;
+  final IconData? icon;
+  final VoidCallback onPressed;
+  final HeaderActionVariant variant;
+
+  const HeaderActionButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.compactLabel,
+    this.icon,
+    this.variant = HeaderActionVariant.primary,
+  });
+
+  @override
+  State<HeaderActionButton> createState() => _HeaderActionButtonState();
+}
+
+class _HeaderActionButtonState extends State<HeaderActionButton> {
+  bool _hovered = false;
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final screenW = MediaQuery.sizeOf(context).width;
+    final isMobile = screenW < 560;
+    final effectiveLabel =
+        (isMobile && widget.compactLabel != null) ? widget.compactLabel! : widget.label;
+
+    final Color bg;
+    final Color border;
+    final Color fg;
+    final Color iconColor;
+    final List<BoxShadow> shadow;
+
+    switch (widget.variant) {
+      case HeaderActionVariant.primary:
+        bg = _hovered ? AppColors.primaryDark : AppColors.primary;
+        border = _hovered ? AppColors.primaryDark : AppColors.primary;
+        fg = Colors.white;
+        iconColor = Colors.white;
+        shadow = [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.28),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ];
+        break;
+      case HeaderActionVariant.secondary:
+        bg = _hovered ? const Color(0xFFF8FAFC) : Colors.white;
+        border = _hovered ? AppColors.borderSlate : AppColors.border;
+        fg = AppColors.textPrimary;
+        iconColor = AppColors.primary;
+        shadow = const [
+          BoxShadow(
+            color: Color(0x070F172A),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ];
+        break;
+      case HeaderActionVariant.danger:
+        bg = _hovered ? AppColors.errorBg : Colors.white;
+        border = AppColors.errorBorder;
+        fg = AppColors.error;
+        iconColor = AppColors.error;
+        shadow = const [
+          BoxShadow(
+            color: Color(0x060F172A),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ];
+        break;
+    }
+
+    final radius = BorderRadius.circular(10);
+    final height = isMobile ? 35.0 : 38.0;
+    final pad = widget.icon != null
+        ? EdgeInsets.fromLTRB(isMobile ? 10.5 : 12.5, 0, isMobile ? 12 : 14, 0)
+        : EdgeInsets.symmetric(horizontal: isMobile ? 12 : 14);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCubic,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutCubic,
+          height: height,
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: radius,
+            border: Border.all(color: border, width: 1.0),
+            boxShadow: shadow,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: radius,
+            child: InkWell(
+              borderRadius: radius,
+              onTap: widget.onPressed,
+              onHighlightChanged: (v) => setState(() => _pressed = v),
+              splashColor: fg.withValues(alpha: 0.08),
+              highlightColor: fg.withValues(alpha: 0.04),
+              child: Padding(
+                padding: pad,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.icon != null) ...[
+                      Icon(
+                        widget.icon,
+                        size: isMobile ? 14.5 : 15.5,
+                        color: iconColor,
+                      ),
+                      const SizedBox(width: 6),
+                    ],
+                    Text(
+                      effectiveLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: isMobile ? 12.3 : 13,
+                        fontWeight: FontWeight.w600,
+                        color: fg,
+                        letterSpacing: 0.0,
+                        wordSpacing: 0.25,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Barcha ekranlar uchun mobil/desktop tekis tekislangan minimalist sahifa sarlavhasi
 class AdaptivePageHeader extends StatelessWidget {
   final String title;
   final String subtitle;
   final Widget? action;
   final IconData? icon;
+  final bool inlineActionOnMobile;
 
   const AdaptivePageHeader({
     super.key,
@@ -430,79 +581,90 @@ class AdaptivePageHeader extends StatelessWidget {
     required this.subtitle,
     this.action,
     this.icon,
+    this.inlineActionOnMobile = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isCompact = constraints.maxWidth < 580;
+        final isCompact = constraints.maxWidth < 560;
 
-        final titleBlock = Column(
+        // Agar action inline sig'masa (masalan, filter bar bo'lsa), pastga tushiramiz
+        if (action != null && !inlineActionOnMobile && isCompact) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: isCompact ? 20 : 23,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.2,
+                  wordSpacing: 0.35,
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: isCompact ? 12.5 : 13.0,
+                  color: AppColors.textMuted,
+                  fontWeight: FontWeight.w400,
+                  height: 1.35,
+                ),
+              ),
+              const SizedBox(height: 12),
+              action!,
+            ],
+          );
+        }
+
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (icon != null) ...[
-                  Icon(
-                    icon,
-                    size: isCompact ? 21 : 23,
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(width: 10),
-                ],
                 Expanded(
                   child: Text(
                     title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: isCompact ? 19.5 : 23,
-                      fontWeight: FontWeight.w800,
+                      fontSize: isCompact ? 19.5 : 22.5,
+                      fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
-                      letterSpacing: -0.45,
+                      letterSpacing: -0.2,
+                      wordSpacing: 0.35,
                       height: 1.2,
                     ),
                   ),
                 ),
+                if (action != null) ...[
+                  const SizedBox(width: 12),
+                  action!,
+                ],
               ],
             ),
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: const TextStyle(
-                fontSize: 13,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: isCompact ? 12.5 : 13.0,
                 color: AppColors.textMuted,
-                fontWeight: FontWeight.w500,
-                height: 1.4,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0.0,
+                wordSpacing: 0.25,
+                height: 1.35,
               ),
             ),
-          ],
-        );
-
-        if (action == null) return titleBlock;
-
-        if (isCompact) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              titleBlock,
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [action!],
-              ),
-            ],
-          );
-        }
-
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(child: titleBlock),
-            const SizedBox(width: 18),
-            Flexible(child: action!),
           ],
         );
       },
@@ -681,9 +843,10 @@ class StatusPill extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: color,
-                  letterSpacing: -0.1,
+                  letterSpacing: 0.0,
+                  wordSpacing: 0.25,
                 ),
               ),
             ),

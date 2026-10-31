@@ -299,18 +299,28 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                 children: [
                   // 1. MUTAXASSISLIKNING RASMIY KASBIY VAKOLAT BANNERI
                   GlassSurface(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(18),
                     borderRadius: 18,
-                    opacity: 0.95,
+                    opacity: 0.96,
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
+                        Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: role.color.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: role.color.withValues(alpha: 0.18),
+                              width: 1.0,
+                            ),
+                          ),
+                          alignment: Alignment.center,
                           child: Icon(
                             roleIcon,
                             color: role.color,
-                            size: 25,
+                            size: 19,
                           ),
                         ),
                         const SizedBox(width: 14),

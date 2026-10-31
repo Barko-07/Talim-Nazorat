@@ -641,19 +641,18 @@ class _IepListScreenState extends State<IepListScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
-            icon: LucideIcons.bookOpenCheck,
-            title: 'Individual Ta’lim Rejalari (ITR)',
+            title: 'Individual rejalar (ITR)',
             subtitle:
-                'Alohida ta’lim ehtiyoji bo‘lgan o‘quvchilarning shaxsiy o‘quv rejalari (${allPlans.length} ta)',
+                'Shaxsiy o‘quv rejalari va maqsadlar • ${allPlans.length} ta',
             action: canCreateIep
-                ? FilledButton.icon(
-                    icon: const Icon(LucideIcons.plus, size: 17),
-                    label: const Text('Yangi ITR yaratish'),
+                ? HeaderActionButton(
+                    icon: LucideIcons.plus,
+                    label: 'Yangi ITR',
                     onPressed: () => _showCreateIepDialog(context, currentUser),
                   )
                 : null,
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           ModernPillFilterBar(
             items: filterItems,
             selectedItem: _selectedStatus,

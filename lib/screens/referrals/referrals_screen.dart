@@ -345,17 +345,16 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
-            icon: LucideIcons.arrowLeftRight,
-            title: 'Yo‘naltirishlar va konsilium',
+            title: 'Yo‘naltirishlar',
             subtitle:
-                'Mutaxassislararo hamkorlik va PMPK komissiyasiga yo‘naltirishlar (${referrals.length} ta)',
-            action: FilledButton.icon(
-              icon: const Icon(LucideIcons.plus, size: 16),
-              label: const Text('Yangi yo‘naltirish'),
+                'Konsilium va PMPK yo‘llanmalari • ${referrals.length} ta',
+            action: HeaderActionButton(
+              icon: LucideIcons.plus,
+              label: 'Yangi yo‘naltirish',
               onPressed: () => _showAddReferralDialog(context),
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
           ModernPillFilterBar(
             items: _statuses,

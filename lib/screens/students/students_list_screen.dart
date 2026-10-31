@@ -23,13 +23,12 @@ class StudentsListScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
-            icon: LucideIcons.users,
-            title: 'Bolalar elektron reyestri',
+            title: 'Bolalar reyestri',
             subtitle:
-                'Jami ${students.length} nafar inklyuziv ta’limdagi o‘quvchi ro‘yxatda',
-            action: FilledButton.icon(
-              icon: const Icon(LucideIcons.userPlus, size: 16),
-              label: const Text('Yangi o‘quvchi'),
+                'Ro‘yxatda ${students.length} nafar inklyuziv ta’lim o‘quvchisi',
+            action: HeaderActionButton(
+              icon: LucideIcons.userPlus,
+              label: 'Yangi o‘quvchi',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -40,7 +39,7 @@ class StudentsListScreen extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Kesib olingan shisha qidiruv va sinf filtri paneli (Mobil va desktopga mos)
           SurfaceCard(

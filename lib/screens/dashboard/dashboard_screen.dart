@@ -265,89 +265,55 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
+  String _initialsFor(String? fullName) {
+    final cleaned = (fullName ?? '').trim();
+    if (cleaned.isEmpty) return 'M';
+    final parts = cleaned
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return parts.first[0].toUpperCase();
+  }
+
+  Widget _buildSectionIconBadge(IconData icon, {double size = 36}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: AppColors.glassWellFill,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.glassInnerBorder, width: 0.9),
+      ),
+      alignment: Alignment.center,
+      child: Icon(icon, size: size * 0.48, color: AppColors.primary),
+    );
+  }
+
   Widget _buildWelcomeHero(BuildContext context, UserModel? user) {
+    final fullName = user?.fullName ?? 'Mutaxassis';
+    final roleLabel = user?.role.label ?? 'Mutaxassis';
+    final roleIcon =
+        user != null ? premiumRoleIcon(user.role) : LucideIcons.shieldCheck;
+    final institutionName =
+        user?.institutionName ?? '9-sonli inklyuziv ta’lim tayanch maktabi';
+    final initials = _initialsFor(user?.fullName);
+
     return GlassSurface(
       borderRadius: 18,
       blur: 16,
-      opacity: 0.95,
-      padding: const EdgeInsets.all(22),
+      opacity: 0.96,
+      padding: EdgeInsets.zero,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final isCompact = constraints.maxWidth < 580;
+          final isCompact = constraints.maxWidth < 600;
 
-          final profileInfo = Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.primaryLight,
-                child: Text(
-                  (user?.fullName ?? 'U').substring(0, 1),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Assalomu alaykum, ${user?.fullName ?? 'Mutaxassis'}!',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: isCompact ? 17 : 20,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.4,
-                        height: 1.25,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    StatusPill(
-                      label: user?.role.label ?? 'Mutaxassis',
-                      color: AppColors.primary,
-                      backgroundColor: AppColors.primaryLight,
-                      icon: user != null ? premiumRoleIcon(user.role) : null,
-                      showDot: user == null,
-                    ),
-                    const SizedBox(height: 7),
-                    Row(
-                      children: [
-                        const Icon(
-                          LucideIcons.school,
-                          size: 14,
-                          color: AppColors.textMuted,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            user?.institutionName ??
-                                '9-sonli inklyuziv ta’lim tayanch maktabi',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.textMuted,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-
-          final addBtn = FilledButton.icon(
-            icon: const Icon(LucideIcons.userPlus, size: 16),
-            label: const Text('Bola qo‘shish'),
+          final addBtn = HeaderActionButton(
+            icon: LucideIcons.userPlus,
+            label: 'Bola qo‘shish',
+            compactLabel: 'Bola qo‘shish',
             onPressed: () {
               Navigator.push(
                 context,
@@ -356,23 +322,215 @@ class DashboardScreen extends StatelessWidget {
             },
           );
 
+          final monogram = Container(
+            width: isCompact ? 42 : 46,
+            height: isCompact ? 42 : 46,
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(isCompact ? 12 : 13),
+              border: Border.all(color: AppColors.primaryTint, width: 1.0),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              initials,
+              style: TextStyle(
+                fontSize: isCompact ? 14.5 : 15.5,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+                letterSpacing: 0.2,
+              ),
+            ),
+          );
+
           if (isCompact) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                profileInfo,
-                const SizedBox(height: 16),
-                addBtn,
-              ],
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      monogram,
+                      const SizedBox(width: 13),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Assalomu alaykum',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              fullName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 16.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                                letterSpacing: -0.1,
+                                wordSpacing: 0.4,
+                                height: 1.24,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 13),
+                  Container(height: 1, color: AppColors.hairlineBorder),
+                  const SizedBox(height: 11),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  roleIcon,
+                                  size: 13.5,
+                                  color: AppColors.primary,
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    roleLabel,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 12.3,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textPrimary,
+                                      wordSpacing: 0.25,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 3),
+                            Row(
+                              children: [
+                                const Icon(
+                                  LucideIcons.school,
+                                  size: 13,
+                                  color: AppColors.textMuted,
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    institutionName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      addBtn,
+                    ],
+                  ),
+                ],
+              ),
             );
           }
 
-          return Row(
-            children: [
-              Expanded(child: profileInfo),
-              const SizedBox(width: 18),
-              addBtn,
-            ],
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                monogram,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Assalomu alaykum',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              fullName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                                letterSpacing: -0.1,
+                                wordSpacing: 0.45,
+                                height: 1.24,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          StatusPill(
+                            label: roleLabel,
+                            color: AppColors.primary,
+                            backgroundColor: AppColors.primaryLight,
+                            icon: roleIcon,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          const Icon(
+                            LucideIcons.school,
+                            size: 13.5,
+                            color: AppColors.textMuted,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              institutionName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                color: AppColors.textMuted,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 18),
+                addBtn,
+              ],
+            ),
           );
         },
       ),
@@ -391,36 +549,35 @@ class DashboardScreen extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               final isNarrow = constraints.maxWidth < 460;
-              const titleCol = Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              final titleRow = Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        LucideIcons.trendingUp,
-                        size: 20,
-                        color: AppColors.primary,
-                      ),
-                      SizedBox(width: 9),
-                      Expanded(
-                        child: Text(
+                  _buildSectionIconBadge(LucideIcons.trendingUp),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
                           'Oylik rivojlanish dinamikasi',
                           style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
-                            letterSpacing: -0.3,
+                            letterSpacing: -0.1,
+                            wordSpacing: 0.35,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Nutq, kognitiv va ijtimoiy mezonlar kesimida o‘rtacha ballar',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      color: AppColors.textMuted,
+                        SizedBox(height: 2.5),
+                        Text(
+                          'Nutq, kognitiv va ijtimoiy mezonlar kesimida o‘rtacha ballar',
+                          style: TextStyle(
+                            fontSize: 12.2,
+                            color: AppColors.textMuted,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -434,21 +591,21 @@ class DashboardScreen extends StatelessWidget {
               );
 
               if (isNarrow) {
-                return const Column(
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    titleCol,
-                    SizedBox(height: 10),
+                    titleRow,
+                    const SizedBox(height: 10),
                     pill,
                   ],
                 );
               }
 
-              return const Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(child: titleCol),
-                  SizedBox(width: 12),
+                  Expanded(child: titleRow),
+                  const SizedBox(width: 12),
                   pill,
                 ],
               );
@@ -609,20 +766,17 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
-                LucideIcons.clipboardCheck,
-                size: 19,
-                color: AppColors.primary,
-              ),
-              const SizedBox(width: 9),
+              _buildSectionIconBadge(LucideIcons.clipboardCheck, size: 34),
+              const SizedBox(width: 11),
               const Expanded(
                 child: Text(
                   'So‘nggi baholashlar',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
-                    letterSpacing: -0.25,
+                    letterSpacing: -0.1,
+                    wordSpacing: 0.35,
                   ),
                 ),
               ),
@@ -747,20 +901,17 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
-                LucideIcons.calendarDays,
-                size: 19,
-                color: AppColors.primary,
-              ),
-              const SizedBox(width: 9),
+              _buildSectionIconBadge(LucideIcons.calendarDays, size: 34),
+              const SizedBox(width: 11),
               const Expanded(
                 child: Text(
                   'Kutilayotgan mashg‘ulotlar',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
-                    letterSpacing: -0.25,
+                    letterSpacing: -0.1,
+                    wordSpacing: 0.35,
                   ),
                 ),
               ),
@@ -1058,16 +1209,9 @@ class DashboardScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 2),
-                child: Icon(
-                  LucideIcons.compass,
-                  color: AppColors.primary,
-                  size: 22,
-                ),
-              ),
+              _buildSectionIconBadge(LucideIcons.compass),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -1076,17 +1220,18 @@ class DashboardScreen extends StatelessWidget {
                     Text(
                       sectionTitle,
                       style: const TextStyle(
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
-                        letterSpacing: -0.3,
+                        letterSpacing: -0.1,
+                        wordSpacing: 0.35,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 2.5),
                     Text(
                       sectionSubtitle,
                       style: const TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 12.2,
                         color: AppColors.textMuted,
                         height: 1.35,
                       ),

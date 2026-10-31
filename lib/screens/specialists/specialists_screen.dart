@@ -174,19 +174,18 @@ class SpecialistsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
-            icon: LucideIcons.userCheck,
-            title: 'Kadrlar va mutaxassislar shtati',
+            title: 'Mutaxassislar shtati',
             subtitle:
-                'Muassasa xodimlari, biriktirilgan sohalar va o‘quvchi yuklamasi (${staffList.length} nafar)',
+                'Muassasa kadrlari va yuklamasi • ${staffList.length} nafar',
             action: canManage
-                ? FilledButton.icon(
-                    icon: const Icon(LucideIcons.userPlus, size: 16),
-                    label: const Text('Yangi xodim'),
+                ? HeaderActionButton(
+                    icon: LucideIcons.userPlus,
+                    label: 'Yangi xodim',
                     onPressed: () => _showAddStaffDialog(context),
                   )
                 : null,
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
           Expanded(
             child: ListView.separated(

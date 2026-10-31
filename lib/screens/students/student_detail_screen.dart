@@ -509,27 +509,47 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 ),
               ),
 
-            // Frosted Cut-Out Profil Hero Karta
+            // Minimalist Soft-Glass Profil Hero Karta
             GlassSurface(
-              padding: const EdgeInsets.all(22),
+              padding: const EdgeInsets.all(20),
               borderRadius: 18,
-              opacity: 0.95,
+              opacity: 0.96,
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final isCompact = constraints.maxWidth < 430;
-                  final avatar = CircleAvatar(
-                    radius: isCompact ? 28 : 34,
-                    backgroundColor: AppColors.primaryLight,
+                  final firstInitial = s.lastName.isNotEmpty
+                      ? s.lastName.substring(0, 1).toUpperCase()
+                      : '';
+                  final secondInitial = s.firstName.isNotEmpty
+                      ? s.firstName.substring(0, 1).toUpperCase()
+                      : '?';
+                  final initials = '$firstInitial$secondInitial';
+
+                  final avatar = Container(
+                    width: isCompact ? 46 : 52,
+                    height: isCompact ? 46 : 52,
+                    decoration: BoxDecoration(
+                      color: isArchived
+                          ? AppColors.glassWellFill
+                          : AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(isCompact ? 13 : 14),
+                      border: Border.all(
+                        color: isArchived
+                            ? AppColors.border
+                            : AppColors.primaryTint,
+                        width: 1.0,
+                      ),
+                    ),
+                    alignment: Alignment.center,
                     child: Text(
-                      s.firstName.isNotEmpty
-                          ? s.firstName.substring(0, 1)
-                          : '?',
+                      initials,
                       style: TextStyle(
-                        fontSize: isCompact ? 22 : 26,
-                        fontWeight: FontWeight.w800,
+                        fontSize: isCompact ? 16 : 18,
+                        fontWeight: FontWeight.w700,
                         color: isArchived
                             ? AppColors.textMuted
                             : AppColors.primary,
+                        letterSpacing: 0.2,
                       ),
                     ),
                   );
@@ -540,17 +560,18 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       Text(
                         s.fullName,
                         style: TextStyle(
-                          fontSize: isCompact ? 18 : 21,
-                          fontWeight: FontWeight.w800,
+                          fontSize: isCompact ? 17.5 : 20,
+                          fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
-                          letterSpacing: -0.4,
+                          letterSpacing: -0.1,
+                          wordSpacing: 0.4,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 4),
                       Text(
                         '${s.institutionName} • ${s.grade}-sinf',
                         style: const TextStyle(
-                          fontSize: 13.5,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textSecondary,
                         ),
@@ -559,11 +580,11 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       Text(
                         'Tug‘ilgan kuni: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
                         style: const TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 12.3,
                           color: AppColors.textMuted,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 11),
                       Wrap(
                         spacing: 8,
                         runSpacing: 6,
@@ -982,17 +1003,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AdaptivePageHeader(
-              icon: LucideIcons.clipboardCheck,
-              title: 'Kasbiy Baholashlar Tarixi',
+              title: 'Baholashlar tarixi',
               subtitle:
-                  'O‘tkazilgan jami diagnostikalar: ${assessments.length} ta',
+                  'O‘tkazilgan jami diagnostikalar • ${assessments.length} ta',
               action: currentRole.canCreateAssessments
-                  ? FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: currentRole.color,
-                      ),
-                      icon: const Icon(LucideIcons.plus, size: 16),
-                      label: Text('Yangi ${currentRole.label} baholashi'),
+                  ? HeaderActionButton(
+                      icon: LucideIcons.plus,
+                      label: 'Yangi baholash',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -1256,17 +1273,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AdaptivePageHeader(
-              icon: LucideIcons.bookOpenCheck,
               title: plan.title,
               subtitle:
                   'O‘quv yili: ${plan.academicYear} • Mas’ul: ${plan.responsibleTeacherName}',
-              action: OutlinedButton.icon(
-                icon: const Icon(
-                  LucideIcons.printer,
-                  size: 16,
-                  color: AppColors.primary,
-                ),
-                label: const Text('Rasmiy Blank'),
+              action: HeaderActionButton(
+                variant: HeaderActionVariant.secondary,
+                icon: LucideIcons.printer,
+                label: 'Rasmiy blank',
                 onPressed: () {
                   Navigator.push(
                     context,

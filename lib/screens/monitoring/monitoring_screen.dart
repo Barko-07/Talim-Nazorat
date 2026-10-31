@@ -178,10 +178,10 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AdaptivePageHeader(
-              icon: LucideIcons.shieldAlert,
-              title: 'Avtomatlashtirilgan monitoring tizimi',
+              title: 'Monitoring tizimi',
               subtitle:
-                  'Rivojlanishdagi xavfli tendensiyalarni erta aniqlash va nazorat qilish',
+                  'Xavfli tendensiyalarni erta aniqlash va nazorat qilish',
+              inlineActionOnMobile: false,
               action: ModernPillFilterBar(
                 items: const ['Faqat ochiqlar', 'Barcha signallar'],
                 selectedItem:
@@ -195,7 +195,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 18),
 
             // 6 ta nazorat qoidalari bloki (Responsive 2-col desktop/tablet, 1-col mobile)
             SurfaceCard(

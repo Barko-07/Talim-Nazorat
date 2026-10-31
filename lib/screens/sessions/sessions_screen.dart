@@ -417,17 +417,16 @@ class _SessionsScreenState extends State<SessionsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
-            icon: LucideIcons.calendarDays,
-            title: 'Korreksion mashg‘ulotlar jadvali',
+            title: 'Mashg‘ulotlar jadvali',
             subtitle:
-                'Jami ${filtered.length} ta rejalashtirilgan va o‘tkazilgan darslar',
-            action: FilledButton.icon(
-              icon: const Icon(LucideIcons.calendarPlus, size: 16),
-              label: const Text('Rejalashtirish'),
+                'Jami ${filtered.length} ta rejalashtirilgan va o‘tilgan dars',
+            action: HeaderActionButton(
+              icon: LucideIcons.calendarPlus,
+              label: 'Rejalashtirish',
               onPressed: () => _showAddSessionDialog(context),
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
           ModernPillFilterBar(
             items: _filters,
