@@ -636,7 +636,11 @@ class _IepListScreenState extends State<IepListScreen> {
       return true;
     }).toList();
 
+    final width = MediaQuery.sizeOf(context).width;
+    final mediaPadding = MediaQuery.paddingOf(context);
+
     final content = ResponsivePageContainer(
+      bottomPadding: 0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -711,6 +715,12 @@ class _IepListScreenState extends State<IepListScreen> {
                     ),
                   )
                 : ListView.separated(
+                    padding: EdgeInsets.fromLTRB(
+                      0,
+                      0,
+                      0,
+                      width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
+                    ),
                     itemCount: plans.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 16),
                     itemBuilder: (context, index) {

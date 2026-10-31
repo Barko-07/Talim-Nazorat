@@ -45,8 +45,11 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
     final currentUser = auth.currentUser;
     final currentRole = currentUser?.role ?? UserRole.psychologist;
     final canPop = Navigator.canPop(context);
+    final width = MediaQuery.sizeOf(context).width;
+    final mediaPadding = MediaQuery.paddingOf(context);
 
     final pageBody = ResponsivePageContainer(
+      bottomPadding: 0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -126,6 +129,12 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                     ),
                   )
                 : ListView.separated(
+                    padding: EdgeInsets.fromLTRB(
+                      0,
+                      0,
+                      0,
+                      width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
+                    ),
                     itemCount: filtered.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 14),
                     itemBuilder: (context, index) {

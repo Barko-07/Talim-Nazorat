@@ -374,6 +374,7 @@ class ResponsivePageContainer extends StatelessWidget {
   final double maxWidth;
   final EdgeInsetsGeometry? padding;
   final bool? withTopHeaderPadding;
+  final double? bottomPadding;
 
   const ResponsivePageContainer({
     super.key,
@@ -381,6 +382,7 @@ class ResponsivePageContainer extends StatelessWidget {
     this.maxWidth = 1260,
     this.padding,
     this.withTopHeaderPadding,
+    this.bottomPadding,
   });
 
   @override
@@ -398,6 +400,8 @@ class ResponsivePageContainer extends StatelessWidget {
         ? MediaQuery.paddingOf(context).top + (width >= 920 ? 82.0 : 74.0)
         : (width < 600 ? 16.0 : 24.0);
 
+    final resolvedBottomPadding = bottomPadding ?? (width < 920 ? 96.0 : 28.0);
+
     return Align(
       alignment: Alignment.topCenter,
       child: ConstrainedBox(
@@ -408,7 +412,7 @@ class ResponsivePageContainer extends StatelessWidget {
                 horizontal,
                 topPadding,
                 horizontal,
-                width < 920 ? 96.0 : 28.0,
+                resolvedBottomPadding,
               ),
           child: child,
         ),

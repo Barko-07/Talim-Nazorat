@@ -17,8 +17,11 @@ class StudentsListScreen extends StatelessWidget {
     final app = context.watch<AppProvider>();
     final students = app.students;
     final canPop = Navigator.canPop(context);
+    final width = MediaQuery.sizeOf(context).width;
+    final mediaPadding = MediaQuery.paddingOf(context);
 
     final bodyContent = ResponsivePageContainer(
+      bottomPadding: 0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -196,6 +199,12 @@ class StudentsListScreen extends StatelessWidget {
                     ),
                   )
                 : ListView.separated(
+                    padding: EdgeInsets.fromLTRB(
+                      0,
+                      0,
+                      0,
+                      width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
+                    ),
                     itemCount: students.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 14),
                     itemBuilder: (context, index) {

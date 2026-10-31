@@ -1536,50 +1536,50 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   blur: 24,
                   opacity: 0.14,
                   boxShadow: const [],
-                  padding: EdgeInsets.zero,
+                  padding: EdgeInsets.fromLTRB(
+                    mediaPadding.left + 5,
+                    5,
+                    5,
+                    5,
+                  ),
                   child: ClipRRect(
                     borderRadius: leftIslandRadius,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: mediaPadding.left),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: quickTabs.map((item) {
-                          final isSelected =
-                              !isMoreActive && _selectedIndex == item.index;
-                          final isFirst = item.index == 0;
-                          final pillRadius = isFirst
-                              ? leftIslandRadius
-                              : BorderRadius.circular(28);
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: quickTabs.map((item) {
+                        final isSelected =
+                            !isMoreActive && _selectedIndex == item.index;
+                        const pillRadius = BorderRadius.all(Radius.circular(20));
 
-                          return Expanded(
-                            flex: isSelected ? 22 : 10,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                borderRadius: pillRadius,
-                                onTap: () => _selectTab(item.index),
-                                splashColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 220),
-                                  curve: Curves.easeOutCubic,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isSelected ? 12 : 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? AppColors.primary
-                                            .withValues(alpha: 0.12)
-                                        : Colors.transparent,
-                                    borderRadius: pillRadius,
-                                    border: isSelected
-                                        ? Border.all(
-                                            color: AppColors.primary
-                                                .withValues(alpha: 0.24),
-                                            width: 1.0,
-                                          )
-                                        : null,
-                                  ),
+                        return Expanded(
+                          flex: isSelected ? 22 : 10,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: pillRadius,
+                              onTap: () => _selectTab(item.index),
+                              splashColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 220),
+                                curve: Curves.easeOutCubic,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isSelected ? 12 : 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? AppColors.primary
+                                          .withValues(alpha: 0.12)
+                                      : Colors.transparent,
+                                  borderRadius: pillRadius,
+                                  border: isSelected
+                                      ? Border.all(
+                                          color: AppColors.primary
+                                              .withValues(alpha: 0.22),
+                                          width: 1.0,
+                                        )
+                                      : null,
+                                ),
                                   child: isSelected
                                       ? Row(
                                           mainAxisAlignment:
@@ -1622,7 +1622,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
                   ),
                 ),
-              ),
               const SizedBox(width: 10),
               // 2. O'ng tarafga yopishgan "Barchasi" Island
               Expanded(
@@ -1636,34 +1635,37 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   blur: 24,
                   opacity: 0.14,
                   boxShadow: const [],
-                  padding: EdgeInsets.zero,
+                  padding: EdgeInsets.fromLTRB(
+                    5,
+                    5,
+                    mediaPadding.right + 5,
+                    5,
+                  ),
                   child: ClipRRect(
                     borderRadius: rightIslandRadius,
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        borderRadius: rightIslandRadius,
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
                         onTap: () => _showMobileModulesSheet(context, app),
                         splashColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 220),
                           curve: Curves.easeOutCubic,
-                          padding: EdgeInsets.fromLTRB(
-                            isMoreActive ? 12 : 16,
-                            0,
-                            (isMoreActive ? 12 : 16) + mediaPadding.right,
-                            0,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isMoreActive ? 12 : 6,
                           ),
                           decoration: BoxDecoration(
                             color: isMoreActive
                                 ? AppColors.primary.withValues(alpha: 0.12)
                                 : Colors.transparent,
-                            borderRadius: rightIslandRadius,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20)),
                             border: isMoreActive
                                 ? Border.all(
                                     color: AppColors.primary
-                                        .withValues(alpha: 0.24),
+                                        .withValues(alpha: 0.22),
                                     width: 1.0,
                                   )
                                 : null,
