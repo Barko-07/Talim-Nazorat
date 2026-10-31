@@ -767,17 +767,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             if (isDesktop && _isDesktopSidebarOpen)
               _buildDesktopGlassSidebar(context, auth, app, user),
             Expanded(
-              child: Column(
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  _buildTopGlassHeader(
-                    context: context,
-                    isDesktop: isDesktop,
-                    currentNav: currentNav,
-                    user: user,
-                    auth: auth,
-                    unreadNotifCount: unreadNotifCount,
-                  ),
-                  Expanded(
+                  Positioned.fill(
                     child: PageTransitionSwitcher(
                       duration: const Duration(milliseconds: 220),
                       transitionBuilder:
@@ -790,6 +783,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         );
                       },
                       child: _buildActiveScreen(),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: _buildTopGlassHeader(
+                      context: context,
+                      isDesktop: isDesktop,
+                      currentNav: currentNav,
+                      user: user,
+                      auth: auth,
+                      unreadNotifCount: unreadNotifCount,
                     ),
                   ),
                 ],
@@ -873,8 +879,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 GlassSurface(
                   customBorderRadius: menuIslandRadius,
                   borderColor: AppColors.border,
-                  blur: 18,
-                  opacity: 0.95,
+                  useBlur: true,
+                  blur: 24,
+                  opacity: 0.12,
+                  boxShadow: const [],
                   padding: EdgeInsets.zero,
                   child: Material(
                     color: Colors.transparent,
@@ -917,8 +925,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 child: GlassSurface(
                   customBorderRadius: mainBarRadius,
                   borderColor: AppColors.border,
-                  blur: 18,
-                  opacity: 0.95,
+                  useBlur: true,
+                  blur: 24,
+                  opacity: 0.12,
+                  boxShadow: const [],
                   padding: EdgeInsets.fromLTRB(
                     isDesktop ? 22 : 16,
                     8,
