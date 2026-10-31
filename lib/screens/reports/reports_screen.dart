@@ -136,8 +136,8 @@ class ReportsScreen extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: SurfaceCard(
         elevated: false,
-        borderRadius: 18,
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+        borderRadius: 12,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         backgroundColor: AppColors.glassWellFill,
         borderColor: AppColors.glassInnerBorder,
         onTap: () {
@@ -197,7 +197,7 @@ class ReportsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               GlassWell(
-                borderRadius: 18,
+                borderRadius: 12,
                 padding: const EdgeInsets.all(14),
                 child: SizedBox(
                   height: 220,
@@ -302,8 +302,8 @@ class ReportsScreen extends StatelessWidget {
 
             // 2. ITR ijrosi jadvali
             SurfaceCard(
-              borderRadius: 28,
-              padding: const EdgeInsets.all(24),
+              borderRadius: 18,
+              padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -344,8 +344,8 @@ class ReportsScreen extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: 12),
                         child: SurfaceCard(
                           elevated: false,
-                          borderRadius: 20,
-                          padding: const EdgeInsets.all(16),
+                          borderRadius: 12,
+                          padding: const EdgeInsets.all(15),
                           backgroundColor: AppColors.glassWellFill,
                           borderColor: AppColors.glassInnerBorder,
                           onTap: () {
@@ -378,20 +378,18 @@ class ReportsScreen extends StatelessWidget {
                                     label:
                                         '${p.averageProgress.toStringAsFixed(1)}%',
                                     color: AppColors.primary,
-                                    backgroundColor:
-                                        Colors.white.withValues(alpha: 0.85),
+                                    backgroundColor: AppColors.primaryLight,
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 11),
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(999),
                                 child: LinearProgressIndicator(
                                   value: progress,
-                                  backgroundColor:
-                                      Colors.white.withValues(alpha: 0.85),
+                                  backgroundColor: AppColors.border,
                                   color: AppColors.primary,
-                                  minHeight: 8.5,
+                                  minHeight: 7,
                                 ),
                               ),
                             ],
@@ -422,8 +420,8 @@ class ReportsScreen extends StatelessWidget {
     required Color accent,
   }) {
     return SurfaceCard(
-      borderRadius: 26,
-      padding: const EdgeInsets.all(22),
+      borderRadius: 18,
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

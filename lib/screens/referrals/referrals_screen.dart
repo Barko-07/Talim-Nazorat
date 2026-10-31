@@ -369,10 +369,10 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
             child: referrals.isEmpty
                 ? Center(
                     child: SurfaceCard(
-                      borderRadius: 28,
+                      borderRadius: 18,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 40,
+                        horizontal: 30,
+                        vertical: 36,
                       ),
                       child: const Column(
                         mainAxisSize: MainAxisSize.min,
@@ -415,8 +415,8 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                       final isCompleted = ref.status == 'Yakunlandi';
 
                       return SurfaceCard(
-                        borderRadius: 26,
-                        padding: const EdgeInsets.all(22),
+                        borderRadius: 18,
+                        padding: const EdgeInsets.all(20),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -490,8 +490,8 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                             ),
                             const SizedBox(height: 14),
                             GlassWell(
-                              borderRadius: 18,
-                              padding: const EdgeInsets.all(16),
+                              borderRadius: 12,
+                              padding: const EdgeInsets.all(15),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -555,10 +555,10 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                 ref.outcomeNotes!.isNotEmpty) ...[
                               const SizedBox(height: 12),
                               GlassWell(
-                                borderRadius: 16,
-                                padding: const EdgeInsets.all(14),
+                                borderRadius: 12,
+                                padding: const EdgeInsets.all(13),
                                 tintColor: AppColors.successBg,
-                                borderColor: Colors.white,
+                                borderColor: AppColors.successBorder,
                                 child: Text(
                                   'Yakuniy xulosa: ${ref.outcomeNotes}',
                                   style: const TextStyle(

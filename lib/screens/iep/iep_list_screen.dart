@@ -665,10 +665,10 @@ class _IepListScreenState extends State<IepListScreen> {
             child: plans.isEmpty
                 ? Center(
                     child: SurfaceCard(
-                      borderRadius: 28,
+                      borderRadius: 18,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 40,
+                        horizontal: 30,
+                        vertical: 36,
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -771,8 +771,8 @@ class _IepListScreenState extends State<IepListScreen> {
             : AppColors.warning;
 
     return SurfaceCard(
-      borderRadius: 26,
-      padding: const EdgeInsets.all(24),
+      borderRadius: 18,
+      padding: const EdgeInsets.all(22),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 540;
@@ -780,9 +780,9 @@ class _IepListScreenState extends State<IepListScreen> {
           final printButton = OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primaryDark,
-              backgroundColor: Colors.white.withValues(alpha: 0.78),
-              side: const BorderSide(color: Colors.white, width: 1.35),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+              backgroundColor: Colors.white,
+              side: const BorderSide(color: AppColors.border, width: 1.0),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             ),
             icon: const Icon(LucideIcons.printer, size: 15),
             label: const Text(
@@ -910,7 +910,7 @@ class _IepListScreenState extends State<IepListScreen> {
 
               // Boshlang'ich daraja va uzoq muddatli maqsadlar
               GlassWell(
-                borderRadius: 18,
+                borderRadius: 12,
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1108,7 +1108,7 @@ class _IepListScreenState extends State<IepListScreen> {
 
                 return GlassWell(
                   margin: const EdgeInsets.only(bottom: 10),
-                  borderRadius: 18,
+                  borderRadius: 12,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 13,

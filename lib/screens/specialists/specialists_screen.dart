@@ -203,8 +203,8 @@ class SpecialistsScreen extends StatelessWidget {
                     staff.role != UserRole.superAdmin;
 
                 return SurfaceCard(
-                  borderRadius: 26,
-                  padding: const EdgeInsets.all(22),
+                  borderRadius: 18,
+                  padding: const EdgeInsets.all(20),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final isCompact = constraints.maxWidth < 480;
@@ -324,8 +324,7 @@ class SpecialistsScreen extends StatelessWidget {
                                   StatusPill(
                                     label: '$assignedCount ta o‘quvchi',
                                     color: AppColors.primary,
-                                    backgroundColor:
-                                        Colors.white.withValues(alpha: 0.85),
+                                    backgroundColor: AppColors.primaryLight,
                                     icon: LucideIcons.users,
                                   ),
                                   ?toggleButton,
@@ -345,7 +344,7 @@ class SpecialistsScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               GlassWell(
-                                borderRadius: 18,
+                                borderRadius: 12,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 14,
                                   vertical: 9,

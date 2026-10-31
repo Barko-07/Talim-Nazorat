@@ -199,8 +199,8 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
 
             // 6 ta nazorat qoidalari bloki (Responsive 2-col desktop/tablet, 1-col mobile)
             SurfaceCard(
-              borderRadius: 28,
-              padding: const EdgeInsets.all(24),
+              borderRadius: 18,
+              padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -263,9 +263,9 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
 
             if (alerts.isEmpty)
               SurfaceCard(
-                borderRadius: 28,
+                borderRadius: 18,
                 padding: const EdgeInsets.symmetric(
-                  vertical: 42,
+                  vertical: 38,
                   horizontal: 24,
                 ),
                 child: const Center(
@@ -316,15 +316,15 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
 
   Widget _buildRuleTile(String code, String title, String condition) {
     return GlassWell(
-      borderRadius: 18,
-      padding: const EdgeInsets.all(15),
+      borderRadius: 12,
+      padding: const EdgeInsets.all(14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           StatusPill(
             label: code,
             color: AppColors.primary,
-            backgroundColor: Colors.white.withValues(alpha: 0.85),
+            backgroundColor: AppColors.primaryLight,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -364,9 +364,9 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
     final df = DateFormat('dd.MM.yyyy HH:mm');
 
     return SurfaceCard(
-      margin: const EdgeInsets.only(bottom: 16),
-      borderRadius: 26,
-      padding: const EdgeInsets.all(22),
+      margin: const EdgeInsets.only(bottom: 14),
+      borderRadius: 18,
+      padding: const EdgeInsets.all(20),
       onTap: () {
         Navigator.push(
           context,
@@ -450,10 +450,10 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
           ),
           const SizedBox(height: 14),
           GlassWell(
-            borderRadius: 18,
-            padding: const EdgeInsets.all(15),
-            tintColor: AppColors.primaryLight.withValues(alpha: 0.72),
-            borderColor: Colors.white,
+            borderRadius: 12,
+            padding: const EdgeInsets.all(14),
+            tintColor: AppColors.primaryLight,
+            borderColor: AppColors.primaryTint,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -515,10 +515,10 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
           if (alt.resolvedNotes != null && alt.resolvedNotes!.isNotEmpty) ...[
             const SizedBox(height: 12),
             GlassWell(
-              borderRadius: 16,
-              padding: const EdgeInsets.all(14),
+              borderRadius: 12,
+              padding: const EdgeInsets.all(13),
               tintColor: AppColors.successBg,
-              borderColor: Colors.white,
+              borderColor: AppColors.successBorder,
               child: Text(
                 'Yechim bayonnomasi: ${alt.resolvedNotes!}',
                 style: const TextStyle(

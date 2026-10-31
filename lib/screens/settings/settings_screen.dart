@@ -37,7 +37,10 @@ class SettingsScreen extends StatelessWidget {
               action: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.error,
-                  side: const BorderSide(color: Colors.white, width: 1.4),
+                  side: const BorderSide(
+                    color: AppColors.errorBorder,
+                    width: 1.0,
+                  ),
                   backgroundColor: AppColors.errorBg,
                 ),
                 icon: const Icon(LucideIcons.logOut, size: 15),
@@ -58,16 +61,16 @@ class SettingsScreen extends StatelessWidget {
 
             // 1. Joriy Foydalanuvchi Profili (Cut-Out Frosted Hero Card)
             GlassSurface(
-              borderRadius: 28,
-              blur: 22,
-              opacity: 0.76,
-              padding: const EdgeInsets.all(24),
+              borderRadius: 18,
+              blur: 16,
+              opacity: 0.95,
+              padding: const EdgeInsets.all(22),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    width: 60,
-                    height: 60,
+                    width: 58,
+                    height: 58,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: const LinearGradient(
@@ -75,7 +78,7 @@ class SettingsScreen extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: [AppColors.primary, AppColors.primaryDark],
                       ),
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: Colors.white, width: 1.5),
                       boxShadow: AppColors.primaryGlow,
                     ),
                     alignment: Alignment.center,
@@ -180,8 +183,8 @@ class SettingsScreen extends StatelessWidget {
 
             // 2. Biriktirilgan kasbiy profil va shaxsiy javobgarlik
             SurfaceCard(
-              borderRadius: 28,
-              padding: const EdgeInsets.all(24),
+              borderRadius: 18,
+              padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -238,7 +241,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   GlassWell(
-                    borderRadius: 18,
+                    borderRadius: 12,
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,8 +310,8 @@ class SettingsScreen extends StatelessWidget {
 
             // 3. Ta'lim muassasasi (Dinamik haqiqiy hudud ma'lumotlari bilan)
             SurfaceCard(
-              borderRadius: 28,
-              padding: const EdgeInsets.all(24),
+              borderRadius: 18,
+              padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -334,7 +337,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   GlassWell(
-                    borderRadius: 18,
+                    borderRadius: 12,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 6,
@@ -362,8 +365,8 @@ class SettingsScreen extends StatelessWidget {
 
             // 4. Ma'lumotlar bazasi va xavfsizlik
             SurfaceCard(
-              borderRadius: 28,
-              padding: const EdgeInsets.all(24),
+              borderRadius: 18,
+              padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -389,7 +392,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   GlassWell(
-                    borderRadius: 18,
+                    borderRadius: 12,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 6,
@@ -448,10 +451,10 @@ class SettingsScreen extends StatelessWidget {
           decoration: BoxDecoration(
             border: isLast
                 ? null
-                : Border(
+                : const Border(
                     bottom: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      width: 1.1,
+                      color: AppColors.hairlineBorder,
+                      width: 1.0,
                     ),
                   ),
           ),

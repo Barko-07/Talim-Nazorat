@@ -68,10 +68,10 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                       );
                     },
                   )
-                : StatusPill(
+                : const StatusPill(
                     label: 'Faqat ko‘rish rejimi',
                     color: AppColors.textMuted,
-                    backgroundColor: Colors.white.withValues(alpha: 0.78),
+                    backgroundColor: AppColors.glassWellFill,
                     icon: LucideIcons.eye,
                   ),
           ),
@@ -88,10 +88,10 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
             child: filtered.isEmpty
                 ? Center(
                     child: SurfaceCard(
-                      borderRadius: 28,
+                      borderRadius: 18,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 40,
+                        horizontal: 30,
+                        vertical: 36,
                       ),
                       child: const Column(
                         mainAxisSize: MainAxisSize.min,
@@ -153,8 +153,8 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
             : AppColors.info;
 
     return SurfaceCard(
-      borderRadius: 26,
-      padding: const EdgeInsets.all(22),
+      borderRadius: 18,
+      padding: const EdgeInsets.all(20),
       onTap: () {
         Navigator.push(
           context,
@@ -233,8 +233,8 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
               ),
               const SizedBox(height: 16),
               GlassWell(
-                borderRadius: 18,
-                padding: const EdgeInsets.all(16),
+                borderRadius: 12,
+                padding: const EdgeInsets.all(15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

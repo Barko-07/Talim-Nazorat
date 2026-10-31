@@ -230,8 +230,8 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
             child: ResponsivePageContainer(
               maxWidth: 520,
               child: SurfaceCard(
-                borderRadius: 28,
-                padding: const EdgeInsets.all(30),
+                borderRadius: 18,
+                padding: const EdgeInsets.all(28),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -299,8 +299,9 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                 children: [
                   // 1. MUTAXASSISLIKNING RASMIY KASBIY VAKOLAT BANNERI
                   GlassSurface(
-                    padding: const EdgeInsets.all(22),
-                    borderRadius: 26,
+                    padding: const EdgeInsets.all(20),
+                    borderRadius: 18,
+                    opacity: 0.95,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -356,13 +357,13 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
                   // Tibbiy tashxis emasligi haqida rasmiy eslatma
                   GlassWell(
-                    borderRadius: 18,
+                    borderRadius: 12,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 13,
+                      horizontal: 15,
+                      vertical: 12,
                     ),
                     tintColor: AppColors.infoBg,
-                    borderColor: Colors.white,
+                    borderColor: AppColors.infoBorder,
                     child: const Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -392,7 +393,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
                   // 2. O'QUVCHI VA MA'LUMOTLAR
                   SurfaceCard(
-                    borderRadius: 28,
+                    borderRadius: 18,
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -492,7 +493,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
                   // 3. SOHAGA MOS RUBRIKA MEZONLARI
                   SurfaceCard(
-                    borderRadius: 28,
+                    borderRadius: 18,
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,7 +530,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                   'Jami: ${_totalScore.toInt()} / ${_maxTotalScore.toInt()} ball',
                               color: role.color,
                               backgroundColor:
-                                  Colors.white.withValues(alpha: 0.78),
+                                  role.color.withValues(alpha: 0.08),
                               icon: LucideIcons.award,
                             ),
                           ],
@@ -553,9 +554,9 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                           final name = item['name'] as String;
 
                           return GlassWell(
-                            margin: const EdgeInsets.only(bottom: 14),
-                            borderRadius: 18,
-                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                            margin: const EdgeInsets.only(bottom: 12),
+                            borderRadius: 12,
+                            padding: const EdgeInsets.fromLTRB(15, 13, 15, 8),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -580,13 +581,11 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white
-                                            .withValues(alpha: 0.85),
-                                        borderRadius:
-                                            BorderRadius.circular(999),
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8),
                                         border: Border.all(
-                                          color: Colors.white,
-                                          width: 1.2,
+                                          color: AppColors.border,
+                                          width: 0.85,
                                         ),
                                       ),
                                       child: Text(
@@ -639,7 +638,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
                   // 4. MUTAXASSIS XULOSASI VA TAVSIYALARI
                   SurfaceCard(
-                    borderRadius: 28,
+                    borderRadius: 18,
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

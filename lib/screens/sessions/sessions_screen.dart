@@ -129,7 +129,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                   ),
                   const SizedBox(height: 14),
                   GlassWell(
-                    borderRadius: 18,
+                    borderRadius: 12,
                     padding: const EdgeInsets.all(14),
                     child: Wrap(
                       spacing: 12,
@@ -441,10 +441,10 @@ class _SessionsScreenState extends State<SessionsScreen> {
             child: filtered.isEmpty
                 ? Center(
                     child: SurfaceCard(
-                      borderRadius: 28,
+                      borderRadius: 18,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 40,
+                        horizontal: 30,
+                        vertical: 36,
                       ),
                       child: const Column(
                         mainAxisSize: MainAxisSize.min,
@@ -499,8 +499,8 @@ class _SessionsScreenState extends State<SessionsScreen> {
                       final df = DateFormat('dd.MM.yyyy HH:mm');
 
                       return SurfaceCard(
-                        borderRadius: 26,
-                        padding: const EdgeInsets.all(22),
+                        borderRadius: 18,
+                        padding: const EdgeInsets.all(20),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -611,7 +611,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                     s.observations!.isNotEmpty) ...[
                                   const SizedBox(height: 14),
                                   GlassWell(
-                                    borderRadius: 18,
+                                    borderRadius: 12,
                                     padding: const EdgeInsets.all(15),
                                     child: Text(
                                       'Kuzatuv: ${s.observations}',
@@ -650,11 +650,10 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                         OutlinedButton.icon(
                                           style: OutlinedButton.styleFrom(
                                             foregroundColor: AppColors.error,
-                                            backgroundColor: Colors.white
-                                                .withValues(alpha: 0.72),
+                                            backgroundColor: Colors.white,
                                             side: const BorderSide(
-                                              color: Colors.white,
-                                              width: 1.3,
+                                              color: AppColors.errorBorder,
+                                              width: 1.0,
                                             ),
                                             minimumSize: const Size(0, 42),
                                           ),
@@ -700,11 +699,10 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                           child: OutlinedButton.icon(
                                             style: OutlinedButton.styleFrom(
                                               foregroundColor: AppColors.error,
-                                              backgroundColor: Colors.white
-                                                  .withValues(alpha: 0.72),
+                                              backgroundColor: Colors.white,
                                               side: const BorderSide(
-                                                color: Colors.white,
-                                                width: 1.3,
+                                                color: AppColors.errorBorder,
+                                                width: 1.0,
                                               ),
                                               minimumSize: const Size(0, 42),
                                             ),

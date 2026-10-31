@@ -31,9 +31,9 @@ class IepPrintScreen extends StatelessWidget {
             padding: const EdgeInsets.only(right: 14),
             child: OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
-                backgroundColor: Colors.white.withValues(alpha: 0.85),
+                backgroundColor: Colors.white,
                 foregroundColor: AppColors.primaryDark,
-                side: const BorderSide(color: Colors.white, width: 1.4),
+                side: const BorderSide(color: AppColors.border, width: 1.0),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 9,
@@ -72,8 +72,8 @@ class IepPrintScreen extends StatelessWidget {
                 padding: EdgeInsets.all(isMobile ? 22 : 38),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white, width: 1.6),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.border, width: 1.0),
                   boxShadow: AppColors.elevatedShadow,
                 ),
                 child: Column(
@@ -417,8 +417,9 @@ class IepPrintScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFEDF2F9),
-        borderRadius: BorderRadius.circular(8),
+        color: AppColors.glassWellFill,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: AppColors.border, width: 0.85),
       ),
       child: Text(
         title,
