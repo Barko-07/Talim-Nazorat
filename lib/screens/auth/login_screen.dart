@@ -92,7 +92,6 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
-  // --- FROSTED GLASS CHORTOQ MAKTABLARINI TANLASH MODALI ---
   void _showIosSchoolPickerModal(BuildContext context) {
     final allSchools = NamanganData.getSchoolsForDistrict('Chortoq tumani');
     showModalBottomSheet(
@@ -116,27 +115,27 @@ class _LoginScreenState extends State<LoginScreen>
             return SizedBox(
               height: MediaQuery.sizeOf(context).height * 0.78,
               child: GlassSurface(
-                borderRadius: 26,
-                blur: 24,
-                opacity: 0.94,
+                borderRadius: 32,
+                blur: 26,
+                opacity: 0.88,
                 child: SafeArea(
                   top: false,
                   child: Column(
                     children: [
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Center(
                         child: Container(
                           width: 40,
-                          height: 4,
+                          height: 4.5,
                           decoration: BoxDecoration(
-                            color: AppColors.border,
-                            borderRadius: BorderRadius.circular(3),
+                            color: AppColors.borderSlate,
+                            borderRadius: BorderRadius.circular(999),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
                         child: Row(
                           children: [
                             Expanded(
@@ -146,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   const Text(
                                     'Ta’lim muassasasini tanlash',
                                     style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 17.5,
                                       fontWeight: FontWeight.w800,
                                       color: AppColors.textPrimary,
                                       letterSpacing: -0.3,
@@ -174,9 +173,9 @@ class _LoginScreenState extends State<LoginScreen>
                           ],
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 14),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
                         child: TextField(
                           onChanged: (val) =>
                               setModalState(() => searchQuery = val),
@@ -185,13 +184,12 @@ class _LoginScreenState extends State<LoginScreen>
                             prefixIcon: Icon(
                               LucideIcons.search,
                               size: 18,
-                              color: AppColors.textMuted,
+                              color: AppColors.primary,
                             ),
-                            fillColor: Colors.white,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Expanded(
                         child: filteredSchools.isEmpty
                             ? const Center(
@@ -202,12 +200,12 @@ class _LoginScreenState extends State<LoginScreen>
                               )
                             : ListView.separated(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
+                                  horizontal: 22,
                                   vertical: 8,
                                 ),
                                 itemCount: filteredSchools.length,
                                 separatorBuilder: (_, _) =>
-                                    const SizedBox(height: 6),
+                                    const SizedBox(height: 8),
                                 itemBuilder: (context, index) {
                                   final school = filteredSchools[index];
                                   final isSelected =
@@ -215,18 +213,18 @@ class _LoginScreenState extends State<LoginScreen>
 
                                   return SurfaceCard(
                                     elevated: false,
-                                    borderRadius: 13,
+                                    borderRadius: 20,
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 12,
+                                      horizontal: 16,
+                                      vertical: 14,
                                     ),
                                     backgroundColor: isSelected
-                                        ? AppColors.primaryLight
-                                        : Colors.white,
+                                        ? Colors.white.withValues(alpha: 0.94)
+                                        : AppColors.glassWellFill,
                                     borderColor: isSelected
                                         ? AppColors.primary
-                                            .withValues(alpha: 0.4)
-                                        : AppColors.hairlineBorder,
+                                            .withValues(alpha: 0.45)
+                                        : Colors.white,
                                     onTap: () {
                                       setState(() {
                                         _institutionCtrl.text = school;
@@ -424,9 +422,9 @@ class _LoginScreenState extends State<LoginScreen>
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 468),
+                constraints: const BoxConstraints(maxWidth: 480),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -439,22 +437,21 @@ class _LoginScreenState extends State<LoginScreen>
                           duration: 220.ms,
                           curve: Curves.easeOutCubic,
                         ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 24),
 
-                    // Frosted Segmented Switcher
                     _buildSegmentedTabs(),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 18),
 
                     if (_errorMessage != null) ...[
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 11,
+                          horizontal: 16,
+                          vertical: 12,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.errorBg,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: AppColors.errorBorder),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white, width: 1.3),
                         ),
                         child: Row(
                           children: [
@@ -477,18 +474,17 @@ class _LoginScreenState extends State<LoginScreen>
                           ],
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
                     ],
 
-                    // Asosiy Frosted Glass Karta
                     GlassSurface(
-                      borderRadius: 24,
-                      blur: 22,
-                      opacity: 0.86,
+                      borderRadius: 30,
+                      blur: 24,
+                      opacity: 0.78,
                       boxShadow: AppColors.elevatedShadow,
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(26),
                       child: PageTransitionSwitcher(
-                        duration: const Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 210),
                         transitionBuilder: (child, primary, secondary) {
                           return FadeThroughTransition(
                             fillColor: Colors.transparent,
@@ -521,7 +517,7 @@ class _LoginScreenState extends State<LoginScreen>
                           curve: Curves.easeOutCubic,
                         ),
 
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 24),
 
                     const Center(
                       child: Text(
@@ -547,57 +543,42 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildBrandHeader() {
     return Column(
       children: [
-        Container(
-          width: 58,
-          height: 58,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [AppColors.primary, AppColors.primaryDark],
-            ),
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: AppColors.primaryGlow,
-          ),
-          child: const Center(
-            child: Icon(
-              LucideIcons.landmark,
-              color: Colors.white,
-              size: 27,
-            ),
-          ),
+        const Icon(
+          LucideIcons.landmark,
+          color: AppColors.primary,
+          size: 38,
         ),
         const SizedBox(height: 14),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5.5),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.78),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.hairlineBorder),
+            color: Colors.white.withValues(alpha: 0.74),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: Colors.white, width: 1.3),
           ),
           child: const Text(
             'MAKTABGACHA VA MAKTAB TA’LIMI VAZIRLIGI',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.7,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.75,
               color: AppColors.textSecondary,
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         const Text(
           'TA’LIM NAZORAT',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 26,
             fontWeight: FontWeight.w900,
-            letterSpacing: -0.4,
+            letterSpacing: -0.5,
             color: AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 3),
+        const SizedBox(height: 4),
         const Text(
           'Yagona inklyuziv ta’lim va pedagogik monitoring platformasi',
           textAlign: TextAlign.center,
@@ -613,11 +594,10 @@ class _LoginScreenState extends State<LoginScreen>
 
   Widget _buildSegmentedTabs() {
     return GlassSurface(
-      borderRadius: 15,
-      blur: 14,
-      opacity: 0.72,
-      padding: const EdgeInsets.all(4),
-      boxShadow: const [],
+      borderRadius: 999,
+      blur: 18,
+      opacity: 0.64,
+      padding: const EdgeInsets.all(5),
       child: Row(
         children: [
           _buildSegmentButton(
@@ -645,13 +625,21 @@ class _LoginScreenState extends State<LoginScreen>
       child: GestureDetector(
         onTap: () => _tabController.animateTo(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 170),
+          duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 8),
           decoration: BoxDecoration(
             color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(11),
-            boxShadow: isSelected ? AppColors.softShadow : null,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: isSelected
+                ? const [
+                    BoxShadow(
+                      color: Color(0x140F172A),
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
+                    ),
+                  ]
+                : null,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -670,7 +658,7 @@ class _LoginScreenState extends State<LoginScreen>
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight:
-                        isSelected ? FontWeight.w700 : FontWeight.w600,
+                        isSelected ? FontWeight.w800 : FontWeight.w600,
                     color: isSelected
                         ? AppColors.primary
                         : AppColors.textSecondary,
@@ -699,7 +687,7 @@ class _LoginScreenState extends State<LoginScreen>
       (
         SeedData.users.firstWhere((u) => u.role == UserRole.specialEducation),
         'Defektolog',
-        LucideIcons.sparkles,
+        LucideIcons.puzzle,
       ),
       (
         SeedData.users.firstWhere((u) => u.role == UserRole.teacher),
@@ -709,7 +697,7 @@ class _LoginScreenState extends State<LoginScreen>
       (
         SeedData.users.firstWhere((u) => u.role == UserRole.coordinator),
         'Koordinator',
-        LucideIcons.building2,
+        LucideIcons.sparkles,
       ),
       (
         SeedData.users.firstWhere((u) => u.role == UserRole.superAdmin),
@@ -724,18 +712,18 @@ class _LoginScreenState extends State<LoginScreen>
         const Text(
           'Shaxsiy kabinetga kirish',
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 18,
             fontWeight: FontWeight.w800,
             color: AppColors.textPrimary,
-            letterSpacing: -0.3,
+            letterSpacing: -0.35,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 5),
         const Text(
           'Telefon raqamingiz yoki elektron pochtangiz orqali tizimga kiring',
           style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 20),
 
         TextField(
           controller: _loginIdentifierCtrl,
@@ -748,7 +736,6 @@ class _LoginScreenState extends State<LoginScreen>
               size: 18,
               color: AppColors.primary,
             ),
-            fillColor: Colors.white,
           ),
         ),
         const SizedBox(height: 14),
@@ -773,13 +760,12 @@ class _LoginScreenState extends State<LoginScreen>
               onPressed: () =>
                   setState(() => _loginObscure = !_loginObscure),
             ),
-            fillColor: Colors.white,
           ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 20),
 
         SizedBox(
-          height: 46,
+          height: 48,
           child: FilledButton(
             onPressed: auth.isLoading ? null : _handleLogin,
             child: auth.isLoading
@@ -816,7 +802,7 @@ class _LoginScreenState extends State<LoginScreen>
               'Yangi hisob ochish (Ro‘yxatdan o‘tish)',
               style: TextStyle(
                 color: AppColors.primary,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
                 fontSize: 12.5,
               ),
             ),
@@ -832,39 +818,41 @@ class _LoginScreenState extends State<LoginScreen>
           children: [
             Icon(LucideIcons.zap, size: 14, color: AppColors.primary),
             SizedBox(width: 6),
-            Text(
-              'Namunaviy hisoblar (1-klikda tezkor kirish):',
-              style: TextStyle(
-                fontSize: 11.5,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textSecondary,
+            Expanded(
+              child: Text(
+                'Namunaviy hisoblar (1-klikda tezkor kirish):',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         Wrap(
-          spacing: 7,
-          runSpacing: 7,
+          spacing: 8,
+          runSpacing: 8,
           children: demoProfiles.map((item) {
             final user = item.$1;
             final label = item.$2;
             final icon = item.$3;
             return SurfaceCard(
               elevated: false,
-              borderRadius: 10,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-              backgroundColor: Colors.white,
+              borderRadius: 999,
+              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+              backgroundColor: Colors.white.withValues(alpha: 0.78),
               onTap: () => _selectDemoAccount(user),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, size: 13.5, color: AppColors.primary),
+                  Icon(icon, size: 14, color: AppColors.primary),
                   const SizedBox(width: 6),
                   Text(
                     label,
                     style: const TextStyle(
-                      fontSize: 11.5,
+                      fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                     ),
@@ -883,7 +871,7 @@ class _LoginScreenState extends State<LoginScreen>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildStepProgressBar(),
-        const SizedBox(height: 18),
+        const SizedBox(height: 20),
         PageTransitionSwitcher(
           duration: const Duration(milliseconds: 190),
           transitionBuilder: (child, primary, secondary) {
@@ -896,7 +884,7 @@ class _LoginScreenState extends State<LoginScreen>
           },
           child: _buildCurrentStepContent(auth),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 20),
         _buildStepActionButtons(auth),
         const SizedBox(height: 8),
         Center(
@@ -915,13 +903,9 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildStepProgressBar() {
     final stepTitles = ['Ism-familiya', 'Kasb va Maktab', 'Aloqa', 'Parol'];
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.hairlineBorder),
-      ),
+    return GlassWell(
+      borderRadius: 18,
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
       child: Column(
         children: [
           Row(
@@ -932,20 +916,22 @@ class _LoginScreenState extends State<LoginScreen>
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeOutCubic,
-                  height: 4.5,
+                  height: 5,
                   margin: EdgeInsets.only(
                     left: index == 0 ? 0 : 3,
                     right: index == 3 ? 0 : 3,
                   ),
                   decoration: BoxDecoration(
-                    color: isPassed ? AppColors.primary : AppColors.border,
-                    borderRadius: BorderRadius.circular(3),
+                    color: isPassed
+                        ? AppColors.primary
+                        : AppColors.borderSlate,
+                    borderRadius: BorderRadius.circular(999),
                   ),
                 ),
               );
             }),
           ),
-          const SizedBox(height: 7),
+          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -954,16 +940,20 @@ class _LoginScreenState extends State<LoginScreen>
                 style: const TextStyle(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
+                  letterSpacing: 0.6,
                   color: AppColors.textMuted,
                 ),
               ),
-              Text(
-                stepTitles[_signUpStep],
-                style: const TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+              Flexible(
+                child: Text(
+                  stepTitles[_signUpStep],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ],
@@ -997,7 +987,7 @@ class _LoginScreenState extends State<LoginScreen>
           const Text(
             '1-Qadam: Ism va Familiyangiz',
             style: TextStyle(
-              fontSize: 15.5,
+              fontSize: 16,
               fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,
             ),
@@ -1007,7 +997,7 @@ class _LoginScreenState extends State<LoginScreen>
             'Tizimda rasmiy hujjatlar sizning nomingizdan yuritiladi.',
             style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           TextField(
             controller: _firstNameCtrl,
             textCapitalization: TextCapitalization.words,
@@ -1019,10 +1009,9 @@ class _LoginScreenState extends State<LoginScreen>
                 size: 18,
                 color: AppColors.primary,
               ),
-              fillColor: Colors.white,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           TextField(
             controller: _lastNameCtrl,
             textCapitalization: TextCapitalization.words,
@@ -1034,7 +1023,6 @@ class _LoginScreenState extends State<LoginScreen>
                 size: 18,
                 color: AppColors.primary,
               ),
-              fillColor: Colors.white,
             ),
           ),
         ],
@@ -1049,10 +1037,10 @@ class _LoginScreenState extends State<LoginScreen>
       (
         UserRole.specialEducation,
         'Maxsus pedagog (Defektolog)',
-        LucideIcons.sparkles,
+        LucideIcons.puzzle,
       ),
       (UserRole.teacher, 'Fan o‘qituvchisi', LucideIcons.bookOpen),
-      (UserRole.institutionAdmin, 'Maktab koordinatori', LucideIcons.building2),
+      (UserRole.institutionAdmin, 'Maktab koordinatori', LucideIcons.landmark),
       (UserRole.reviewer, 'Metodik inspektor', LucideIcons.eye),
     ];
 
@@ -1068,7 +1056,7 @@ class _LoginScreenState extends State<LoginScreen>
           const Text(
             '2-Qadam: Mutaxassislik va Muassasa',
             style: TextStyle(
-              fontSize: 15.5,
+              fontSize: 16,
               fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,
             ),
@@ -1087,7 +1075,7 @@ class _LoginScreenState extends State<LoginScreen>
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -1099,15 +1087,16 @@ class _LoginScreenState extends State<LoginScreen>
 
               return SurfaceCard(
                 elevated: false,
-                borderRadius: 11,
+                borderRadius: 999,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
+                  horizontal: 13,
+                  vertical: 9,
                 ),
-                backgroundColor:
-                    isSelected ? AppColors.primaryLight : Colors.white,
+                backgroundColor: isSelected
+                    ? Colors.white.withValues(alpha: 0.96)
+                    : AppColors.glassWellFill,
                 borderColor:
-                    isSelected ? AppColors.primary : AppColors.border,
+                    isSelected ? AppColors.primary : Colors.white,
                 onTap: () {
                   setState(() {
                     _selectedRole = r;
@@ -1124,15 +1113,19 @@ class _LoginScreenState extends State<LoginScreen>
                           isSelected ? AppColors.primary : AppColors.textMuted,
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.textPrimary,
+                    Flexible(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight:
+                              isSelected ? FontWeight.w800 : FontWeight.w600,
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.textPrimary,
+                        ),
                       ),
                     ),
                     if (isSelected) ...[
@@ -1160,10 +1153,9 @@ class _LoginScreenState extends State<LoginScreen>
           const SizedBox(height: 8),
           SurfaceCard(
             elevated: false,
-            borderRadius: 13,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            backgroundColor: Colors.white,
-            borderColor: AppColors.primary.withValues(alpha: 0.3),
+            borderRadius: 20,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            backgroundColor: Colors.white.withValues(alpha: 0.82),
             onTap: () => _showIosSchoolPickerModal(context),
             child: Row(
               children: [
@@ -1172,7 +1164,7 @@ class _LoginScreenState extends State<LoginScreen>
                   color: AppColors.primary,
                   size: 19,
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 11),
                 Expanded(
                   child: Text(
                     selectedSchool,
@@ -1208,7 +1200,7 @@ class _LoginScreenState extends State<LoginScreen>
           const Text(
             '3-Qadam: Aloqa Ma’lumotlari',
             style: TextStyle(
-              fontSize: 15.5,
+              fontSize: 16,
               fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,
             ),
@@ -1218,7 +1210,7 @@ class _LoginScreenState extends State<LoginScreen>
             'Telefon raqamingiz tizimga kirish identifikatori bo‘lib xizmat qiladi.',
             style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           TextField(
             controller: _phoneCtrl,
             keyboardType: TextInputType.phone,
@@ -1230,10 +1222,9 @@ class _LoginScreenState extends State<LoginScreen>
                 size: 18,
                 color: AppColors.primary,
               ),
-              fillColor: Colors.white,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           TextField(
             controller: _emailCtrl,
             keyboardType: TextInputType.emailAddress,
@@ -1245,7 +1236,6 @@ class _LoginScreenState extends State<LoginScreen>
                 size: 18,
                 color: AppColors.primary,
               ),
-              fillColor: Colors.white,
             ),
           ),
         ],
@@ -1262,7 +1252,7 @@ class _LoginScreenState extends State<LoginScreen>
           const Text(
             '4-Qadam: Parol va Tasdiqlash',
             style: TextStyle(
-              fontSize: 15.5,
+              fontSize: 16,
               fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,
             ),
@@ -1273,20 +1263,16 @@ class _LoginScreenState extends State<LoginScreen>
             style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
           ),
           const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.hairlineBorder),
-            ),
+          GlassWell(
+            borderRadius: 18,
+            padding: const EdgeInsets.all(14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'F.I.Sh: ${_firstNameCtrl.text.trim()} ${_lastNameCtrl.text.trim()}',
                   style: const TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                   ),
@@ -1297,13 +1283,13 @@ class _LoginScreenState extends State<LoginScreen>
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Maktab: ${_institutionCtrl.text.trim()}',
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 11.5,
@@ -1313,7 +1299,7 @@ class _LoginScreenState extends State<LoginScreen>
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           TextField(
             controller: _signUpPasswordCtrl,
             obscureText: _signUpObscure,
@@ -1334,10 +1320,9 @@ class _LoginScreenState extends State<LoginScreen>
                 onPressed: () =>
                     setState(() => _signUpObscure = !_signUpObscure),
               ),
-              fillColor: Colors.white,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           TextField(
             controller: _signUpConfirmPasswordCtrl,
             obscureText: _signUpConfirmObscure,
@@ -1358,7 +1343,6 @@ class _LoginScreenState extends State<LoginScreen>
                   () => _signUpConfirmObscure = !_signUpConfirmObscure,
                 ),
               ),
-              fillColor: Colors.white,
             ),
           ),
         ],
@@ -1375,7 +1359,7 @@ class _LoginScreenState extends State<LoginScreen>
           Expanded(
             flex: 2,
             child: SizedBox(
-              height: 46,
+              height: 48,
               child: OutlinedButton(
                 onPressed: auth.isLoading ? null : _previousStep,
                 child: const Text('Orqaga'),
@@ -1387,7 +1371,7 @@ class _LoginScreenState extends State<LoginScreen>
         Expanded(
           flex: 3,
           child: SizedBox(
-            height: 46,
+            height: 48,
             child: FilledButton(
               onPressed: auth.isLoading
                   ? null
@@ -1404,11 +1388,15 @@ class _LoginScreenState extends State<LoginScreen>
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          isLastStep ? 'Ro‘yxatdan o‘tish' : 'Keyingisi',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13.5,
+                        Flexible(
+                          child: Text(
+                            isLastStep ? 'Ro‘yxatdan o‘tish' : 'Keyingisi',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13.5,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 6),

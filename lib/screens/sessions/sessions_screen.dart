@@ -86,16 +86,17 @@ class _SessionsScreenState extends State<SessionsScreen> {
                         .toList(),
                     onChanged: (v) => setDlgState(() => selectedStdId = v!),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   TextField(
                     controller: topicCtrl,
                     decoration: const InputDecoration(
                       labelText: 'Mashg‘ulot mavzusi *',
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   DropdownButtonFormField<String>(
                     initialValue: sessionType,
+                    isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'Mashg‘ulot shakli',
                     ),
@@ -111,9 +112,10 @@ class _SessionsScreenState extends State<SessionsScreen> {
                     ],
                     onChanged: (v) => setDlgState(() => sessionType = v!),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   DropdownButtonFormField<int>(
                     initialValue: durationMinutes,
+                    isExpanded: true,
                     decoration: const InputDecoration(labelText: 'Davomiyligi'),
                     items: const [
                       DropdownMenuItem(value: 30, child: Text('30 daqiqa')),
@@ -125,44 +127,47 @@ class _SessionsScreenState extends State<SessionsScreen> {
                     ],
                     onChanged: (v) => setDlgState(() => durationMinutes = v!),
                   ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.hairlineBorder),
-                    ),
-                    child: Row(
+                  const SizedBox(height: 14),
+                  GlassWell(
+                    borderRadius: 18,
+                    padding: const EdgeInsets.all(14),
+                    child: Wrap(
+                      spacing: 12,
+                      runSpacing: 10,
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        const Icon(
-                          LucideIcons.calendarClock,
-                          color: AppColors.primary,
-                          size: 19,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Mashg‘ulot vaqti',
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  color: AppColors.textMuted,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              LucideIcons.calendarClock,
+                              color: AppColors.primary,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Mashg‘ulot vaqti',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    color: AppColors.textMuted,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                DateFormat('dd.MM.yyyy HH:mm')
-                                    .format(scheduledDate),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 13.5,
-                                  fontFeatures: [FontFeature.tabularFigures()],
+                                Text(
+                                  DateFormat('dd.MM.yyyy HH:mm')
+                                      .format(scheduledDate),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 13.5,
+                                    fontFeatures: [FontFeature.tabularFigures()],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                          ],
                         ),
                         OutlinedButton(
                           onPressed: () async {
@@ -199,7 +204,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   TextField(
                     controller: activitiesCtrl,
                     maxLines: 2,
@@ -407,263 +412,335 @@ class _SessionsScreenState extends State<SessionsScreen> {
         f: allSessions.where((s) => s.status == f).length,
     };
 
-    return Scaffold(
-      backgroundColor: canPop ? AppColors.background : Colors.transparent,
-      appBar: canPop ? AppBar(title: const Text('Mashg‘ulotlar')) : null,
-      body: ResponsivePageContainer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AdaptivePageHeader(
-              icon: LucideIcons.calendarDays,
-              title: 'Korreksion mashg‘ulotlar jadvali',
-              subtitle:
-                  'Jami ${filtered.length} ta rejalashtirilgan va o‘tkazilgan darslar',
-              action: FilledButton.icon(
-                icon: const Icon(LucideIcons.calendarPlus, size: 16),
-                label: const Text('Rejalashtirish'),
-                onPressed: () => _showAddSessionDialog(context),
-              ),
+    final pageBody = ResponsivePageContainer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdaptivePageHeader(
+            icon: LucideIcons.calendarDays,
+            title: 'Korreksion mashg‘ulotlar jadvali',
+            subtitle:
+                'Jami ${filtered.length} ta rejalashtirilgan va o‘tkazilgan darslar',
+            action: FilledButton.icon(
+              icon: const Icon(LucideIcons.calendarPlus, size: 16),
+              label: const Text('Rejalashtirish'),
+              onPressed: () => _showAddSessionDialog(context),
             ),
-            const SizedBox(height: 16),
+          ),
+          const SizedBox(height: 18),
 
-            ModernPillFilterBar(
-              items: _filters,
-              selectedItem: _filter,
-              counts: counts,
-              onSelected: (f) => setState(() => _filter = f),
-            ),
-            const SizedBox(height: 14),
+          ModernPillFilterBar(
+            items: _filters,
+            selectedItem: _filter,
+            counts: counts,
+            onSelected: (f) => setState(() => _filter = f),
+          ),
+          const SizedBox(height: 18),
 
-            Expanded(
-              child: filtered.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+          Expanded(
+            child: filtered.isEmpty
+                ? Center(
+                    child: SurfaceCard(
+                      borderRadius: 28,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 40,
+                      ),
+                      child: const Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              border:
-                                  Border.all(color: AppColors.hairlineBorder),
-                            ),
-                            child: const Icon(
-                              LucideIcons.calendarX,
-                              size: 26,
-                              color: AppColors.textMuted,
+                          Icon(
+                            LucideIcons.calendarX,
+                            size: 34,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(height: 14),
+                          Text(
+                            'Mashg‘ulotlar topilmadi',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'Mashg‘ulotlar topilmadi',
+                          SizedBox(height: 5),
+                          Text(
+                            'Boshqa holat filtrini tanlang yoki yangi dars rejalashtiring.',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
+                              fontSize: 13,
+                              color: AppColors.textMuted,
+                              height: 1.4,
                             ),
                           ),
                         ],
                       ),
-                    )
-                  : ListView.separated(
-                      itemCount: filtered.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final s = filtered[index];
-                        final isDone = s.status == 'Bajarildi';
-                        final isAbsent = s.status == 'Qatnashmadi';
-                        final isCancelled = s.status == 'Bekor qilindi';
-                        final accent = isDone
-                            ? AppColors.success
-                            : (isAbsent || isCancelled
-                                ? AppColors.error
-                                : AppColors.primary);
-                        final accentBg = isDone
-                            ? AppColors.successBg
-                            : (isAbsent || isCancelled
-                                ? AppColors.errorBg
-                                : AppColors.primaryLight);
-                        final df = DateFormat('dd.MM.yyyy HH:mm');
+                    ),
+                  )
+                : ListView.separated(
+                    itemCount: filtered.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 14),
+                    itemBuilder: (context, index) {
+                      final s = filtered[index];
+                      final isDone = s.status == 'Bajarildi';
+                      final isAbsent = s.status == 'Qatnashmadi';
+                      final isCancelled = s.status == 'Bekor qilindi';
+                      final accent = isDone
+                          ? AppColors.success
+                          : (isAbsent || isCancelled
+                              ? AppColors.error
+                              : AppColors.primary);
+                      final accentBg = isDone
+                          ? AppColors.successBg
+                          : (isAbsent || isCancelled
+                              ? AppColors.errorBg
+                              : AppColors.primaryLight);
+                      final df = DateFormat('dd.MM.yyyy HH:mm');
 
-                        return SurfaceCard(
-                          borderRadius: 16,
-                          padding: const EdgeInsets.all(16),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => StudentDetailScreen(
-                                  studentId: s.studentId,
-                                ),
+                      return SurfaceCard(
+                        borderRadius: 26,
+                        padding: const EdgeInsets.all(22),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => StudentDetailScreen(
+                                studentId: s.studentId,
                               ),
+                            ),
+                          );
+                        },
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final isCompact = constraints.maxWidth < 450;
+                            final isVeryNarrow = constraints.maxWidth < 360;
+
+                            final statusBadge = StatusPill(
+                              label: s.status,
+                              color: accent,
+                              backgroundColor: accentBg,
+                              showDot: true,
                             );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: accentBg,
-                                      borderRadius: BorderRadius.circular(11),
-                                    ),
-                                    child: Icon(
-                                      isDone
-                                          ? LucideIcons.circleCheck
-                                          : (isAbsent
-                                              ? LucideIcons.circleX
-                                              : LucideIcons.clock),
-                                      color: accent,
-                                      size: 19,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                s.topic,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 14.5,
-                                                  color: AppColors.textPrimary,
-                                                  letterSpacing: -0.2,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            StatusPill(
-                                              label: s.status,
-                                              color: accent,
-                                              backgroundColor: accentBg,
-                                              showDot: true,
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'O‘quvchi: ${s.studentName} • ${s.specialistName}',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 12.5,
-                                            color: AppColors.textSecondary,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 3),
-                                        Text(
-                                          '${s.sessionType} • ${df.format(s.scheduledAt)} (${s.durationMinutes} daqiqa)',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 11.5,
-                                            color: AppColors.textMuted,
-                                            fontFeatures: [
-                                              FontFeature.tabularFigures(),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              if (s.observations != null &&
-                                  s.observations!.isNotEmpty) ...[
-                                const SizedBox(height: 12),
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(11),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.background,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: AppColors.hairlineBorder,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'Kuzatuv: ${s.observations}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textPrimary,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                              if (!isDone && !isAbsent && !isCancelled) ...[
-                                const SizedBox(height: 12),
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Expanded(
-                                      child: FilledButton.icon(
-                                        style: FilledButton.styleFrom(
-                                          backgroundColor: AppColors.success,
-                                          minimumSize: const Size(0, 38),
-                                        ),
-                                        icon: const Icon(
-                                          LucideIcons.check,
-                                          size: 15,
-                                        ),
-                                        label: const Text('Bajarildi'),
-                                        onPressed: () =>
-                                            _showCompleteSessionDialog(
-                                          context,
-                                          s,
-                                        ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 2),
+                                      child: Icon(
+                                        isDone
+                                            ? LucideIcons.circleCheck
+                                            : (isAbsent
+                                                ? LucideIcons.circleX
+                                                : LucideIcons.clock),
+                                        color: accent,
+                                        size: 22,
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
+                                    const SizedBox(width: 12),
                                     Expanded(
-                                      child: OutlinedButton.icon(
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor: AppColors.error,
-                                          side: const BorderSide(
-                                            color: AppColors.errorBorder,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (isCompact) ...[
+                                            statusBadge,
+                                            const SizedBox(height: 8),
+                                          ],
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  s.topic,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w800,
+                                                    fontSize: 15,
+                                                    color:
+                                                        AppColors.textPrimary,
+                                                    letterSpacing: -0.25,
+                                                    height: 1.3,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (!isCompact) ...[
+                                                const SizedBox(width: 12),
+                                                statusBadge,
+                                              ],
+                                            ],
                                           ),
-                                          minimumSize: const Size(0, 38),
-                                        ),
-                                        icon: const Icon(
-                                          LucideIcons.userX,
-                                          size: 15,
-                                        ),
-                                        label: const Text('Qatnashmadi'),
-                                        onPressed: () {
-                                          app.updateSessionStatus(
-                                            s.id,
-                                            'Qatnashmadi',
-                                            notes: 'Mashg‘ulotga kelmadi.',
-                                          );
-                                        },
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            'O‘quvchi: ${s.studentName} • ${s.specialistName}',
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: AppColors.textSecondary,
+                                              fontWeight: FontWeight.w600,
+                                              height: 1.35,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            '${s.sessionType} • ${df.format(s.scheduledAt)} (${s.durationMinutes} daqiqa)',
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: AppColors.textMuted,
+                                              fontFeatures: [
+                                                FontFeature.tabularFigures(),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
+                                if (s.observations != null &&
+                                    s.observations!.isNotEmpty) ...[
+                                  const SizedBox(height: 14),
+                                  GlassWell(
+                                    borderRadius: 18,
+                                    padding: const EdgeInsets.all(15),
+                                    child: Text(
+                                      'Kuzatuv: ${s.observations}',
+                                      style: const TextStyle(
+                                        fontSize: 12.5,
+                                        color: AppColors.textPrimary,
+                                        height: 1.45,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                                if (!isDone && !isAbsent && !isCancelled) ...[
+                                  const SizedBox(height: 16),
+                                  if (isVeryNarrow)
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        FilledButton.icon(
+                                          style: FilledButton.styleFrom(
+                                            backgroundColor: AppColors.success,
+                                            minimumSize: const Size(0, 42),
+                                          ),
+                                          icon: const Icon(
+                                            LucideIcons.check,
+                                            size: 16,
+                                          ),
+                                          label: const Text('Bajarildi'),
+                                          onPressed: () =>
+                                              _showCompleteSessionDialog(
+                                            context,
+                                            s,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        OutlinedButton.icon(
+                                          style: OutlinedButton.styleFrom(
+                                            foregroundColor: AppColors.error,
+                                            backgroundColor: Colors.white
+                                                .withValues(alpha: 0.72),
+                                            side: const BorderSide(
+                                              color: Colors.white,
+                                              width: 1.3,
+                                            ),
+                                            minimumSize: const Size(0, 42),
+                                          ),
+                                          icon: const Icon(
+                                            LucideIcons.userX,
+                                            size: 16,
+                                          ),
+                                          label: const Text('Qatnashmadi'),
+                                          onPressed: () {
+                                            app.updateSessionStatus(
+                                              s.id,
+                                              'Qatnashmadi',
+                                              notes: 'Mashg‘ulotga kelmadi.',
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    )
+                                  else
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: FilledButton.icon(
+                                            style: FilledButton.styleFrom(
+                                              backgroundColor:
+                                                  AppColors.success,
+                                              minimumSize: const Size(0, 42),
+                                            ),
+                                            icon: const Icon(
+                                              LucideIcons.check,
+                                              size: 16,
+                                            ),
+                                            label: const Text('Bajarildi'),
+                                            onPressed: () =>
+                                                _showCompleteSessionDialog(
+                                              context,
+                                              s,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: OutlinedButton.icon(
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: AppColors.error,
+                                              backgroundColor: Colors.white
+                                                  .withValues(alpha: 0.72),
+                                              side: const BorderSide(
+                                                color: Colors.white,
+                                                width: 1.3,
+                                              ),
+                                              minimumSize: const Size(0, 42),
+                                            ),
+                                            icon: const Icon(
+                                              LucideIcons.userX,
+                                              size: 16,
+                                            ),
+                                            label: const Text('Qatnashmadi'),
+                                            onPressed: () {
+                                              app.updateSessionStatus(
+                                                s.id,
+                                                'Qatnashmadi',
+                                                notes: 'Mashg‘ulotga kelmadi.',
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
                               ],
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
+    );
+
+    return Scaffold(
+      backgroundColor: canPop ? AppColors.background : Colors.transparent,
+      appBar: canPop ? AppBar(title: const Text('Mashg‘ulotlar')) : null,
+      body: canPop ? AmbientMeshBackground(child: pageBody) : pageBody,
     );
   }
 }

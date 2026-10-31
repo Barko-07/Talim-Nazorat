@@ -128,17 +128,13 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     required String subtitle,
   }) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: AppColors.primaryLight,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, size: 18, color: AppColors.primary),
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(icon, size: 22, color: AppColors.primary),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 13),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,15 +143,16 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                 title,
                 style: const TextStyle(
                   fontWeight: FontWeight.w800,
-                  fontSize: 15.5,
+                  fontSize: 16,
                   color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
+                  letterSpacing: -0.25,
                 ),
               ),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 12.5,
                   color: AppColors.textMuted,
                 ),
               ),
@@ -176,7 +173,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
           key: _formKey,
           child: SingleChildScrollView(
             child: ResponsivePageContainer(
-              maxWidth: 780,
+              maxWidth: 800,
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final isCompact = constraints.maxWidth < 460;
@@ -185,46 +182,60 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                     children: [
                       // 1. Shaxsiy ma'lumotlar
                       SurfaceCard(
-                        padding: const EdgeInsets.all(22),
+                        borderRadius: 28,
+                        padding: const EdgeInsets.all(24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildSectionTitle(
                               icon: LucideIcons.userRoundPlus,
                               title: '1. O‘quvchining Shaxsiy Ma’lumotlari',
-                              subtitle: 'Asosiy F.I.Sh., jinsi va biriktirilgan sinf',
+                              subtitle:
+                                  'Asosiy F.I.Sh., jinsi va biriktirilgan sinf',
                             ),
-                            const SizedBox(height: 18),
+                            const SizedBox(height: 20),
                             TextFormField(
                               controller: _lastNameCtrl,
                               decoration: const InputDecoration(
                                 labelText: 'Familiyasi *',
-                                prefixIcon: Icon(LucideIcons.user, size: 18),
+                                prefixIcon: Icon(
+                                  LucideIcons.user,
+                                  size: 18,
+                                  color: AppColors.primary,
+                                ),
                               ),
                               validator: (v) => v == null || v.trim().isEmpty
                                   ? 'Familiyani kiriting'
                                   : null,
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             TextFormField(
                               controller: _firstNameCtrl,
                               decoration: const InputDecoration(
                                 labelText: 'Ismi *',
-                                prefixIcon: Icon(LucideIcons.user, size: 18),
+                                prefixIcon: Icon(
+                                  LucideIcons.user,
+                                  size: 18,
+                                  color: AppColors.primary,
+                                ),
                               ),
                               validator: (v) => v == null || v.trim().isEmpty
                                   ? 'Ismni kiriting'
                                   : null,
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             TextFormField(
                               controller: _middleNameCtrl,
                               decoration: const InputDecoration(
                                 labelText: 'Otasining ismi',
-                                prefixIcon: Icon(LucideIcons.user, size: 18),
+                                prefixIcon: Icon(
+                                  LucideIcons.user,
+                                  size: 18,
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             Row(
                               children: [
                                 Expanded(
@@ -246,7 +257,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                         setState(() => _gender = v!),
                                   ),
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: 14),
                                 Expanded(
                                   child: DropdownButtonFormField<String>(
                                     initialValue: _grade,
@@ -280,11 +291,12 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
 
                       // 2. Ta'limiy ehtiyoj
                       SurfaceCard(
-                        padding: const EdgeInsets.all(22),
+                        borderRadius: 28,
+                        padding: const EdgeInsets.all(24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -294,7 +306,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               subtitle:
                                   'Ehtiyoj toifasi, qo‘llab-quvvatlash darajasi va tavsiyalar',
                             ),
-                            const SizedBox(height: 18),
+                            const SizedBox(height: 20),
                             DropdownButtonFormField<String>(
                               initialValue: _primaryNeed,
                               isExpanded: true,
@@ -316,7 +328,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               onChanged: (v) =>
                                   setState(() => _primaryNeed = v!),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             DropdownButtonFormField<String>(
                               initialValue: _supportLevel,
                               isExpanded: true,
@@ -338,7 +350,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               onChanged: (v) =>
                                   setState(() => _supportLevel = v!),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             TextFormField(
                               controller: _medicalNotesCtrl,
                               maxLines: 2,
@@ -351,20 +363,22 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
 
                       // 3. Oila va Vasiylar
                       SurfaceCard(
-                        padding: const EdgeInsets.all(22),
+                        borderRadius: 28,
+                        padding: const EdgeInsets.all(24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildSectionTitle(
                               icon: LucideIcons.usersRound,
                               title: '3. Qonuniy Vasiy (Ota-ona)',
-                              subtitle: 'Bog‘lanish uchun aloqa va manzil ma’lumotlari',
+                              subtitle:
+                                  'Bog‘lanish uchun aloqa va manzil ma’lumotlari',
                             ),
-                            const SizedBox(height: 18),
+                            const SizedBox(height: 20),
                             TextFormField(
                               controller: _guardianNameCtrl,
                               decoration: const InputDecoration(
@@ -372,10 +386,11 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                 prefixIcon: Icon(
                                   LucideIcons.userCheck,
                                   size: 18,
+                                  color: AppColors.primary,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             if (isCompact) ...[
                               DropdownButtonFormField<String>(
                                 initialValue: _guardianRelation,
@@ -400,13 +415,17 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                 onChanged: (v) =>
                                     setState(() => _guardianRelation = v!),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 14),
                               TextFormField(
                                 controller: _guardianPhoneCtrl,
                                 decoration: const InputDecoration(
                                   labelText: 'Telefon raqami',
                                   hintText: '+998 90 123-45-67',
-                                  prefixIcon: Icon(LucideIcons.phone, size: 17),
+                                  prefixIcon: Icon(
+                                    LucideIcons.phone,
+                                    size: 17,
+                                    color: AppColors.primary,
+                                  ),
                                 ),
                               ),
                             ] else
@@ -438,7 +457,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(width: 14),
                                   Expanded(
                                     child: TextFormField(
                                       controller: _guardianPhoneCtrl,
@@ -448,26 +467,30 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                         prefixIcon: Icon(
                                           LucideIcons.phone,
                                           size: 17,
+                                          color: AppColors.primary,
                                         ),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             TextFormField(
                               controller: _addressCtrl,
                               decoration: const InputDecoration(
                                 labelText: 'Yashash manzili',
-                                prefixIcon: Icon(LucideIcons.mapPin, size: 17),
+                                prefixIcon: Icon(
+                                  LucideIcons.mapPin,
+                                  size: 17,
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 24),
 
-                      // Saqlash tugmasi
                       FilledButton.icon(
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),

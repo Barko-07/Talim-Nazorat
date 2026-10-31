@@ -217,7 +217,7 @@ class _IepListScreenState extends State<IepListScreen> {
                           maxLines: 2,
                         ),
                         const SizedBox(height: 16),
-                        const Divider(color: AppColors.hairlineBorder),
+                        const Divider(),
                         const SizedBox(height: 8),
                         const Text(
                           'Birinchi o‘lchanadigan oraliq maqsad:',
@@ -653,58 +653,53 @@ class _IepListScreenState extends State<IepListScreen> {
                   )
                 : null,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           ModernPillFilterBar(
             items: filterItems,
             selectedItem: _selectedStatus,
             counts: counts,
             onSelected: (val) => setState(() => _selectedStatus = val),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           Expanded(
             child: plans.isEmpty
                 ? Center(
                     child: SurfaceCard(
+                      borderRadius: 28,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 32,
-                        vertical: 36,
+                        vertical: 40,
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: const Icon(
-                              LucideIcons.bookOpen,
-                              size: 28,
-                              color: AppColors.primary,
-                            ),
+                          const Icon(
+                            LucideIcons.bookOpen,
+                            size: 34,
+                            color: AppColors.primary,
                           ),
                           const SizedBox(height: 14),
                           const Text(
                             'Tanlangan filtr bo‘yicha ITR rejalari topilmadi',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15.5,
                               color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 5),
                           const Text(
                             'O‘quvchi uchun yangi individual ta’lim rejasini shakllantirishingiz mumkin.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 13,
                               color: AppColors.textMuted,
+                              height: 1.4,
                             ),
                           ),
                           if (canCreateIep) ...[
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 18),
                             OutlinedButton.icon(
                               icon: const Icon(LucideIcons.plus, size: 16),
                               label: const Text('ITR rejasi tuzish'),
@@ -718,7 +713,7 @@ class _IepListScreenState extends State<IepListScreen> {
                   )
                 : ListView.separated(
                     itemCount: plans.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 14),
+                    separatorBuilder: (_, _) => const SizedBox(height: 16),
                     itemBuilder: (context, index) {
                       final p = plans[index];
                       final student = app.students.firstWhere(
@@ -776,19 +771,18 @@ class _IepListScreenState extends State<IepListScreen> {
             : AppColors.warning;
 
     return SurfaceCard(
-      padding: const EdgeInsets.all(20),
+      borderRadius: 26,
+      padding: const EdgeInsets.all(24),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 540;
 
-          final printButton = FilledButton.tonalIcon(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primaryLight,
+          final printButton = OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primaryDark,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(11),
-              ),
+              backgroundColor: Colors.white.withValues(alpha: 0.78),
+              side: const BorderSide(color: Colors.white, width: 1.35),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
             ),
             icon: const Icon(LucideIcons.printer, size: 15),
             label: const Text(
@@ -809,17 +803,17 @@ class _IepListScreenState extends State<IepListScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Wrap(
-                spacing: 8,
-                runSpacing: 6,
+                spacing: 10,
+                runSpacing: 8,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
                     p.title,
                     style: const TextStyle(
                       fontWeight: FontWeight.w800,
-                      fontSize: 16,
+                      fontSize: 16.5,
                       color: AppColors.textPrimary,
-                      letterSpacing: -0.2,
+                      letterSpacing: -0.25,
                     ),
                   ),
                   StatusPill(
@@ -829,14 +823,14 @@ class _IepListScreenState extends State<IepListScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Wrap(
-                spacing: 12,
+                spacing: 14,
                 runSpacing: 6,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   InkWell(
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(8),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -851,16 +845,18 @@ class _IepListScreenState extends State<IepListScreen> {
                       children: [
                         const Icon(
                           LucideIcons.userRound,
-                          size: 13.5,
+                          size: 14,
                           color: AppColors.primary,
                         ),
                         const SizedBox(width: 5),
-                        Text(
-                          '${p.studentName} (${p.studentGrade}-sinf)',
-                          style: const TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
+                        Flexible(
+                          child: Text(
+                            '${p.studentName} (${p.studentGrade}-sinf)',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                            ),
                           ),
                         ),
                       ],
@@ -869,22 +865,22 @@ class _IepListScreenState extends State<IepListScreen> {
                   Text(
                     'O‘quv yili: ${p.academicYear}',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 12.5,
                       color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   Text(
                     'Mas’ul: ${p.responsibleTeacherName}',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 12.5,
                       color: AppColors.textMuted,
                     ),
                   ),
                   Text(
                     '${df.format(p.startDate)} — ${df.format(p.reviewDate)}',
                     style: const TextStyle(
-                      fontSize: 11.5,
+                      fontSize: 12,
                       color: AppColors.textMuted,
                       fontFeatures: [FontFeature.tabularFigures()],
                     ),
@@ -899,35 +895,30 @@ class _IepListScreenState extends State<IepListScreen> {
             children: [
               if (isCompact) ...[
                 titleAndMeta,
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 printButton,
               ] else
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(child: titleAndMeta),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 16),
                     printButton,
                   ],
                 ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
 
               // Boshlang'ich daraja va uzoq muddatli maqsadlar
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.hairlineBorder),
-                ),
+              GlassWell(
+                borderRadius: 18,
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     RichText(
                       text: TextSpan(
                         style: const TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           height: 1.45,
                           color: AppColors.textSecondary,
                         ),
@@ -943,11 +934,11 @@ class _IepListScreenState extends State<IepListScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     RichText(
                       text: TextSpan(
                         style: const TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           height: 1.45,
                           color: AppColors.primaryDark,
                         ),
@@ -965,11 +956,11 @@ class _IepListScreenState extends State<IepListScreen> {
                     ),
                     if (p.supportStrategies != null &&
                         p.supportStrategies!.isNotEmpty) ...[
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 8),
                       Text(
                         'Qo‘llab-quvvatlash: ${p.supportStrategies!}',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 12.5,
                           color: AppColors.textMuted,
                           height: 1.4,
                         ),
@@ -978,12 +969,12 @@ class _IepListScreenState extends State<IepListScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
               // Maqsadlar sarlavhasi
               Wrap(
                 spacing: 12,
-                runSpacing: 6,
+                runSpacing: 8,
                 alignment: WrapAlignment.spaceBetween,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
@@ -992,16 +983,18 @@ class _IepListScreenState extends State<IepListScreen> {
                     children: [
                       const Icon(
                         LucideIcons.target,
-                        size: 15,
+                        size: 16,
                         color: AppColors.primary,
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'O‘lchanadigan maqsadlar (${p.completedObjectivesCount}/${p.totalObjectivesCount} bajarildi)',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                          color: AppColors.textPrimary,
+                      const SizedBox(width: 7),
+                      Flexible(
+                        child: Text(
+                          'O‘lchanadigan maqsadlar (${p.completedObjectivesCount}/${p.totalObjectivesCount} bajarildi)',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13.5,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
                     ],
@@ -1010,13 +1003,13 @@ class _IepListScreenState extends State<IepListScreen> {
                     TextButton.icon(
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
+                          horizontal: 12,
+                          vertical: 7,
                         ),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      icon: const Icon(LucideIcons.plus, size: 14),
+                      icon: const Icon(LucideIcons.plus, size: 15),
                       label: const Text(
                         'Maqsad qo‘shish',
                         style: TextStyle(
@@ -1029,7 +1022,7 @@ class _IepListScreenState extends State<IepListScreen> {
                     ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
 
               ...p.objectives.map((obj) {
                 final objPercent = obj.progressPercent;
@@ -1044,12 +1037,12 @@ class _IepListScreenState extends State<IepListScreen> {
                     Expanded(
                       child: SliderTheme(
                         data: SliderTheme.of(context).copyWith(
-                          trackHeight: 5,
+                          trackHeight: 5.5,
                           overlayShape: const RoundSliderOverlayShape(
                             overlayRadius: 14,
                           ),
                           thumbShape: const RoundSliderThumbShape(
-                            enabledThumbRadius: 7,
+                            enabledThumbRadius: 7.5,
                           ),
                         ),
                         child: Slider(
@@ -1074,13 +1067,13 @@ class _IepListScreenState extends State<IepListScreen> {
                       ),
                     ),
                     Container(
-                      width: 50,
+                      width: 52,
                       alignment: Alignment.centerRight,
                       child: Text(
                         '$objPercent%',
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
-                          fontSize: 12.5,
+                          fontSize: 13,
                           color: objColor,
                           fontFeatures: const [FontFeature.tabularFigures()],
                         ),
@@ -1095,46 +1088,44 @@ class _IepListScreenState extends State<IepListScreen> {
                     Text(
                       obj.title,
                       style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
+                        height: 1.35,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
                       '${obj.domain} • Mezon: ${obj.measurementCriteria ?? obj.successCriteria ?? ''}',
                       style: const TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 12,
                         color: AppColors.textMuted,
+                        height: 1.35,
                       ),
                     ),
                   ],
                 );
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
+                return GlassWell(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  borderRadius: 18,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(11),
-                    border: Border.all(color: AppColors.hairlineBorder),
+                    horizontal: 16,
+                    vertical: 13,
                   ),
                   child: isCompact
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             objectiveInfo,
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
                             sliderRow,
                           ],
                         )
                       : Row(
                           children: [
                             Expanded(flex: 5, child: objectiveInfo),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 14),
                             Expanded(flex: 4, child: sliderRow),
                           ],
                         ),

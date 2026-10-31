@@ -28,14 +28,15 @@ class IepPrintScreen extends StatelessWidget {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: FilledButton.tonalIcon(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primaryLight,
+            padding: const EdgeInsets.only(right: 14),
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                backgroundColor: Colors.white.withValues(alpha: 0.85),
                 foregroundColor: AppColors.primaryDark,
+                side: const BorderSide(color: Colors.white, width: 1.4),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                  horizontal: 14,
+                  vertical: 9,
                 ),
               ),
               icon: const Icon(LucideIcons.printer, size: 16),
@@ -61,18 +62,18 @@ class IepPrintScreen extends StatelessWidget {
       body: AmbientMeshBackground(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 14 : 24,
-            vertical: isMobile ? 16 : 24,
+            horizontal: isMobile ? 16 : 26,
+            vertical: isMobile ? 18 : 28,
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 820),
+              constraints: const BoxConstraints(maxWidth: 840),
               child: Container(
-                padding: EdgeInsets.all(isMobile ? 20 : 36),
+                padding: EdgeInsets.all(isMobile ? 22 : 38),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.white, width: 1.6),
                   boxShadow: AppColors.elevatedShadow,
                 ),
                 child: Column(
@@ -100,7 +101,7 @@ class IepPrintScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Divider(thickness: 1.6, color: Colors.black87),
+                    const Divider(thickness: 1.5, color: Colors.black87),
                     const SizedBox(height: 12),
 
                     Text(
@@ -127,7 +128,7 @@ class IepPrintScreen extends StatelessWidget {
 
                     // 1. O'quvchi haqida ma'lumotlar jadvali
                     _buildSectionHeader('1. O‘QUVCHI HAQIDA UMUMIY MA’LUMOT'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     _buildInfoRow(
                       'O‘quvchining to‘liq F.I.Sh.:',
                       student.fullName,
@@ -156,7 +157,7 @@ class IepPrintScreen extends StatelessWidget {
                           : 'Mavjud emas',
                       isMobile,
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
 
                     // 2. Boshlang'ich daraja
                     _buildSectionHeader(
@@ -171,7 +172,7 @@ class IepPrintScreen extends StatelessWidget {
                         color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
 
                     // 3. Uzoq muddatli maqsadlar
                     _buildSectionHeader('3. UZOQ MUDDATLI PEDAGOGIK MAQSADLAR'),
@@ -184,131 +185,27 @@ class IepPrintScreen extends StatelessWidget {
                         color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
 
-                    // 4. Maqsadlar jadvali
+                    // 4. Maqsadlar jadvali (Mobilda matn ustundan chiqib ketmasligi uchun moslashuvchan)
                     _buildSectionHeader(
                       '4. REJALASHTIRILGAN O‘LCHANADIGAN MAQSADLAR VA IJRO MEZONLARI',
                     ),
-                    const SizedBox(height: 8),
-                    Table(
-                      border: TableBorder.all(color: Colors.black45),
-                      columnWidths: {
-                        0: FixedColumnWidth(isMobile ? 24 : 32),
-                        1: const FlexColumnWidth(4),
-                        2: const FlexColumnWidth(2),
-                        3: const FlexColumnWidth(2),
-                        4: const FlexColumnWidth(2),
-                      },
-                      children: [
-                        const TableRow(
-                          decoration: BoxDecoration(color: Color(0xFFF1F5F9)),
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(6),
-                              child: Text(
-                                '№',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
+                    const SizedBox(height: 10),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final table = _buildObjectivesTable(df);
+                        if (constraints.maxWidth < 500) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              width: 520,
+                              child: table,
                             ),
-                            Padding(
-                              padding: EdgeInsets.all(6),
-                              child: Text(
-                                'Maqsad mazmuni',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(6),
-                              child: Text(
-                                'Soha',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(6),
-                              child: Text(
-                                'Muddat',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(6),
-                              child: Text(
-                                'Ijro (%)',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        ...List.generate(plan.objectives.length, (idx) {
-                          final obj = plan.objectives[idx];
-                          return TableRow(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(6),
-                                child: Text(
-                                  '${idx + 1}',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 11),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(6),
-                                child: Text(
-                                  '${obj.title}\n(${obj.successCriteria ?? ''})',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    height: 1.35,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(6),
-                                child: Text(
-                                  obj.domain,
-                                  style: const TextStyle(fontSize: 11),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(6),
-                                child: Text(
-                                  df.format(obj.targetDate),
-                                  style: const TextStyle(fontSize: 10.5),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(6),
-                                child: Text(
-                                  '${obj.progressPercent}% (${obj.status})',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
                           );
-                        }),
-                      ],
+                        }
+                        return table;
+                      },
                     ),
                     const SizedBox(height: 28),
 
@@ -394,12 +291,134 @@ class IepPrintScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildObjectivesTable(DateFormat df) {
+    return Table(
+      border: TableBorder.all(color: Colors.black45),
+      columnWidths: const {
+        0: FixedColumnWidth(32),
+        1: FlexColumnWidth(4),
+        2: FlexColumnWidth(2),
+        3: FlexColumnWidth(2),
+        4: FlexColumnWidth(2),
+      },
+      children: [
+        const TableRow(
+          decoration: BoxDecoration(color: Color(0xFFF1F5F9)),
+          children: [
+            Padding(
+              padding: EdgeInsets.all(7),
+              child: Text(
+                '№',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(7),
+              child: Text(
+                'Maqsad mazmuni',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(7),
+              child: Text(
+                'Soha',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(7),
+              child: Text(
+                'Muddat',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(7),
+              child: Text(
+                'Ijro (%)',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+          ],
+        ),
+        ...List.generate(plan.objectives.length, (idx) {
+          final obj = plan.objectives[idx];
+          return TableRow(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(7),
+                child: Text(
+                  '${idx + 1}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 11),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(7),
+                child: Text(
+                  '${obj.title}\n(${obj.successCriteria ?? ''})',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(7),
+                child: Text(
+                  obj.domain,
+                  style: const TextStyle(fontSize: 11),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(7),
+                child: Text(
+                  df.format(obj.targetDate),
+                  style: const TextStyle(fontSize: 10.5),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(7),
+                child: Text(
+                  '${obj.progressPercent}% (${obj.status})',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          );
+        }),
+      ],
+    );
+  }
+
   Widget _buildSectionHeader(String title) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFE2E8F0),
-        borderRadius: BorderRadius.circular(4),
+        color: const Color(0xFFEDF2F9),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         title,
@@ -422,7 +441,7 @@ class IepPrintScreen extends StatelessWidget {
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.textPrimary,
-              height: 1.35,
+              height: 1.4,
             ),
             children: [
               TextSpan(
@@ -437,7 +456,7 @@ class IepPrintScreen extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3.5),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

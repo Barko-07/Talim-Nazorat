@@ -19,7 +19,11 @@ class ReportsScreen extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         title: const Row(
           children: [
-            Icon(LucideIcons.fileSpreadsheet, color: AppColors.primary, size: 20),
+            Icon(
+              LucideIcons.fileSpreadsheet,
+              color: AppColors.primary,
+              size: 21,
+            ),
             SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -38,10 +42,13 @@ class ReportsScreen extends StatelessWidget {
               children: [
                 const Text(
                   'Qaysi toifadagi hisobotni eksport qilmoqchisiz? Barcha ma’lumotlar UTF-8 BOM bilan rasmiylashtiriladi (Excel o‘zbekcha harflarni to‘g‘ri ochadi).',
-                  style:
-                      TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: AppColors.textSecondary,
+                    height: 1.4,
+                  ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 _buildExportOption(
                   ctx,
                   icon: LucideIcons.users,
@@ -126,25 +133,29 @@ class ReportsScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.only(bottom: 8),
       child: SurfaceCard(
         elevated: false,
-        borderRadius: 12,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        backgroundColor: AppColors.background,
+        borderRadius: 18,
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+        backgroundColor: AppColors.glassWellFill,
+        borderColor: AppColors.glassInnerBorder,
         onTap: () {
           Navigator.pop(ctx);
           onTap();
         },
         child: Row(
           children: [
-            Icon(icon, color: AppColors.primary, size: 18),
-            const SizedBox(width: 10),
+            Icon(icon, color: AppColors.primary, size: 19),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
-                style:
-                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ),
             const Icon(
@@ -168,7 +179,7 @@ class ReportsScreen extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         title: Text(
           'CSV fayli tayyor: $filename',
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+          style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800),
         ),
         content: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 520),
@@ -178,25 +189,27 @@ class ReportsScreen extends StatelessWidget {
             children: [
               const Text(
                 'Fayl mazmuni muvaffaqiyatli shakllantirildi. Ma’lumotlarni xotiraga nusxalab Excel dasturida ochishingiz mumkin:',
-                style:
-                    TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                height: 220,
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
                 ),
-                child: SingleChildScrollView(
-                  child: Text(
-                    csvData,
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 11.5,
+              ),
+              const SizedBox(height: 14),
+              GlassWell(
+                borderRadius: 18,
+                padding: const EdgeInsets.all(14),
+                child: SizedBox(
+                  height: 220,
+                  width: double.maxFinite,
+                  child: SingleChildScrollView(
+                    child: Text(
+                      csvData,
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 11.5,
+                        height: 1.4,
+                      ),
                     ),
                   ),
                 ),
@@ -237,174 +250,167 @@ class ReportsScreen extends StatelessWidget {
     final plans = app.iepPlans;
     final canPop = Navigator.canPop(context);
 
+    final scrollBody = SingleChildScrollView(
+      child: ResponsivePageContainer(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AdaptivePageHeader(
+              icon: LucideIcons.chartColumn,
+              title: 'Hisobotlar va tahliliy yig‘ma',
+              subtitle:
+                  'Davlat ta’lim standartlari va pedagogik monitoring bo‘yicha rasmiy ko‘rsatkichlar',
+              action: FilledButton.icon(
+                icon: const Icon(LucideIcons.download, size: 16),
+                label: const Text('CSV Eksport'),
+                onPressed: () => _showCsvExportDialog(context),
+              ),
+            ),
+            const SizedBox(height: 22),
+
+            // 1. Moslashuvchan statistika kartalari (0% overflow, erkin ikonkalar va kesib olingan shisha)
+            ResponsiveGlassGrid(
+              mobileColumns: 1,
+              tabletColumns: 3,
+              desktopColumns: 3,
+              spacing: 16,
+              children: [
+                _buildSummaryStatCard(
+                  label: 'Jami ro‘yxatdagi bolalar',
+                  value: '${students.length}',
+                  caption: '100% inklyuziv qamrovda',
+                  icon: LucideIcons.users,
+                  accent: AppColors.primary,
+                ),
+                _buildSummaryStatCard(
+                  label: 'O‘tkazilgan baholashlar',
+                  value: '${assessments.length}',
+                  caption: 'Barcha diagnostik yo‘nalishlar',
+                  icon: LucideIcons.clipboardCheck,
+                  accent: AppColors.info,
+                ),
+                _buildSummaryStatCard(
+                  label: 'Korreksion darslar',
+                  value: '${sessions.length}',
+                  caption: 'Davomat va kuzatuv nazoratida',
+                  icon: LucideIcons.calendarCheck2,
+                  accent: AppColors.purple,
+                ),
+              ],
+            ),
+            const SizedBox(height: 22),
+
+            // 2. ITR ijrosi jadvali
+            SurfaceCard(
+              borderRadius: 28,
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(
+                        LucideIcons.bookOpenCheck,
+                        size: 20,
+                        color: AppColors.primary,
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Individual ta’lim rejalari (ITR) monitoring hisoboti',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  if (plans.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 18),
+                      child: Text(
+                        'ITR rejalari mavjud emas.',
+                        style: TextStyle(color: AppColors.textMuted),
+                      ),
+                    )
+                  else
+                    ...plans.map((p) {
+                      final progress =
+                          (p.averageProgress / 100).clamp(0.0, 1.0);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: SurfaceCard(
+                          elevated: false,
+                          borderRadius: 20,
+                          padding: const EdgeInsets.all(16),
+                          backgroundColor: AppColors.glassWellFill,
+                          borderColor: AppColors.glassInnerBorder,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => StudentDetailScreen(
+                                  studentId: p.studentId,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      '${p.studentName} (${p.studentGrade})',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  StatusPill(
+                                    label:
+                                        '${p.averageProgress.toStringAsFixed(1)}%',
+                                    color: AppColors.primary,
+                                    backgroundColor:
+                                        Colors.white.withValues(alpha: 0.85),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(999),
+                                child: LinearProgressIndicator(
+                                  value: progress,
+                                  backgroundColor:
+                                      Colors.white.withValues(alpha: 0.85),
+                                  color: AppColors.primary,
+                                  minHeight: 8.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
     return Scaffold(
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
       appBar: canPop ? AppBar(title: const Text('Hisobotlar')) : null,
-      body: SingleChildScrollView(
-        child: ResponsivePageContainer(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AdaptivePageHeader(
-                icon: LucideIcons.chartColumn,
-                title: 'Hisobotlar va tahliliy yig‘ma',
-                subtitle:
-                    'Davlat ta’lim standartlari va pedagogik monitoring bo‘yicha rasmiy ko‘rsatkichlar',
-                action: FilledButton.icon(
-                  icon: const Icon(LucideIcons.download, size: 16),
-                  label: const Text('CSV Eksport'),
-                  onPressed: () => _showCsvExportDialog(context),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // 1. Moslashuvchan statistika kartalari (Mobilda ustma-ust/keng, desktopda 3 ustun)
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final cols = constraints.maxWidth >= 680 ? 3 : 1;
-                  return GridView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: cols,
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 12,
-                      mainAxisExtent: 112,
-                    ),
-                    children: [
-                      _buildSummaryStatCard(
-                        label: 'Jami ro‘yxatdagi bolalar',
-                        value: '${students.length}',
-                        caption: '100% inklyuziv qamrovda',
-                        icon: LucideIcons.users,
-                        accent: AppColors.primary,
-                        bg: AppColors.primaryLight,
-                      ),
-                      _buildSummaryStatCard(
-                        label: 'O‘tkazilgan baholashlar',
-                        value: '${assessments.length}',
-                        caption: 'Barcha diagnostik yo‘nalishlar',
-                        icon: LucideIcons.clipboardCheck,
-                        accent: AppColors.info,
-                        bg: AppColors.infoBg,
-                      ),
-                      _buildSummaryStatCard(
-                        label: 'Korreksion darslar',
-                        value: '${sessions.length}',
-                        caption: 'Davomat va kuzatuv nazoratida',
-                        icon: LucideIcons.calendarCheck2,
-                        accent: AppColors.purple,
-                        bg: AppColors.purpleBg,
-                      ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-
-              // 2. ITR ijrosi jadvali
-              SurfaceCard(
-                borderRadius: 20,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(
-                          LucideIcons.bookOpenCheck,
-                          size: 18,
-                          color: AppColors.primary,
-                        ),
-                        SizedBox(width: 9),
-                        Expanded(
-                          child: Text(
-                            'Individual ta’lim rejalari (ITR) monitoring hisoboti',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 15.5,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    if (plans.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Text(
-                          'ITR rejalari mavjud emas.',
-                          style: TextStyle(color: AppColors.textMuted),
-                        ),
-                      )
-                    else
-                      ...plans.map((p) {
-                        final progress =
-                            (p.averageProgress / 100).clamp(0.0, 1.0);
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: SurfaceCard(
-                            elevated: false,
-                            borderRadius: 13,
-                            padding: const EdgeInsets.all(14),
-                            backgroundColor: AppColors.background,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => StudentDetailScreen(
-                                    studentId: p.studentId,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        '${p.studentName} (${p.studentGrade})',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 13.5,
-                                          color: AppColors.textPrimary,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    StatusPill(
-                                      label:
-                                          '${p.averageProgress.toStringAsFixed(1)}%',
-                                      color: AppColors.primary,
-                                      backgroundColor: Colors.white,
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(6),
-                                  child: LinearProgressIndicator(
-                                    value: progress,
-                                    backgroundColor: Colors.white,
-                                    color: AppColors.primary,
-                                    minHeight: 8,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      body: canPop ? AmbientMeshBackground(child: scrollBody) : scrollBody,
     );
   }
 
@@ -414,68 +420,56 @@ class ReportsScreen extends StatelessWidget {
     required String caption,
     required IconData icon,
     required Color accent,
-    required Color bg,
   }) {
     return SurfaceCard(
-      borderRadius: 18,
-      padding: const EdgeInsets.all(16),
-      child: Row(
+      borderRadius: 26,
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Icon(icon, color: accent, size: 22),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
                   label,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textMuted,
+                    height: 1.3,
                   ),
                 ),
-                const SizedBox(height: 3),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      value,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: accent,
-                        letterSpacing: -0.5,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        caption,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
+              const SizedBox(width: 10),
+              Icon(icon, color: accent, size: 22),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.w800,
+              color: accent,
+              letterSpacing: -0.8,
+              height: 1.05,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            caption,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
+              height: 1.35,
             ),
           ),
         ],

@@ -120,6 +120,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: priority,
+                    isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'Muhimlik darajasi',
                     ),
@@ -339,93 +340,103 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
         st: allReferrals.where((r) => r.status == st).length,
     };
 
-    return Scaffold(
-      backgroundColor: canPop ? AppColors.background : Colors.transparent,
-      appBar: canPop ? AppBar(title: const Text('Yo‘naltirishlar')) : null,
-      body: ResponsivePageContainer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AdaptivePageHeader(
-              icon: LucideIcons.arrowLeftRight,
-              title: 'Yo‘naltirishlar va konsilium',
-              subtitle:
-                  'Mutaxassislararo hamkorlik va PMPK komissiyasiga yo‘naltirishlar (${referrals.length} ta)',
-              action: FilledButton.icon(
-                icon: const Icon(LucideIcons.plus, size: 16),
-                label: const Text('Yangi yo‘naltirish'),
-                onPressed: () => _showAddReferralDialog(context),
-              ),
+    final pageBody = ResponsivePageContainer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdaptivePageHeader(
+            icon: LucideIcons.arrowLeftRight,
+            title: 'Yo‘naltirishlar va konsilium',
+            subtitle:
+                'Mutaxassislararo hamkorlik va PMPK komissiyasiga yo‘naltirishlar (${referrals.length} ta)',
+            action: FilledButton.icon(
+              icon: const Icon(LucideIcons.plus, size: 16),
+              label: const Text('Yangi yo‘naltirish'),
+              onPressed: () => _showAddReferralDialog(context),
             ),
-            const SizedBox(height: 16),
+          ),
+          const SizedBox(height: 18),
 
-            // Skroll bo'ladigan filtr qatori (iPhone'da 0% overflow!)
-            ModernPillFilterBar(
-              items: _statuses,
-              selectedItem: _statusFilter,
-              counts: counts,
-              onSelected: (val) => setState(() => _statusFilter = val),
-            ),
-            const SizedBox(height: 14),
+          ModernPillFilterBar(
+            items: _statuses,
+            selectedItem: _statusFilter,
+            counts: counts,
+            onSelected: (val) => setState(() => _statusFilter = val),
+          ),
+          const SizedBox(height: 18),
 
-            Expanded(
-              child: referrals.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+          Expanded(
+            child: referrals.isEmpty
+                ? Center(
+                    child: SurfaceCard(
+                      borderRadius: 28,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 40,
+                      ),
+                      child: const Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              border:
-                                  Border.all(color: AppColors.hairlineBorder),
-                            ),
-                            child: const Icon(
-                              LucideIcons.arrowLeftRight,
-                              size: 26,
-                              color: AppColors.textMuted,
+                          Icon(
+                            LucideIcons.arrowLeftRight,
+                            size: 34,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(height: 14),
+                          Text(
+                            'Ushbu holatda yo‘naltirishlar mavjud emas',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15.5,
+                              color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'Ushbu holatda yo‘naltirishlar mavjud emas',
+                          SizedBox(height: 5),
+                          Text(
+                            'Boshqa holat filtrini tanlang yoki yangi yo‘naltirish yarating.',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
+                              fontSize: 13,
+                              color: AppColors.textMuted,
+                              height: 1.4,
                             ),
                           ),
                         ],
                       ),
-                    )
-                  : ListView.separated(
-                      itemCount: referrals.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final ref = referrals[index];
-                        final isUrgent = ref.priority == 'Shoshilinch';
-                        final isCompleted = ref.status == 'Yakunlandi';
+                    ),
+                  )
+                : ListView.separated(
+                    itemCount: referrals.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 14),
+                    itemBuilder: (context, index) {
+                      final ref = referrals[index];
+                      final isUrgent = ref.priority == 'Shoshilinch';
+                      final isCompleted = ref.status == 'Yakunlandi';
 
-                        return SurfaceCard(
-                          borderRadius: 18,
-                          padding: const EdgeInsets.all(16),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => StudentDetailScreen(
-                                  studentId: ref.studentId,
-                                ),
+                      return SurfaceCard(
+                        borderRadius: 26,
+                        padding: const EdgeInsets.all(22),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => StudentDetailScreen(
+                                studentId: ref.studentId,
                               ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            ),
+                          );
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: Wrap(
+                                spacing: 10,
+                                runSpacing: 6,
+                                alignment: WrapAlignment.spaceBetween,
+                                crossAxisAlignment: WrapCrossAlignment.center,
                                 children: [
                                   StatusPill(
                                     label: ref.priority,
@@ -436,23 +447,12 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                         ? AppColors.errorBg
                                         : AppColors.infoBg,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      ref.toSpecialistType,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 14.5,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
                                   Text(
                                     df.format(ref.createdAt),
                                     style: const TextStyle(
-                                      fontSize: 11.5,
+                                      fontSize: 12,
                                       color: AppColors.textMuted,
+                                      fontWeight: FontWeight.w500,
                                       fontFeatures: [
                                         FontFeature.tabularFigures(),
                                       ],
@@ -460,68 +460,120 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10),
-                              Text(
-                                'O‘quvchi: ${ref.studentName}',
-                                style: const TextStyle(
-                                  fontSize: 13.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 2),
+                                  child: Icon(
+                                    LucideIcons.arrowUpRight,
+                                    size: 20,
+                                    color: AppColors.primary,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Sababi: ${ref.reason}',
-                                style: const TextStyle(
-                                  fontSize: 12.5,
-                                  color: AppColors.textSecondary,
-                                  height: 1.4,
-                                ),
-                              ),
-                              if (ref.supportingObservations != null &&
-                                  ref.supportingObservations!.isNotEmpty) ...[
-                                const SizedBox(height: 6),
-                                Text(
-                                  'Kuzatuvlar: ${ref.supportingObservations}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textMuted,
+                                const SizedBox(width: 9),
+                                Expanded(
+                                  child: Text(
+                                    ref.toSpecialistType,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 15.5,
+                                      color: AppColors.textPrimary,
+                                      letterSpacing: -0.25,
+                                      height: 1.3,
+                                    ),
                                   ),
                                 ),
                               ],
-                              const SizedBox(height: 6),
-                              Text(
-                                'Yuborgan: ${ref.fromSpecialistName} (${ref.fromSpecialistRole ?? 'Mutaxassis'})',
-                                style: const TextStyle(
-                                  fontSize: 11.5,
+                            ),
+                            const SizedBox(height: 14),
+                            GlassWell(
+                              borderRadius: 18,
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'O‘quvchi: ${ref.studentName}',
+                                    style: const TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'Sababi: ${ref.reason}',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: AppColors.textSecondary,
+                                      height: 1.45,
+                                    ),
+                                  ),
+                                  if (ref.supportingObservations != null &&
+                                      ref.supportingObservations!
+                                          .isNotEmpty) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'Kuzatuvlar: ${ref.supportingObservations}',
+                                      style: const TextStyle(
+                                        fontSize: 12.5,
+                                        color: AppColors.textMuted,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                const Icon(
+                                  LucideIcons.userCheck,
+                                  size: 14.5,
                                   color: AppColors.textMuted,
                                 ),
-                              ),
-                              if (ref.outcomeNotes != null &&
-                                  ref.outcomeNotes!.isNotEmpty) ...[
-                                const SizedBox(height: 10),
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.successBg,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: AppColors.successBorder,
-                                    ),
-                                  ),
+                                const SizedBox(width: 6),
+                                Expanded(
                                   child: Text(
-                                    'Yakuniy xulosa: ${ref.outcomeNotes}',
+                                    'Yuborgan: ${ref.fromSpecialistName} (${ref.fromSpecialistRole ?? 'Mutaxassis'})',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.success,
-                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textMuted,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
                               ],
+                            ),
+                            if (ref.outcomeNotes != null &&
+                                ref.outcomeNotes!.isNotEmpty) ...[
                               const SizedBox(height: 12),
-                              Wrap(
+                              GlassWell(
+                                borderRadius: 16,
+                                padding: const EdgeInsets.all(14),
+                                tintColor: AppColors.successBg,
+                                borderColor: Colors.white,
+                                child: Text(
+                                  'Yakuniy xulosa: ${ref.outcomeNotes}',
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: AppColors.success,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Wrap(
                                 spacing: 10,
                                 runSpacing: 8,
                                 alignment: WrapAlignment.spaceBetween,
@@ -546,10 +598,10 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                               'Ko‘rib chiqilmoqda') ...[
                                         OutlinedButton(
                                           style: OutlinedButton.styleFrom(
-                                            minimumSize: const Size(0, 34),
+                                            minimumSize: const Size(0, 38),
                                             padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 6,
+                                              horizontal: 14,
+                                              vertical: 8,
                                             ),
                                           ),
                                           onPressed: () {
@@ -560,17 +612,17 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                           },
                                           child: const Text(
                                             'Qabul qilish',
-                                            style: TextStyle(fontSize: 12),
+                                            style: TextStyle(fontSize: 12.5),
                                           ),
                                         ),
                                       ],
                                       if (ref.status == 'Qabul qilindi') ...[
                                         FilledButton.tonal(
                                           style: FilledButton.styleFrom(
-                                            minimumSize: const Size(0, 34),
+                                            minimumSize: const Size(0, 38),
                                             padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 6,
+                                              horizontal: 14,
+                                              vertical: 8,
                                             ),
                                           ),
                                           onPressed: () {
@@ -581,7 +633,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                           },
                                           child: const Text(
                                             'Jarayonga o‘tkazish',
-                                            style: TextStyle(fontSize: 12),
+                                            style: TextStyle(fontSize: 12.5),
                                           ),
                                         ),
                                       ],
@@ -589,10 +641,10 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                         FilledButton(
                                           style: FilledButton.styleFrom(
                                             backgroundColor: AppColors.success,
-                                            minimumSize: const Size(0, 34),
+                                            minimumSize: const Size(0, 38),
                                             padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 6,
+                                              horizontal: 14,
+                                              vertical: 8,
                                             ),
                                           ),
                                           onPressed: () =>
@@ -602,7 +654,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                           ),
                                           child: const Text(
                                             'Yakunlash',
-                                            style: TextStyle(fontSize: 12),
+                                            style: TextStyle(fontSize: 12.5),
                                           ),
                                         ),
                                       ],
@@ -610,15 +662,21 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
+    );
+
+    return Scaffold(
+      backgroundColor: canPop ? AppColors.background : Colors.transparent,
+      appBar: canPop ? AppBar(title: const Text('Yo‘naltirishlar')) : null,
+      body: canPop ? AmbientMeshBackground(child: pageBody) : pageBody,
     );
   }
 }

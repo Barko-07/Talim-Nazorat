@@ -169,190 +169,233 @@ class SpecialistsScreen extends StatelessWidget {
     final allStudents = app.students;
     final canPop = Navigator.canPop(context);
 
-    return Scaffold(
-      backgroundColor: canPop ? AppColors.background : Colors.transparent,
-      appBar: canPop ? AppBar(title: const Text('Mutaxassislar')) : null,
-      body: ResponsivePageContainer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AdaptivePageHeader(
-              icon: LucideIcons.userCheck,
-              title: 'Kadrlar va mutaxassislar shtati',
-              subtitle:
-                  'Muassasa xodimlari, biriktirilgan sohalar va o‘quvchi yuklamasi (${staffList.length} nafar)',
-              action: canManage
-                  ? FilledButton.icon(
-                      icon: const Icon(LucideIcons.userPlus, size: 16),
-                      label: const Text('Yangi xodim'),
-                      onPressed: () => _showAddStaffDialog(context),
-                    )
-                  : null,
-            ),
-            const SizedBox(height: 16),
+    final pageBody = ResponsivePageContainer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdaptivePageHeader(
+            icon: LucideIcons.userCheck,
+            title: 'Kadrlar va mutaxassislar shtati',
+            subtitle:
+                'Muassasa xodimlari, biriktirilgan sohalar va o‘quvchi yuklamasi (${staffList.length} nafar)',
+            action: canManage
+                ? FilledButton.icon(
+                    icon: const Icon(LucideIcons.userPlus, size: 16),
+                    label: const Text('Yangi xodim'),
+                    onPressed: () => _showAddStaffDialog(context),
+                  )
+                : null,
+          ),
+          const SizedBox(height: 18),
 
-            Expanded(
-              child: ListView.separated(
-                itemCount: staffList.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final staff = staffList[index];
-                  final assignedCount = allStudents
-                      .where((s) => s.assignedSpecialistIds.contains(staff.id))
-                      .length;
-                  final isActive = staff.isActive;
+          Expanded(
+            child: ListView.separated(
+              itemCount: staffList.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 14),
+              itemBuilder: (context, index) {
+                final staff = staffList[index];
+                final assignedCount = allStudents
+                    .where((s) => s.assignedSpecialistIds.contains(staff.id))
+                    .length;
+                final isActive = staff.isActive;
+                final showToggle = canManage &&
+                    staff.id != user.id &&
+                    staff.role != UserRole.superAdmin;
 
-                  return SurfaceCard(
-                    borderRadius: 18,
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            color: staff.role.color.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(14),
+                return SurfaceCard(
+                  borderRadius: 26,
+                  padding: const EdgeInsets.all(22),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isCompact = constraints.maxWidth < 480;
+
+                      final mainInfo = Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Icon(
+                              premiumRoleIcon(staff.role),
+                              color: staff.role.color,
+                              size: 24,
+                            ),
                           ),
-                          child: Icon(
-                            staff.role.icon,
-                            color: staff.role.color,
-                            size: 22,
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 6,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Text(
+                                      staff.fullName,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 15.5,
+                                        color: isActive
+                                            ? AppColors.textPrimary
+                                            : AppColors.textMuted,
+                                        letterSpacing: -0.2,
+                                      ),
+                                    ),
+                                    if (!isActive)
+                                      const StatusPill(
+                                        label: 'Bloklangan',
+                                        color: AppColors.error,
+                                        backgroundColor: AppColors.errorBg,
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  '${staff.role.label} • ${staff.specialization ?? staff.role.professionTitle}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: staff.role.color,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.35,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${staff.institutionName ?? 'Belgilanmagan'}${staff.phone != null && staff.phone!.isNotEmpty ? ' • ${staff.phone}' : ''}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textMuted,
+                                    height: 1.35,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 4,
+                        ],
+                      );
+
+                      final toggleButton = showToggle
+                          ? TextButton(
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                minimumSize: const Size(0, 30),
+                                foregroundColor: isActive
+                                    ? AppColors.error
+                                    : AppColors.success,
+                              ),
+                              onPressed: () {
+                                app.toggleUserActive(
+                                  staff.id,
+                                  !isActive,
+                                  byUser: user,
+                                );
+                              },
+                              child: Text(
+                                isActive ? 'Bloklash' : 'Faollashtirish',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            )
+                          : null;
+
+                      if (isCompact) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            mainInfo,
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Wrap(
+                                spacing: 10,
+                                runSpacing: 8,
+                                alignment: WrapAlignment.spaceBetween,
                                 crossAxisAlignment: WrapCrossAlignment.center,
                                 children: [
-                                  Text(
-                                    staff.fullName,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 15,
-                                      color: isActive
-                                          ? AppColors.textPrimary
-                                          : AppColors.textMuted,
-                                    ),
+                                  StatusPill(
+                                    label: '$assignedCount ta o‘quvchi',
+                                    color: AppColors.primary,
+                                    backgroundColor:
+                                        Colors.white.withValues(alpha: 0.85),
+                                    icon: LucideIcons.users,
                                   ),
-                                  if (!isActive)
-                                    const StatusPill(
-                                      label: 'Bloklangan',
-                                      color: AppColors.error,
-                                      backgroundColor: AppColors.errorBg,
-                                    ),
-                                ],
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                '${staff.role.label} • ${staff.specialization ?? staff.role.professionTitle}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                  color: staff.role.color,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                '${staff.institutionName ?? 'Belgilanmagan'} • ${staff.phone ?? ''}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 11,
-                                vertical: 7,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.background,
-                                border:
-                                    Border.all(color: AppColors.hairlineBorder),
-                                borderRadius: BorderRadius.circular(11),
-                              ),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    '$assignedCount',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 16,
-                                      color: AppColors.primary,
-                                      fontFeatures: [
-                                        FontFeature.tabularFigures(),
-                                      ],
-                                    ),
-                                  ),
-                                  const Text(
-                                    'o‘quvchi',
-                                    style: TextStyle(
-                                      fontSize: 10.5,
-                                      color: AppColors.textMuted,
-                                    ),
-                                  ),
+                                  ?toggleButton,
                                 ],
                               ),
                             ),
-                            if (canManage &&
-                                staff.id != user.id &&
-                                staff.role != UserRole.superAdmin) ...[
-                              const SizedBox(height: 6),
-                              TextButton(
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  minimumSize: const Size(0, 28),
-                                  foregroundColor: isActive
-                                      ? AppColors.error
-                                      : AppColors.success,
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(child: mainInfo),
+                          const SizedBox(width: 14),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              GlassWell(
+                                borderRadius: 18,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 9,
                                 ),
-                                onPressed: () {
-                                  app.toggleUserActive(
-                                    staff.id,
-                                    !isActive,
-                                    byUser: user,
-                                  );
-                                },
-                                child: Text(
-                                  isActive ? 'Bloklash' : 'Faollashtirish',
-                                  style: const TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      '$assignedCount',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 17,
+                                        color: AppColors.primary,
+                                        fontFeatures: [
+                                          FontFeature.tabularFigures(),
+                                        ],
+                                      ),
+                                    ),
+                                    const Text(
+                                      'o‘quvchi',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.textMuted,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                              if (toggleButton != null) ...[
+                                const SizedBox(height: 6),
+                                toggleButton,
+                              ],
                             ],
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+
+    return Scaffold(
+      backgroundColor: canPop ? AppColors.background : Colors.transparent,
+      appBar: canPop ? AppBar(title: const Text('Mutaxassislar')) : null,
+      body: canPop ? AmbientMeshBackground(child: pageBody) : pageBody,
     );
   }
 }

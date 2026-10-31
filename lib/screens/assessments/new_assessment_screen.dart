@@ -219,6 +219,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
     final user = auth.currentUser;
     final role = user?.role ?? UserRole.psychologist;
     final students = app.students;
+    final roleIcon = premiumRoleIcon(role);
 
     if (!role.canCreateAssessments) {
       return Scaffold(
@@ -229,21 +230,15 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
             child: ResponsivePageContainer(
               maxWidth: 520,
               child: SurfaceCard(
-                padding: const EdgeInsets.all(28),
+                borderRadius: 28,
+                padding: const EdgeInsets.all(30),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.warningBg,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Icon(
-                        LucideIcons.shieldAlert,
-                        size: 36,
-                        color: AppColors.warning,
-                      ),
+                    const Icon(
+                      LucideIcons.shieldAlert,
+                      size: 40,
+                      color: AppColors.warning,
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -298,26 +293,24 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
           key: _formKey,
           child: SingleChildScrollView(
             child: ResponsivePageContainer(
-              maxWidth: 820,
+              maxWidth: 840,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // 1. MUTAXASSISLIKNING RASMIY KASBIY VAKOLAT BANNERI
                   GlassSurface(
-                    padding: const EdgeInsets.all(18),
-                    borderRadius: 16,
-                    borderColor: role.color.withValues(alpha: 0.25),
+                    padding: const EdgeInsets.all(22),
+                    borderRadius: 26,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: role.color.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(13),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Icon(
+                            roleIcon,
+                            color: role.color,
+                            size: 25,
                           ),
-                          child: Icon(role.icon, color: role.color, size: 22),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -325,8 +318,8 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Wrap(
-                                spacing: 8,
-                                runSpacing: 4,
+                                spacing: 10,
+                                runSpacing: 6,
                                 crossAxisAlignment: WrapCrossAlignment.center,
                                 children: [
                                   StatusPill(
@@ -337,19 +330,20 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                   Text(
                                     user?.fullName ?? '',
                                     style: const TextStyle(
-                                      fontSize: 13,
+                                      fontSize: 13.5,
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.textPrimary,
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 7),
                               const Text(
                                 'Ushbu baholash faqat sizning kasbiy sohangiz doirasida rasmiylashtiriladi.',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 12.5,
                                   color: AppColors.textMuted,
+                                  height: 1.4,
                                 ),
                               ),
                             ],
@@ -358,62 +352,73 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
 
                   // Tibbiy tashxis emasligi haqida rasmiy eslatma
-                  Container(
+                  GlassWell(
+                    borderRadius: 18,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 11,
+                      horizontal: 16,
+                      vertical: 13,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.infoBg,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.info.withValues(alpha: 0.24),
-                      ),
-                    ),
+                    tintColor: AppColors.infoBg,
+                    borderColor: Colors.white,
                     child: const Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          LucideIcons.info,
-                          color: AppColors.info,
-                          size: 17,
+                        Padding(
+                          padding: EdgeInsets.only(top: 1),
+                          child: Icon(
+                            LucideIcons.info,
+                            color: AppColors.info,
+                            size: 18,
+                          ),
                         ),
                         SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             'Eslatma: Ushbu baholash kasbiy pedagogik-psixologik kuzatuv hisoblanadi va tibbiy tashxis qo‘yish uchun asos bo‘lmaydi.',
                             style: TextStyle(
-                              fontSize: 11.5,
+                              fontSize: 12,
                               color: AppColors.textPrimary,
-                              height: 1.35,
+                              height: 1.4,
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
                   // 2. O'QUVCHI VA MA'LUMOTLAR
                   SurfaceCard(
-                    padding: const EdgeInsets.all(22),
+                    borderRadius: 28,
+                    padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Baholanayotgan O‘quvchi',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15.5,
-                            color: AppColors.textPrimary,
-                          ),
+                        const Row(
+                          children: [
+                            Icon(
+                              LucideIcons.userRoundCheck,
+                              size: 20,
+                              color: AppColors.primary,
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Baholanayotgan O‘quvchi',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 18),
 
-                        // O'quvchini tanlash (isExpanded: true — iPhone'da overflow bo'lmaydi)
                         DropdownButtonFormField<String>(
                           initialValue: _selectedStudentId,
                           isExpanded: true,
@@ -440,14 +445,13 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                         ),
                         const SizedBox(height: 14),
 
-                        // Sohaviy Diagnostika Kategoriyasi
                         DropdownButtonFormField<String>(
                           initialValue: _category,
                           isExpanded: true,
                           decoration: InputDecoration(
                             labelText: 'Kasbiy diagnostika yo‘nalishi *',
                             prefixIcon: Icon(
-                              role.icon,
+                              roleIcon,
                               size: 19,
                               color: role.color,
                             ),
@@ -468,7 +472,6 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                         ),
                         const SizedBox(height: 14),
 
-                        // Sarlavha
                         TextFormField(
                           controller: _titleCtrl,
                           decoration: const InputDecoration(
@@ -485,17 +488,18 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
                   // 3. SOHAGA MOS RUBRIKA MEZONLARI
                   SurfaceCard(
-                    padding: const EdgeInsets.all(22),
+                    borderRadius: 28,
+                    padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Wrap(
                           spacing: 12,
-                          runSpacing: 8,
+                          runSpacing: 10,
                           alignment: WrapAlignment.spaceBetween,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
@@ -504,55 +508,42 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                               children: [
                                 Icon(
                                   LucideIcons.slidersHorizontal,
-                                  size: 18,
+                                  size: 20,
                                   color: role.color,
                                 ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'Kasbiy Rubrika Mezonlari',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 15.5,
-                                    color: AppColors.textPrimary,
+                                const SizedBox(width: 10),
+                                const Flexible(
+                                  child: Text(
+                                    'Kasbiy Rubrika Mezonlari',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                      color: AppColors.textPrimary,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 11,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: role.color.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(9),
-                                border: Border.all(
-                                  color: role.color.withValues(alpha: 0.24),
-                                ),
-                              ),
-                              child: Text(
-                                'Jami: ${_totalScore.toInt()} / ${_maxTotalScore.toInt()} ball',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  color: role.color,
-                                  fontSize: 12.5,
-                                  fontFeatures: const [
-                                    FontFeature.tabularFigures(),
-                                  ],
-                                ),
-                              ),
+                            StatusPill(
+                              label:
+                                  'Jami: ${_totalScore.toInt()} / ${_maxTotalScore.toInt()} ball',
+                              color: role.color,
+                              backgroundColor:
+                                  Colors.white.withValues(alpha: 0.78),
+                              icon: LucideIcons.award,
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                         const Text(
                           'Har bir mezon bo‘yicha bolaning haqiqiy o‘zlashtirish darajasini belgilang:',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.5,
                             color: AppColors.textMuted,
+                            height: 1.4,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 18),
 
                         // Dinamik mezon slayderlari
                         ...List.generate(_criteriaList.length, (index) {
@@ -561,14 +552,10 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                           final max = item['max'] as double;
                           final name = item['name'] as String;
 
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
-                            decoration: BoxDecoration(
-                              color: AppColors.background,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.hairlineBorder),
-                            ),
+                          return GlassWell(
+                            margin: const EdgeInsets.only(bottom: 14),
+                            borderRadius: 18,
+                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -579,25 +566,27 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                       child: Text(
                                         '${index + 1}. $name',
                                         style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13.5,
                                           color: AppColors.textPrimary,
+                                          height: 1.35,
                                         ),
                                       ),
                                     ),
                                     const SizedBox(width: 10),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 2.5,
+                                        horizontal: 11,
+                                        vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(7),
+                                        color: Colors.white
+                                            .withValues(alpha: 0.85),
+                                        borderRadius:
+                                            BorderRadius.circular(999),
                                         border: Border.all(
-                                          color: role.color.withValues(
-                                            alpha: 0.35,
-                                          ),
+                                          color: Colors.white,
+                                          width: 1.2,
                                         ),
                                       ),
                                       child: Text(
@@ -614,12 +603,12 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 6),
                                 SliderTheme(
                                   data: SliderTheme.of(context).copyWith(
-                                    trackHeight: 5,
+                                    trackHeight: 5.5,
                                     thumbShape: const RoundSliderThumbShape(
-                                      enabledThumbRadius: 7.5,
+                                      enabledThumbRadius: 8,
                                     ),
                                   ),
                                   child: Slider(
@@ -646,23 +635,36 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
                   // 4. MUTAXASSIS XULOSASI VA TAVSIYALARI
                   SurfaceCard(
-                    padding: const EdgeInsets.all(22),
+                    borderRadius: 28,
+                    padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Mutaxassis Xulosasi va Pedagogik Tavsiyalar',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15.5,
-                            color: AppColors.textPrimary,
-                          ),
+                        const Row(
+                          children: [
+                            Icon(
+                              LucideIcons.sparkles,
+                              size: 20,
+                              color: AppColors.primary,
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Mutaxassis Xulosasi va Pedagogik Tavsiyalar',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 18),
                         TextFormField(
                           controller: _notesCtrl,
                           maxLines: 3,
@@ -676,7 +678,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                               ? 'Xulosa matnini kiriting'
                               : null,
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 14),
                         TextFormField(
                           controller: _recommendationsCtrl,
                           maxLines: 2,
@@ -693,7 +695,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 24),
 
                   // SAQLASH TUGMASI
                   FilledButton.icon(

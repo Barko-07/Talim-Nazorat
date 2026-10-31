@@ -18,6 +18,197 @@ class StudentsListScreen extends StatelessWidget {
     final students = app.students;
     final canPop = Navigator.canPop(context);
 
+    final bodyContent = ResponsivePageContainer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdaptivePageHeader(
+            icon: LucideIcons.users,
+            title: 'Bolalar elektron reyestri',
+            subtitle:
+                'Jami ${students.length} nafar inklyuziv ta’limdagi o‘quvchi ro‘yxatda',
+            action: FilledButton.icon(
+              icon: const Icon(LucideIcons.userPlus, size: 16),
+              label: const Text('Yangi o‘quvchi'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AddStudentScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Kesib olingan shisha qidiruv va sinf filtri paneli (Mobil va desktopga mos)
+          SurfaceCard(
+            borderRadius: 24,
+            padding: const EdgeInsets.all(14),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 520;
+
+                final searchField = TextField(
+                  decoration: InputDecoration(
+                    hintText:
+                        'F.I.Sh. yoki ta’lim ehtiyoji bo‘yicha qidirish...',
+                    prefixIcon: const Icon(
+                      LucideIcons.search,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
+                    fillColor: Colors.white.withValues(alpha: 0.72),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 13,
+                    ),
+                    suffixIcon: app.searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(LucideIcons.x, size: 16),
+                            onPressed: () => app.setSearchQuery(''),
+                          )
+                        : null,
+                  ),
+                  onChanged: (val) => app.setSearchQuery(val),
+                );
+
+                final gradeFilter = DropdownButtonHideUnderline(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.78),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: Colors.white, width: 1.3),
+                    ),
+                    child: DropdownButton<String?>(
+                      value: app.selectedGrade,
+                      isExpanded: isCompact,
+                      borderRadius: BorderRadius.circular(20),
+                      dropdownColor: const Color(0xF5FFFFFF),
+                      icon: const Padding(
+                        padding: EdgeInsets.only(left: 6),
+                        child: Icon(
+                          LucideIcons.chevronDown,
+                          size: 16,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                      hint: const Text(
+                        'Barcha sinflar',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      items: [
+                        const DropdownMenuItem(
+                          value: null,
+                          child: Text(
+                            'Barcha sinflar',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        ...['1-A', '2-A', '2-B', '3-A', '3-B', '4-A'].map(
+                          (g) => DropdownMenuItem(
+                            value: g,
+                            child: Text(
+                              '$g sinf',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      onChanged: (val) => app.setFilterGrade(val),
+                    ),
+                  ),
+                );
+
+                if (isCompact) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      searchField,
+                      const SizedBox(height: 10),
+                      gradeFilter,
+                    ],
+                  );
+                }
+
+                return Row(
+                  children: [
+                    Expanded(child: searchField),
+                    const SizedBox(width: 12),
+                    gradeFilter,
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          // Bolalar ro'yxati
+          Expanded(
+            child: students.isEmpty
+                ? Center(
+                    child: SurfaceCard(
+                      borderRadius: 28,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 36,
+                      ),
+                      child: const Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            LucideIcons.userSearch,
+                            size: 36,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(height: 14),
+                          Text(
+                            'O‘quvchilar topilmadi',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            'Qidiruv so‘zini yoki sinf filtrini o‘zgartirib ko‘ring',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : ListView.separated(
+                    itemCount: students.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 14),
+                    itemBuilder: (context, index) {
+                      final student = students[index];
+                      return _buildStudentCard(context, student);
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+
     return Scaffold(
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
       appBar: canPop
@@ -25,183 +216,7 @@ class StudentsListScreen extends StatelessWidget {
               title: const Text('Bolalar elektron reyestri'),
             )
           : null,
-      body: ResponsivePageContainer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AdaptivePageHeader(
-              icon: LucideIcons.users,
-              title: 'Bolalar elektron reyestri',
-              subtitle:
-                  'Jami ${students.length} nafar inklyuziv ta’limdagi o‘quvchi ro‘yxatda',
-              action: FilledButton.icon(
-                icon: const Icon(LucideIcons.userPlus, size: 16),
-                label: const Text('Yangi o‘quvchi'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const AddStudentScreen(),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Qidiruv va Sinf filtri paneli
-            SurfaceCard(
-              elevated: false,
-              borderRadius: 16,
-              padding: const EdgeInsets.all(10),
-              backgroundColor: Colors.white.withValues(alpha: 0.86),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'F.I.Sh. yoki ta’lim ehtiyoji bo‘yicha qidirish...',
-                        prefixIcon: const Icon(
-                          LucideIcons.search,
-                          size: 17,
-                          color: AppColors.textMuted,
-                        ),
-                        fillColor: AppColors.background,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(11),
-                          borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(11),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 11,
-                        ),
-                        suffixIcon: app.searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(LucideIcons.x, size: 15),
-                                onPressed: () => app.setSearchQuery(''),
-                              )
-                            : null,
-                      ),
-                      onChanged: (val) => app.setSearchQuery(val),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  DropdownButtonHideUnderline(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(11),
-                        border: Border.all(color: AppColors.hairlineBorder),
-                      ),
-                      child: DropdownButton<String?>(
-                        value: app.selectedGrade,
-                        borderRadius: BorderRadius.circular(14),
-                        icon: const Padding(
-                          padding: EdgeInsets.only(left: 4),
-                          child: Icon(
-                            LucideIcons.chevronDown,
-                            size: 15,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                        hint: const Text(
-                          'Sinf',
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        items: [
-                          const DropdownMenuItem(
-                            value: null,
-                            child: Text(
-                              'Barcha sinflar',
-                              style: TextStyle(fontSize: 12.5),
-                            ),
-                          ),
-                          ...['1-A', '2-A', '2-B', '3-A', '3-B', '4-A'].map(
-                            (g) => DropdownMenuItem(
-                              value: g,
-                              child: Text(
-                                '$g sinf',
-                                style: const TextStyle(
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        onChanged: (val) => app.setFilterGrade(val),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 14),
-
-            // Bolalar ro'yxati
-            Expanded(
-              child: students.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              border:
-                                  Border.all(color: AppColors.hairlineBorder),
-                            ),
-                            child: const Icon(
-                              LucideIcons.userSearch,
-                              size: 26,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'O‘quvchilar topilmadi',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Qidiruv so‘zini yoki sinf filtrini o‘zgartirib ko‘ring',
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.separated(
-                      itemCount: students.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 10),
-                      itemBuilder: (context, index) {
-                        final student = students[index];
-                        return _buildStudentCard(context, student);
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
+      body: canPop ? AmbientMeshBackground(child: bodyContent) : bodyContent,
     );
   }
 
@@ -211,8 +226,8 @@ class StudentsListScreen extends StatelessWidget {
         : 'Vasiy kiritilmagan';
 
     return SurfaceCard(
-      borderRadius: 16,
-      padding: const EdgeInsets.all(14),
+      borderRadius: 26,
+      padding: const EdgeInsets.all(20),
       onTap: () {
         Navigator.push(
           context,
@@ -222,90 +237,81 @@ class StudentsListScreen extends StatelessWidget {
         );
       },
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColors.primaryLight, AppColors.primaryTint],
-              ),
-              borderRadius: BorderRadius.circular(13),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.14),
-              ),
-            ),
-            alignment: Alignment.center,
+          CircleAvatar(
+            radius: 23,
+            backgroundColor: Colors.white.withValues(alpha: 0.9),
             child: Text(
               s.firstName.isNotEmpty ? s.firstName.substring(0, 1) : '?',
               style: const TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w800,
-                fontSize: 16,
+                fontSize: 17,
               ),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Text(
                         s.fullName,
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
-                          letterSpacing: -0.2,
+                          letterSpacing: -0.25,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     StatusPill(
                       label: '${s.grade}-sinf',
-                      color: AppColors.textSecondary,
-                      backgroundColor: AppColors.background,
-                      borderColor: AppColors.border,
+                      color: AppColors.primary,
+                      backgroundColor: Colors.white.withValues(alpha: 0.85),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 5),
                 Text(
                   s.primaryNeed,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 13,
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
+                    height: 1.35,
                   ),
                 ),
-                const SizedBox(height: 7),
+                const SizedBox(height: 10),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
+                  spacing: 10,
+                  runSpacing: 6,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     StatusPill(
                       label: s.supportLevel,
                       color: AppColors.info,
-                      backgroundColor: AppColors.infoBg,
-                      borderColor: AppColors.infoBorder,
+                      backgroundColor: Colors.white.withValues(alpha: 0.82),
+                      maxWidth: 230,
                     ),
                     Text(
                       '${s.age} yosh • $guardianText',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 12,
                         color: AppColors.textMuted,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -314,10 +320,13 @@ class StudentsListScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          const Icon(
-            LucideIcons.chevronRight,
-            size: 18,
-            color: AppColors.textSubtle,
+          const Padding(
+            padding: EdgeInsets.only(top: 4),
+            child: Icon(
+              LucideIcons.chevronRight,
+              size: 18,
+              color: AppColors.textSubtle,
+            ),
           ),
         ],
       ),

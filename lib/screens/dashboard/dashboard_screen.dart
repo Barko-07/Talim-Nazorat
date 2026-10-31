@@ -52,146 +52,160 @@ class DashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. FROSTED GLASS SALOMLASHUV PANELI
+              // 1. KESIB OLINGAN SHISHA SALOMLASHUV PANELI
               _buildWelcomeHero(context, user)
                   .animate()
-                  .fadeIn(duration: 200.ms, curve: Curves.easeOutCubic)
+                  .fadeIn(duration: 210.ms, curve: Curves.easeOutCubic)
                   .slideY(
                     begin: 0.025,
                     end: 0,
-                    duration: 200.ms,
+                    duration: 210.ms,
                     curve: Curves.easeOutCubic,
                   ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              // 2. DIQQAT TALAB HOLATLAR BANNERI
+              // 2. DIQQAT TALAB HOLATLAR BANNERI (Erkin ikonkali)
               if (alerts.isNotEmpty) ...[
                 SurfaceCard(
-                  borderRadius: 16,
+                  borderRadius: 24,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 13,
+                    horizontal: 20,
+                    vertical: 16,
                   ),
                   backgroundColor: AppColors.warningBg,
-                  borderColor: AppColors.warningBorder,
-                  elevated: false,
+                  borderColor: Colors.white,
                   onTap: () =>
                       _openModule(context, 5, const MonitoringScreen()),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: AppColors.warning.withValues(alpha: 0.14),
-                          borderRadius: BorderRadius.circular(11),
-                        ),
-                        child: const Icon(
-                          LucideIcons.triangleAlert,
-                          color: AppColors.warning,
-                          size: 19,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isNarrow = constraints.maxWidth < 430;
+                      final textCol = Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Diqqat talab holatlar (${alerts.length} ta)',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            alerts.first.message,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              color: AppColors.textSecondary,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      );
+
+                      if (isNarrow) {
+                        return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Diqqat talab holatlar (${alerts.length} ta)',
-                              style: const TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
-                              ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 2),
+                                  child: Icon(
+                                    LucideIcons.triangleAlert,
+                                    color: AppColors.warning,
+                                    size: 21,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(child: textCol),
+                              ],
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              alerts.first.message,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
+                            const SizedBox(height: 10),
+                            const StatusPill(
+                              label: 'Monitoringni ko‘rish',
+                              color: AppColors.warning,
+                              backgroundColor: Colors.white,
+                              icon: LucideIcons.arrowUpRight,
                             ),
                           ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const StatusPill(
-                        label: 'Ko‘rish',
-                        color: AppColors.warning,
-                        backgroundColor: Colors.white,
-                        icon: LucideIcons.arrowUpRight,
-                      ),
-                    ],
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          const Icon(
+                            LucideIcons.triangleAlert,
+                            color: AppColors.warning,
+                            size: 22,
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(child: textCol),
+                          const SizedBox(width: 12),
+                          const StatusPill(
+                            label: 'Ko‘rish',
+                            color: AppColors.warning,
+                            backgroundColor: Colors.white,
+                            icon: LucideIcons.arrowUpRight,
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
               ],
 
-              // 3. 4 TA ASOSIY KPI KARTALARI (Fixed height -> 0% overflow on any mobile/desktop width)
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final cols = constraints.maxWidth >= 780 ? 4 : 2;
-                  return GridView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: cols,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      mainAxisExtent: 124,
+              // 3. 4 TA ASOSIY KPI KARTALARI (0% overflow ResponsiveGlassGrid + Free-standing icons)
+              ResponsiveGlassGrid(
+                mobileColumns: 2,
+                tabletColumns: 2,
+                desktopColumns: 4,
+                spacing: 16,
+                children: [
+                  _buildKpiCard(
+                    title: 'Jami o‘quvchilar',
+                    value: '${app.totalStudentsCount}',
+                    subtitle: 'Inklyuziv ro‘yxatda',
+                    icon: LucideIcons.users,
+                    color: AppColors.primary,
+                    onTap: () => _openModule(
+                      context,
+                      1,
+                      const StudentsListScreen(),
                     ),
-                    children: [
-                      _buildKpiCard(
-                        title: 'Jami o‘quvchilar',
-                        value: '${app.totalStudentsCount}',
-                        subtitle: 'Inklyuziv ro‘yxatda',
-                        icon: LucideIcons.users,
-                        color: AppColors.primary,
-                        bgColor: AppColors.primaryLight,
-                        onTap: () => _openModule(
-                          context,
-                          1,
-                          const StudentsListScreen(),
-                        ),
-                      ),
-                      _buildKpiCard(
-                        title: 'Faol ITR rejalari',
-                        value: '${app.activeIepCount}',
-                        subtitle: 'Ijro etilayotgan',
-                        icon: LucideIcons.bookOpenCheck,
-                        color: AppColors.info,
-                        bgColor: AppColors.infoBg,
-                        onTap: () =>
-                            _openModule(context, 4, const IepListScreen()),
-                      ),
-                      _buildKpiCard(
-                        title: 'Bu oygi darslar',
-                        value: '${app.thisMonthSessionsCount}',
-                        subtitle: 'O‘tkazilgan va rejada',
-                        icon: LucideIcons.calendarCheck2,
-                        color: AppColors.purple,
-                        bgColor: AppColors.purpleBg,
-                        onTap: () =>
-                            _openModule(context, 3, const SessionsScreen()),
-                      ),
-                      _buildKpiCard(
-                        title: 'O‘rtacha o‘sish',
-                        value:
-                            '+${app.averageDevelopmentGrowth.toStringAsFixed(1)}%',
-                        subtitle: 'Oxirgi chorakda',
-                        icon: LucideIcons.trendingUp,
-                        color: AppColors.success,
-                        bgColor: AppColors.successBg,
-                        onTap: () =>
-                            _openModule(context, 6, const ReportsScreen()),
-                      ),
-                    ],
-                  );
-                },
+                  ),
+                  _buildKpiCard(
+                    title: 'Faol ITR rejalari',
+                    value: '${app.activeIepCount}',
+                    subtitle: 'Ijro etilayotgan',
+                    icon: LucideIcons.bookOpenCheck,
+                    color: AppColors.info,
+                    onTap: () =>
+                        _openModule(context, 4, const IepListScreen()),
+                  ),
+                  _buildKpiCard(
+                    title: 'Bu oygi darslar',
+                    value: '${app.thisMonthSessionsCount}',
+                    subtitle: 'O‘tkazilgan va rejada',
+                    icon: LucideIcons.calendarCheck2,
+                    color: AppColors.purple,
+                    onTap: () =>
+                        _openModule(context, 3, const SessionsScreen()),
+                  ),
+                  _buildKpiCard(
+                    title: 'O‘rtacha o‘sish',
+                    value:
+                        '+${app.averageDevelopmentGrowth.toStringAsFixed(1)}%',
+                    subtitle: 'Oxirgi chorakda',
+                    icon: LucideIcons.trendingUp,
+                    color: AppColors.success,
+                    onTap: () =>
+                        _openModule(context, 6, const ReportsScreen()),
+                  ),
+                ],
               )
                   .animate()
                   .fadeIn(
@@ -206,20 +220,20 @@ class DashboardScreen extends StatelessWidget {
                     curve: Curves.easeOutCubic,
                   ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
 
               // 4. KASBIY ISH MAYDONI
               _buildRoleSpecificWorkspace(context, user),
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
 
               // 5. GRAFIK: OYLIK RIVOJLANISH DINAMIKASI
               _buildAnalyticsChartCard(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
 
               // 6. SO'NGGI BAHOLASHLAR VA KUTILAYOTGAN MASHG'ULOTLAR
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final isWide = constraints.maxWidth >= 760;
+                  final isWide = constraints.maxWidth >= 780;
 
                   final leftCard =
                       _buildRecentAssessmentsCard(context, assessments);
@@ -231,14 +245,14 @@ class DashboardScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(child: leftCard),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 20),
                             Expanded(child: rightCard),
                           ],
                         )
                       : Column(
                           children: [
                             leftCard,
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
                             rightCard,
                           ],
                         );
@@ -253,94 +267,75 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildWelcomeHero(BuildContext context, UserModel? user) {
     return GlassSurface(
-      borderRadius: 20,
-      blur: 18,
-      opacity: 0.85,
-      padding: const EdgeInsets.all(18),
+      borderRadius: 28,
+      blur: 22,
+      opacity: 0.76,
+      padding: const EdgeInsets.all(24),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final isCompact = constraints.maxWidth < 560;
+          final isCompact = constraints.maxWidth < 580;
 
           final profileInfo = Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppColors.primaryLight, AppColors.primaryTint],
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.16),
-                  ),
-                ),
-                alignment: Alignment.center,
+              CircleAvatar(
+                radius: 25,
+                backgroundColor: Colors.white.withValues(alpha: 0.9),
                 child: Text(
                   (user?.fullName ?? 'U').substring(0, 1),
                   style: const TextStyle(
-                    fontSize: 19,
+                    fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primary,
                   ),
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Assalomu alaykum, ${user?.fullName ?? 'Mutaxassis'}!',
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: isCompact ? 15.5 : 17.5,
+                        fontSize: isCompact ? 17 : 20,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
-                        letterSpacing: -0.35,
+                        letterSpacing: -0.4,
+                        height: 1.25,
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      crossAxisAlignment: WrapCrossAlignment.center,
+                    const SizedBox(height: 8),
+                    StatusPill(
+                      label: user?.role.label ?? 'Mutaxassis',
+                      color: AppColors.primary,
+                      backgroundColor: Colors.white.withValues(alpha: 0.85),
+                      icon: user != null ? premiumRoleIcon(user.role) : null,
+                      showDot: user == null,
+                    ),
+                    const SizedBox(height: 7),
+                    Row(
                       children: [
-                        StatusPill(
-                          label: user?.role.label ?? 'Mutaxassis',
-                          color: AppColors.primary,
-                          backgroundColor: AppColors.primaryLight,
-                          showDot: true,
+                        const Icon(
+                          LucideIcons.school,
+                          size: 14,
+                          color: AppColors.textMuted,
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              LucideIcons.school,
-                              size: 13.5,
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            user?.institutionName ??
+                                '9-sonli inklyuziv ta’lim tayanch maktabi',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12.5,
                               color: AppColors.textMuted,
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(width: 5),
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: isCompact ? 210 : 340,
-                              ),
-                              child: Text(
-                                user?.institutionName ??
-                                    '9-sonli inklyuziv ta’lim tayanch maktabi',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textMuted,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
@@ -366,7 +361,7 @@ class DashboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 profileInfo,
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 addBtn,
               ],
             );
@@ -375,7 +370,7 @@ class DashboardScreen extends StatelessWidget {
           return Row(
             children: [
               Expanded(child: profileInfo),
-              const SizedBox(width: 14),
+              const SizedBox(width: 18),
               addBtn,
             ],
           );
@@ -388,176 +383,215 @@ class DashboardScreen extends StatelessWidget {
     const months = ['Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
 
     return SurfaceCard(
-      borderRadius: 20,
-      padding: const EdgeInsets.all(20),
+      borderRadius: 28,
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Expanded(
-                child: Column(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isNarrow = constraints.maxWidth < 460;
+              const titleCol = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        LucideIcons.trendingUp,
+                        size: 20,
+                        color: AppColors.primary,
+                      ),
+                      SizedBox(width: 9),
+                      Expanded(
+                        child: Text(
+                          'Oylik rivojlanish dinamikasi',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Nutq, kognitiv va ijtimoiy mezonlar kesimida o‘rtacha ballar',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
+              );
+
+              const pill = StatusPill(
+                label: '2026 o‘quv yili',
+                color: AppColors.primary,
+                backgroundColor: Colors.white,
+                icon: LucideIcons.sparkles,
+              );
+
+              if (isNarrow) {
+                return const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Oylik rivojlanish dinamikasi',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.3,
+                    titleCol,
+                    SizedBox(height: 10),
+                    pill,
+                  ],
+                );
+              }
+
+              return const Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: titleCol),
+                  SizedBox(width: 12),
+                  pill,
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+          GlassWell(
+            borderRadius: 20,
+            padding: const EdgeInsets.fromLTRB(10, 20, 26, 12),
+            child: SizedBox(
+              height: 205,
+              child: LineChart(
+                LineChartData(
+                  lineTouchData: LineTouchData(
+                    handleBuiltInTouches: true,
+                    touchTooltipData: LineTouchTooltipData(
+                      tooltipBorderRadius: BorderRadius.circular(14),
+                      getTooltipColor: (_) => AppColors.textPrimary,
+                      getTooltipItems: (touchedSpots) {
+                        return touchedSpots.map((spot) {
+                          final idx = spot.x.toInt();
+                          final month = (idx >= 0 && idx < months.length)
+                              ? months[idx]
+                              : '';
+                          return LineTooltipItem(
+                            '$month\n${spot.y.toInt()} ball',
+                            const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              height: 1.35,
+                            ),
+                          );
+                        }).toList();
+                      },
+                    ),
+                  ),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: 25,
+                    getDrawingHorizontalLine: (_) => FlLine(
+                      color: AppColors.borderSlate.withValues(alpha: 0.7),
+                      strokeWidth: 1,
+                      dashArray: [5, 5],
+                    ),
+                  ),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: 25,
+                        reservedSize: 34,
+                        getTitlesWidget: (val, _) => Text(
+                          '${val.toInt()}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textMuted,
+                            fontFeatures: [FontFeature.tabularFigures()],
+                          ),
+                        ),
                       ),
                     ),
-                    SizedBox(height: 3),
-                    Text(
-                      'Nutq, kognitiv va ijtimoiy mezonlar kesimida o‘rtacha ballar',
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        color: AppColors.textMuted,
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: 1,
+                        reservedSize: 32,
+                        getTitlesWidget: (val, meta) {
+                          final idx = val.toInt();
+                          if (val != idx.toDouble()) {
+                            return const SizedBox.shrink();
+                          }
+                          if (idx >= 0 && idx < months.length) {
+                            return SideTitleWidget(
+                              meta: meta,
+                              space: 10,
+                              fitInside: SideTitleFitInsideData.fromTitleMeta(
+                                meta,
+                                distanceFromEdge: 0,
+                              ),
+                              child: Text(
+                                months[idx],
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  minX: 0,
+                  maxX: 3,
+                  minY: 0,
+                  maxY: 100,
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: const [
+                        FlSpot(0, 55),
+                        FlSpot(1, 62),
+                        FlSpot(2, 70),
+                        FlSpot(3, 78),
+                      ],
+                      isCurved: true,
+                      curveSmoothness: 0.34,
+                      color: AppColors.primary,
+                      barWidth: 3.2,
+                      isStrokeCapRound: true,
+                      dotData: FlDotData(
+                        show: true,
+                        getDotPainter: (_, _, _, _) => FlDotCirclePainter(
+                          radius: 5,
+                          color: Colors.white,
+                          strokeWidth: 2.6,
+                          strokeColor: AppColors.primary,
+                        ),
+                      ),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            AppColors.primary.withValues(alpha: 0.24),
+                            AppColors.primary.withValues(alpha: 0.0),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 10),
-              const StatusPill(
-                label: '2026 o‘quv yili',
-                color: AppColors.primary,
-                backgroundColor: AppColors.primaryLight,
-                icon: LucideIcons.sparkles,
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            height: 200,
-            child: LineChart(
-              LineChartData(
-                lineTouchData: LineTouchData(
-                  handleBuiltInTouches: true,
-                  touchTooltipData: LineTouchTooltipData(
-                    tooltipBorderRadius: BorderRadius.circular(10),
-                    getTooltipColor: (_) => AppColors.textPrimary,
-                    getTooltipItems: (touchedSpots) {
-                      return touchedSpots.map((spot) {
-                        final idx = spot.x.toInt();
-                        final month = (idx >= 0 && idx < months.length)
-                            ? months[idx]
-                            : '';
-                        return LineTooltipItem(
-                          '$month\n${spot.y.toInt()} ball',
-                          const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            height: 1.35,
-                          ),
-                        );
-                      }).toList();
-                    },
-                  ),
-                ),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  horizontalInterval: 25,
-                  getDrawingHorizontalLine: (_) => FlLine(
-                    color: AppColors.border.withValues(alpha: 0.7),
-                    strokeWidth: 1,
-                    dashArray: [4, 4],
-                  ),
-                ),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      interval: 25,
-                      reservedSize: 34,
-                      getTitlesWidget: (val, _) => Text(
-                        '${val.toInt()}',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textMuted,
-                          fontFeatures: [FontFeature.tabularFigures()],
-                        ),
-                      ),
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      interval: 1,
-                      reservedSize: 30,
-                      getTitlesWidget: (val, _) {
-                        final idx = val.toInt();
-                        if (val != idx.toDouble()) {
-                          return const SizedBox.shrink();
-                        }
-                        if (idx >= 0 && idx < months.length) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: Text(
-                              months[idx],
-                              style: const TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                ),
-                borderData: FlBorderData(show: false),
-                minX: 0,
-                maxX: 3,
-                minY: 0,
-                maxY: 100,
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: const [
-                      FlSpot(0, 55),
-                      FlSpot(1, 62),
-                      FlSpot(2, 70),
-                      FlSpot(3, 78),
-                    ],
-                    isCurved: true,
-                    curveSmoothness: 0.32,
-                    color: AppColors.primary,
-                    barWidth: 3,
-                    isStrokeCapRound: true,
-                    dotData: FlDotData(
-                      show: true,
-                      getDotPainter: (_, _, _, _) => FlDotCirclePainter(
-                        radius: 4.5,
-                        color: Colors.white,
-                        strokeWidth: 2.5,
-                        strokeColor: AppColors.primary,
-                      ),
-                    ),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          AppColors.primary.withValues(alpha: 0.22),
-                          AppColors.primary.withValues(alpha: 0.0),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           ),
@@ -568,44 +602,51 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildRecentAssessmentsCard(BuildContext context, List assessments) {
     return SurfaceCard(
-      borderRadius: 18,
-      padding: const EdgeInsets.all(18),
+      borderRadius: 26,
+      padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'So‘nggi baholashlar',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
+              const Icon(
+                LucideIcons.clipboardCheck,
+                size: 19,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 9),
+              const Expanded(
+                child: Text(
+                  'So‘nggi baholashlar',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.25,
+                  ),
                 ),
               ),
               if (onNavigateTab != null)
                 InkWell(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(999),
                   onTap: () => onNavigateTab!(2),
                   child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           'Barchasi',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                           ),
                         ),
-                        SizedBox(width: 3),
+                        SizedBox(width: 4),
                         Icon(
                           LucideIcons.arrowRight,
-                          size: 13,
+                          size: 13.5,
                           color: AppColors.primary,
                         ),
                       ],
@@ -614,7 +655,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (assessments.isEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
@@ -626,12 +667,15 @@ class DashboardScreen extends StatelessWidget {
           else
             ...assessments.take(3).map((a) {
               return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.only(bottom: 11),
                 child: SurfaceCard(
                   elevated: false,
-                  borderRadius: 12,
-                  padding: const EdgeInsets.all(11),
-                  backgroundColor: AppColors.background,
+                  borderRadius: 18,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 13,
+                  ),
+                  backgroundColor: AppColors.glassWellFill,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -643,21 +687,12 @@ class DashboardScreen extends StatelessWidget {
                   },
                   child: Row(
                     children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.hairlineBorder),
-                        ),
-                        child: const Icon(
-                          LucideIcons.clipboardCheck,
-                          color: AppColors.primary,
-                          size: 17,
-                        ),
+                      const Icon(
+                        LucideIcons.fileCheck2,
+                        color: AppColors.primary,
+                        size: 19,
                       ),
-                      const SizedBox(width: 11),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -668,7 +703,7 @@ class DashboardScreen extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 13,
+                                fontSize: 13.5,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -678,7 +713,7 @@ class DashboardScreen extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 12,
                                 color: AppColors.textMuted,
                               ),
                             ),
@@ -690,7 +725,7 @@ class DashboardScreen extends StatelessWidget {
                         label:
                             '${a.totalScore.toInt()}/${a.maxScore.toInt()}',
                         color: AppColors.success,
-                        backgroundColor: AppColors.successBg,
+                        backgroundColor: Colors.white.withValues(alpha: 0.85),
                       ),
                     ],
                   ),
@@ -704,44 +739,51 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildUpcomingSessionsCard(BuildContext context, List sessions) {
     return SurfaceCard(
-      borderRadius: 18,
-      padding: const EdgeInsets.all(18),
+      borderRadius: 26,
+      padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Kutilayotgan mashg‘ulotlar',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
+              const Icon(
+                LucideIcons.calendarDays,
+                size: 19,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 9),
+              const Expanded(
+                child: Text(
+                  'Kutilayotgan mashg‘ulotlar',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.25,
+                  ),
                 ),
               ),
               if (onNavigateTab != null)
                 InkWell(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(999),
                   onTap: () => onNavigateTab!(3),
                   child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           'Jadval',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                           ),
                         ),
-                        SizedBox(width: 3),
+                        SizedBox(width: 4),
                         Icon(
                           LucideIcons.arrowRight,
-                          size: 13,
+                          size: 13.5,
                           color: AppColors.primary,
                         ),
                       ],
@@ -750,7 +792,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (sessions.isEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
@@ -765,12 +807,15 @@ class DashboardScreen extends StatelessWidget {
               final accent = isDone ? AppColors.success : AppColors.info;
 
               return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.only(bottom: 11),
                 child: SurfaceCard(
                   elevated: false,
-                  borderRadius: 12,
-                  padding: const EdgeInsets.all(11),
-                  backgroundColor: AppColors.background,
+                  borderRadius: 18,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 13,
+                  ),
+                  backgroundColor: AppColors.glassWellFill,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -782,21 +827,12 @@ class DashboardScreen extends StatelessWidget {
                   },
                   child: Row(
                     children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.hairlineBorder),
-                        ),
-                        child: Icon(
-                          isDone ? LucideIcons.circleCheck : LucideIcons.clock,
-                          color: accent,
-                          size: 17,
-                        ),
+                      Icon(
+                        isDone ? LucideIcons.circleCheck : LucideIcons.clock,
+                        color: accent,
+                        size: 19,
                       ),
-                      const SizedBox(width: 11),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -807,7 +843,7 @@ class DashboardScreen extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 13,
+                                fontSize: 13.5,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -817,7 +853,7 @@ class DashboardScreen extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 12,
                                 color: AppColors.textMuted,
                               ),
                             ),
@@ -828,6 +864,7 @@ class DashboardScreen extends StatelessWidget {
                       StatusPill(
                         label: s.status,
                         color: accent,
+                        backgroundColor: Colors.white.withValues(alpha: 0.85),
                         showDot: true,
                       ),
                     ],
@@ -919,7 +956,7 @@ class DashboardScreen extends StatelessWidget {
           {
             'title': 'Defektologik test',
             'desc': 'Sensomotorik va kognitiv qobiliyatlarni baholash',
-            'icon': LucideIcons.sparkles,
+            'icon': LucideIcons.puzzle,
             'color': AppColors.primary,
             'screen': const NewAssessmentScreen(),
           },
@@ -1013,24 +1050,20 @@ class DashboardScreen extends StatelessWidget {
     }
 
     return SurfaceCard(
-      borderRadius: 20,
-      padding: const EdgeInsets.all(20),
+      borderRadius: 28,
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(11),
-                ),
-                child: const Icon(
+              const Padding(
+                padding: EdgeInsets.only(top: 2),
+                child: Icon(
                   LucideIcons.compass,
                   color: AppColors.primary,
-                  size: 19,
+                  size: 22,
                 ),
               ),
               const SizedBox(width: 12),
@@ -1041,18 +1074,19 @@ class DashboardScreen extends StatelessWidget {
                     Text(
                       sectionTitle,
                       style: const TextStyle(
-                        fontSize: 15.5,
+                        fontSize: 16.5,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
-                        letterSpacing: -0.25,
+                        letterSpacing: -0.3,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
                       sectionSubtitle,
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 12.5,
                         color: AppColors.textMuted,
+                        height: 1.35,
                       ),
                     ),
                   ],
@@ -1060,36 +1094,14 @@ class DashboardScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isWide = constraints.maxWidth >= 740;
-              if (isWide) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: List.generate(actions.length, (i) {
-                    return Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          right: i < actions.length - 1 ? 12 : 0,
-                        ),
-                        child: _buildActionTile(context, actions[i]),
-                      ),
-                    );
-                  }),
-                );
-              }
-              return Column(
-                children: List.generate(actions.length, (i) {
-                  return Padding(
-                    padding: EdgeInsets.only(
-                      bottom: i < actions.length - 1 ? 10 : 0,
-                    ),
-                    child: _buildActionTile(context, actions[i]),
-                  );
-                }),
-              );
-            },
+          const SizedBox(height: 18),
+          ResponsiveGlassGrid(
+            mobileColumns: 1,
+            tabletColumns: 1,
+            desktopColumns: 3,
+            spacing: 14,
+            children:
+                actions.map((act) => _buildActionTile(context, act)).toList(),
           ),
         ],
       ),
@@ -1102,9 +1114,9 @@ class DashboardScreen extends StatelessWidget {
 
     return SurfaceCard(
       elevated: false,
-      borderRadius: 14,
-      padding: const EdgeInsets.all(14),
-      backgroundColor: AppColors.background,
+      borderRadius: 20,
+      padding: const EdgeInsets.all(18),
+      backgroundColor: AppColors.glassWellFill,
       onTap: () {
         if (tabIdx != null && onNavigateTab != null) {
           onNavigateTab!(tabIdx);
@@ -1116,22 +1128,17 @@ class DashboardScreen extends StatelessWidget {
         }
       },
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(11),
-              border: Border.all(color: accent.withValues(alpha: 0.2)),
-            ),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
             child: Icon(
               act['icon'] as IconData,
               color: accent,
-              size: 20,
+              size: 22,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 13),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1139,30 +1146,33 @@ class DashboardScreen extends StatelessWidget {
                 Text(
                   act['title'] as String,
                   style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 Text(
                   act['desc'] as String,
-                  maxLines: 2,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 12,
                     color: AppColors.textMuted,
-                    height: 1.3,
+                    height: 1.35,
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 6),
-          const Icon(
-            LucideIcons.chevronRight,
-            size: 16,
-            color: AppColors.textSubtle,
+          const Padding(
+            padding: EdgeInsets.only(top: 2),
+            child: Icon(
+              LucideIcons.chevronRight,
+              size: 16,
+              color: AppColors.textSubtle,
+            ),
           ),
         ],
       ),
@@ -1175,43 +1185,37 @@ class DashboardScreen extends StatelessWidget {
     required String subtitle,
     required IconData icon,
     required Color color,
-    required Color bgColor,
     required VoidCallback onTap,
   }) {
     return SurfaceCard(
-      borderRadius: 18,
-      padding: const EdgeInsets.all(15),
+      borderRadius: 26,
+      padding: const EdgeInsets.all(20),
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Text(
                   title,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textSecondary,
+                    height: 1.25,
                   ),
                 ),
               ),
-              const SizedBox(width: 6),
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(9),
-                ),
-                child: Icon(icon, color: color, size: 16),
-              ),
+              const SizedBox(width: 8),
+              Icon(icon, color: color, size: 21),
             ],
           ),
+          const SizedBox(height: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1220,20 +1224,20 @@ class DashboardScreen extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 23,
+                  fontSize: 26,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
-                  letterSpacing: -0.6,
+                  letterSpacing: -0.7,
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 3),
               Text(
                 subtitle,
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 11,
+                  fontSize: 11.5,
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w500,
                 ),

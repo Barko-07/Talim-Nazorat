@@ -18,372 +18,420 @@ class SettingsScreen extends StatelessWidget {
     final canPop = Navigator.canPop(context);
     final region = user?.region ?? 'Namangan viloyati';
     final district = user?.district ?? 'Chortoq tumani';
+    final roleColor = user?.role.color ?? AppColors.primary;
+    final roleIcon = user != null
+        ? premiumRoleIcon(user.role)
+        : LucideIcons.shieldCheck;
+
+    final scrollBody = SingleChildScrollView(
+      child: ResponsivePageContainer(
+        maxWidth: 960,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AdaptivePageHeader(
+              icon: LucideIcons.settings,
+              title: 'Tizim va profil sozlamalari',
+              subtitle:
+                  'Foydalanuvchi profili, kasbiy javobgarlik doirasi va xavfsizlik konfiguratsiyasi',
+              action: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.error,
+                  side: const BorderSide(color: Colors.white, width: 1.4),
+                  backgroundColor: AppColors.errorBg,
+                ),
+                icon: const Icon(LucideIcons.logOut, size: 15),
+                label: const Text('Tizimdan chiqish'),
+                onPressed: () async {
+                  await auth.logout();
+                  if (context.mounted) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (_) => const LoginScreen(),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 22),
+
+            // 1. Joriy Foydalanuvchi Profili (Cut-Out Frosted Hero Card)
+            GlassSurface(
+              borderRadius: 28,
+              blur: 22,
+              opacity: 0.76,
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [AppColors.primary, AppColors.primaryDark],
+                      ),
+                      border: Border.all(color: Colors.white, width: 2),
+                      boxShadow: AppColors.primaryGlow,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      (user?.fullName ?? 'U').substring(0, 1),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 23,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 18),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user?.fullName ?? 'Mutaxassis',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 18,
+                            color: AppColors.textPrimary,
+                            letterSpacing: -0.35,
+                          ),
+                        ),
+                        const SizedBox(height: 7),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            StatusPill(
+                              label: user?.role.label ?? 'Mutaxassis',
+                              color: AppColors.primary,
+                              backgroundColor: AppColors.primaryLight,
+                              showDot: true,
+                            ),
+                            const StatusPill(
+                              label: 'Faol hisob',
+                              color: AppColors.success,
+                              backgroundColor: AppColors.successBg,
+                              icon: LucideIcons.shieldCheck,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 9),
+                        Wrap(
+                          spacing: 14,
+                          runSpacing: 5,
+                          children: [
+                            if (user?.email != null && user!.email.isNotEmpty)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    LucideIcons.mail,
+                                    size: 13.5,
+                                    color: AppColors.textMuted,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Flexible(
+                                    child: Text(
+                                      user.email,
+                                      style: const TextStyle(
+                                        fontSize: 12.5,
+                                        color: AppColors.textMuted,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  LucideIcons.phone,
+                                  size: 13.5,
+                                  color: AppColors.textMuted,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  user?.phone ?? '+998 90 000-00-00',
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: AppColors.textMuted,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+
+            // 2. Biriktirilgan kasbiy profil va shaxsiy javobgarlik
+            SurfaceCard(
+              borderRadius: 28,
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Icon(
+                          roleIcon,
+                          color: roleColor,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  user?.role.label ?? 'Mutaxassis',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const StatusPill(
+                                  label: 'Soha qulflangan',
+                                  color: AppColors.success,
+                                  backgroundColor: AppColors.successBg,
+                                  icon: LucideIcons.lock,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              user?.role.professionTitle ?? '',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: roleColor,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  GlassWell(
+                    borderRadius: 18,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(
+                              LucideIcons.info,
+                              size: 16,
+                              color: AppColors.primary,
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Mutaxassislik huquqi va doirasi',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 13,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          user?.role.domainDescription ?? '',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                            height: 1.45,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 1),
+                        child: Icon(
+                          LucideIcons.shield,
+                          size: 15,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Shaxsiy javobgarlik talabiga binoan, profil ichidan mutaxassislik sohasini o‘zgartirib bo‘lmaydi. Boshqa kasbiy profil bilan kirish uchun joriy tizimdan chiqish lozim.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textMuted,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+
+            // 3. Ta'lim muassasasi (Dinamik haqiqiy hudud ma'lumotlari bilan)
+            SurfaceCard(
+              borderRadius: 28,
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(
+                        LucideIcons.school,
+                        color: AppColors.primary,
+                        size: 22,
+                      ),
+                      SizedBox(width: 11),
+                      Expanded(
+                        child: Text(
+                          'Ta’lim muassasasi',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  GlassWell(
+                    borderRadius: 18,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
+                    child: Column(
+                      children: [
+                        _buildSettingRow(
+                          'Muassasa nomi',
+                          user?.institutionName ??
+                              '9-sonli inklyuziv ta’lim tayanch maktabi',
+                        ),
+                        _buildSettingRow('Hudud', '$region, $district'),
+                        _buildSettingRow(
+                          'Bo‘lim',
+                          'Alohida ta’lim ehtiyojlari bo‘lgan bolalar korreksion sektori',
+                          isLast: true,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+
+            // 4. Ma'lumotlar bazasi va xavfsizlik
+            SurfaceCard(
+              borderRadius: 28,
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(
+                        LucideIcons.database,
+                        color: AppColors.info,
+                        size: 22,
+                      ),
+                      SizedBox(width: 11),
+                      Expanded(
+                        child: Text(
+                          'Ma’lumotlar bazasi va xavfsizlik',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  GlassWell(
+                    borderRadius: 18,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
+                    child: Column(
+                      children: [
+                        _buildSettingRow(
+                          'Baza arxitekturasi',
+                          'Mahalliy mustaqil ma’lumotlar bazasi (Offline-first Local DB)',
+                        ),
+                        _buildSettingRow(
+                          'Tashqi bog‘liqlik',
+                          'O‘chirilgan (Zero External Cloud Dependency)',
+                        ),
+                        _buildSettingRow(
+                          'Xotirada saqlash',
+                          'SharedPreferences doimiy xotirasi + tezkor indeksatsiya',
+                        ),
+                        _buildSettingRow(
+                          'Xavfsizlik standarti',
+                          'O‘zR O‘RQ-547 «Shaxsga doir ma’lumotlar to‘g‘risida»gi qonuniga muvofiq',
+                        ),
+                        _buildSettingRow(
+                          'Audit jurnali',
+                          'Barcha amallar vaqt tamg‘asi bilan o‘zgarmas tarzda qayd etiladi',
+                          isLast: true,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
     return Scaffold(
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
       appBar: canPop ? AppBar(title: const Text('Sozlamalar')) : null,
-      body: SingleChildScrollView(
-        child: ResponsivePageContainer(
-          maxWidth: 960,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AdaptivePageHeader(
-                icon: LucideIcons.settings,
-                title: 'Tizim va profil sozlamalari',
-                subtitle:
-                    'Foydalanuvchi profili, kasbiy javobgarlik doirasi va xavfsizlik konfiguratsiyasi',
-                action: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: const BorderSide(color: AppColors.errorBorder),
-                    backgroundColor: AppColors.errorBg,
-                  ),
-                  icon: const Icon(LucideIcons.logOut, size: 15),
-                  label: const Text('Tizimdan chiqish'),
-                  onPressed: () async {
-                    await auth.logout();
-                    if (context.mounted) {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (_) => const LoginScreen(),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // 1. Joriy Foydalanuvchi Profili (Frosted Hero Card)
-              GlassSurface(
-                borderRadius: 20,
-                blur: 18,
-                opacity: 0.86,
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [AppColors.primary, AppColors.primaryDark],
-                        ),
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: AppColors.primaryGlow,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        (user?.fullName ?? 'U').substring(0, 1),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 24,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user?.fullName ?? 'Mutaxassis',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 17,
-                              color: AppColors.textPrimary,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 6,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              StatusPill(
-                                label: user?.role.label ?? 'Mutaxassis',
-                                color: AppColors.primary,
-                                backgroundColor: AppColors.primaryLight,
-                                showDot: true,
-                              ),
-                              StatusPill(
-                                label: 'Faol hisob',
-                                color: AppColors.success,
-                                backgroundColor: AppColors.successBg,
-                                icon: LucideIcons.shieldCheck,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            '${user?.email ?? ''} • ${user?.phone ?? '+998 90 000-00-00'}',
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 2. Biriktirilgan kasbiy profil va shaxsiy javobgarlik
-              SurfaceCard(
-                borderRadius: 20,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: (user?.role.color ?? AppColors.primary)
-                                .withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            user?.role.icon ?? Icons.verified_user_rounded,
-                            color: user?.role.color ?? AppColors.primary,
-                            size: 21,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 6,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: [
-                                  Text(
-                                    user?.role.label ?? 'Mutaxassis',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 15.5,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  const StatusPill(
-                                    label: 'Soha qulflangan',
-                                    color: AppColors.success,
-                                    backgroundColor: AppColors.successBg,
-                                    icon: LucideIcons.lock,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                user?.role.professionTitle ?? '',
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                  color:
-                                      user?.role.color ?? AppColors.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.hairlineBorder),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(
-                                LucideIcons.info,
-                                size: 15,
-                                color: AppColors.primary,
-                              ),
-                              SizedBox(width: 6),
-                              Text(
-                                'Mutaxassislik huquqi va doirasi',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 12.5,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            user?.role.domainDescription ?? '',
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.textSecondary,
-                              height: 1.45,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    const Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 1),
-                          child: Icon(
-                            LucideIcons.shield,
-                            size: 14,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Shaxsiy javobgarlik talabiga binoan, profil ichidan mutaxassislik sohasini o‘zgartirib bo‘lmaydi. Boshqa kasbiy profil bilan kirish uchun joriy tizimdan chiqish lozim.',
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              color: AppColors.textMuted,
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 3. Ta'lim muassasasi (Dinamik haqiqiy hudud ma'lumotlari bilan)
-              SurfaceCard(
-                borderRadius: 20,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(
-                            LucideIcons.school,
-                            color: AppColors.primary,
-                            size: 18,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          'Ta’lim muassasasi',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15.5,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    _buildSettingRow(
-                      'Muassasa nomi',
-                      user?.institutionName ??
-                          '9-sonli inklyuziv ta’lim tayanch maktabi',
-                    ),
-                    _buildSettingRow('Hudud', '$region, $district'),
-                    _buildSettingRow(
-                      'Bo‘lim',
-                      'Alohida ta’lim ehtiyojlari bo‘lgan bolalar korreksion sektori',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 4. Ma'lumotlar bazasi va xavfsizlik
-              SurfaceCard(
-                borderRadius: 20,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: AppColors.infoBg,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(
-                            LucideIcons.database,
-                            color: AppColors.info,
-                            size: 18,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Expanded(
-                          child: Text(
-                            'Ma’lumotlar bazasi va xavfsizlik',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 15.5,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    _buildSettingRow(
-                      'Baza arxitekturasi',
-                      'Mahalliy mustaqil ma’lumotlar bazasi (Offline-first Local DB)',
-                    ),
-                    _buildSettingRow(
-                      'Tashqi bog‘liqlik',
-                      'O‘chirilgan (Zero External Cloud Dependency)',
-                    ),
-                    _buildSettingRow(
-                      'Xotirada saqlash',
-                      'SharedPreferences doimiy xotirasi + tezkor indeksatsiya',
-                    ),
-                    _buildSettingRow(
-                      'Xavfsizlik standarti',
-                      'O‘zR O‘RQ-547 «Shaxsga doir ma’lumotlar to‘g‘risida»gi qonuniga muvofiq',
-                    ),
-                    _buildSettingRow(
-                      'Audit jurnali',
-                      'Barcha amallar vaqt tamg‘asi bilan o‘zgarmas tarzda qayd etiladi',
-                      isLast: true,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      body: canPop ? AmbientMeshBackground(child: scrollBody) : scrollBody,
     );
   }
 
@@ -396,12 +444,15 @@ class SettingsScreen extends StatelessWidget {
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 460;
         return Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             border: isLast
                 ? null
-                : const Border(
-                    bottom: BorderSide(color: AppColors.hairlineBorder),
+                : Border(
+                    bottom: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      width: 1.1,
+                    ),
                   ),
           ),
           child: isCompact
@@ -411,18 +462,19 @@ class SettingsScreen extends StatelessWidget {
                     Text(
                       label,
                       style: const TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textMuted,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 4),
                     Text(
                       value,
                       style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
+                        height: 1.35,
                       ),
                     ),
                   ],
@@ -431,12 +483,12 @@ class SettingsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: 170,
+                      width: 175,
                       child: Text(
                         label,
                         style: const TextStyle(
                           fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           color: AppColors.textMuted,
                         ),
                       ),
@@ -446,8 +498,9 @@ class SettingsScreen extends StatelessWidget {
                         value,
                         style: const TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
+                          height: 1.35,
                         ),
                       ),
                     ),

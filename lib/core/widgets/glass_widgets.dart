@@ -1,10 +1,37 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../models/user_model.dart';
 import '../constants/app_colors.dart';
 
-/// Sokin va minimalistik orqa fon nuri (Frosted Glass qatlamlari jonli ko'rinishi uchun)
+/// Rollar uchun premium minimalistik vektor ikonkalar (eski Material Icons o'rniga, models/ ni o'zgartirmasdan)
+IconData premiumRoleIcon(UserRole role) {
+  switch (role) {
+    case UserRole.superAdmin:
+      return LucideIcons.shieldCheck;
+    case UserRole.institutionAdmin:
+      return LucideIcons.landmark;
+    case UserRole.coordinator:
+      return LucideIcons.sparkles;
+    case UserRole.psychologist:
+      return LucideIcons.brain;
+    case UserRole.speechTherapist:
+      return LucideIcons.mic;
+    case UserRole.specialEducation:
+      return LucideIcons.puzzle;
+    case UserRole.teacher:
+      return LucideIcons.bookOpen;
+    case UserRole.reviewer:
+      return LucideIcons.eye;
+    case UserRole.parent:
+      return LucideIcons.heartHandshake;
+  }
+}
+
+/// Apple visionOS / iOS 26 uslubidagi mayin atmosferik fon — ustidagi yarim shaffof oq qutilar
+/// va oppoq borderlar orqa fondan "kesib olingandek" (cut-out frosted glass) ajralib ko'rinadi.
 class AmbientMeshBackground extends StatelessWidget {
   final Widget child;
   final bool intense;
@@ -17,20 +44,33 @@ class AmbientMeshBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final topAlpha = intense ? 0.085 : 0.045;
-    final bottomAlpha = intense ? 0.065 : 0.035;
+    final topAlpha = intense ? 0.22 : 0.15;
+    final midAlpha = intense ? 0.16 : 0.11;
+    final bottomAlpha = intense ? 0.18 : 0.13;
 
     return Stack(
       fit: StackFit.expand,
       children: [
-        const ColoredBox(color: AppColors.background),
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFEAF0FA),
+                Color(0xFFE3ECF8),
+                Color(0xFFE9EFF9),
+              ],
+            ),
+          ),
+        ),
         Positioned(
-          top: -140,
-          right: -100,
+          top: -160,
+          right: -110,
           child: IgnorePointer(
             child: Container(
-              width: 440,
-              height: 440,
+              width: 520,
+              height: 520,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
@@ -44,12 +84,31 @@ class AmbientMeshBackground extends StatelessWidget {
           ),
         ),
         Positioned(
-          bottom: -160,
-          left: -120,
+          top: 220,
+          left: -160,
           child: IgnorePointer(
             child: Container(
               width: 480,
               height: 480,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF6366F1).withValues(alpha: midAlpha),
+                    const Color(0xFF6366F1).withValues(alpha: 0.0),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: -180,
+          right: 60,
+          child: IgnorePointer(
+            child: Container(
+              width: 540,
+              height: 540,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
@@ -68,7 +127,7 @@ class AmbientMeshBackground extends StatelessWidget {
   }
 }
 
-/// Haqiqiy Apple/Linear uslubidagi Frosted Glass konteyneri
+/// Haqiqiy Apple Liquid Glass / Frosted Cut-Out konteyneri (yumaloq radius + sof oq shisha border)
 class GlassSurface extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -86,9 +145,9 @@ class GlassSurface extends StatelessWidget {
     required this.child,
     this.padding,
     this.margin,
-    this.borderRadius = 18,
-    this.blur = 18,
-    this.opacity = 0.78,
+    this.borderRadius = 28,
+    this.blur = 22,
+    this.opacity = 0.72,
     this.tintColor,
     this.borderColor,
     this.boxShadow,
@@ -108,13 +167,13 @@ class GlassSurface extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            baseColor.withValues(alpha: (opacity + 0.08).clamp(0.0, 1.0)),
-            baseColor.withValues(alpha: (opacity - 0.04).clamp(0.0, 1.0)),
+            baseColor.withValues(alpha: (opacity + 0.12).clamp(0.0, 1.0)),
+            baseColor.withValues(alpha: (opacity - 0.08).clamp(0.0, 1.0)),
           ],
         ),
         border: Border.all(
-          color: borderColor ?? AppColors.hairlineBorder,
-          width: 1,
+          color: borderColor ?? AppColors.glassWhiteBorder,
+          width: 1.45,
         ),
       ),
       child: child,
@@ -141,7 +200,8 @@ class GlassSurface extends StatelessWidget {
   }
 }
 
-/// Bosilganda va sichqoncha borganda mayin taktil javob qaytaruvchi karta (0.985 scale, 140ms easeOutCubic)
+/// Apple uslubidagi "kesib olingandek" (cut-out frosted glass) asosiy karta:
+/// 26px yumaloq radius, yarim shaffof sutdek oq gradient va 1.45px yorqin oq border.
 class SurfaceCard extends StatefulWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -155,9 +215,9 @@ class SurfaceCard extends StatefulWidget {
   const SurfaceCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(16),
+    this.padding = const EdgeInsets.all(22),
     this.margin,
-    this.borderRadius = 16,
+    this.borderRadius = 26,
     this.onTap,
     this.backgroundColor,
     this.borderColor,
@@ -179,17 +239,36 @@ class _SurfaceCardState extends State<SurfaceCard> {
 
     final effectiveBorderColor = widget.borderColor ??
         (_hovered && interactive
-            ? AppColors.primary.withValues(alpha: 0.28)
-            : AppColors.hairlineBorder);
+            ? Colors.white
+            : AppColors.glassWhiteBorder);
+
+    final bgColor = widget.backgroundColor;
 
     Widget cardBody = AnimatedContainer(
-      duration: const Duration(milliseconds: 160),
+      duration: const Duration(milliseconds: 170),
       curve: Curves.easeOutCubic,
       margin: widget.margin,
       decoration: BoxDecoration(
-        color: widget.backgroundColor ?? AppColors.glassFillStrong,
+        color: bgColor,
+        gradient: bgColor == null
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(
+                    alpha: _hovered && interactive ? 0.88 : 0.78,
+                  ),
+                  Colors.white.withValues(
+                    alpha: _hovered && interactive ? 0.70 : 0.58,
+                  ),
+                ],
+              )
+            : null,
         borderRadius: radius,
-        border: Border.all(color: effectiveBorderColor, width: 1),
+        border: Border.all(
+          color: effectiveBorderColor,
+          width: _hovered && interactive ? 1.7 : 1.45,
+        ),
         boxShadow: widget.elevated
             ? (_hovered && interactive
                 ? AppColors.elevatedShadow
@@ -203,7 +282,7 @@ class _SurfaceCardState extends State<SurfaceCard> {
           onTap: widget.onTap,
           borderRadius: radius,
           splashColor: AppColors.primary.withValues(alpha: 0.05),
-          highlightColor: AppColors.primary.withValues(alpha: 0.03),
+          highlightColor: Colors.white.withValues(alpha: 0.18),
           onHighlightChanged: interactive
               ? (value) => setState(() => _pressed = value)
               : null,
@@ -221,8 +300,8 @@ class _SurfaceCardState extends State<SurfaceCard> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedScale(
-        scale: _pressed ? 0.986 : 1.0,
-        duration: const Duration(milliseconds: 130),
+        scale: _pressed ? 0.975 : 1.0,
+        duration: const Duration(milliseconds: 140),
         curve: Curves.easeOutCubic,
         child: cardBody,
       ),
@@ -230,7 +309,125 @@ class _SurfaceCardState extends State<SurfaceCard> {
   }
 }
 
-/// Keng monitorlarda kontentni o'rtaga tekislab, iPhone'da ideal hoshiya beruvchi konteyner
+/// Karta ichidagi konsentrik (outer 26 -> inner 18) o'yilgan shisha blok (Glass Well)
+class GlassWell extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry? margin;
+  final double borderRadius;
+  final Color? tintColor;
+  final Color? borderColor;
+
+  const GlassWell({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(16),
+    this.margin,
+    this.borderRadius = 18,
+    this.tintColor,
+    this.borderColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: margin,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: tintColor ?? AppColors.glassWellFill,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(
+          color: borderColor ?? AppColors.glassInnerBorder,
+          width: 1.2,
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
+/// Qat'iy balandliksiz (0% vertical text overflow!) moslashuvchan grid:
+/// Mobil, planshet va desktop ustunlar soniga qarab bir qatordagi kartalarni teng balandlikda joylaydi.
+class ResponsiveGlassGrid extends StatelessWidget {
+  final List<Widget> children;
+  final int mobileColumns;
+  final int tabletColumns;
+  final int desktopColumns;
+  final double spacing;
+
+  const ResponsiveGlassGrid({
+    super.key,
+    required this.children,
+    this.mobileColumns = 1,
+    this.tabletColumns = 2,
+    this.desktopColumns = 4,
+    this.spacing = 16,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (children.isEmpty) return const SizedBox.shrink();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final w = constraints.maxWidth;
+        final cols = w >= 960
+            ? desktopColumns
+            : w >= 540
+                ? tabletColumns
+                : mobileColumns;
+
+        if (cols <= 1) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (int i = 0; i < children.length; i++) ...[
+                if (i > 0) SizedBox(height: spacing),
+                children[i],
+              ],
+            ],
+          );
+        }
+
+        final rows = <Widget>[];
+        for (int i = 0; i < children.length; i += cols) {
+          final end = (i + cols < children.length) ? i + cols : children.length;
+          final slice = children.sublist(i, end);
+          final remaining = cols - slice.length;
+
+          if (rows.isNotEmpty) {
+            rows.add(SizedBox(height: spacing));
+          }
+
+          rows.add(
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (int j = 0; j < slice.length; j++) ...[
+                    if (j > 0) SizedBox(width: spacing),
+                    Expanded(child: slice[j]),
+                  ],
+                  for (int k = 0; k < remaining; k++) ...[
+                    SizedBox(width: spacing),
+                    const Expanded(child: SizedBox.shrink()),
+                  ],
+                ],
+              ),
+            ),
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: rows,
+        );
+      },
+    );
+  }
+}
+
+/// Keng monitorlarda kontentni o'rtaga tekislab, iPhone'da nafas oladigan hoshiya beruvchi konteyner
 class ResponsivePageContainer extends StatelessWidget {
   final Widget child;
   final double maxWidth;
@@ -239,7 +436,7 @@ class ResponsivePageContainer extends StatelessWidget {
   const ResponsivePageContainer({
     super.key,
     required this.child,
-    this.maxWidth = 1240,
+    this.maxWidth = 1260,
     this.padding,
   });
 
@@ -247,11 +444,11 @@ class ResponsivePageContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final horizontal = width < 600
-        ? 16.0
+        ? 18.0
         : width < 1024
-            ? 22.0
-            : 28.0;
-    final vertical = width < 600 ? 16.0 : 22.0;
+            ? 26.0
+            : 34.0;
+    final vertical = width < 600 ? 18.0 : 28.0;
 
     return Align(
       alignment: Alignment.topCenter,
@@ -263,7 +460,7 @@ class ResponsivePageContainer extends StatelessWidget {
                 horizontal,
                 vertical,
                 horizontal,
-                width < 860 ? 24.0 : vertical,
+                width < 860 ? 32.0 : vertical,
               ),
           child: child,
         ),
@@ -272,7 +469,8 @@ class ResponsivePageContainer extends StatelessWidget {
   }
 }
 
-/// Barcha ekranlar uchun mobil/desktop moslashuvchan sahifa sarlavhasi (0% RenderFlex overflow)
+/// Barcha ekranlar uchun mobil/desktop moslashuvchan sahifa sarlavhasi
+/// (Ikonka hech qanday qutisiz erkin/free turadi va 0% RenderFlex overflow!)
 class AdaptivePageHeader extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -291,52 +489,45 @@ class AdaptivePageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isCompact = constraints.maxWidth < 560;
+        final isCompact = constraints.maxWidth < 580;
 
-        final titleBlock = Row(
+        final titleBlock = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            if (icon != null) ...[
-              Container(
-                width: 40,
-                height: 40,
-                margin: const EdgeInsets.only(right: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.14),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (icon != null) ...[
+                  Icon(
+                    icon,
+                    size: isCompact ? 22 : 25,
+                    color: AppColors.primary,
                   ),
-                ),
-                child: Icon(icon, size: 20, color: AppColors.primary),
-              ),
-            ],
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
+                  const SizedBox(width: 11),
+                ],
+                Expanded(
+                  child: Text(
                     title,
                     style: TextStyle(
-                      fontSize: isCompact ? 18 : 21,
+                      fontSize: isCompact ? 20 : 24,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
-                      letterSpacing: -0.4,
+                      letterSpacing: -0.5,
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 12.5,
-                      color: AppColors.textMuted,
-                      fontWeight: FontWeight.w500,
-                      height: 1.35,
-                    ),
-                  ),
-                ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
               ),
             ),
           ],
@@ -349,10 +540,11 @@ class AdaptivePageHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               titleBlock,
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: action!,
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [action!],
               ),
             ],
           );
@@ -362,8 +554,8 @@ class AdaptivePageHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(child: titleBlock),
-            const SizedBox(width: 16),
-            action!,
+            const SizedBox(width: 20),
+            Flexible(child: action!),
           ],
         );
       },
@@ -371,7 +563,7 @@ class AdaptivePageHeader extends StatelessWidget {
   }
 }
 
-/// Skroll bo'ladigan zamonaviy pill-filtrlar qatori (iPhone va Desktop uchun)
+/// Apple Capsule (999px) uslubidagi kesib olingan shisha filtr-bar
 class ModernPillFilterBar extends StatelessWidget {
   final List<String> items;
   final String selectedItem;
@@ -392,11 +584,12 @@ class ModernPillFilterBar extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.none,
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: const Color(0xFFEAEFF7).withValues(alpha: 0.75),
-          borderRadius: BorderRadius.circular(13),
-          border: Border.all(color: AppColors.hairlineBorder),
+          color: Colors.white.withValues(alpha: 0.56),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: Colors.white, width: 1.35),
+          boxShadow: AppColors.softShadow,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -407,21 +600,25 @@ class ModernPillFilterBar extends StatelessWidget {
             return GestureDetector(
               onTap: () => onSelected(item),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 170),
+                duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOutCubic,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 13,
-                  vertical: 7,
+                  horizontal: 16,
+                  vertical: 9,
                 ),
                 decoration: BoxDecoration(
                   color: isSelected ? Colors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(9),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: isSelected ? Colors.white : Colors.transparent,
+                    width: 1,
+                  ),
                   boxShadow: isSelected
                       ? const [
                           BoxShadow(
-                            color: Color(0x120F172A),
-                            blurRadius: 6,
-                            offset: Offset(0, 2),
+                            color: Color(0x140F172A),
+                            blurRadius: 10,
+                            offset: Offset(0, 3),
                           ),
                         ]
                       : null,
@@ -434,24 +631,24 @@ class ModernPillFilterBar extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                            isSelected ? FontWeight.w700 : FontWeight.w600,
                         color: isSelected
                             ? AppColors.primary
                             : AppColors.textSecondary,
                       ),
                     ),
                     if (count != null) ...[
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 7),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1.5,
+                          horizontal: 7,
+                          vertical: 2,
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppColors.primaryLight
-                              : Colors.white.withValues(alpha: 0.7),
-                          borderRadius: BorderRadius.circular(6),
+                              : Colors.white.withValues(alpha: 0.72),
+                          borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
                           '$count',
@@ -477,7 +674,7 @@ class ModernPillFilterBar extends StatelessWidget {
   }
 }
 
-/// Yagona minimalistik holat (status) nishoni
+/// Apple Capsule holat nishoni (uzun matnlarda ham tashqariga chiqib ketmaydi)
 class StatusPill extends StatelessWidget {
   final String label;
   final Color color;
@@ -485,6 +682,7 @@ class StatusPill extends StatelessWidget {
   final Color? borderColor;
   final IconData? icon;
   final bool showDot;
+  final double maxWidth;
 
   const StatusPill({
     super.key,
@@ -494,51 +692,55 @@ class StatusPill extends StatelessWidget {
     this.borderColor,
     this.icon,
     this.showDot = false,
+    this.maxWidth = 240,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bg = backgroundColor ?? color.withValues(alpha: 0.1);
-    final border = borderColor ?? color.withValues(alpha: 0.22);
+    final bg = backgroundColor ?? color.withValues(alpha: 0.11);
+    final border = borderColor ?? Colors.white.withValues(alpha: 0.85);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4.5),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: border, width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 13, color: color),
-            const SizedBox(width: 5),
-          ] else if (showDot) ...[
-            Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5.5),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: border, width: 1.15),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 13.5, color: color),
+              const SizedBox(width: 5.5),
+            ] else if (showDot) ...[
+              Container(
+                width: 6.5,
+                height: 6.5,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                  letterSpacing: -0.1,
+                ),
               ),
             ),
-            const SizedBox(width: 6),
           ],
-          Flexible(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 11.5,
-                fontWeight: FontWeight.w700,
-                color: color,
-                letterSpacing: -0.1,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

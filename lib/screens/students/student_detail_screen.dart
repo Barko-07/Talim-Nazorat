@@ -186,7 +186,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
       builder: (ctx) => AlertDialog(
         title: const Text('Mutaxassis biriktirish'),
         content: SizedBox(
-          width: 420,
+          width: 430,
           child: availableSpecialists.isEmpty
               ? const Padding(
                   padding: EdgeInsets.all(16),
@@ -198,63 +198,70 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               : ListView.separated(
                   shrinkWrap: true,
                   itemCount: availableSpecialists.length,
-                  separatorBuilder: (_, _) =>
-                      const Divider(color: AppColors.hairlineBorder, height: 1),
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemBuilder: (c, i) {
                     final sp = availableSpecialists[i];
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 4,
+                    return GlassWell(
+                      borderRadius: 18,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
                       ),
-                      leading: Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: sp.role.color.withValues(alpha: 0.14),
-                          borderRadius: BorderRadius.circular(11),
-                        ),
-                        child: Icon(
-                          LucideIcons.userRound,
-                          color: sp.role.color,
-                          size: 18,
-                        ),
-                      ),
-                      title: Text(
-                        sp.fullName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13.5,
-                        ),
-                      ),
-                      subtitle: Text(
-                        '${sp.role.label} • ${sp.institutionName ?? ''}',
-                        style: const TextStyle(
-                          fontSize: 11.5,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(
-                          LucideIcons.userPlus,
-                          color: AppColors.primary,
-                          size: 18,
-                        ),
-                        onPressed: () async {
-                          Navigator.pop(ctx);
-                          await app.assignSpecialistToStudent(
-                            student.id,
-                            sp.id,
-                            byUser: currentUser,
-                          );
-                          messenger.showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                '${sp.fullName} ushbu o‘quvchiga biriktirildi',
-                              ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            premiumRoleIcon(sp.role),
+                            color: sp.role.color,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  sp.fullName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13.5,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                Text(
+                                  '${sp.role.label} • ${sp.institutionName ?? ''}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    color: AppColors.textMuted,
+                                  ),
+                                ),
+                              ],
                             ),
-                          );
-                        },
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              LucideIcons.userPlus,
+                              color: AppColors.primary,
+                              size: 18,
+                            ),
+                            onPressed: () async {
+                              Navigator.pop(ctx);
+                              await app.assignSpecialistToStudent(
+                                student.id,
+                                sp.id,
+                                byUser: currentUser,
+                              );
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${sp.fullName} ushbu o‘quvchiga biriktirildi',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -318,7 +325,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           style: const TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 16,
-            letterSpacing: -0.2,
+            letterSpacing: -0.25,
           ),
         ),
         actions: [
@@ -355,11 +362,11 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           controller: _tabController,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          dividerColor: AppColors.hairlineBorder,
+          dividerColor: Colors.white,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textMuted,
           indicatorColor: AppColors.primary,
-          indicatorWeight: 2.5,
+          indicatorWeight: 2.6,
           labelStyle: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 13,
@@ -399,41 +406,35 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
       child: ResponsivePageContainer(
         maxWidth: 480,
         child: SurfaceCard(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 34),
+          borderRadius: 28,
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 38),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(icon, size: 26, color: AppColors.primary),
-              ),
-              const SizedBox(height: 14),
+              Icon(icon, size: 36, color: AppColors.primary),
+              const SizedBox(height: 16),
               Text(
                 title,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 16,
                   color: AppColors.textPrimary,
                 ),
               ),
               if (subtitle != null) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   subtitle,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 13,
                     color: AppColors.textMuted,
                     height: 1.4,
                   ),
                 ),
               ],
-              if (action != null) ...[const SizedBox(height: 16), action],
+              if (action != null) ...[const SizedBox(height: 18), action],
             ],
           ),
         ),
@@ -462,21 +463,17 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     return SingleChildScrollView(
       child: ResponsivePageContainer(
-        maxWidth: 1040,
+        maxWidth: 1060,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (isArchived)
-              Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.warningBg,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppColors.warning.withValues(alpha: 0.3),
-                  ),
-                ),
+              SurfaceCard(
+                margin: const EdgeInsets.only(bottom: 18),
+                padding: const EdgeInsets.all(18),
+                borderRadius: 24,
+                backgroundColor: AppColors.warningBg,
+                borderColor: Colors.white,
                 child: Row(
                   children: [
                     const Icon(
@@ -501,7 +498,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           Text(
                             'Sababi: ${s.deactivationReason ?? 'Ko‘rsatilmagan'} • Sana: ${s.deactivatedAt != null ? df.format(s.deactivatedAt!) : 'Noma’lum'}',
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 12.5,
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -512,36 +509,16 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 ),
               ),
 
-            // Frosted Profil Hero Karta
+            // Frosted Cut-Out Profil Hero Karta
             GlassSurface(
-              padding: const EdgeInsets.all(22),
-              borderRadius: 18,
+              padding: const EdgeInsets.all(24),
+              borderRadius: 28,
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final isCompact = constraints.maxWidth < 430;
-                  final avatar = Container(
-                    width: isCompact ? 56 : 68,
-                    height: isCompact ? 56 : 68,
-                    decoration: BoxDecoration(
-                      gradient: isArchived
-                          ? null
-                          : const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppColors.primaryLight,
-                                Color(0xFFDCE7FF),
-                              ],
-                            ),
-                      color: isArchived ? AppColors.borderLight : null,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: isArchived
-                            ? AppColors.border
-                            : AppColors.primary.withValues(alpha: 0.18),
-                      ),
-                    ),
-                    alignment: Alignment.center,
+                  final avatar = CircleAvatar(
+                    radius: isCompact ? 28 : 34,
+                    backgroundColor: Colors.white.withValues(alpha: 0.92),
                     child: Text(
                       s.firstName.isNotEmpty
                           ? s.firstName.substring(0, 1)
@@ -551,7 +528,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         fontWeight: FontWeight.w800,
                         color: isArchived
                             ? AppColors.textMuted
-                            : AppColors.primaryDark,
+                            : AppColors.primary,
                       ),
                     ),
                   );
@@ -562,30 +539,30 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       Text(
                         s.fullName,
                         style: TextStyle(
-                          fontSize: isCompact ? 17 : 19,
+                          fontSize: isCompact ? 18 : 21,
                           fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
-                          letterSpacing: -0.3,
+                          letterSpacing: -0.4,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 5),
                       Text(
                         '${s.institutionName} • ${s.grade}-sinf',
                         style: const TextStyle(
-                          fontSize: 13,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textSecondary,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       Text(
                         'Tug‘ilgan kuni: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 12.5,
                           color: AppColors.textMuted,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Wrap(
                         spacing: 8,
                         runSpacing: 6,
@@ -595,12 +572,16 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             color: isArchived
                                 ? AppColors.warning
                                 : AppColors.success,
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.86),
                             showDot: true,
                           ),
                           if (s.coordinatorName != null)
                             StatusPill(
                               label: 'Koordinator: ${s.coordinatorName}',
                               color: AppColors.info,
+                              backgroundColor:
+                                  Colors.white.withValues(alpha: 0.86),
                               icon: LucideIcons.shieldCheck,
                             ),
                         ],
@@ -619,11 +600,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 },
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
-            // Ta'limiy Ehtiyoj va Daraja
+            // Ta'limiy Ehtiyoj va Daraja (Erkin ikonkalar!)
             SurfaceCard(
-              padding: const EdgeInsets.all(22),
+              borderRadius: 26,
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -631,11 +613,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     'Ta’limiy Ehtiyoj va Qo‘llab-quvvatlash Darajasi',
                     style: TextStyle(
                       fontWeight: FontWeight.w800,
-                      fontSize: 15.5,
+                      fontSize: 16,
                       color: AppColors.textPrimary,
+                      letterSpacing: -0.25,
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 18),
                   _buildDetailItem(
                     icon: LucideIcons.brain,
                     iconColor: AppColors.primary,
@@ -643,8 +626,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     value: s.primaryNeed,
                   ),
                   const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Divider(color: AppColors.hairlineBorder, height: 1),
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    child: Divider(height: 1),
                   ),
                   _buildDetailItem(
                     icon: LucideIcons.badgeCheck,
@@ -653,26 +636,21 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     value: s.supportLevel,
                   ),
                   const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Divider(color: AppColors.hairlineBorder, height: 1),
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    child: Divider(height: 1),
                   ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: AppColors.warning.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
+                      const Padding(
+                        padding: EdgeInsets.only(top: 2),
+                        child: Icon(
                           LucideIcons.stethoscope,
                           color: AppColors.warning,
-                          size: 18,
+                          size: 20,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -682,10 +660,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textMuted,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 5),
                             if (canViewMedical)
                               Text(
                                 s.medicalNotes ??
@@ -694,32 +672,26 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textPrimary,
-                                  height: 1.4,
+                                  height: 1.45,
                                 ),
                               )
                             else
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: AppColors.background,
-                                  borderRadius: BorderRadius.circular(9),
-                                  border: Border.all(
-                                    color: AppColors.hairlineBorder,
-                                  ),
-                                ),
-                                child: const Row(
+                              const GlassWell(
+                                borderRadius: 16,
+                                padding: EdgeInsets.all(12),
+                                child: Row(
                                   children: [
                                     Icon(
                                       LucideIcons.lock,
-                                      size: 15,
+                                      size: 16,
                                       color: AppColors.textMuted,
                                     ),
-                                    SizedBox(width: 8),
+                                    SizedBox(width: 10),
                                     Expanded(
                                       child: Text(
                                         'Maxfiy tibbiy ma’lumot — faqat vakolatli tibbiy va defektologik mutaxassislar uchun ochiq',
                                         style: TextStyle(
-                                          fontSize: 11.5,
+                                          fontSize: 12,
                                           color: AppColors.textMuted,
                                         ),
                                       ),
@@ -735,11 +707,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             // Biriktirilgan Mutaxassislar
             SurfaceCard(
-              padding: const EdgeInsets.all(22),
+              borderRadius: 26,
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -753,16 +726,17 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         'Mas’ul Mutaxassislar Jamoasi',
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
-                          fontSize: 15.5,
+                          fontSize: 16,
                           color: AppColors.textPrimary,
+                          letterSpacing: -0.25,
                         ),
                       ),
                       if (canManageAssignments)
                         OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
+                              horizontal: 14,
+                              vertical: 9,
                             ),
                             minimumSize: Size.zero,
                           ),
@@ -779,44 +753,32 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   if (assignedStaff.isEmpty)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 6),
                       child: Text(
                         'Ushbu o‘quvchiga hali maxsus mutaxassis biriktirilmagan',
                         style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           color: AppColors.textMuted,
                         ),
                       ),
                     )
                   else
                     ...assignedStaff.map((staff) {
-                      return Container(
+                      return GlassWell(
                         margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.hairlineBorder),
-                        ),
+                        padding: const EdgeInsets.all(15),
+                        borderRadius: 18,
                         child: Row(
                           children: [
-                            Container(
-                              width: 38,
-                              height: 38,
-                              decoration: BoxDecoration(
-                                color: staff.role.color.withValues(alpha: 0.14),
-                                borderRadius: BorderRadius.circular(11),
-                              ),
-                              child: Icon(
-                                LucideIcons.userRound,
-                                color: staff.role.color,
-                                size: 18,
-                              ),
+                            Icon(
+                              premiumRoleIcon(staff.role),
+                              color: staff.role.color,
+                              size: 20,
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 13),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -825,7 +787,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     staff.fullName,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
-                                      fontSize: 13.5,
+                                      fontSize: 14,
                                       color: AppColors.textPrimary,
                                     ),
                                   ),
@@ -847,11 +809,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             // Vasiylar
             SurfaceCard(
-              padding: const EdgeInsets.all(22),
+              borderRadius: 26,
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -859,11 +822,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     'Ota-ona yoki Qonuniy Vasiylar',
                     style: TextStyle(
                       fontWeight: FontWeight.w800,
-                      fontSize: 15.5,
+                      fontSize: 16,
                       color: AppColors.textPrimary,
+                      letterSpacing: -0.25,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   if (s.guardians.isEmpty)
                     const Text(
                       'Vasiy ma’lumotlari kiritilmagan',
@@ -871,31 +835,22 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     )
                   else
                     ...s.guardians.map((g) {
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.hairlineBorder),
-                        ),
+                      return GlassWell(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(15),
+                        borderRadius: 18,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 38,
-                              height: 38,
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
-                                borderRadius: BorderRadius.circular(11),
-                              ),
-                              child: const Icon(
+                            const Padding(
+                              padding: EdgeInsets.only(top: 2),
+                              child: Icon(
                                 LucideIcons.usersRound,
                                 color: AppColors.primary,
-                                size: 18,
+                                size: 20,
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 13),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -904,7 +859,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     g.fullName,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
-                                      fontSize: 13.5,
+                                      fontSize: 14,
                                       color: AppColors.textPrimary,
                                     ),
                                   ),
@@ -912,10 +867,11 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   Text(
                                     '${g.relationship} • Tel: ${g.phone}',
                                     style: const TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 12.5,
                                       color: AppColors.textSecondary,
                                     ),
                                   ),
+                                  const SizedBox(height: 2),
                                   Text(
                                     'Manzil: ${g.address ?? 'Ko‘rsatilmagan'}',
                                     style: const TextStyle(
@@ -948,16 +904,11 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: iconColor.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: iconColor, size: 18),
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(icon, color: iconColor, size: 20),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 14),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -967,16 +918,17 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textMuted,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 3),
               Text(
                 value,
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
                   color: AppColors.textPrimary,
+                  height: 1.35,
                 ),
               ),
             ],
@@ -1024,7 +976,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     return SingleChildScrollView(
       child: ResponsivePageContainer(
-        maxWidth: 1040,
+        maxWidth: 1060,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1053,51 +1005,54 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     )
                   : null,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
             ...assessments.map((a) {
               return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: 14),
                 child: SurfaceCard(
-                  padding: const EdgeInsets.all(18),
+                  borderRadius: 26,
+                  padding: const EdgeInsets.all(22),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 8,
-                        alignment: WrapAlignment.spaceBetween,
-                        crossAxisAlignment: WrapCrossAlignment.center,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                a.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 15,
-                                  color: AppColors.textPrimary,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  a.title,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 15.5,
+                                    color: AppColors.textPrimary,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Yo‘nalish: ${a.category}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
+                                const SizedBox(height: 3),
+                                Text(
+                                  'Yo‘nalish: ${a.category}',
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 10),
                           StatusPill(
                             label:
                                 '${a.totalScore.toInt()} / ${a.maxScore.toInt()} ball',
                             color: AppColors.success,
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.85),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Wrap(
                         spacing: 10,
                         runSpacing: 6,
@@ -1108,16 +1063,20 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             children: [
                               const Icon(
                                 LucideIcons.userCheck,
-                                size: 13.5,
+                                size: 14,
                                 color: AppColors.textMuted,
                               ),
-                              const SizedBox(width: 5),
-                              Text(
-                                a.specialistName,
-                                style: const TextStyle(
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  a.specialistName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                  ),
                                 ),
                               ),
                             ],
@@ -1125,8 +1084,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           StatusPill(
                             label: a.specialistRole,
                             color: AppColors.textSecondary,
-                            backgroundColor: AppColors.background,
-                            borderColor: AppColors.hairlineBorder,
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.8),
                           ),
                           Text(
                             df.format(a.assessmentDate),
@@ -1138,31 +1097,26 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(13),
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(11),
-                          border: Border.all(color: AppColors.hairlineBorder),
-                        ),
+                      const SizedBox(height: 14),
+                      GlassWell(
+                        borderRadius: 18,
+                        padding: const EdgeInsets.all(15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Xulosa: ${a.notes}',
                               style: const TextStyle(
-                                fontSize: 12.5,
+                                fontSize: 13,
                                 height: 1.45,
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
                             Text(
                               'Tavsiya: ${a.recommendations}',
                               style: const TextStyle(
-                                fontSize: 12,
+                                fontSize: 12.5,
                                 color: AppColors.primaryDark,
                                 fontWeight: FontWeight.w600,
                                 height: 1.4,
@@ -1195,72 +1149,70 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     final df = DateFormat('dd.MM.yyyy HH:mm');
     return SingleChildScrollView(
       child: ResponsivePageContainer(
-        maxWidth: 1040,
+        maxWidth: 1060,
         child: Column(
           children: sessions.map((s) {
             final isDone = s.status == 'Bajarildi';
             final statusColor = isDone ? AppColors.success : AppColors.info;
             return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 14),
               child: SurfaceCard(
-                padding: const EdgeInsets.all(16),
+                borderRadius: 26,
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(11),
-                      ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
                       child: Icon(
                         isDone ? LucideIcons.circleCheck : LucideIcons.clock,
                         color: statusColor,
-                        size: 18,
+                        size: 20,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Wrap(
-                            spacing: 10,
-                            runSpacing: 6,
-                            alignment: WrapAlignment.spaceBetween,
-                            crossAxisAlignment: WrapCrossAlignment.center,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                s.topic,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
-                                  color: AppColors.textPrimary,
+                              Expanded(
+                                child: Text(
+                                  s.topic,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 14.5,
+                                    color: AppColors.textPrimary,
+                                  ),
                                 ),
                               ),
+                              const SizedBox(width: 10),
                               StatusPill(
                                 label: s.status,
                                 color: statusColor,
+                                backgroundColor:
+                                    Colors.white.withValues(alpha: 0.85),
                                 showDot: true,
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 5),
                           Text(
                             '${s.specialistName} • ${df.format(s.scheduledAt)}',
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 12.5,
                               color: AppColors.textMuted,
                             ),
                           ),
                           if (s.activities != null &&
                               s.activities!.isNotEmpty) ...[
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
                             Text(
                               s.activities!,
                               style: const TextStyle(
-                                fontSize: 12.5,
+                                fontSize: 13,
                                 color: AppColors.textSecondary,
                                 height: 1.4,
                               ),
@@ -1298,7 +1250,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     return SingleChildScrollView(
       child: ResponsivePageContainer(
-        maxWidth: 1040,
+        maxWidth: 1060,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1307,12 +1259,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               title: plan.title,
               subtitle:
                   'O‘quv yili: ${plan.academicYear} • Mas’ul: ${plan.responsibleTeacherName}',
-              action: FilledButton.tonalIcon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primaryLight,
-                  foregroundColor: AppColors.primaryDark,
+              action: OutlinedButton.icon(
+                icon: const Icon(
+                  LucideIcons.printer,
+                  size: 16,
+                  color: AppColors.primary,
                 ),
-                icon: const Icon(LucideIcons.printer, size: 16),
                 label: const Text('Rasmiy Blank'),
                 onPressed: () {
                   Navigator.push(
@@ -1325,21 +1277,22 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 },
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 20),
             const Text(
               'Rejalashtirilgan o‘lchanadigan maqsadlar va ularning bajarilishi:',
               style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 13.5,
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             ...plan.objectives.map((obj) {
               return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: 14),
                 child: SurfaceCard(
-                  padding: const EdgeInsets.all(18),
+                  borderRadius: 26,
+                  padding: const EdgeInsets.all(22),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1350,8 +1303,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             child: Text(
                               obj.title,
                               style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 14.5,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -1362,23 +1315,25 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             color: obj.progressPercent >= 80
                                 ? AppColors.success
                                 : AppColors.primary,
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.86),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 5),
                       Text(
                         'Soha: ${obj.domain} • Mezon: ${obj.successCriteria ?? ''}',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 12.5,
                           color: AppColors.textMuted,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       SliderTheme(
                         data: SliderTheme.of(context).copyWith(
-                          trackHeight: 5,
+                          trackHeight: 5.5,
                           thumbShape: const RoundSliderThumbShape(
-                            enabledThumbRadius: 7.5,
+                            enabledThumbRadius: 8,
                           ),
                         ),
                         child: Slider(
@@ -1418,31 +1373,26 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     return SingleChildScrollView(
       child: ResponsivePageContainer(
-        maxWidth: 1040,
+        maxWidth: 1060,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GlassSurface(
-              padding: const EdgeInsets.all(20),
-              borderRadius: 16,
-              child: Row(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 28,
+              child: const Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.successBg,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
+                  Padding(
+                    padding: EdgeInsets.only(top: 2),
+                    child: Icon(
                       LucideIcons.trendingUp,
                       color: AppColors.success,
-                      size: 20,
+                      size: 23,
                     ),
                   ),
-                  const SizedBox(width: 14),
-                  const Expanded(
+                  SizedBox(width: 14),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1450,7 +1400,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           'Rivojlanish tendensiyasi xulosasi',
                           style: TextStyle(
                             fontWeight: FontWeight.w800,
-                            fontSize: 15,
+                            fontSize: 16,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -1469,11 +1419,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             if (sorted.length >= 2) ...[
               SurfaceCard(
-                padding: const EdgeInsets.all(20),
+                borderRadius: 26,
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1481,122 +1432,142 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       'Baholash ko‘rsatkichlari grafigi (%)',
                       style: TextStyle(
                         fontWeight: FontWeight.w800,
-                        fontSize: 14.5,
+                        fontSize: 15.5,
                         color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 18),
-                    SizedBox(
-                      height: 190,
-                      child: LineChart(
-                        LineChartData(
-                          minY: 0,
-                          maxY: 100,
-                          gridData: FlGridData(
-                            show: true,
-                            drawVerticalLine: false,
-                            horizontalInterval: 25,
-                            getDrawingHorizontalLine: (_) => const FlLine(
-                              color: AppColors.borderLight,
-                              strokeWidth: 1,
-                              dashArray: [4, 4],
+                    GlassWell(
+                      borderRadius: 20,
+                      padding: const EdgeInsets.fromLTRB(8, 18, 24, 10),
+                      child: SizedBox(
+                        height: 195,
+                        child: LineChart(
+                          LineChartData(
+                            minY: 0,
+                            maxY: 100,
+                            gridData: FlGridData(
+                              show: true,
+                              drawVerticalLine: false,
+                              horizontalInterval: 25,
+                              getDrawingHorizontalLine: (_) => FlLine(
+                                color: AppColors.borderSlate.withValues(
+                                  alpha: 0.7,
+                                ),
+                                strokeWidth: 1,
+                                dashArray: [4, 4],
+                              ),
                             ),
-                          ),
-                          borderData: FlBorderData(show: false),
-                          titlesData: FlTitlesData(
-                            topTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            rightTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 34,
-                                interval: 25,
-                                getTitlesWidget: (val, _) => Text(
-                                  '${val.toInt()}%',
-                                  style: const TextStyle(
-                                    fontSize: 10.5,
-                                    color: AppColors.textMuted,
+                            borderData: FlBorderData(show: false),
+                            titlesData: FlTitlesData(
+                              topTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                              rightTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: 36,
+                                  interval: 25,
+                                  getTitlesWidget: (val, _) => Text(
+                                    '${val.toInt()}%',
+                                    style: const TextStyle(
+                                      fontSize: 10.5,
+                                      color: AppColors.textMuted,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                interval: 1,
-                                getTitlesWidget: (val, _) {
-                                  final idx = val.toInt();
-                                  if (idx < 0 || idx >= sorted.length) {
-                                    return const SizedBox.shrink();
-                                  }
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 6),
-                                    child: Text(
-                                      DateFormat(
-                                        'dd.MM',
-                                      ).format(sorted[idx].assessmentDate),
-                                      style: const TextStyle(
-                                        fontSize: 10.5,
-                                        color: AppColors.textMuted,
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  interval: 1,
+                                  reservedSize: 28,
+                                  getTitlesWidget: (val, meta) {
+                                    final idx = val.toInt();
+                                    if (val != idx.toDouble() ||
+                                        idx < 0 ||
+                                        idx >= sorted.length) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    return SideTitleWidget(
+                                      meta: meta,
+                                      space: 8,
+                                      fitInside:
+                                          SideTitleFitInsideData.fromTitleMeta(
+                                        meta,
+                                        distanceFromEdge: 0,
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          lineBarsData: [
-                            LineChartBarData(
-                              isCurved: true,
-                              curveSmoothness: 0.32,
-                              color: AppColors.primary,
-                              barWidth: 3,
-                              spots: List.generate(sorted.length, (i) {
-                                final pct = sorted[i].maxScore > 0
-                                    ? (sorted[i].totalScore /
-                                              sorted[i].maxScore) *
-                                          100
-                                    : 0.0;
-                                return FlSpot(i.toDouble(), pct.clamp(0, 100));
-                              }),
-                              dotData: FlDotData(
-                                show: true,
-                                getDotPainter: (_, _, _, _) =>
-                                    FlDotCirclePainter(
-                                      radius: 4.5,
-                                      color: Colors.white,
-                                      strokeWidth: 2.5,
-                                      strokeColor: AppColors.primary,
-                                    ),
-                              ),
-                              belowBarData: BarAreaData(
-                                show: true,
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    AppColors.primary.withValues(alpha: 0.2),
-                                    AppColors.primary.withValues(alpha: 0.0),
-                                  ],
+                                      child: Text(
+                                        DateFormat(
+                                          'dd.MM',
+                                        ).format(sorted[idx].assessmentDate),
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
-                          ],
+                            lineBarsData: [
+                              LineChartBarData(
+                                isCurved: true,
+                                curveSmoothness: 0.32,
+                                color: AppColors.primary,
+                                barWidth: 3,
+                                spots: List.generate(sorted.length, (i) {
+                                  final pct = sorted[i].maxScore > 0
+                                      ? (sorted[i].totalScore /
+                                                sorted[i].maxScore) *
+                                            100
+                                      : 0.0;
+                                  return FlSpot(
+                                    i.toDouble(),
+                                    pct.clamp(0, 100),
+                                  );
+                                }),
+                                dotData: FlDotData(
+                                  show: true,
+                                  getDotPainter: (_, _, _, _) =>
+                                      FlDotCirclePainter(
+                                        radius: 4.5,
+                                        color: Colors.white,
+                                        strokeWidth: 2.5,
+                                        strokeColor: AppColors.primary,
+                                      ),
+                                ),
+                                belowBarData: BarAreaData(
+                                  show: true,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      AppColors.primary.withValues(alpha: 0.22),
+                                      AppColors.primary.withValues(alpha: 0.0),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
             ],
 
             SurfaceCard(
-              padding: const EdgeInsets.all(20),
+              borderRadius: 26,
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1604,7 +1575,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     'Monitoring baholarining vaqt bo‘yicha o‘zgarishi',
                     style: TextStyle(
                       fontWeight: FontWeight.w800,
-                      fontSize: 14.5,
+                      fontSize: 15.5,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -1613,34 +1584,34 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     const Text(
                       'Hozircha monitoring ballari kiritilmagan.',
                       style: TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 13,
                         color: AppColors.textMuted,
                       ),
                     )
                   else
                     ...assessments.map((a) {
-                      return Container(
+                      return GlassWell(
                         margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(11),
-                          border: Border.all(color: AppColors.hairlineBorder),
-                        ),
+                        padding: const EdgeInsets.all(14),
+                        borderRadius: 18,
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                              LucideIcons.activity,
-                              color: AppColors.primary,
-                              size: 18,
+                            const Padding(
+                              padding: EdgeInsets.only(top: 2),
+                              child: Icon(
+                                LucideIcons.activity,
+                                color: AppColors.primary,
+                                size: 18,
+                              ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 11),
                             Expanded(
                               child: Text(
                                 '${a.category}: ${a.title}',
                                 style: const TextStyle(
                                   fontSize: 13,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
@@ -1649,6 +1620,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             StatusPill(
                               label: '${a.totalScore.toInt()} ball (${a.trend})',
                               color: AppColors.primary,
+                              backgroundColor:
+                                  Colors.white.withValues(alpha: 0.85),
                             ),
                           ],
                         ),
@@ -1675,68 +1648,67 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     }
     return SingleChildScrollView(
       child: ResponsivePageContainer(
-        maxWidth: 1040,
+        maxWidth: 1060,
         child: Column(
           children: referrals.map((r) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 14),
               child: SurfaceCard(
-                padding: const EdgeInsets.all(16),
+                borderRadius: 26,
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(11),
-                      ),
-                      child: const Icon(
+                    const Padding(
+                      padding: EdgeInsets.only(top: 2),
+                      child: Icon(
                         LucideIcons.arrowUpRight,
                         color: AppColors.primary,
-                        size: 18,
+                        size: 20,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Wrap(
-                            spacing: 10,
-                            runSpacing: 6,
-                            alignment: WrapAlignment.spaceBetween,
-                            crossAxisAlignment: WrapCrossAlignment.center,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                '${r.toSpecialistType}ga yo‘naltirish',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
-                                  color: AppColors.textPrimary,
+                              Expanded(
+                                child: Text(
+                                  '${r.toSpecialistType}ga yo‘naltirish',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 14.5,
+                                    color: AppColors.textPrimary,
+                                  ),
                                 ),
                               ),
+                              const SizedBox(width: 10),
                               StatusPill(
                                 label: r.status,
                                 color: AppColors.primary,
+                                backgroundColor:
+                                    Colors.white.withValues(alpha: 0.85),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 5),
                           Text(
                             'Yuborgan: ${r.fromSpecialistName}',
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 12.5,
                               color: AppColors.textMuted,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 3),
                           Text(
                             'Sababi: ${r.reason}',
                             style: const TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 13,
                               color: AppColors.textSecondary,
+                              height: 1.4,
                             ),
                           ),
                         ],
@@ -1767,29 +1739,22 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     return SingleChildScrollView(
       child: ResponsivePageContainer(
-        maxWidth: 1040,
+        maxWidth: 1060,
         child: Column(
           children: docs.map((doc) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 14),
               child: SurfaceCard(
-                padding: const EdgeInsets.all(16),
+                borderRadius: 26,
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.errorBg,
-                        borderRadius: BorderRadius.circular(11),
-                      ),
-                      child: const Icon(
-                        LucideIcons.fileText,
-                        color: AppColors.error,
-                        size: 19,
-                      ),
+                    const Icon(
+                      LucideIcons.fileText,
+                      color: AppColors.error,
+                      size: 22,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1797,16 +1762,16 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           Text(
                             doc.title,
                             style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14.5,
                               color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 3),
                           Text(
                             doc.subtitle,
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 12.5,
                               color: AppColors.textMuted,
                             ),
                           ),
@@ -1816,7 +1781,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     IconButton(
                       icon: const Icon(
                         LucideIcons.download,
-                        size: 18,
+                        size: 19,
                         color: AppColors.primary,
                       ),
                       tooltip: 'Yuklab olish',
@@ -1848,31 +1813,26 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     }
     return SingleChildScrollView(
       child: ResponsivePageContainer(
-        maxWidth: 1040,
+        maxWidth: 1060,
         child: Column(
           children: logs.map((log) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 12),
               child: SurfaceCard(
-                padding: const EdgeInsets.all(15),
+                borderRadius: 24,
+                padding: const EdgeInsets.all(18),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.hairlineBorder),
-                      ),
-                      child: const Icon(
+                    const Padding(
+                      padding: EdgeInsets.only(top: 2),
+                      child: Icon(
                         LucideIcons.history,
-                        color: AppColors.textMuted,
-                        size: 16,
+                        color: AppColors.primary,
+                        size: 18,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 13),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1880,29 +1840,36 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           Text(
                             log.details,
                             style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
+                              height: 1.35,
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${log.userFullName} (${log.userRole})',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textMuted,
-                            ),
+                          const SizedBox(height: 4),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 4,
+                            children: [
+                              Text(
+                                '${log.userFullName} (${log.userRole})',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                              Text(
+                                DateFormat('dd.MM HH:mm').format(log.timestamp),
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  color: AppColors.textSubtle,
+                                  fontWeight: FontWeight.w600,
+                                  fontFeatures: [FontFeature.tabularFigures()],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      DateFormat('dd.MM HH:mm').format(log.timestamp),
-                      style: const TextStyle(
-                        fontSize: 11.5,
-                        color: AppColors.textMuted,
-                        fontFeatures: [FontFeature.tabularFigures()],
                       ),
                     ),
                   ],

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -192,7 +190,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     showDialog(
       context: context,
-      barrierColor: const Color(0x4D0F172A),
+      barrierColor: const Color(0x420F172A),
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
           final results = app.students.where((s) {
@@ -206,17 +204,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           return Dialog(
             backgroundColor: Colors.transparent,
             insetPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: 18,
               vertical: 32,
             ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 540, maxHeight: 480),
+              constraints: const BoxConstraints(maxWidth: 560, maxHeight: 500),
               child: GlassSurface(
-                borderRadius: 22,
-                blur: 24,
-                opacity: 0.92,
+                borderRadius: 30,
+                blur: 26,
+                opacity: 0.84,
                 boxShadow: AppColors.elevatedShadow,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(22),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,30 +231,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           color: AppColors.primary,
                         ),
                         suffixIcon: IconButton(
-                          icon: const Icon(LucideIcons.x, size: 16),
+                          icon: const Icon(LucideIcons.x, size: 17),
                           onPressed: () => Navigator.pop(ctx),
                         ),
-                        fillColor: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
                     const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      padding: EdgeInsets.symmetric(horizontal: 6),
                       child: Text(
                         'TEZKOR NATIJALAR',
                         style: TextStyle(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w700,
-                          letterSpacing: 0.7,
+                          letterSpacing: 0.8,
                           color: AppColors.textMuted,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     Flexible(
                       child: results.isEmpty
                           ? const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 32),
+                              padding: EdgeInsets.symmetric(vertical: 34),
                               child: Center(
                                 child: Text(
                                   'So‘rov bo‘yicha o‘quvchi topilmadi',
@@ -271,17 +268,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                               shrinkWrap: true,
                               itemCount: results.length,
                               separatorBuilder: (_, _) =>
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 8),
                               itemBuilder: (_, i) {
                                 final s = results[i];
                                 return SurfaceCard(
                                   elevated: false,
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 10,
+                                    horizontal: 16,
+                                    vertical: 13,
                                   ),
-                                  borderRadius: 12,
-                                  backgroundColor: Colors.white,
+                                  borderRadius: 20,
                                   onTap: () {
                                     Navigator.pop(ctx);
                                     Navigator.push(
@@ -294,27 +290,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                   },
                                   child: Row(
                                     children: [
-                                      Container(
-                                        width: 36,
-                                        height: 36,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primaryLight,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          s.firstName.isNotEmpty
-                                              ? s.firstName[0]
-                                              : '?',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w800,
-                                            color: AppColors.primary,
-                                            fontSize: 14,
-                                          ),
-                                        ),
+                                      const Icon(
+                                        LucideIcons.userRound,
+                                        size: 19,
+                                        color: AppColors.primary,
                                       ),
-                                      const SizedBox(width: 12),
+                                      const SizedBox(width: 13),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
@@ -322,18 +303,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                           children: [
                                             Text(
                                               s.fullName,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 13.5,
                                                 fontWeight: FontWeight.w700,
                                                 color: AppColors.textPrimary,
                                               ),
                                             ),
+                                            const SizedBox(height: 2),
                                             Text(
                                               '${s.grade}-sinf • ${s.primaryNeed}',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
-                                                fontSize: 11.5,
+                                                fontSize: 12,
                                                 color: AppColors.textMuted,
                                               ),
                                             ),
@@ -367,141 +351,138 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => GlassSurface(
-        borderRadius: 26,
-        blur: 24,
-        opacity: 0.93,
-        padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+        borderRadius: 32,
+        blur: 26,
+        opacity: 0.88,
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
         child: SafeArea(
           top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 38,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.border,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Barcha tizim bo‘limlari',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.3,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4.5,
+                    decoration: BoxDecoration(
+                      color: AppColors.borderSlate,
+                      borderRadius: BorderRadius.circular(999),
                     ),
                   ),
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    onPressed: () => Navigator.pop(ctx),
-                    icon: const Icon(LucideIcons.x, size: 18),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _navItems.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  mainAxisExtent: 60,
                 ),
-                itemBuilder: (_, idx) {
-                  final item = _navItems[idx];
-                  final isSel = _selectedIndex == item.index;
-                  final badge = _badgeForIndex(item.index, app);
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    const Icon(
+                      LucideIcons.layoutGrid,
+                      size: 20,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'Barcha tizim bo‘limlari',
+                        style: TextStyle(
+                          fontSize: 17.5,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () => Navigator.pop(ctx),
+                      icon: const Icon(LucideIcons.x, size: 18),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                ResponsiveGlassGrid(
+                  mobileColumns: 2,
+                  tabletColumns: 2,
+                  desktopColumns: 2,
+                  spacing: 12,
+                  children: _navItems.map((item) {
+                    final isSel = _selectedIndex == item.index;
+                    final badge = _badgeForIndex(item.index, app);
 
-                  return SurfaceCard(
-                    elevated: false,
-                    borderRadius: 14,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    backgroundColor:
-                        isSel ? AppColors.primaryLight : Colors.white,
-                    borderColor: isSel
-                        ? AppColors.primary.withValues(alpha: 0.35)
-                        : AppColors.hairlineBorder,
-                    onTap: () {
-                      Navigator.pop(ctx);
-                      _selectTab(item.index);
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
+                    return SurfaceCard(
+                      elevated: !isSel,
+                      borderRadius: 22,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 14,
+                      ),
+                      backgroundColor: isSel
+                          ? Colors.white.withValues(alpha: 0.94)
+                          : null,
+                      borderColor: isSel
+                          ? AppColors.primary.withValues(alpha: 0.45)
+                          : Colors.white,
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _selectTab(item.index);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            item.icon,
+                            size: 19,
                             color: isSel
                                 ? AppColors.primary
-                                : AppColors.background,
-                            borderRadius: BorderRadius.circular(10),
+                                : AppColors.textSecondary,
                           ),
-                          child: Icon(
-                            item.icon,
-                            size: 17,
-                            color:
-                                isSel ? Colors.white : AppColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            item.shortLabel,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              fontWeight:
-                                  isSel ? FontWeight.w700 : FontWeight.w600,
-                              color: isSel
-                                  ? AppColors.primary
-                                  : AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                        if (badge != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: item.index == 5
-                                  ? AppColors.errorBg
-                                  : AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
+                          const SizedBox(width: 10),
+                          Expanded(
                             child: Text(
-                              '$badge',
+                              item.shortLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w700,
-                                color: item.index == 5
-                                    ? AppColors.error
-                                    : AppColors.primary,
+                                fontSize: 13,
+                                fontWeight:
+                                    isSel ? FontWeight.w800 : FontWeight.w600,
+                                color: isSel
+                                    ? AppColors.primary
+                                    : AppColors.textPrimary,
                               ),
                             ),
                           ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
+                          if (badge != null) ...[
+                            const SizedBox(width: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: item.index == 5
+                                    ? AppColors.errorBg
+                                    : AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                '$badge',
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: item.index == 5
+                                      ? AppColors.error
+                                      : AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -522,61 +503,63 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           final notifications = app.myNotifications;
           final unreadCount = app.myUnreadNotificationCount;
           return GlassSurface(
-            borderRadius: 26,
-            blur: 24,
-            opacity: 0.94,
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+            borderRadius: 32,
+            blur: 26,
+            opacity: 0.88,
+            padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
             child: SafeArea(
               top: false,
               child: SizedBox(
-                height: 480,
+                height: 500,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Center(
                       child: Container(
-                        width: 38,
-                        height: 4,
+                        width: 40,
+                        height: 4.5,
                         decoration: BoxDecoration(
-                          color: AppColors.border,
-                          borderRadius: BorderRadius.circular(4),
+                          color: AppColors.borderSlate,
+                          borderRadius: BorderRadius.circular(999),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 14),
-                    Row(
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(
-                            LucideIcons.bellRing,
-                            color: AppColors.primary,
-                            size: 18,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Expanded(
-                          child: Text(
-                            'Bildirishnomalar',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 16,
-                              letterSpacing: -0.2,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              LucideIcons.bellRing,
+                              color: AppColors.primary,
+                              size: 20,
                             ),
-                          ),
+                            const SizedBox(width: 10),
+                            const Text(
+                              'Bildirishnomalar',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 17,
+                                letterSpacing: -0.3,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            if (unreadCount > 0) ...[
+                              const SizedBox(width: 8),
+                              StatusPill(
+                                label: '$unreadCount yangi',
+                                color: AppColors.error,
+                                backgroundColor: AppColors.errorBg,
+                              ),
+                            ],
+                          ],
                         ),
-                        if (unreadCount > 0)
-                          StatusPill(
-                            label: '$unreadCount yangi',
-                            color: AppColors.error,
-                            backgroundColor: AppColors.errorBg,
-                          ),
-                        if (auth.currentUser != null && unreadCount > 0) ...[
-                          const SizedBox(width: 6),
+                        if (auth.currentUser != null && unreadCount > 0)
                           TextButton(
                             onPressed: () async {
                               await app.markAllNotificationsAsRead(
@@ -587,17 +570,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             child: const Text(
                               'O‘qilgan qilish',
                               style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
-                        ],
                       ],
                     ),
                     const SizedBox(height: 12),
                     const Divider(),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     Expanded(
                       child: notifications.isEmpty
                           ? const Center(
@@ -623,7 +605,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           : ListView.separated(
                               itemCount: notifications.length,
                               separatorBuilder: (_, _) =>
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 10),
                               itemBuilder: (c, i) {
                                 final notif = notifications[i];
                                 final isAlert = notif.type == 'ALERT';
@@ -633,14 +615,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
                                 return SurfaceCard(
                                   elevated: false,
-                                  borderRadius: 14,
-                                  padding: const EdgeInsets.all(12),
-                                  backgroundColor: notif.isRead
-                                      ? Colors.white.withValues(alpha: 0.7)
-                                      : Colors.white,
+                                  borderRadius: 22,
+                                  padding: const EdgeInsets.all(16),
                                   borderColor: notif.isRead
-                                      ? AppColors.hairlineBorder
-                                      : accent.withValues(alpha: 0.25),
+                                      ? Colors.white
+                                      : accent.withValues(alpha: 0.35),
                                   onTap: () async {
                                     final navigator =
                                         Navigator.of(this.context);
@@ -667,16 +646,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        width: 36,
-                                        height: 36,
-                                        decoration: BoxDecoration(
-                                          color: notif.isRead
-                                              ? AppColors.borderLight
-                                              : accent.withValues(alpha: 0.12),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 2),
                                         child: Icon(
                                           isAlert
                                               ? LucideIcons.triangleAlert
@@ -686,10 +657,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                           color: notif.isRead
                                               ? AppColors.textMuted
                                               : accent,
-                                          size: 18,
+                                          size: 20,
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
+                                      const SizedBox(width: 13),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
@@ -703,8 +674,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                                     style: TextStyle(
                                                       fontWeight: notif.isRead
                                                           ? FontWeight.w600
-                                                          : FontWeight.w700,
-                                                      fontSize: 13,
+                                                          : FontWeight.w800,
+                                                      fontSize: 13.5,
                                                       color:
                                                           AppColors.textPrimary,
                                                     ),
@@ -712,8 +683,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                                 ),
                                                 if (!notif.isRead)
                                                   Container(
-                                                    width: 7,
-                                                    height: 7,
+                                                    width: 7.5,
+                                                    height: 7.5,
                                                     decoration: BoxDecoration(
                                                       color: accent,
                                                       shape: BoxShape.circle,
@@ -721,16 +692,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                                   ),
                                               ],
                                             ),
-                                            const SizedBox(height: 3),
+                                            const SizedBox(height: 4),
                                             Text(
                                               notif.body,
                                               style: const TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 12.5,
                                                 color: AppColors.textSecondary,
-                                                height: 1.35,
+                                                height: 1.4,
                                               ),
                                             ),
-                                            const SizedBox(height: 4),
+                                            const SizedBox(height: 5),
                                             Text(
                                               df.format(notif.createdAt),
                                               style: const TextStyle(
@@ -763,7 +734,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final isDesktop = width >= 900;
+    final isDesktop = width >= 920;
     final auth = context.watch<AuthProvider>();
     final app = context.watch<AppProvider>();
     final user = auth.currentUser;
@@ -791,7 +762,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   ),
                   Expanded(
                     child: PageTransitionSwitcher(
-                      duration: const Duration(milliseconds: 210),
+                      duration: const Duration(milliseconds: 220),
                       transitionBuilder:
                           (child, primaryAnimation, secondaryAnimation) {
                         return FadeThroughTransition(
@@ -823,343 +794,323 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     required AuthProvider auth,
     required int unreadNotifCount,
   }) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.78),
-            border: const Border(
-              bottom: BorderSide(color: AppColors.hairlineBorder, width: 1),
-            ),
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          isDesktop ? 24 : 14,
+          isDesktop ? 16 : 10,
+          isDesktop ? 28 : 14,
+          4,
+        ),
+        child: GlassSurface(
+          borderRadius: 24,
+          blur: 22,
+          opacity: 0.74,
+          padding: EdgeInsets.symmetric(
+            horizontal: isDesktop ? 20 : 12,
+            vertical: 10,
           ),
-          child: SafeArea(
-            bottom: false,
-            child: SizedBox(
-              height: 60,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 14),
-                child: Row(
+          child: Row(
+            children: [
+              if (!isDesktop) ...[
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  tooltip: 'Menyu',
+                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                  icon: const Icon(
+                    LucideIcons.panelLeft,
+                    size: 20,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(
+                  LucideIcons.landmark,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 9),
+              ],
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (!isDesktop) ...[
-                      IconButton(
-                        visualDensity: VisualDensity.compact,
-                        tooltip: 'Menyu',
-                        onPressed: () =>
-                            _scaffoldKey.currentState?.openDrawer(),
-                        icon: const Icon(
-                          LucideIcons.panelLeft,
-                          size: 20,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                    ],
-                    if (!isDesktop)
-                      Container(
-                        width: 34,
-                        height: 34,
-                        margin: const EdgeInsets.only(right: 10),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [AppColors.primary, AppColors.primaryDark],
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: AppColors.primaryGlow,
-                        ),
-                        child: const Icon(
-                          LucideIcons.landmark,
-                          color: Colors.white,
-                          size: 17,
-                        ),
-                      ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isDesktop ? currentNav.title : 'TA’LIM NAZORAT',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: isDesktop ? 16 : 14.5,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -0.25,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          Text(
-                            user?.institutionName ??
-                                '9-sonli inklyuziv ta’lim tayanch maktabi',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              color: AppColors.textMuted,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                    Text(
+                      isDesktop ? currentNav.title : 'TA’LIM NAZORAT',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: isDesktop ? 16.5 : 14.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.3,
+                        color: AppColors.textPrimary,
                       ),
                     ),
-
-                    // Tezkor qidiruv tugmasi
-                    if (isDesktop)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: InkWell(
-                          onTap: () => _showQuickSearchModal(context),
-                          borderRadius: BorderRadius.circular(11),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 7,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.background,
-                              borderRadius: BorderRadius.circular(11),
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  LucideIcons.search,
-                                  size: 15,
-                                  color: AppColors.textMuted,
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  'O‘quvchi qidirish...',
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    color: AppColors.textMuted,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    else
-                      IconButton(
-                        visualDensity: VisualDensity.compact,
-                        tooltip: 'Qidirish',
-                        onPressed: () => _showQuickSearchModal(context),
-                        icon: const Icon(
-                          LucideIcons.search,
-                          size: 19,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-
-                    // Bildirishnomalar
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        IconButton(
-                          visualDensity: VisualDensity.compact,
-                          tooltip: 'Bildirishnomalar',
-                          onPressed: () => _showNotificationsSheet(context),
-                          icon: const Icon(
-                            LucideIcons.bell,
-                            size: 19,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        if (unreadNotifCount > 0)
-                          Positioned(
-                            top: 5,
-                            right: 5,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4.5,
-                                vertical: 1.5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.error,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 1.5,
-                                ),
-                              ),
-                              constraints: const BoxConstraints(minWidth: 16),
-                              child: Text(
-                                '$unreadNotifCount',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 9.5,
-                                  fontWeight: FontWeight.w800,
-                                  fontFeatures: [FontFeature.tabularFigures()],
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    const SizedBox(width: 4),
-
-                    // Foydalanuvchi menyusi
-                    PopupMenuButton<String>(
-                      tooltip: 'Profil menyusi',
-                      offset: const Offset(0, 46),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: const BorderSide(color: AppColors.hairlineBorder),
-                      ),
-                      onSelected: (val) async {
-                        if (val == 'settings') {
-                          _selectTab(9);
-                        } else if (val == 'logout') {
-                          await auth.logout();
-                          if (context.mounted) {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (_) => const LoginScreen(),
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      itemBuilder: (_) => [
-                        PopupMenuItem(
-                          enabled: false,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                user?.fullName ?? 'Mutaxassis',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                user?.role.label ?? '',
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuDivider(),
-                        const PopupMenuItem(
-                          value: 'settings',
-                          child: Row(
-                            children: [
-                              Icon(LucideIcons.settings, size: 16),
-                              SizedBox(width: 10),
-                              Text(
-                                'Sozlamalar',
-                                style: TextStyle(fontSize: 13),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'logout',
-                          child: Row(
-                            children: [
-                              Icon(
-                                LucideIcons.logOut,
-                                size: 16,
-                                color: AppColors.error,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                'Tizimdan chiqish',
-                                style: TextStyle(
-                                  color: AppColors.error,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isDesktop ? 10 : 4,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.hairlineBorder),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircleAvatar(
-                              radius: 14,
-                              backgroundColor: AppColors.primaryLight,
-                              child: Text(
-                                (user?.fullName ?? 'U').substring(0, 1),
-                                style: const TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                            if (isDesktop) ...[
-                              const SizedBox(width: 8),
-                              ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 140),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      user?.fullName ?? '',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                    Text(
-                                      user?.role.label ?? '',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 10.5,
-                                        color: AppColors.textMuted,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                LucideIcons.chevronDown,
-                                size: 14,
-                                color: AppColors.textMuted,
-                              ),
-                            ],
-                          ],
-                        ),
+                    Text(
+                      user?.institutionName ??
+                          '9-sonli inklyuziv ta’lim tayanch maktabi',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: AppColors.textMuted,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
+
+              if (isDesktop)
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: InkWell(
+                    onTap: () => _showQuickSearchModal(context),
+                    borderRadius: BorderRadius.circular(999),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 8.5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.68),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: Colors.white, width: 1.3),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            LucideIcons.search,
+                            size: 15,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'O‘quvchi qidirish...',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              else
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  tooltip: 'Qidirish',
+                  onPressed: () => _showQuickSearchModal(context),
+                  icon: const Icon(
+                    LucideIcons.search,
+                    size: 19,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    tooltip: 'Bildirishnomalar',
+                    onPressed: () => _showNotificationsSheet(context),
+                    icon: const Icon(
+                      LucideIcons.bell,
+                      size: 19,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  if (unreadNotifCount > 0)
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4.5,
+                          vertical: 1.5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.error,
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 1.5,
+                          ),
+                        ),
+                        constraints: const BoxConstraints(minWidth: 16),
+                        child: Text(
+                          '$unreadNotifCount',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w800,
+                            fontFeatures: [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+
+              const SizedBox(width: 6),
+
+              PopupMenuButton<String>(
+                tooltip: 'Profil menyusi',
+                offset: const Offset(0, 48),
+                color: const Color(0xF2FFFFFF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22),
+                  side: const BorderSide(color: Colors.white, width: 1.4),
+                ),
+                onSelected: (val) async {
+                  if (val == 'settings') {
+                    _selectTab(9);
+                  } else if (val == 'logout') {
+                    await auth.logout();
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (_) => const LoginScreen(),
+                        ),
+                      );
+                    }
+                  }
+                },
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    enabled: false,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user?.fullName ?? 'Mutaxassis',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          user?.role.label ?? '',
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: 'settings',
+                    child: Row(
+                      children: [
+                        Icon(LucideIcons.settings, size: 16),
+                        SizedBox(width: 10),
+                        Text(
+                          'Sozlamalar',
+                          style: TextStyle(fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'logout',
+                    child: Row(
+                      children: [
+                        Icon(
+                          LucideIcons.logOut,
+                          size: 16,
+                          color: AppColors.error,
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'Tizimdan chiqish',
+                          style: TextStyle(
+                            color: AppColors.error,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isDesktop ? 12 : 6,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.78),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: Colors.white, width: 1.3),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 13.5,
+                        backgroundColor: AppColors.primaryLight,
+                        child: Text(
+                          (user?.fullName ?? 'U').substring(0, 1),
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      if (isDesktop) ...[
+                        const SizedBox(width: 9),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 145),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user?.fullName ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              Text(
+                                user?.role.label ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 10.5,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        const Icon(
+                          LucideIcons.chevronDown,
+                          size: 14,
+                          color: AppColors.textMuted,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -1191,45 +1142,30 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ],
     };
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          width: 256,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.82),
-            border: const Border(
-              right: BorderSide(color: AppColors.hairlineBorder, width: 1),
-            ),
-          ),
-          child: SafeArea(
+    return SafeArea(
+      right: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 0, 16),
+        child: SizedBox(
+          width: 262,
+          child: GlassSurface(
+            borderRadius: 30,
+            blur: 24,
+            opacity: 0.74,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Brand Header
+                // Brand Header (free-standing icon!)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+                  padding: const EdgeInsets.fromLTRB(22, 22, 20, 16),
                   child: Row(
                     children: [
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [AppColors.primary, AppColors.primaryDark],
-                          ),
-                          borderRadius: BorderRadius.circular(11),
-                          boxShadow: AppColors.primaryGlow,
-                        ),
-                        child: const Icon(
-                          LucideIcons.landmark,
-                          color: Colors.white,
-                          size: 19,
-                        ),
+                      const Icon(
+                        LucideIcons.landmark,
+                        color: AppColors.primary,
+                        size: 24,
                       ),
-                      const SizedBox(width: 11),
+                      const SizedBox(width: 12),
                       const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1237,16 +1173,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             Text(
                               'TA’LIM NAZORAT',
                               style: TextStyle(
-                                fontSize: 14.5,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w900,
-                                letterSpacing: 0.2,
+                                letterSpacing: -0.2,
                                 color: AppColors.textPrimary,
                               ),
                             ),
                             Text(
                               'Inklyuziv monitoring',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 11.5,
                                 color: AppColors.textMuted,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -1259,27 +1195,26 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
                 const Divider(height: 1),
 
-                // Scrollable Grouped Nav List (zero vertical overflow on any laptop)
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 14,
+                      horizontal: 14,
+                      vertical: 16,
                     ),
                     children: groups.entries.map((entry) {
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.only(bottom: 18),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
+                              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                               child: Text(
                                 entry.key,
                                 style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.8,
+                                  letterSpacing: 0.9,
                                   color: AppColors.textSubtle,
                                 ),
                               ),
@@ -1290,43 +1225,54 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                               final isAlertBadge = item.index == 5;
 
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 3),
+                                padding: const EdgeInsets.only(bottom: 4),
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    borderRadius: BorderRadius.circular(11),
+                                    borderRadius: BorderRadius.circular(18),
                                     onTap: () => _selectTab(item.index),
                                     child: AnimatedContainer(
                                       duration: const Duration(
-                                        milliseconds: 160,
+                                        milliseconds: 170,
                                       ),
                                       curve: Curves.easeOutCubic,
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 11,
-                                        vertical: 9.5,
+                                        horizontal: 14,
+                                        vertical: 11,
                                       ),
                                       decoration: BoxDecoration(
                                         color: isSelected
-                                            ? AppColors.primaryLight
+                                            ? Colors.white.withValues(
+                                                alpha: 0.92,
+                                              )
                                             : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(11),
+                                        borderRadius: BorderRadius.circular(18),
                                         border: Border.all(
                                           color: isSelected
-                                              ? AppColors.primary
-                                                  .withValues(alpha: 0.18)
+                                              ? Colors.white
                                               : Colors.transparent,
+                                          width: 1.2,
                                         ),
+                                        boxShadow: isSelected
+                                            ? const [
+                                                BoxShadow(
+                                                  color: Color(0x100F172A),
+                                                  blurRadius: 12,
+                                                  offset: Offset(0, 4),
+                                                ),
+                                              ]
+                                            : null,
                                       ),
                                       child: Row(
                                         children: [
                                           Icon(
                                             item.icon,
-                                            size: 18,
+                                            size: 18.5,
                                             color: isSelected
                                                 ? AppColors.primary
                                                 : AppColors.textMuted,
                                           ),
-                                          const SizedBox(width: 11),
+                                          const SizedBox(width: 12),
                                           Expanded(
                                             child: Text(
                                               item.title,
@@ -1335,8 +1281,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 fontWeight: isSelected
-                                                    ? FontWeight.w700
-                                                    : FontWeight.w500,
+                                                    ? FontWeight.w800
+                                                    : FontWeight.w600,
                                                 color: isSelected
                                                     ? AppColors.primary
                                                     : AppColors.textSecondary,
@@ -1348,18 +1294,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                             Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                horizontal: 7,
+                                                horizontal: 7.5,
                                                 vertical: 2,
                                               ),
                                               decoration: BoxDecoration(
                                                 color: isAlertBadge
                                                     ? AppColors.errorBg
-                                                    : (isSelected
-                                                        ? Colors.white
-                                                        : AppColors
-                                                            .borderLight),
+                                                    : AppColors.primaryLight,
                                                 borderRadius:
-                                                    BorderRadius.circular(7),
+                                                    BorderRadius.circular(999),
                                               ),
                                               child: Text(
                                                 '$badge',
@@ -1372,10 +1315,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                                   ],
                                                   color: isAlertBadge
                                                       ? AppColors.error
-                                                      : (isSelected
-                                                          ? AppColors.primary
-                                                          : AppColors
-                                                              .textMuted),
+                                                      : AppColors.primary,
                                                 ),
                                               ),
                                             ),
@@ -1393,32 +1333,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   ),
                 ),
 
-                // Sidebar Footer Card
-                Container(
-                  margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                  padding: const EdgeInsets.all(11),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(13),
-                    border: Border.all(color: AppColors.hairlineBorder),
+                // Sidebar Footer Glass Well (free-standing icon!)
+                GlassWell(
+                  margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
                   ),
+                  borderRadius: 20,
                   child: Row(
                     children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(9),
-                          border: Border.all(color: AppColors.hairlineBorder),
-                        ),
-                        child: const Icon(
-                          LucideIcons.shieldCheck,
-                          size: 16,
-                          color: AppColors.success,
-                        ),
+                      const Icon(
+                        LucideIcons.shieldCheck,
+                        size: 19,
+                        color: AppColors.success,
                       ),
-                      const SizedBox(width: 9),
+                      const SizedBox(width: 11),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1428,7 +1358,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
                               ),
@@ -1458,123 +1388,132 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final quickTabs = [_navItems[0], _navItems[1], _navItems[2], _navItems[3]];
     final isMoreActive = _selectedIndex >= 4;
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.85),
-            border: const Border(
-              top: BorderSide(color: AppColors.hairlineBorder, width: 1),
-            ),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ...quickTabs.map((item) {
-                    final isSelected = _selectedIndex == item.index;
-                    return Expanded(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => _selectTab(item.index),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 160),
-                          curve: Curves.easeOutCubic,
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppColors.primaryLight
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                item.icon,
-                                size: 20,
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : AppColors.textMuted,
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                item.shortLabel,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 10.5,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                  color: isSelected
-                                      ? AppColors.primary
-                                      : AppColors.textMuted,
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
+        child: GlassSurface(
+          borderRadius: 28,
+          blur: 24,
+          opacity: 0.80,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ...quickTabs.map((item) {
+                final isSelected = _selectedIndex == item.index;
+                return Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => _selectTab(item.index),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 170),
+                      curve: Curves.easeOutCubic,
+                      padding: const EdgeInsets.symmetric(vertical: 7),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.white.withValues(alpha: 0.94)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(22),
+                        boxShadow: isSelected
+                            ? const [
+                                BoxShadow(
+                                  color: Color(0x120F172A),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 3),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
+                              ]
+                            : null,
                       ),
-                    );
-                  }),
-
-                  // 5-chi "Bo'limlar" tugmasi (4..9 indekslar faol bo'lganda aynan shu yonadi!)
-                  Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => _showMobileModulesSheet(context, app),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 160),
-                        curve: Curves.easeOutCubic,
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        decoration: BoxDecoration(
-                          color: isMoreActive
-                              ? AppColors.primaryLight
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isMoreActive
-                                  ? _navItems[_selectedIndex].icon
-                                  : LucideIcons.layoutGrid,
-                              size: 20,
-                              color: isMoreActive
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            item.icon,
+                            size: 20,
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.textMuted,
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            item.shortLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w500,
+                              color: isSelected
                                   ? AppColors.primary
                                   : AppColors.textMuted,
                             ),
-                            const SizedBox(height: 3),
-                            Text(
-                              isMoreActive
-                                  ? _navItems[_selectedIndex].shortLabel
-                                  : 'Barchasi',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 10.5,
-                                fontWeight: isMoreActive
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                                color: isMoreActive
-                                    ? AppColors.primary
-                                    : AppColors.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
+                );
+              }),
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _showMobileModulesSheet(context, app),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 170),
+                    curve: Curves.easeOutCubic,
+                    padding: const EdgeInsets.symmetric(vertical: 7),
+                    decoration: BoxDecoration(
+                      color: isMoreActive
+                          ? Colors.white.withValues(alpha: 0.94)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(22),
+                      boxShadow: isMoreActive
+                          ? const [
+                              BoxShadow(
+                                color: Color(0x120F172A),
+                                blurRadius: 10,
+                                offset: Offset(0, 3),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isMoreActive
+                              ? _navItems[_selectedIndex].icon
+                              : LucideIcons.layoutGrid,
+                          size: 20,
+                          color: isMoreActive
+                              ? AppColors.primary
+                              : AppColors.textMuted,
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          isMoreActive
+                              ? _navItems[_selectedIndex].shortLabel
+                              : 'Barchasi',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: isMoreActive
+                                ? FontWeight.w800
+                                : FontWeight.w500,
+                            color: isMoreActive
+                                ? AppColors.primary
+                                : AppColors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -1588,55 +1527,43 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     UserModel? user,
   ) {
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(30)),
+      ),
       child: SafeArea(
         child: Column(
           children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-              decoration: const BoxDecoration(
-                color: AppColors.background,
-                border: Border(
-                  bottom: BorderSide(color: AppColors.hairlineBorder),
-                ),
-              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  const Row(
                     children: [
-                      Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          LucideIcons.landmark,
-                          color: Colors.white,
-                          size: 17,
-                        ),
+                      Icon(
+                        LucideIcons.landmark,
+                        color: AppColors.primary,
+                        size: 22,
                       ),
-                      const SizedBox(width: 10),
-                      const Expanded(
+                      SizedBox(width: 10),
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'TA’LIM NAZORAT',
                               style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w900,
                                 color: AppColors.textPrimary,
                               ),
                             ),
                             Text(
                               'Yagona monitoring tizimi',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 11.5,
                                 color: AppColors.textMuted,
                               ),
                             ),
@@ -1648,24 +1575,23 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   const SizedBox(height: 14),
                   SurfaceCard(
                     elevated: false,
-                    padding: const EdgeInsets.all(11),
-                    borderRadius: 12,
-                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.all(14),
+                    borderRadius: 22,
                     child: Row(
                       children: [
                         CircleAvatar(
-                          radius: 17,
+                          radius: 18,
                           backgroundColor: AppColors.primaryLight,
                           child: Text(
                             (user?.fullName ?? 'U').substring(0, 1),
                             style: const TextStyle(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w800,
-                              fontSize: 13,
+                              fontSize: 13.5,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 11),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1675,16 +1601,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 13,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 user?.role.label ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 11.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.primary,
                                 ),
@@ -1700,21 +1628,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 itemCount: _navItems.length,
                 itemBuilder: (ctx, idx) {
                   final item = _navItems[idx];
                   final isSel = _selectedIndex == item.index;
                   final badge = _badgeForIndex(item.index, app);
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
+                    padding: const EdgeInsets.only(bottom: 4),
                     child: ListTile(
                       dense: true,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(18),
                       ),
-                      tileColor:
-                          isSel ? AppColors.primaryLight : Colors.transparent,
+                      tileColor: isSel
+                          ? Colors.white.withValues(alpha: 0.9)
+                          : Colors.transparent,
                       leading: Icon(
                         item.icon,
                         color: isSel
@@ -1726,7 +1655,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         item.title,
                         style: TextStyle(
                           fontWeight:
-                              isSel ? FontWeight.w700 : FontWeight.w500,
+                              isSel ? FontWeight.w800 : FontWeight.w600,
                           color: isSel
                               ? AppColors.primary
                               : AppColors.textPrimary,
@@ -1750,20 +1679,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 },
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: AppColors.hairlineBorder),
-                ),
-              ),
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   const Expanded(
                     child: Text(
-                      'TA’LIM NAZORAT • v2.5',
+                      'TA’LIM NAZORAT • v2.6',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 11.5,
                         color: AppColors.textMuted,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1789,7 +1713,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       'Chiqish',
                       style: TextStyle(
                         color: AppColors.error,
-                        fontSize: 12,
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
