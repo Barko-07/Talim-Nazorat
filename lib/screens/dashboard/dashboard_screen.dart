@@ -1,22 +1,39 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/widgets/glass_widgets.dart';
+import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
-import '../../models/user_model.dart';
-import '../students/add_student_screen.dart';
-import '../students/students_list_screen.dart';
-import '../monitoring/monitoring_screen.dart';
 import '../assessments/new_assessment_screen.dart';
-import '../sessions/sessions_screen.dart';
 import '../iep/iep_list_screen.dart';
+import '../monitoring/monitoring_screen.dart';
 import '../reports/reports_screen.dart';
+import '../sessions/sessions_screen.dart';
 import '../specialists/specialists_screen.dart';
+import '../students/add_student_screen.dart';
+import '../students/student_detail_screen.dart';
+import '../students/students_list_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  final ValueChanged<int>? onNavigateTab;
+
+  const DashboardScreen({super.key, this.onNavigateTab});
+
+  void _openModule(BuildContext context, int tabIndex, Widget fallbackScreen) {
+    if (onNavigateTab != null) {
+      onNavigateTab!(tabIndex);
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => fallbackScreen),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,724 +46,796 @@ class DashboardScreen extends StatelessWidget {
     final assessments = app.assessments;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Shaxsiy Mutaxassis Paneli (Welcome Header - Responsive)
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isNarrow = constraints.maxWidth < 550;
-                return Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.border, width: 1),
+        child: ResponsivePageContainer(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. FROSTED GLASS SALOMLASHUV PANELI
+              _buildWelcomeHero(context, user)
+                  .animate()
+                  .fadeIn(duration: 200.ms, curve: Curves.easeOutCubic)
+                  .slideY(
+                    begin: 0.025,
+                    end: 0,
+                    duration: 200.ms,
+                    curve: Curves.easeOutCubic,
                   ),
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: isNarrow
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 22,
-                                    backgroundColor: AppColors.primaryLight,
-                                    child: Text(
-                                      (user?.fullName ?? 'U').substring(0, 1),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Assalomu alaykum, ${user?.fullName ?? ''}!',
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w800,
-                                            color: AppColors.textPrimary,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 3),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 7,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primaryLight,
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          child: Text(
-                                            user?.role.label ?? '',
-                                            style: const TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.primary,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.account_balance_outlined,
-                                          size: 14,
-                                          color: AppColors.textMuted,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            user?.institutionName ?? '5-sonli maktab',
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              color: AppColors.textMuted,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  FilledButton.icon(
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: AppColors.primary,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 8,
-                                      ),
-                                      visualDensity: VisualDensity.compact,
-                                    ),
-                                    icon: const Icon(
-                                      Icons.person_add_rounded,
-                                      size: 15,
-                                    ),
-                                    label: const Text(
-                                      'Bola qo‘shish',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              const AddStudentScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          )
-                        : Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 24,
-                                backgroundColor: AppColors.primaryLight,
-                                child: Text(
-                                  (user?.fullName ?? 'U').substring(0, 1),
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Assalomu alaykum, ${user?.fullName ?? ''}!',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 7,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primaryLight,
-                                            borderRadius: BorderRadius.circular(6),
-                                          ),
-                                          child: Text(
-                                            user?.role.label ?? '',
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.primary,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          '• ${user?.institutionName ?? ''}',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            color: AppColors.textMuted,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              FilledButton.icon(
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 10,
-                                  ),
-                                  visualDensity: VisualDensity.compact,
-                                ),
-                                icon: const Icon(
-                                  Icons.person_add_rounded,
-                                  size: 16,
-                                ),
-                                label: const Text('Bola qo‘shish', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const AddStudentScreen(),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 14),
+              const SizedBox(height: 16),
 
-            // 1. DIQQAT TALAB HOLATLAR (Agar signal bo'lsa)
-            if (alerts.isNotEmpty) ...[
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.warningBg,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.warningBorder,
-                    width: 1,
+              // 2. DIQQAT TALAB HOLATLAR BANNERI
+              if (alerts.isNotEmpty) ...[
+                SurfaceCard(
+                  borderRadius: 16,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 13,
+                  ),
+                  backgroundColor: AppColors.warningBg,
+                  borderColor: AppColors.warningBorder,
+                  elevated: false,
+                  onTap: () =>
+                      _openModule(context, 5, const MonitoringScreen()),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: AppColors.warning.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        child: const Icon(
+                          LucideIcons.triangleAlert,
+                          color: AppColors.warning,
+                          size: 19,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Diqqat talab holatlar (${alerts.length} ta)',
+                              style: const TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              alerts.first.message,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const StatusPill(
+                        label: 'Ko‘rish',
+                        color: AppColors.warning,
+                        backgroundColor: Colors.white,
+                        icon: LucideIcons.arrowUpRight,
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: AppColors.warning.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.warning_amber_rounded,
-                        color: AppColors.warning,
-                        size: 18,
-                      ),
+                const SizedBox(height: 16),
+              ],
+
+              // 3. 4 TA ASOSIY KPI KARTALARI (Fixed height -> 0% overflow on any mobile/desktop width)
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final cols = constraints.maxWidth >= 780 ? 4 : 2;
+                  return GridView(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: cols,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      mainAxisExtent: 124,
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Diqqat talab holatlar (${alerts.length} ta)',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            alerts.first.message,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: AppColors.textSecondary,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: BorderSide(color: AppColors.warning.withValues(alpha: 0.5)),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        visualDensity: VisualDensity.compact,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
+                    children: [
+                      _buildKpiCard(
+                        title: 'Jami o‘quvchilar',
+                        value: '${app.totalStudentsCount}',
+                        subtitle: 'Inklyuziv ro‘yxatda',
+                        icon: LucideIcons.users,
+                        color: AppColors.primary,
+                        bgColor: AppColors.primaryLight,
+                        onTap: () => _openModule(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => const MonitoringScreen(),
-                          ),
+                          1,
+                          const StudentsListScreen(),
+                        ),
+                      ),
+                      _buildKpiCard(
+                        title: 'Faol ITR rejalari',
+                        value: '${app.activeIepCount}',
+                        subtitle: 'Ijro etilayotgan',
+                        icon: LucideIcons.bookOpenCheck,
+                        color: AppColors.info,
+                        bgColor: AppColors.infoBg,
+                        onTap: () =>
+                            _openModule(context, 4, const IepListScreen()),
+                      ),
+                      _buildKpiCard(
+                        title: 'Bu oygi darslar',
+                        value: '${app.thisMonthSessionsCount}',
+                        subtitle: 'O‘tkazilgan va rejada',
+                        icon: LucideIcons.calendarCheck2,
+                        color: AppColors.purple,
+                        bgColor: AppColors.purpleBg,
+                        onTap: () =>
+                            _openModule(context, 3, const SessionsScreen()),
+                      ),
+                      _buildKpiCard(
+                        title: 'O‘rtacha o‘sish',
+                        value:
+                            '+${app.averageDevelopmentGrowth.toStringAsFixed(1)}%',
+                        subtitle: 'Oxirgi chorakda',
+                        icon: LucideIcons.trendingUp,
+                        color: AppColors.success,
+                        bgColor: AppColors.successBg,
+                        onTap: () =>
+                            _openModule(context, 6, const ReportsScreen()),
+                      ),
+                    ],
+                  );
+                },
+              )
+                  .animate()
+                  .fadeIn(
+                    delay: 40.ms,
+                    duration: 220.ms,
+                    curve: Curves.easeOutCubic,
+                  )
+                  .slideY(
+                    begin: 0.02,
+                    end: 0,
+                    duration: 220.ms,
+                    curve: Curves.easeOutCubic,
+                  ),
+
+              const SizedBox(height: 20),
+
+              // 4. KASBIY ISH MAYDONI
+              _buildRoleSpecificWorkspace(context, user),
+              const SizedBox(height: 20),
+
+              // 5. GRAFIK: OYLIK RIVOJLANISH DINAMIKASI
+              _buildAnalyticsChartCard(),
+              const SizedBox(height: 20),
+
+              // 6. SO'NGGI BAHOLASHLAR VA KUTILAYOTGAN MASHG'ULOTLAR
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth >= 760;
+
+                  final leftCard =
+                      _buildRecentAssessmentsCard(context, assessments);
+                  final rightCard =
+                      _buildUpcomingSessionsCard(context, sessions);
+
+                  return isWide
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: leftCard),
+                            const SizedBox(width: 16),
+                            Expanded(child: rightCard),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            leftCard,
+                            const SizedBox(height: 16),
+                            rightCard,
+                          ],
                         );
-                      },
-                      child: const Text(
-                        'Ko‘rish',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.warning),
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWelcomeHero(BuildContext context, UserModel? user) {
+    return GlassSurface(
+      borderRadius: 20,
+      blur: 18,
+      opacity: 0.85,
+      padding: const EdgeInsets.all(18),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < 560;
+
+          final profileInfo = Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.primaryLight, AppColors.primaryTint],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.16),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  (user?.fullName ?? 'U').substring(0, 1),
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Assalomu alaykum, ${user?.fullName ?? 'Mutaxassis'}!',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: isCompact ? 15.5 : 17.5,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.35,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        StatusPill(
+                          label: user?.role.label ?? 'Mutaxassis',
+                          color: AppColors.primary,
+                          backgroundColor: AppColors.primaryLight,
+                          showDot: true,
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              LucideIcons.school,
+                              size: 13.5,
+                              color: AppColors.textMuted,
+                            ),
+                            const SizedBox(width: 5),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: isCompact ? 210 : 340,
+                              ),
+                              child: Text(
+                                user?.institutionName ??
+                                    '9-sonli inklyuziv ta’lim tayanch maktabi',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textMuted,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+
+          final addBtn = FilledButton.icon(
+            icon: const Icon(LucideIcons.userPlus, size: 16),
+            label: const Text('Bola qo‘shish'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AddStudentScreen()),
+              );
+            },
+          );
+
+          if (isCompact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                profileInfo,
+                const SizedBox(height: 14),
+                addBtn,
+              ],
+            );
+          }
+
+          return Row(
+            children: [
+              Expanded(child: profileInfo),
+              const SizedBox(width: 14),
+              addBtn,
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildAnalyticsChartCard() {
+    const months = ['Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
+
+    return SurfaceCard(
+      borderRadius: 20,
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Oylik rivojlanish dinamikasi',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'Nutq, kognitiv va ijtimoiy mezonlar kesimida o‘rtacha ballar',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(width: 10),
+              const StatusPill(
+                label: '2026 o‘quv yili',
+                color: AppColors.primary,
+                backgroundColor: AppColors.primaryLight,
+                icon: LucideIcons.sparkles,
+              ),
             ],
-
-            // 2. 4 TA ASOSIY KPI KARTALARI
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide = constraints.maxWidth > 650;
-                return GridView.count(
-                  crossAxisCount: isWide ? 4 : 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: isWide ? 1.5 : 1.25,
-                  children: [
-                    _buildKpiCard(
-                      title: 'Jami o‘quvchilar',
-                      value: '${app.totalStudentsCount}',
-                      subtitle: 'Inklyuziv ro‘yxatda',
-                      icon: Icons.people_alt_rounded,
-                      color: AppColors.primary,
-                      bgColor: AppColors.primaryLight,
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 200,
+            child: LineChart(
+              LineChartData(
+                lineTouchData: LineTouchData(
+                  handleBuiltInTouches: true,
+                  touchTooltipData: LineTouchTooltipData(
+                    tooltipBorderRadius: BorderRadius.circular(10),
+                    getTooltipColor: (_) => AppColors.textPrimary,
+                    getTooltipItems: (touchedSpots) {
+                      return touchedSpots.map((spot) {
+                        final idx = spot.x.toInt();
+                        final month = (idx >= 0 && idx < months.length)
+                            ? months[idx]
+                            : '';
+                        return LineTooltipItem(
+                          '$month\n${spot.y.toInt()} ball',
+                          const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            height: 1.35,
+                          ),
+                        );
+                      }).toList();
+                    },
+                  ),
+                ),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: 25,
+                  getDrawingHorizontalLine: (_) => FlLine(
+                    color: AppColors.border.withValues(alpha: 0.7),
+                    strokeWidth: 1,
+                    dashArray: [4, 4],
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 25,
+                      reservedSize: 34,
+                      getTitlesWidget: (val, _) => Text(
+                        '${val.toInt()}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                      ),
                     ),
-                    _buildKpiCard(
-                      title: 'Faol ITR rejalari',
-                      value: '${app.activeIepCount}',
-                      subtitle: 'Ijro etilayotgan',
-                      icon: Icons.assignment_turned_in_rounded,
-                      color: AppColors.info,
-                      bgColor: AppColors.infoBg,
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 1,
+                      reservedSize: 30,
+                      getTitlesWidget: (val, _) {
+                        final idx = val.toInt();
+                        if (val != idx.toDouble()) {
+                          return const SizedBox.shrink();
+                        }
+                        if (idx >= 0 && idx < months.length) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Text(
+                              months[idx],
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
                     ),
-                    _buildKpiCard(
-                      title: 'Bu oygi darslar',
-                      value: '${app.thisMonthSessionsCount}',
-                      subtitle: 'O‘tkazilgan va rejada',
-                      icon: Icons.event_available_rounded,
-                      color: AppColors.purple,
-                      bgColor: AppColors.purpleBg,
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                minX: 0,
+                maxX: 3,
+                minY: 0,
+                maxY: 100,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: const [
+                      FlSpot(0, 55),
+                      FlSpot(1, 62),
+                      FlSpot(2, 70),
+                      FlSpot(3, 78),
+                    ],
+                    isCurved: true,
+                    curveSmoothness: 0.32,
+                    color: AppColors.primary,
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (_, _, _, _) => FlDotCirclePainter(
+                        radius: 4.5,
+                        color: Colors.white,
+                        strokeWidth: 2.5,
+                        strokeColor: AppColors.primary,
+                      ),
                     ),
-                    _buildKpiCard(
-                      title: 'O‘rtacha o‘sish',
-                      value:
-                          '+${app.averageDevelopmentGrowth.toStringAsFixed(1)}%',
-                      subtitle: 'Oxirgi chorakda',
-                      icon: Icons.trending_up_rounded,
-                      color: AppColors.success,
-                      bgColor: AppColors.successBg,
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.primary.withValues(alpha: 0.22),
+                          AppColors.primary.withValues(alpha: 0.0),
+                        ],
+                      ),
                     ),
-                  ],
-                );
-              },
+                  ),
+                ],
+              ),
             ),
-            // 2.5 KASBIY TEZKOR VAZIFALAR VA ISH MAYDONI
-            _buildRoleSpecificWorkspace(context, user),
-            const SizedBox(height: 24),
+          ),
+        ],
+      ),
+    );
+  }
 
-            // 3. GRAFIK: OYLIK RIVOJLANISH DINAMIKASI
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildRecentAssessmentsCard(BuildContext context, List assessments) {
+    return SurfaceCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'So‘nggi baholashlar',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              if (onNavigateTab != null)
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => onNavigateTab!(2),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Column(
+                        Text(
+                          'Barchasi',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        SizedBox(width: 3),
+                        Icon(
+                          LucideIcons.arrowRight,
+                          size: 13,
+                          color: AppColors.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          if (assessments.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                'Hozircha baholashlar yo‘q',
+                style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+              ),
+            )
+          else
+            ...assessments.take(3).map((a) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: SurfaceCard(
+                  elevated: false,
+                  borderRadius: 12,
+                  padding: const EdgeInsets.all(11),
+                  backgroundColor: AppColors.background,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            StudentDetailScreen(studentId: a.studentId),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.hairlineBorder),
+                        ),
+                        child: const Icon(
+                          LucideIcons.clipboardCheck,
+                          color: AppColors.primary,
+                          size: 17,
+                        ),
+                      ),
+                      const SizedBox(width: 11),
+                      Expanded(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
-                              'Oylik Rivojlanish Dinamikasi (Kuzatuv mezonlari)',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
+                              a.studentName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
-                              'Nutq, kognitiv va ijtimoiy sohalar kesimida o‘rtacha ballar',
-                              style: TextStyle(
-                                fontSize: 12,
+                              '${a.title} • ${a.specialistRole}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11.5,
                                 color: AppColors.textMuted,
                               ),
                             ),
                           ],
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
+                      ),
+                      const SizedBox(width: 8),
+                      StatusPill(
+                        label:
+                            '${a.totalScore.toInt()}/${a.maxScore.toInt()}',
+                        color: AppColors.success,
+                        backgroundColor: AppColors.successBg,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUpcomingSessionsCard(BuildContext context, List sessions) {
+    return SurfaceCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Kutilayotgan mashg‘ulotlar',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              if (onNavigateTab != null)
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => onNavigateTab!(3),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Jadval',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
                           ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Text(
-                            '2026 o‘quv yili',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryDark,
-                            ),
-                          ),
+                        ),
+                        SizedBox(width: 3),
+                        Icon(
+                          LucideIcons.arrowRight,
+                          size: 13,
+                          color: AppColors.primary,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      height: 180,
-                      child: LineChart(
-                        LineChartData(
-                          gridData: FlGridData(
-                            show: true,
-                            drawVerticalLine: false,
-                            horizontalInterval: 25,
-                            getDrawingHorizontalLine: (value) => const FlLine(
-                              color: AppColors.borderLight,
-                              strokeWidth: 1,
-                            ),
-                          ),
-                          titlesData: FlTitlesData(
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                interval: 25,
-                                reservedSize: 32,
-                                getTitlesWidget: (val, meta) => Text(
-                                  '${val.toInt()}',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: AppColors.textMuted,
-                                  ),
-                                ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          if (sessions.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                'Rejalashtirilgan darslar yo‘q',
+                style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+              ),
+            )
+          else
+            ...sessions.take(3).map((s) {
+              final isDone = s.status == 'Bajarildi';
+              final accent = isDone ? AppColors.success : AppColors.info;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: SurfaceCard(
+                  elevated: false,
+                  borderRadius: 12,
+                  padding: const EdgeInsets.all(11),
+                  backgroundColor: AppColors.background,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            StudentDetailScreen(studentId: s.studentId),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.hairlineBorder),
+                        ),
+                        child: Icon(
+                          isDone ? LucideIcons.circleCheck : LucideIcons.clock,
+                          color: accent,
+                          size: 17,
+                        ),
+                      ),
+                      const SizedBox(width: 11),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              s.studentName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                                color: AppColors.textPrimary,
                               ),
                             ),
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (val, meta) {
-                                  final months = [
-                                    'Sentyabr',
-                                    'Oktyabr',
-                                    'Noyabr',
-                                    'Dekabr',
-                                  ];
-                                  final idx = val.toInt();
-                                  if (idx >= 0 && idx < months.length) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        months[idx],
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  return const SizedBox.shrink();
-                                },
-                              ),
-                            ),
-                            topTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            rightTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                          ),
-                          borderData: FlBorderData(show: false),
-                          minX: 0,
-                          maxX: 3,
-                          minY: 0,
-                          maxY: 100,
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: const [
-                                FlSpot(0, 55),
-                                FlSpot(1, 62),
-                                FlSpot(2, 70),
-                                FlSpot(3, 78),
-                              ],
-                              isCurved: true,
-                              color: AppColors.primary,
-                              barWidth: 3,
-                              dotData: const FlDotData(show: true),
-                              belowBarData: BarAreaData(
-                                show: true,
-                                color: AppColors.primary.withValues(
-                                  alpha: 0.15,
-                                ),
+                            const SizedBox(height: 2),
+                            Text(
+                              s.topic,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                color: AppColors.textMuted,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      StatusPill(
+                        label: s.status,
+                        color: accent,
+                        showDot: true,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // 4. SO'NGGI HARAKATLAR VA O'QUVCHILAR
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide = constraints.maxWidth > 700;
-
-                final leftCard = Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'So‘nggi baholashlar',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        if (assessments.isEmpty)
-                          const Text(
-                            'Hozircha baholashlar yo‘q',
-                            style: TextStyle(fontSize: 12),
-                          )
-                        else
-                          ...assessments.take(3).map((a) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12.0),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryLight,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Icon(
-                                      Icons.assignment,
-                                      color: AppColors.primary,
-                                      size: 18,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          a.studentName,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                        Text(
-                                          '${a.title} • ${a.specialistRole}',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            color: AppColors.textMuted,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.successBg,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      '${a.totalScore.toInt()}/${a.maxScore.toInt()}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 11,
-                                        color: AppColors.success,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                      ],
-                    ),
-                  ),
-                );
-
-                final rightCard = Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Kutilayotgan mashg‘ulotlar',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        if (sessions.isEmpty)
-                          const Text(
-                            'Rejalashtirilgan darslar yo‘q',
-                            style: TextStyle(fontSize: 12),
-                          )
-                        else
-                          ...sessions.take(3).map((s) {
-                            final isDone = s.status == 'Bajarildi';
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12.0),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: isDone
-                                          ? AppColors.successBg
-                                          : AppColors.infoBg,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      isDone
-                                          ? Icons.check_circle
-                                          : Icons.schedule,
-                                      color: isDone
-                                          ? AppColors.success
-                                          : AppColors.info,
-                                      size: 18,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          s.studentName,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                        Text(
-                                          s.topic,
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            color: AppColors.textMuted,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    s.status,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: isDone
-                                          ? AppColors.success
-                                          : AppColors.info,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                      ],
-                    ),
-                  ),
-                );
-
-                return isWide
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(child: leftCard),
-                          const SizedBox(width: 16),
-                          Expanded(child: rightCard),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          leftCard,
-                          const SizedBox(height: 16),
-                          rightCard,
-                        ],
-                      );
-              },
-            ),
-          ],
-        ),
+              );
+            }),
+        ],
       ),
     );
   }
@@ -761,27 +850,31 @@ class DashboardScreen extends StatelessWidget {
     switch (role) {
       case UserRole.psychologist:
         sectionTitle = 'Amaliyotchi psixolog ish maydoni';
-        sectionSubtitle = 'Kognitiv, hissiy-irodaviy sohalarni baholash va korreksion mashg‘ulotlar';
+        sectionSubtitle =
+            'Kognitiv, hissiy-irodaviy sohalarni baholash va korreksion mashg‘ulotlar';
         actions = [
           {
             'title': 'Yangi baholash (Rubrika)',
-            'desc': 'Bola rivojlanish darajasini standart mezonlar bo‘yicha baholash',
-            'icon': Icons.psychology_rounded,
+            'desc':
+                'Bola rivojlanish darajasini standart mezonlar bo‘yicha baholash',
+            'icon': LucideIcons.brain,
             'color': AppColors.primary,
             'screen': const NewAssessmentScreen(),
           },
           {
             'title': 'Bolalar ruhiy xaritasi',
             'desc': 'Biriktirilgan inklyuziv bolalar dinamikasi va profili',
-            'icon': Icons.child_care_rounded,
+            'icon': LucideIcons.users,
             'color': AppColors.info,
+            'tabIndex': 1,
             'screen': const StudentsListScreen(),
           },
           {
             'title': 'Korreksion mashg‘ulotlar',
             'desc': 'Yakka va kichik guruhdagi psixologik seanslar jurnali',
-            'icon': Icons.calendar_month_rounded,
+            'icon': LucideIcons.calendarDays,
             'color': AppColors.purple,
+            'tabIndex': 3,
             'screen': const SessionsScreen(),
           },
         ];
@@ -789,27 +882,30 @@ class DashboardScreen extends StatelessWidget {
 
       case UserRole.speechTherapist:
         sectionTitle = 'Logoped-defektolog ish maydoni';
-        sectionSubtitle = 'Nutq nuqsonlari korreksiyasi, fonematik eshitish va artikulyatsion tahlil';
+        sectionSubtitle =
+            'Nutq nuqsonlari korreksiyasi, fonematik eshitish va artikulyatsion tahlil';
         actions = [
           {
             'title': 'Nutq diagnostikasi',
             'desc': 'Tovush talaffuzi va fonematik idrokni baholash testi',
-            'icon': Icons.record_voice_over_rounded,
+            'icon': LucideIcons.mic,
             'color': AppColors.primary,
             'screen': const NewAssessmentScreen(),
           },
           {
             'title': 'Artikulyatsion darslar',
             'desc': 'Rejalashtirilgan logopedik mashg‘ulotlar davomati',
-            'icon': Icons.mic_external_on_rounded,
+            'icon': LucideIcons.calendarCheck2,
             'color': AppColors.info,
+            'tabIndex': 3,
             'screen': const SessionsScreen(),
           },
           {
             'title': 'Logopedik ITR rejalari',
             'desc': 'Individual ta’lim dasturidagi nutqiy maqsadlar ijrosi',
-            'icon': Icons.menu_book_rounded,
+            'icon': LucideIcons.bookOpenCheck,
             'color': AppColors.purple,
+            'tabIndex': 4,
             'screen': const IepListScreen(),
           },
         ];
@@ -817,27 +913,30 @@ class DashboardScreen extends StatelessWidget {
 
       case UserRole.specialEducation:
         sectionTitle = 'Maxsus pedagog (Defektolog) ish maydoni';
-        sectionSubtitle = 'Sensor, motorika va aqliy rivojlanishni moslashtirilgan ta’lim bilan qo‘llab-quvvatlash';
+        sectionSubtitle =
+            'Sensor, motorika va aqliy rivojlanishni moslashtirilgan ta’lim bilan qo‘llab-quvvatlash';
         actions = [
           {
             'title': 'Defektologik test',
             'desc': 'Sensomotorik va kognitiv qobiliyatlarni baholash',
-            'icon': Icons.accessibility_new_rounded,
+            'icon': LucideIcons.sparkles,
             'color': AppColors.primary,
             'screen': const NewAssessmentScreen(),
           },
           {
             'title': 'Yakka tartibdagi dars',
             'desc': 'Maxsus metodik mashg‘ulotlar jadvali va davomat',
-            'icon': Icons.event_note_rounded,
+            'icon': LucideIcons.calendarDays,
             'color': AppColors.info,
+            'tabIndex': 3,
             'screen': const SessionsScreen(),
           },
           {
             'title': 'Moslashtirilgan ITR',
             'desc': 'Bolaga moslashtirilgan o‘quv rejasi va mezonlari',
-            'icon': Icons.auto_stories_rounded,
+            'icon': LucideIcons.bookOpenCheck,
             'color': AppColors.purple,
+            'tabIndex': 4,
             'screen': const IepListScreen(),
           },
         ];
@@ -845,27 +944,31 @@ class DashboardScreen extends StatelessWidget {
 
       case UserRole.teacher:
         sectionTitle = 'Fan o‘qituvchisi / Tyutor ish maydoni';
-        sectionSubtitle = 'Sinfdagi inklyuziv muhit, o‘quv dasturini moslashtirish va davomat';
+        sectionSubtitle =
+            'Sinfdagi inklyuziv muhit, o‘quv dasturini moslashtirish va davomat';
         actions = [
           {
             'title': 'Dars davomati va faollik',
             'desc': 'Inklyuziv o‘quvchilarning umumiy sinfdagi ishtiroki',
-            'icon': Icons.fact_check_rounded,
+            'icon': LucideIcons.clipboardCheck,
             'color': AppColors.primary,
+            'tabIndex': 3,
             'screen': const SessionsScreen(),
           },
           {
             'title': 'O‘quvchilar ro‘yxati',
             'desc': 'Sinfdagi alohida ehtiyojli o‘quvchilar profillari',
-            'icon': Icons.groups_rounded,
+            'icon': LucideIcons.users,
             'color': AppColors.info,
+            'tabIndex': 1,
             'screen': const StudentsListScreen(),
           },
           {
             'title': 'ITR tavsiyalari',
             'desc': 'Mutaxassislar tomonidan tavsiya etilgan dars usullari',
-            'icon': Icons.assignment_outlined,
+            'icon': LucideIcons.bookOpen,
             'color': AppColors.purple,
+            'tabIndex': 4,
             'screen': const IepListScreen(),
           },
         ];
@@ -876,143 +979,58 @@ class DashboardScreen extends StatelessWidget {
       case UserRole.superAdmin:
       default:
         sectionTitle = 'Boshqaruv va Monitoring maydoni';
-        sectionSubtitle = 'Muassasa bo‘yicha tahliliy ko‘rsatkichlar, xavflar va mutaxassislar yuklamasi';
+        sectionSubtitle =
+            'Muassasa bo‘yicha tahliliy ko‘rsatkichlar, xavflar va mutaxassislar yuklamasi';
         actions = [
           {
             'title': 'Tahliliy hisobotlar',
-            'desc': 'Maktab inklyuziv ta’lim holati, choraklik natijalar va CSV eksport',
-            'icon': Icons.analytics_rounded,
+            'desc':
+                'Maktab inklyuziv ta’lim holati, choraklik natijalar va CSV eksport',
+            'icon': LucideIcons.chartColumn,
             'color': AppColors.primary,
+            'tabIndex': 6,
             'screen': const ReportsScreen(),
           },
           {
             'title': 'Monitoring signallari',
-            'desc': 'Rivojlanish regressiyasi va to‘xtab qolish xavfi ogohlantirishlari',
-            'icon': Icons.shield_rounded,
+            'desc':
+                'Rivojlanish regressiyasi va to‘xtab qolish xavfi ogohlantirishlari',
+            'icon': LucideIcons.shieldAlert,
             'color': AppColors.warning,
+            'tabIndex': 5,
             'screen': const MonitoringScreen(),
           },
           {
             'title': 'Mutaxassislar shtati',
             'desc': 'Psixolog, logoped va pedagoglar yuklamasi va bolalari',
-            'icon': Icons.badge_rounded,
+            'icon': LucideIcons.userCheck,
             'color': AppColors.purple,
+            'tabIndex': 7,
             'screen': const SpecialistsScreen(),
           },
         ];
         break;
     }
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
-      ),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.stars_rounded,
-                    color: AppColors.primary,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        sectionTitle,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        sectionSubtitle,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide = constraints.maxWidth > 700;
-                return isWide
-                    ? Row(
-                        children: actions.map((act) {
-                          return Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              child: _buildActionTile(context, act),
-                            ),
-                          );
-                        }).toList(),
-                      )
-                    : Column(
-                        children: actions.map((act) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: _buildActionTile(context, act),
-                          );
-                        }).toList(),
-                      );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionTile(BuildContext context, Map<String, dynamic> act) {
-    return Material(
-      color: AppColors.background,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => act['screen'] as Widget),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
+    return SurfaceCard(
+      borderRadius: 20,
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
-                  color: (act['color'] as Color).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(11),
                 ),
-                child: Icon(
-                  act['icon'] as IconData,
-                  color: act['color'] as Color,
-                  size: 22,
+                child: const Icon(
+                  LucideIcons.compass,
+                  color: AppColors.primary,
+                  size: 19,
                 ),
               ),
               const SizedBox(width: 12),
@@ -1021,33 +1039,132 @@ class DashboardScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      act['title'] as String,
+                      sectionTitle,
                       style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
+                        letterSpacing: -0.25,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      act['desc'] as String,
+                      sectionSubtitle,
                       style: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         color: AppColors.textMuted,
-                        height: 1.25,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 14,
-                color: AppColors.textMuted,
-              ),
             ],
           ),
-        ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 740;
+              if (isWide) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(actions.length, (i) {
+                    return Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          right: i < actions.length - 1 ? 12 : 0,
+                        ),
+                        child: _buildActionTile(context, actions[i]),
+                      ),
+                    );
+                  }),
+                );
+              }
+              return Column(
+                children: List.generate(actions.length, (i) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: i < actions.length - 1 ? 10 : 0,
+                    ),
+                    child: _buildActionTile(context, actions[i]),
+                  );
+                }),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionTile(BuildContext context, Map<String, dynamic> act) {
+    final accent = act['color'] as Color;
+    final tabIdx = act['tabIndex'] as int?;
+
+    return SurfaceCard(
+      elevated: false,
+      borderRadius: 14,
+      padding: const EdgeInsets.all(14),
+      backgroundColor: AppColors.background,
+      onTap: () {
+        if (tabIdx != null && onNavigateTab != null) {
+          onNavigateTab!(tabIdx);
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => act['screen'] as Widget),
+          );
+        }
+      },
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: accent.withValues(alpha: 0.2)),
+            ),
+            child: Icon(
+              act['icon'] as IconData,
+              color: accent,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  act['title'] as String,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  act['desc'] as String,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    color: AppColors.textMuted,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 6),
+          const Icon(
+            LucideIcons.chevronRight,
+            size: 16,
+            color: AppColors.textSubtle,
+          ),
+        ],
       ),
     );
   }
@@ -1059,71 +1176,71 @@ class DashboardScreen extends StatelessWidget {
     required IconData icon,
     required Color color,
     required Color bgColor,
+    required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppColors.border, width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(icon, color: color, size: 16),
-                ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: AppColors.textMuted,
-                    fontWeight: FontWeight.w500,
-                  ),
+    return SurfaceCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(15),
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              const SizedBox(width: 6),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Icon(icon, color: color, size: 16),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 23,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                  fontFeatures: [FontFeature.tabularFigures()],
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textMuted,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
