@@ -74,7 +74,7 @@ class _IepListScreenState extends State<IepListScreen> {
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
-                      value: selectedStudentId,
+                      initialValue: selectedStudentId,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         contentPadding: EdgeInsets.symmetric(
@@ -203,7 +203,7 @@ class _IepListScreenState extends State<IepListScreen> {
                       children: [
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            value: selectedDomain,
+                            initialValue: selectedDomain,
                             decoration: const InputDecoration(
                               labelText: 'Soha',
                               border: OutlineInputBorder(),
@@ -393,7 +393,7 @@ class _IepListScreenState extends State<IepListScreen> {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: selectedDomain,
+                      initialValue: selectedDomain,
                       decoration: const InputDecoration(
                         labelText: 'Soha',
                         border: OutlineInputBorder(),

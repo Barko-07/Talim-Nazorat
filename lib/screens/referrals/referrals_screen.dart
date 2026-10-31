@@ -55,7 +55,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DropdownButtonFormField<String>(
-                  value: selectedStdId,
+                  initialValue: selectedStdId,
                   decoration: const InputDecoration(
                     labelText: 'O‘quvchini tanlang *',
                   ),
@@ -71,7 +71,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: toService,
+                  initialValue: toService,
                   decoration: const InputDecoration(
                     labelText: 'Qaysi mutaxassis / xizmatga *',
                   ),
@@ -103,7 +103,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: priority,
+                  initialValue: priority,
                   decoration: const InputDecoration(
                     labelText: 'Muhimlik darajasi',
                   ),

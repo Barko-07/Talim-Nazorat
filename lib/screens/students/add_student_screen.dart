@@ -168,7 +168,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _gender,
+                              initialValue: _gender,
                               decoration: const InputDecoration(
                                 labelText: 'Jinsi',
                               ),
@@ -186,7 +186,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _grade,
+                              initialValue: _grade,
                               decoration: const InputDecoration(
                                 labelText: 'Sinfi',
                               ),
@@ -235,7 +235,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: _primaryNeed,
+                        initialValue: _primaryNeed,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           labelText: 'Asosiy ta’limiy ehtiyoj toifasi',
@@ -255,7 +255,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
-                        value: _supportLevel,
+                        initialValue: _supportLevel,
                         decoration: const InputDecoration(
                           labelText: 'Qo‘llab-quvvatlash darajasi',
                         ),
@@ -318,7 +318,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _guardianRelation,
+                              initialValue: _guardianRelation,
                               decoration: const InputDecoration(
                                 labelText: 'Qarindoshligi',
                               ),

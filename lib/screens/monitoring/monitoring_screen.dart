@@ -62,7 +62,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 ),
                 const SizedBox(height: 14),
                 DropdownButtonFormField<String>(
-                  value: selectedStatus,
+                  initialValue: selectedStatus,
                   decoration: const InputDecoration(
                     labelText: 'Yangi holati *',
                     border: OutlineInputBorder(),

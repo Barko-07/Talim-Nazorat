@@ -391,7 +391,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
                       // O'quvchini tanlash
                       DropdownButtonFormField<String>(
-                        value: _selectedStudentId,
+                        initialValue: _selectedStudentId,
                         decoration: const InputDecoration(
                           labelText: 'O‘quvchini tanlang *',
                           prefixIcon: Icon(
@@ -418,7 +418,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
                       // Sohaviy Diagnostika Kategoriyasi (Faqat shu mutaxassis vakolatiga tegishlilari)
                       DropdownButtonFormField<String>(
-                        value: _category,
+                        initialValue: _category,
                         decoration: InputDecoration(
                           labelText: 'Kasbiy diagnostika yo‘nalishi *',
                           prefixIcon: Icon(

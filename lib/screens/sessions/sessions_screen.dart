@@ -58,7 +58,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DropdownButtonFormField<String>(
-                  value: selectedStdId,
+                  initialValue: selectedStdId,
                   decoration: const InputDecoration(
                     labelText: 'O‘quvchini tanlang *',
                   ),
@@ -81,7 +81,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: sessionType,
+                  initialValue: sessionType,
                   decoration: const InputDecoration(
                     labelText: 'Mashg‘ulot shakli',
                   ),
@@ -99,7 +99,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<int>(
-                  value: durationMinutes,
+                  initialValue: durationMinutes,
                   decoration: const InputDecoration(labelText: 'Davomiyligi'),
                   items: const [
                     DropdownMenuItem(value: 30, child: Text('30 daqiqa')),
