@@ -67,13 +67,13 @@ class DashboardScreen extends StatelessWidget {
               // 2. DIQQAT TALAB HOLATLAR BANNERI (Erkin ikonkali)
               if (alerts.isNotEmpty) ...[
                 SurfaceCard(
-                  borderRadius: 24,
+                  borderRadius: 16,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
+                    horizontal: 18,
+                    vertical: 15,
                   ),
                   backgroundColor: AppColors.warningBg,
-                  borderColor: Colors.white,
+                  borderColor: AppColors.warningBorder,
                   onTap: () =>
                       _openModule(context, 5, const MonitoringScreen()),
                   child: LayoutBuilder(
@@ -267,10 +267,10 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildWelcomeHero(BuildContext context, UserModel? user) {
     return GlassSurface(
-      borderRadius: 28,
-      blur: 22,
-      opacity: 0.76,
-      padding: const EdgeInsets.all(24),
+      borderRadius: 18,
+      blur: 16,
+      opacity: 0.95,
+      padding: const EdgeInsets.all(22),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 580;
@@ -279,8 +279,8 @@ class DashboardScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                radius: 25,
-                backgroundColor: Colors.white.withValues(alpha: 0.9),
+                radius: 24,
+                backgroundColor: AppColors.primaryLight,
                 child: Text(
                   (user?.fullName ?? 'U').substring(0, 1),
                   style: const TextStyle(
@@ -311,7 +311,7 @@ class DashboardScreen extends StatelessWidget {
                     StatusPill(
                       label: user?.role.label ?? 'Mutaxassis',
                       color: AppColors.primary,
-                      backgroundColor: Colors.white.withValues(alpha: 0.85),
+                      backgroundColor: AppColors.primaryLight,
                       icon: user != null ? premiumRoleIcon(user.role) : null,
                       showDot: user == null,
                     ),
@@ -383,8 +383,8 @@ class DashboardScreen extends StatelessWidget {
     const months = ['Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
 
     return SurfaceCard(
-      borderRadius: 28,
-      padding: const EdgeInsets.all(24),
+      borderRadius: 18,
+      padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -429,7 +429,7 @@ class DashboardScreen extends StatelessWidget {
               const pill = StatusPill(
                 label: '2026 o‘quv yili',
                 color: AppColors.primary,
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.primaryLight,
                 icon: LucideIcons.sparkles,
               );
 
@@ -456,7 +456,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           GlassWell(
-            borderRadius: 20,
+            borderRadius: 12,
             padding: const EdgeInsets.fromLTRB(10, 20, 26, 12),
             child: SizedBox(
               height: 205,
@@ -465,7 +465,7 @@ class DashboardScreen extends StatelessWidget {
                   lineTouchData: LineTouchData(
                     handleBuiltInTouches: true,
                     touchTooltipData: LineTouchTooltipData(
-                      tooltipBorderRadius: BorderRadius.circular(14),
+                      tooltipBorderRadius: BorderRadius.circular(10),
                       getTooltipColor: (_) => AppColors.textPrimary,
                       getTooltipItems: (touchedSpots) {
                         return touchedSpots.map((spot) {
@@ -602,7 +602,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildRecentAssessmentsCard(BuildContext context, List assessments) {
     return SurfaceCard(
-      borderRadius: 26,
+      borderRadius: 18,
       padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -670,12 +670,13 @@ class DashboardScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 11),
                 child: SurfaceCard(
                   elevated: false,
-                  borderRadius: 18,
+                  borderRadius: 12,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 13,
+                    horizontal: 14,
+                    vertical: 12,
                   ),
                   backgroundColor: AppColors.glassWellFill,
+                  borderColor: AppColors.glassInnerBorder,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -739,7 +740,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildUpcomingSessionsCard(BuildContext context, List sessions) {
     return SurfaceCard(
-      borderRadius: 26,
+      borderRadius: 18,
       padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -810,12 +811,13 @@ class DashboardScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 11),
                 child: SurfaceCard(
                   elevated: false,
-                  borderRadius: 18,
+                  borderRadius: 12,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 13,
+                    horizontal: 14,
+                    vertical: 12,
                   ),
                   backgroundColor: AppColors.glassWellFill,
+                  borderColor: AppColors.glassInnerBorder,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -1050,8 +1052,8 @@ class DashboardScreen extends StatelessWidget {
     }
 
     return SurfaceCard(
-      borderRadius: 28,
-      padding: const EdgeInsets.all(24),
+      borderRadius: 18,
+      padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1114,9 +1116,10 @@ class DashboardScreen extends StatelessWidget {
 
     return SurfaceCard(
       elevated: false,
-      borderRadius: 20,
-      padding: const EdgeInsets.all(18),
+      borderRadius: 14,
+      padding: const EdgeInsets.all(16),
       backgroundColor: AppColors.glassWellFill,
+      borderColor: AppColors.glassInnerBorder,
       onTap: () {
         if (tabIdx != null && onNavigateTab != null) {
           onNavigateTab!(tabIdx);
@@ -1188,7 +1191,7 @@ class DashboardScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return SurfaceCard(
-      borderRadius: 26,
+      borderRadius: 18,
       padding: const EdgeInsets.all(20),
       onTap: onTap,
       child: Column(

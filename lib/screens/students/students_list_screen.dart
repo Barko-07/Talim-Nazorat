@@ -44,7 +44,7 @@ class StudentsListScreen extends StatelessWidget {
 
           // Kesib olingan shisha qidiruv va sinf filtri paneli (Mobil va desktopga mos)
           SurfaceCard(
-            borderRadius: 24,
+            borderRadius: 16,
             padding: const EdgeInsets.all(14),
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -59,9 +59,9 @@ class StudentsListScreen extends StatelessWidget {
                       size: 18,
                       color: AppColors.primary,
                     ),
-                    fillColor: Colors.white.withValues(alpha: 0.72),
+                    fillColor: const Color(0xFFF9FAFC),
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
+                      horizontal: 15,
                       vertical: 13,
                     ),
                     suffixIcon: app.searchQuery.isNotEmpty
@@ -76,18 +76,18 @@ class StudentsListScreen extends StatelessWidget {
 
                 final gradeFilter = DropdownButtonHideUnderline(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    height: 46,
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    height: 45,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.78),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: Colors.white, width: 1.3),
+                      color: const Color(0xFFF9FAFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border, width: 1.0),
                     ),
                     child: DropdownButton<String?>(
                       value: app.selectedGrade,
                       isExpanded: isCompact,
-                      borderRadius: BorderRadius.circular(20),
-                      dropdownColor: const Color(0xF5FFFFFF),
+                      borderRadius: BorderRadius.circular(14),
+                      dropdownColor: Colors.white,
                       icon: const Padding(
                         padding: EdgeInsets.only(left: 6),
                         child: Icon(
@@ -161,10 +161,10 @@ class StudentsListScreen extends StatelessWidget {
             child: students.isEmpty
                 ? Center(
                     child: SurfaceCard(
-                      borderRadius: 28,
+                      borderRadius: 18,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 36,
+                        horizontal: 30,
+                        vertical: 34,
                       ),
                       child: const Column(
                         mainAxisSize: MainAxisSize.min,
@@ -226,8 +226,8 @@ class StudentsListScreen extends StatelessWidget {
         : 'Vasiy kiritilmagan';
 
     return SurfaceCard(
-      borderRadius: 26,
-      padding: const EdgeInsets.all(20),
+      borderRadius: 18,
+      padding: const EdgeInsets.all(18),
       onTap: () {
         Navigator.push(
           context,
@@ -240,8 +240,8 @@ class StudentsListScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            radius: 23,
-            backgroundColor: Colors.white.withValues(alpha: 0.9),
+            radius: 22,
+            backgroundColor: AppColors.primaryLight,
             child: Text(
               s.firstName.isNotEmpty ? s.firstName.substring(0, 1) : '?',
               style: const TextStyle(
@@ -276,7 +276,7 @@ class StudentsListScreen extends StatelessWidget {
                     StatusPill(
                       label: '${s.grade}-sinf',
                       color: AppColors.primary,
-                      backgroundColor: Colors.white.withValues(alpha: 0.85),
+                      backgroundColor: AppColors.primaryLight,
                     ),
                   ],
                 ),
@@ -301,7 +301,7 @@ class StudentsListScreen extends StatelessWidget {
                     StatusPill(
                       label: s.supportLevel,
                       color: AppColors.info,
-                      backgroundColor: Colors.white.withValues(alpha: 0.82),
+                      backgroundColor: AppColors.infoBg,
                       maxWidth: 230,
                     ),
                     Text(

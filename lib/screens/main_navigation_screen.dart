@@ -210,11 +210,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 560, maxHeight: 500),
               child: GlassSurface(
-                borderRadius: 30,
-                blur: 26,
-                opacity: 0.84,
+                borderRadius: 20,
+                blur: 18,
+                opacity: 0.96,
                 boxShadow: AppColors.elevatedShadow,
-                padding: const EdgeInsets.all(22),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,10 +274,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                 return SurfaceCard(
                                   elevated: false,
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 13,
+                                    horizontal: 15,
+                                    vertical: 12,
                                   ),
-                                  borderRadius: 20,
+                                  borderRadius: 12,
                                   onTap: () {
                                     Navigator.pop(ctx);
                                     Navigator.push(
@@ -351,10 +351,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => GlassSurface(
-        borderRadius: 32,
-        blur: 26,
-        opacity: 0.88,
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+        borderRadius: 22,
+        blur: 18,
+        opacity: 0.97,
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 26),
         child: SafeArea(
           top: false,
           child: SingleChildScrollView(
@@ -410,18 +410,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     final badge = _badgeForIndex(item.index, app);
 
                     return SurfaceCard(
-                      elevated: !isSel,
-                      borderRadius: 22,
+                      elevated: false,
+                      borderRadius: 14,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 14,
+                        horizontal: 14,
+                        vertical: 13,
                       ),
                       backgroundColor: isSel
-                          ? Colors.white.withValues(alpha: 0.94)
-                          : null,
-                      borderColor: isSel
-                          ? AppColors.primary.withValues(alpha: 0.45)
+                          ? AppColors.primaryLight
                           : Colors.white,
+                      borderColor: isSel
+                          ? AppColors.primary.withValues(alpha: 0.35)
+                          : AppColors.border,
                       onTap: () {
                         Navigator.pop(ctx);
                         _selectTab(item.index);
@@ -462,7 +462,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                 color: item.index == 5
                                     ? AppColors.errorBg
                                     : AppColors.primaryLight,
-                                borderRadius: BorderRadius.circular(999),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 '$badge',
@@ -503,10 +503,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           final notifications = app.myNotifications;
           final unreadCount = app.myUnreadNotificationCount;
           return GlassSurface(
-            borderRadius: 32,
-            blur: 26,
-            opacity: 0.88,
-            padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
+            borderRadius: 22,
+            blur: 18,
+            opacity: 0.97,
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
             child: SafeArea(
               top: false,
               child: SizedBox(
@@ -615,10 +615,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
                                 return SurfaceCard(
                                   elevated: false,
-                                  borderRadius: 22,
-                                  padding: const EdgeInsets.all(16),
+                                  borderRadius: 14,
+                                  padding: const EdgeInsets.all(15),
                                   borderColor: notif.isRead
-                                      ? Colors.white
+                                      ? AppColors.border
                                       : accent.withValues(alpha: 0.35),
                                   onTap: () async {
                                     final navigator =
@@ -804,12 +804,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           4,
         ),
         child: GlassSurface(
-          borderRadius: 24,
-          blur: 22,
-          opacity: 0.74,
+          borderRadius: 16,
+          blur: 16,
+          opacity: 0.94,
           padding: EdgeInsets.symmetric(
-            horizontal: isDesktop ? 20 : 12,
-            vertical: 10,
+            horizontal: isDesktop ? 18 : 12,
+            vertical: 9.5,
           ),
           child: Row(
             children: [
@@ -868,16 +868,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   padding: const EdgeInsets.only(right: 10),
                   child: InkWell(
                     onTap: () => _showQuickSearchModal(context),
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(10),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 8.5,
+                        horizontal: 14,
+                        vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.68),
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: Colors.white, width: 1.3),
+                        color: AppColors.glassWellFill,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.border, width: 1.0),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
@@ -964,10 +964,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               PopupMenuButton<String>(
                 tooltip: 'Profil menyusi',
                 offset: const Offset(0, 48),
-                color: const Color(0xF2FFFFFF),
+                color: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  side: const BorderSide(color: Colors.white, width: 1.4),
+                  borderRadius: BorderRadius.circular(14),
+                  side: const BorderSide(color: AppColors.border, width: 1.0),
                 ),
                 onSelected: (val) async {
                   if (val == 'settings') {
@@ -1046,13 +1046,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ],
                 child: Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: isDesktop ? 12 : 6,
-                    vertical: 6,
+                    horizontal: isDesktop ? 11 : 6,
+                    vertical: 5.5,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.78),
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: Colors.white, width: 1.3),
+                    color: AppColors.glassWellFill,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.border, width: 1.0),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -1147,11 +1147,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 0, 16),
         child: SizedBox(
-          width: 262,
+          width: 260,
           child: GlassSurface(
-            borderRadius: 30,
-            blur: 24,
-            opacity: 0.74,
+            borderRadius: 20,
+            blur: 16,
+            opacity: 0.95,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -1229,39 +1229,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    borderRadius: BorderRadius.circular(18),
+                                    borderRadius: BorderRadius.circular(12),
                                     onTap: () => _selectTab(item.index),
                                     child: AnimatedContainer(
                                       duration: const Duration(
-                                        milliseconds: 170,
+                                        milliseconds: 160,
                                       ),
                                       curve: Curves.easeOutCubic,
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 14,
-                                        vertical: 11,
+                                        horizontal: 13,
+                                        vertical: 10.5,
                                       ),
                                       decoration: BoxDecoration(
                                         color: isSelected
-                                            ? Colors.white.withValues(
-                                                alpha: 0.92,
-                                              )
+                                            ? AppColors.primaryLight
                                             : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(18),
+                                        borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
                                           color: isSelected
-                                              ? Colors.white
+                                              ? AppColors.primaryTint
                                               : Colors.transparent,
-                                          width: 1.2,
+                                          width: 1.0,
                                         ),
-                                        boxShadow: isSelected
-                                            ? const [
-                                                BoxShadow(
-                                                  color: Color(0x100F172A),
-                                                  blurRadius: 12,
-                                                  offset: Offset(0, 4),
-                                                ),
-                                              ]
-                                            : null,
                                       ),
                                       child: Row(
                                         children: [
@@ -1300,9 +1289,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                               decoration: BoxDecoration(
                                                 color: isAlertBadge
                                                     ? AppColors.errorBg
-                                                    : AppColors.primaryLight,
+                                                    : Colors.white,
                                                 borderRadius:
-                                                    BorderRadius.circular(999),
+                                                    BorderRadius.circular(6),
+                                                border: Border.all(
+                                                  color: isAlertBadge
+                                                      ? AppColors.errorBorder
+                                                      : AppColors.border,
+                                                  width: 0.85,
+                                                ),
                                               ),
                                               child: Text(
                                                 '$badge',
@@ -1338,9 +1333,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
-                    vertical: 12,
+                    vertical: 11,
                   ),
-                  borderRadius: 20,
+                  borderRadius: 12,
                   child: Row(
                     children: [
                       const Icon(
@@ -1393,10 +1388,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
         child: GlassSurface(
-          borderRadius: 28,
-          blur: 24,
-          opacity: 0.80,
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          borderRadius: 20,
+          blur: 18,
+          opacity: 0.95,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5.5),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -1407,23 +1402,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     behavior: HitTestBehavior.opaque,
                     onTap: () => _selectTab(item.index),
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 170),
+                      duration: const Duration(milliseconds: 160),
                       curve: Curves.easeOutCubic,
                       padding: const EdgeInsets.symmetric(vertical: 7),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Colors.white.withValues(alpha: 0.94)
+                            ? AppColors.primaryLight
                             : Colors.transparent,
-                        borderRadius: BorderRadius.circular(22),
-                        boxShadow: isSelected
-                            ? const [
-                                BoxShadow(
-                                  color: Color(0x120F172A),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 3),
-                                ),
-                              ]
-                            : null,
+                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.primaryTint
+                              : Colors.transparent,
+                          width: 0.85,
+                        ),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -1461,23 +1453,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   behavior: HitTestBehavior.opaque,
                   onTap: () => _showMobileModulesSheet(context, app),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 170),
+                    duration: const Duration(milliseconds: 160),
                     curve: Curves.easeOutCubic,
                     padding: const EdgeInsets.symmetric(vertical: 7),
                     decoration: BoxDecoration(
                       color: isMoreActive
-                          ? Colors.white.withValues(alpha: 0.94)
+                          ? AppColors.primaryLight
                           : Colors.transparent,
-                      borderRadius: BorderRadius.circular(22),
-                      boxShadow: isMoreActive
-                          ? const [
-                              BoxShadow(
-                                color: Color(0x120F172A),
-                                blurRadius: 10,
-                                offset: Offset(0, 3),
-                              ),
-                            ]
-                          : null,
+                      borderRadius: BorderRadius.circular(13),
+                      border: Border.all(
+                        color: isMoreActive
+                            ? AppColors.primaryTint
+                            : Colors.transparent,
+                        width: 0.85,
+                      ),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -1530,7 +1519,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       backgroundColor: AppColors.background,
       surfaceTintColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.horizontal(right: Radius.circular(30)),
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(20)),
       ),
       child: SafeArea(
         child: Column(
@@ -1576,7 +1565,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   SurfaceCard(
                     elevated: false,
                     padding: const EdgeInsets.all(14),
-                    borderRadius: 22,
+                    borderRadius: 14,
                     child: Row(
                       children: [
                         CircleAvatar(
@@ -1639,10 +1628,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     child: ListTile(
                       dense: true,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       tileColor: isSel
-                          ? Colors.white.withValues(alpha: 0.9)
+                          ? AppColors.primaryLight
                           : Colors.transparent,
                       leading: Icon(
                         item.icon,

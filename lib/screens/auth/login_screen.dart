@@ -115,9 +115,9 @@ class _LoginScreenState extends State<LoginScreen>
             return SizedBox(
               height: MediaQuery.sizeOf(context).height * 0.78,
               child: GlassSurface(
-                borderRadius: 32,
-                blur: 26,
-                opacity: 0.88,
+                borderRadius: 22,
+                blur: 18,
+                opacity: 0.97,
                 child: SafeArea(
                   top: false,
                   child: Column(
@@ -213,18 +213,18 @@ class _LoginScreenState extends State<LoginScreen>
 
                                   return SurfaceCard(
                                     elevated: false,
-                                    borderRadius: 20,
+                                    borderRadius: 12,
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 14,
+                                      horizontal: 15,
+                                      vertical: 13,
                                     ),
                                     backgroundColor: isSelected
-                                        ? Colors.white.withValues(alpha: 0.94)
+                                        ? AppColors.primaryLight
                                         : AppColors.glassWellFill,
                                     borderColor: isSelected
                                         ? AppColors.primary
-                                            .withValues(alpha: 0.45)
-                                        : Colors.white,
+                                            .withValues(alpha: 0.4)
+                                        : AppColors.border,
                                     onTap: () {
                                       setState(() {
                                         _institutionCtrl.text = school;
@@ -450,8 +450,11 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.errorBg,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white, width: 1.3),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.errorBorder,
+                            width: 1.0,
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -478,11 +481,11 @@ class _LoginScreenState extends State<LoginScreen>
                     ],
 
                     GlassSurface(
-                      borderRadius: 30,
-                      blur: 24,
-                      opacity: 0.78,
+                      borderRadius: 20,
+                      blur: 18,
+                      opacity: 0.96,
                       boxShadow: AppColors.elevatedShadow,
-                      padding: const EdgeInsets.all(26),
+                      padding: const EdgeInsets.all(24),
                       child: PageTransitionSwitcher(
                         duration: const Duration(milliseconds: 210),
                         transitionBuilder: (child, primary, secondary) {
@@ -550,11 +553,11 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         const SizedBox(height: 14),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5.5),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.74),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: Colors.white, width: 1.3),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.border, width: 1.0),
           ),
           child: const Text(
             'MAKTABGACHA VA MAKTAB TA’LIMI VAZIRLIGI',
@@ -593,11 +596,13 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildSegmentedTabs() {
-    return GlassSurface(
-      borderRadius: 999,
-      blur: 18,
-      opacity: 0.64,
-      padding: const EdgeInsets.all(5),
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF1F5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border, width: 0.9),
+      ),
       child: Row(
         children: [
           _buildSegmentButton(
@@ -625,18 +630,23 @@ class _LoginScreenState extends State<LoginScreen>
       child: GestureDetector(
         onTap: () => _tabController.animateTo(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
+          duration: const Duration(milliseconds: 160),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
           decoration: BoxDecoration(
             color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(9),
+            border: Border.all(
+              color:
+                  isSelected ? AppColors.glassWhiteBorder : Colors.transparent,
+              width: 0.85,
+            ),
             boxShadow: isSelected
                 ? const [
                     BoxShadow(
-                      color: Color(0x140F172A),
-                      blurRadius: 10,
-                      offset: Offset(0, 3),
+                      color: Color(0x0D0F172A),
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
                     ),
                   ]
                 : null,
@@ -840,9 +850,10 @@ class _LoginScreenState extends State<LoginScreen>
             final icon = item.$3;
             return SurfaceCard(
               elevated: false,
-              borderRadius: 999,
-              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-              backgroundColor: Colors.white.withValues(alpha: 0.78),
+              borderRadius: 10,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              backgroundColor: AppColors.glassWellFill,
+              borderColor: AppColors.border,
               onTap: () => _selectDemoAccount(user),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -904,7 +915,7 @@ class _LoginScreenState extends State<LoginScreen>
     final stepTitles = ['Ism-familiya', 'Kasb va Maktab', 'Aloqa', 'Parol'];
 
     return GlassWell(
-      borderRadius: 18,
+      borderRadius: 12,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
       child: Column(
         children: [
@@ -1087,16 +1098,17 @@ class _LoginScreenState extends State<LoginScreen>
 
               return SurfaceCard(
                 elevated: false,
-                borderRadius: 999,
+                borderRadius: 10,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 13,
+                  horizontal: 12,
                   vertical: 9,
                 ),
                 backgroundColor: isSelected
-                    ? Colors.white.withValues(alpha: 0.96)
+                    ? AppColors.primaryLight
                     : AppColors.glassWellFill,
-                borderColor:
-                    isSelected ? AppColors.primary : Colors.white,
+                borderColor: isSelected
+                    ? AppColors.primary.withValues(alpha: 0.45)
+                    : AppColors.border,
                 onTap: () {
                   setState(() {
                     _selectedRole = r;
@@ -1153,9 +1165,10 @@ class _LoginScreenState extends State<LoginScreen>
           const SizedBox(height: 8),
           SurfaceCard(
             elevated: false,
-            borderRadius: 20,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            backgroundColor: Colors.white.withValues(alpha: 0.82),
+            borderRadius: 12,
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+            backgroundColor: AppColors.glassWellFill,
+            borderColor: AppColors.border,
             onTap: () => _showIosSchoolPickerModal(context),
             child: Row(
               children: [
@@ -1264,7 +1277,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           const SizedBox(height: 14),
           GlassWell(
-            borderRadius: 18,
+            borderRadius: 12,
             padding: const EdgeInsets.all(14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

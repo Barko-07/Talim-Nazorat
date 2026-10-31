@@ -182,8 +182,8 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                     children: [
                       // 1. Shaxsiy ma'lumotlar
                       SurfaceCard(
-                        borderRadius: 28,
-                        padding: const EdgeInsets.all(24),
+                        borderRadius: 18,
+                        padding: const EdgeInsets.all(22),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -295,8 +295,8 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
 
                       // 2. Ta'limiy ehtiyoj
                       SurfaceCard(
-                        borderRadius: 28,
-                        padding: const EdgeInsets.all(24),
+                        borderRadius: 18,
+                        padding: const EdgeInsets.all(22),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -367,8 +367,8 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
 
                       // 3. Oila va Vasiylar
                       SurfaceCard(
-                        borderRadius: 28,
-                        padding: const EdgeInsets.all(24),
+                        borderRadius: 18,
+                        padding: const EdgeInsets.all(22),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

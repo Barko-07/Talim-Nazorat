@@ -202,7 +202,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   itemBuilder: (c, i) {
                     final sp = availableSpecialists[i];
                     return GlassWell(
-                      borderRadius: 18,
+                      borderRadius: 12,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 14,
                         vertical: 10,
@@ -362,7 +362,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           controller: _tabController,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          dividerColor: Colors.white,
+          dividerColor: AppColors.hairlineBorder,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textMuted,
           indicatorColor: AppColors.primary,
@@ -406,7 +406,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
       child: ResponsivePageContainer(
         maxWidth: 480,
         child: SurfaceCard(
-          borderRadius: 28,
+          borderRadius: 18,
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 38),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -470,10 +470,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             if (isArchived)
               SurfaceCard(
                 margin: const EdgeInsets.only(bottom: 18),
-                padding: const EdgeInsets.all(18),
-                borderRadius: 24,
+                padding: const EdgeInsets.all(16),
+                borderRadius: 16,
                 backgroundColor: AppColors.warningBg,
-                borderColor: Colors.white,
+                borderColor: AppColors.warningBorder,
                 child: Row(
                   children: [
                     const Icon(
@@ -511,14 +511,15 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
             // Frosted Cut-Out Profil Hero Karta
             GlassSurface(
-              padding: const EdgeInsets.all(24),
-              borderRadius: 28,
+              padding: const EdgeInsets.all(22),
+              borderRadius: 18,
+              opacity: 0.95,
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final isCompact = constraints.maxWidth < 430;
                   final avatar = CircleAvatar(
                     radius: isCompact ? 28 : 34,
-                    backgroundColor: Colors.white.withValues(alpha: 0.92),
+                    backgroundColor: AppColors.primaryLight,
                     child: Text(
                       s.firstName.isNotEmpty
                           ? s.firstName.substring(0, 1)
@@ -604,7 +605,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
             // Ta'limiy Ehtiyoj va Daraja (Erkin ikonkalar!)
             SurfaceCard(
-              borderRadius: 26,
+              borderRadius: 18,
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -677,7 +678,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               )
                             else
                               const GlassWell(
-                                borderRadius: 16,
+                                borderRadius: 12,
                                 padding: EdgeInsets.all(12),
                                 child: Row(
                                   children: [
@@ -711,7 +712,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
             // Biriktirilgan Mutaxassislar
             SurfaceCard(
-              borderRadius: 26,
+              borderRadius: 18,
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -770,7 +771,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       return GlassWell(
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(15),
-                        borderRadius: 18,
+                        borderRadius: 12,
                         child: Row(
                           children: [
                             Icon(
@@ -813,7 +814,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
             // Vasiylar
             SurfaceCard(
-              borderRadius: 26,
+              borderRadius: 18,
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -838,7 +839,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       return GlassWell(
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(15),
-                        borderRadius: 18,
+                        borderRadius: 12,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1010,7 +1011,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               return Padding(
                 padding: const EdgeInsets.only(bottom: 14),
                 child: SurfaceCard(
-                  borderRadius: 26,
+                  borderRadius: 18,
                   padding: const EdgeInsets.all(22),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1099,7 +1100,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       ),
                       const SizedBox(height: 14),
                       GlassWell(
-                        borderRadius: 18,
+                        borderRadius: 12,
                         padding: const EdgeInsets.all(15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1157,7 +1158,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             return Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: SurfaceCard(
-                borderRadius: 26,
+                borderRadius: 18,
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1291,7 +1292,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               return Padding(
                 padding: const EdgeInsets.only(bottom: 14),
                 child: SurfaceCard(
-                  borderRadius: 26,
+                  borderRadius: 18,
                   padding: const EdgeInsets.all(22),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1379,7 +1380,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           children: [
             GlassSurface(
               padding: const EdgeInsets.all(24),
-              borderRadius: 28,
+              borderRadius: 18,
               child: const Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1423,7 +1424,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
             if (sorted.length >= 2) ...[
               SurfaceCard(
-                borderRadius: 26,
+                borderRadius: 18,
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1438,7 +1439,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     ),
                     const SizedBox(height: 18),
                     GlassWell(
-                      borderRadius: 20,
+                      borderRadius: 12,
                       padding: const EdgeInsets.fromLTRB(8, 18, 24, 10),
                       child: SizedBox(
                         height: 195,
@@ -1566,7 +1567,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             ],
 
             SurfaceCard(
-              borderRadius: 26,
+              borderRadius: 18,
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1593,7 +1594,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       return GlassWell(
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(14),
-                        borderRadius: 18,
+                        borderRadius: 12,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1654,7 +1655,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             return Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: SurfaceCard(
-                borderRadius: 26,
+                borderRadius: 18,
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1745,7 +1746,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             return Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: SurfaceCard(
-                borderRadius: 26,
+                borderRadius: 18,
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
@@ -1819,8 +1820,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: SurfaceCard(
-                borderRadius: 24,
-                padding: const EdgeInsets.all(18),
+                borderRadius: 16,
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
