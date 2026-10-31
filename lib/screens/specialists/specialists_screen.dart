@@ -1,8 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -26,71 +30,74 @@ class SpecialistsScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDlgState) => AlertDialog(
-          title: const Text(
-            'Yangi Xodim / Mutaxassis Qo‘shish',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'F.I.SH (To‘liq) *',
+          title: const Text('Yangi xodim / mutaxassis qo‘shish'),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'F.I.Sh. (To‘liq) *',
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<UserRole>(
-                  initialValue: selectedRole,
-                  decoration: const InputDecoration(
-                    labelText: 'Lavozimi va Roli *',
-                  ),
-                  items:
-                      [
-                            UserRole.psychologist,
-                            UserRole.speechTherapist,
-                            UserRole.specialEducation,
-                            UserRole.teacher,
-                            UserRole.coordinator,
-                            UserRole.institutionAdmin,
-                          ]
-                          .map(
-                            (r) => DropdownMenuItem(
-                              value: r,
-                              child: Text(r.label),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<UserRole>(
+                    initialValue: selectedRole,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Lavozimi va roli *',
+                    ),
+                    items: [
+                      UserRole.psychologist,
+                      UserRole.speechTherapist,
+                      UserRole.specialEducation,
+                      UserRole.teacher,
+                      UserRole.coordinator,
+                      UserRole.institutionAdmin,
+                    ]
+                        .map(
+                          (r) => DropdownMenuItem(
+                            value: r,
+                            child: Text(
+                              r.label,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          )
-                          .toList(),
-                  onChanged: (v) {
-                    setDlgState(() {
-                      selectedRole = v!;
-                      specCtrl.text = selectedRole.professionTitle;
-                    });
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: specCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Mutaxassislik yo‘nalishi',
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) {
+                      setDlgState(() {
+                        selectedRole = v!;
+                        specCtrl.text = selectedRole.professionTitle;
+                      });
+                    },
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: phoneCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Telefon raqami *',
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: specCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Mutaxassislik yo‘nalishi',
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: emailCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Elektron pochta (Email)',
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: phoneCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Telefon raqami *',
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: emailCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Elektron pochta (Email)',
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -162,44 +169,27 @@ class SpecialistsScreen extends StatelessWidget {
 
     final staffList = canManage ? app.allUsers : app.specialists;
     final allStudents = app.students;
+    final canPop = Navigator.canPop(context);
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
+      backgroundColor: canPop ? AppColors.background : Colors.transparent,
+      appBar: canPop ? AppBar(title: const Text('Mutaxassislar')) : null,
+      body: ResponsivePageContainer(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Kadrlar va Mutaxassislar Boshqaruvi',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Muassasa xodimlari, lavozimlar va yuklama hisobi (${staffList.length} nafar)',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-                if (canManage)
-                  FilledButton.icon(
-                    icon: const Icon(Icons.person_add_rounded, size: 18),
-                    label: const Text('Yangi xodim'),
-                    onPressed: () => _showAddStaffDialog(context),
-                  ),
-              ],
+            AdaptivePageHeader(
+              icon: LucideIcons.userCheck,
+              title: 'Kadrlar va mutaxassislar shtati',
+              subtitle:
+                  'Muassasa xodimlari, biriktirilgan sohalar va o‘quvchi yuklamasi (${staffList.length} nafar)',
+              action: canManage
+                  ? FilledButton.icon(
+                      icon: const Icon(LucideIcons.userPlus, size: 16),
+                      label: const Text('Yangi xodim'),
+                      onPressed: () => _showAddStaffDialog(context),
+                    )
+                  : null,
             ),
             const SizedBox(height: 16),
 
@@ -214,145 +204,149 @@ class SpecialistsScreen extends StatelessWidget {
                       .length;
                   final isActive = staff.isActive;
 
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundColor: staff.role.color.withValues(
-                              alpha: 0.15,
-                            ),
-                            child: Icon(
-                              staff.role.icon,
-                              color: staff.role.color,
-                              size: 22,
-                            ),
+                  return SurfaceCard(
+                    borderRadius: 18,
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                            color: staff.role.color.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      staff.fullName,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                        color: isActive
-                                            ? AppColors.textPrimary
-                                            : AppColors.textMuted,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    if (!isActive)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.errorBg,
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'Bloklangan',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: AppColors.error,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${staff.role.label} • ${staff.specialization ?? staff.role.professionTitle}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: staff.role.color,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Muassasa: ${staff.institutionName ?? 'Belgilanmagan'} • Tel: ${staff.phone ?? ''}',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textMuted,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          child: Icon(
+                            staff.role.icon,
+                            color: staff.role.color,
+                            size: 22,
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.background,
-                                  border: Border.all(color: AppColors.border),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      '$assignedCount',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: AppColors.primary,
-                                      ),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 4,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Text(
+                                    staff.fullName,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 15,
+                                      color: isActive
+                                          ? AppColors.textPrimary
+                                          : AppColors.textMuted,
                                     ),
-                                    const Text(
-                                      'o‘quvchi',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: AppColors.textMuted,
-                                      ),
+                                  ),
+                                  if (!isActive)
+                                    const StatusPill(
+                                      label: 'Bloklangan',
+                                      color: AppColors.error,
+                                      backgroundColor: AppColors.errorBg,
                                     ),
-                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                '${staff.role.label} • ${staff.specialization ?? staff.role.professionTitle}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  color: staff.role.color,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              if (canManage &&
-                                  staff.id != user.id &&
-                                  staff.role != UserRole.superAdmin) ...[
-                                const SizedBox(height: 6),
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: const Size(60, 24),
-                                    foregroundColor: isActive
-                                        ? AppColors.error
-                                        : AppColors.success,
-                                  ),
-                                  onPressed: () {
-                                    app.toggleUserActive(
-                                      staff.id,
-                                      !isActive,
-                                      byUser: user,
-                                    );
-                                  },
-                                  child: Text(
-                                    isActive ? 'Bloklash' : 'Faollashtirish',
-                                    style: const TextStyle(fontSize: 11),
-                                  ),
+                              const SizedBox(height: 3),
+                              Text(
+                                '${staff.institutionName ?? 'Belgilanmagan'} • ${staff.phone ?? ''}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  color: AppColors.textMuted,
                                 ),
-                              ],
+                              ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 11,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                border:
+                                    Border.all(color: AppColors.hairlineBorder),
+                                borderRadius: BorderRadius.circular(11),
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    '$assignedCount',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                      color: AppColors.primary,
+                                      fontFeatures: [
+                                        FontFeature.tabularFigures(),
+                                      ],
+                                    ),
+                                  ),
+                                  const Text(
+                                    'o‘quvchi',
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (canManage &&
+                                staff.id != user.id &&
+                                staff.role != UserRole.superAdmin) ...[
+                              const SizedBox(height: 6),
+                              TextButton(
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  minimumSize: const Size(0, 28),
+                                  foregroundColor: isActive
+                                      ? AppColors.error
+                                      : AppColors.success,
+                                ),
+                                onPressed: () {
+                                  app.toggleUserActive(
+                                    staff.id,
+                                    !isActive,
+                                    byUser: user,
+                                  );
+                                },
+                                child: Text(
+                                  isActive ? 'Bloklash' : 'Faollashtirish',
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ],
                     ),
                   );
                 },

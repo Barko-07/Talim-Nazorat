@@ -1,12 +1,17 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/widgets/glass_widgets.dart';
 import '../../models/assessment_model.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../students/student_detail_screen.dart';
 import 'new_assessment_screen.dart';
 
 class AssessmentsListScreen extends StatefulWidget {
@@ -17,9 +22,9 @@ class AssessmentsListScreen extends StatefulWidget {
 }
 
 class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
-  String? _selectedCategory;
+  String _selectedCategory = 'Barchasi';
 
-  final List<String> _categories = [
+  static const List<String> _categories = [
     'Barchasi',
     'Nutq va muloqot',
     'Kognitiv rivojlanish',
@@ -32,183 +37,94 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
     final app = context.watch<AppProvider>();
     final allAssessments = app.assessments;
 
-    final filtered =
-        _selectedCategory == null || _selectedCategory == 'Barchasi'
+    final filtered = _selectedCategory == 'Barchasi'
         ? allAssessments
-        : allAssessments.where((a) => a.category == _selectedCategory).toList();
+        : allAssessments
+            .where((a) => a.category == _selectedCategory)
+            .toList();
 
     final auth = context.watch<AuthProvider>();
     final currentUser = auth.currentUser;
     final currentRole = currentUser?.role ?? UserRole.psychologist;
+    final canPop = Navigator.canPop(context);
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+      backgroundColor: canPop ? AppColors.background : Colors.transparent,
+      appBar: canPop ? AppBar(title: const Text('Baholashlar')) : null,
+      body: ResponsivePageContainer(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Responsive Sarlavha va Qo'shish tugmasi
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            'Baholashlar',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
-                              letterSpacing: -0.2,
-                            ),
+            AdaptivePageHeader(
+              icon: LucideIcons.clipboardCheck,
+              title: 'Kasbiy baholashlar jurnali',
+              subtitle:
+                  '${currentRole.label} • Jami ${filtered.length} ta diagnostik monitoring qaydi',
+              action: currentRole.canCreateAssessments
+                  ? FilledButton.icon(
+                      icon: const Icon(LucideIcons.plus, size: 16),
+                      label: const Text('Yangi baholash'),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NewAssessmentScreen(),
                           ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              currentRole.label,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Jami ${filtered.length} ta monitoring baholashi',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                if (currentRole.canCreateAssessments)
-                  FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
-                      ),
-                      visualDensity: VisualDensity.compact,
+                        );
+                      },
+                    )
+                  : const StatusPill(
+                      label: 'Faqat ko‘rish rejimi',
+                      color: AppColors.textMuted,
+                      backgroundColor: Colors.white,
+                      icon: LucideIcons.eye,
                     ),
-                    icon: const Icon(Icons.add_rounded, size: 16),
-                    label: const Text(
-                      'Baholash',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const NewAssessmentScreen(),
-                        ),
-                      );
-                    },
-                  )
-                else
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: const Text(
-                      'Faqat ko‘rish',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                  ),
-              ],
+            ),
+            const SizedBox(height: 16),
+
+            ModernPillFilterBar(
+              items: _categories,
+              selectedItem: _selectedCategory,
+              onSelected: (cat) => setState(() => _selectedCategory = cat),
             ),
             const SizedBox(height: 14),
 
-            // Kategoriya chiplari (Scrollable)
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _categories.map((cat) {
-                  final isSelected = (_selectedCategory ?? 'Barchasi') == cat;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 6.0),
-                    child: ChoiceChip(
-                      visualDensity: VisualDensity.compact,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      label: Text(
-                        cat,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color: isSelected
-                              ? Colors.white
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                      selected: isSelected,
-                      selectedColor: AppColors.primary,
-                      backgroundColor: Colors.white,
-                      side: BorderSide(
-                        color: isSelected ? AppColors.primary : AppColors.border,
-                        width: 1,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      onSelected: (val) {
-                        setState(() => _selectedCategory = cat);
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Ro'yxat
             Expanded(
               child: filtered.isEmpty
                   ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            Icons.assignment_outlined,
-                            size: 40,
-                            color: AppColors.textMuted,
+                        children: [
+                          Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border:
+                                  Border.all(color: AppColors.hairlineBorder),
+                            ),
+                            child: const Icon(
+                              LucideIcons.clipboardList,
+                              size: 26,
+                              color: AppColors.textMuted,
+                            ),
                           ),
-                          SizedBox(height: 10),
-                          Text(
+                          const SizedBox(height: 12),
+                          const Text(
                             'Baholashlar topilmadi',
                             style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Boshqa yo‘nalishni tanlang yoki yangi baholash kiriting',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              color: AppColors.textMuted,
                             ),
                           ),
                         ],
@@ -216,10 +132,9 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                     )
                   : ListView.separated(
                       itemCount: filtered.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 10),
+                      separatorBuilder: (_, _) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
-                        final a = filtered[index];
-                        return _buildAssessmentCard(context, a);
+                        return _buildAssessmentCard(context, filtered[index]);
                       },
                     ),
             ),
@@ -234,161 +149,159 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
     final trendColor = a.trend == 'O‘sish'
         ? AppColors.success
         : a.trend == 'Pasayish'
-        ? AppColors.error
-        : AppColors.info;
+            ? AppColors.error
+            : AppColors.info;
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppColors.border, width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return SurfaceCard(
+      borderRadius: 16,
+      padding: const EdgeInsets.all(16),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => StudentDetailScreen(studentId: a.studentId),
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: const Icon(
+                  LucideIcons.clipboardCheck,
+                  color: AppColors.primary,
+                  size: 19,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      a.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14.5,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${a.studentName} • ${df.format(a.assessmentDate)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              StatusPill(
+                label: '${a.totalScore.toInt()}/${a.maxScore.toInt()} ball',
+                color: AppColors.success,
+                backgroundColor: AppColors.successBg,
+                borderColor: AppColors.successBorder,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: AppColors.hairlineBorder),
+            ),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Row(
+                Text(
+                  a.notes,
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    height: 1.4,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                if (a.recommendations.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.assignment_turned_in_rounded,
+                      const Padding(
+                        padding: EdgeInsets.only(top: 2),
+                        child: Icon(
+                          LucideIcons.sparkles,
+                          size: 13,
                           color: AppColors.primary,
-                          size: 18,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 6),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              a.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14,
-                                color: AppColors.textPrimary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'O‘quvchi: ${a.studentName} • ${df.format(a.assessmentDate)}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textMuted,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                        child: Text(
+                          'Tavsiya: ${a.recommendations}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.primaryDark,
+                            fontWeight: FontWeight.w600,
+                            height: 1.35,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.successBg,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppColors.successBorder),
-                  ),
-                  child: Text(
-                    '${a.totalScore.toInt()}/${a.maxScore.toInt()} ball',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.success,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(8),
-                border: const Border(
-                  left: BorderSide(color: AppColors.primary, width: 3),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Xulosa: ${a.notes}',
-                    style: const TextStyle(fontSize: 12, height: 1.35, color: AppColors.textPrimary),
-                  ),
-                  if (a.recommendations.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      'Tavsiya: ${a.recommendations}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.primaryDark,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
                 ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    '${a.specialistName} • ${a.specialistRole}',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: AppColors.textMuted,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: trendColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    'Dinamika: ${a.trend}',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: trendColor,
-                    ),
-                  ),
-                ),
               ],
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const Icon(
+                LucideIcons.userCheck,
+                size: 13.5,
+                color: AppColors.textMuted,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  '${a.specialistName} • ${a.specialistRole}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              StatusPill(
+                label: a.trend,
+                color: trendColor,
+                showDot: true,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

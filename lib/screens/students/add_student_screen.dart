@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/widgets/glass_widgets.dart';
 import '../../models/student_model.dart';
 import '../../providers/app_provider.dart';
 
@@ -27,7 +29,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
 
   String _gender = 'Erkak';
   String _grade = '1-A';
-  String _supportLevel = '2-daraja (O‘rta yordam)';
+  String _supportLevel = '2-daraja (O‘rta yordam - doimiy korreksiya)';
   String _primaryNeed =
       'Nutqiy rivojlanishdan orqada qolish (Fonetik-fonematik)';
   String _guardianRelation = 'Onasi';
@@ -41,6 +43,12 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     'Autizm spektri buzilishi (Yengil / O‘rta)',
     'Eshitish zaifligi (1-2 daraja)',
     'Bolalar serebral falaji (Harakat tayanch tizimi)',
+  ];
+
+  final List<String> _supportLevels = [
+    '1-daraja (Yengil - minimal moslashtirish)',
+    '2-daraja (O‘rta yordam - doimiy korreksiya)',
+    '3-daraja (Intensiv yordam - maxsus dastur)',
   ];
 
   @override
@@ -114,271 +122,371 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     }
   }
 
+  Widget _buildSectionTitle({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppColors.primaryLight,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, size: 18, color: AppColors.primary),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 15.5,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(title: const Text('Yangi o‘quvchini ro‘yxatga olish')),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 1. Shaxsiy ma'lumotlar
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      body: AmbientMeshBackground(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: ResponsivePageContainer(
+              maxWidth: 780,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isCompact = constraints.maxWidth < 460;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        '1. O‘quvchining Shaxsiy Ma’lumotlari',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      // 1. Shaxsiy ma'lumotlar
+                      SurfaceCard(
+                        padding: const EdgeInsets.all(22),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle(
+                              icon: LucideIcons.userRoundPlus,
+                              title: '1. O‘quvchining Shaxsiy Ma’lumotlari',
+                              subtitle: 'Asosiy F.I.Sh., jinsi va biriktirilgan sinf',
+                            ),
+                            const SizedBox(height: 18),
+                            TextFormField(
+                              controller: _lastNameCtrl,
+                              decoration: const InputDecoration(
+                                labelText: 'Familiyasi *',
+                                prefixIcon: Icon(LucideIcons.user, size: 18),
+                              ),
+                              validator: (v) => v == null || v.trim().isEmpty
+                                  ? 'Familiyani kiriting'
+                                  : null,
+                            ),
+                            const SizedBox(height: 12),
+                            TextFormField(
+                              controller: _firstNameCtrl,
+                              decoration: const InputDecoration(
+                                labelText: 'Ismi *',
+                                prefixIcon: Icon(LucideIcons.user, size: 18),
+                              ),
+                              validator: (v) => v == null || v.trim().isEmpty
+                                  ? 'Ismni kiriting'
+                                  : null,
+                            ),
+                            const SizedBox(height: 12),
+                            TextFormField(
+                              controller: _middleNameCtrl,
+                              decoration: const InputDecoration(
+                                labelText: 'Otasining ismi',
+                                prefixIcon: Icon(LucideIcons.user, size: 18),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: DropdownButtonFormField<String>(
+                                    initialValue: _gender,
+                                    isExpanded: true,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Jinsi',
+                                    ),
+                                    items: ['Erkak', 'Ayol']
+                                        .map(
+                                          (g) => DropdownMenuItem(
+                                            value: g,
+                                            child: Text(g),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: (v) =>
+                                        setState(() => _gender = v!),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: DropdownButtonFormField<String>(
+                                    initialValue: _grade,
+                                    isExpanded: true,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Sinfi',
+                                    ),
+                                    items: [
+                                      '1-A',
+                                      '1-B',
+                                      '2-A',
+                                      '2-B',
+                                      '3-A',
+                                      '3-B',
+                                      '4-A',
+                                      '5-A',
+                                    ]
+                                        .map(
+                                          (g) => DropdownMenuItem(
+                                            value: g,
+                                            child: Text(g),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: (v) =>
+                                        setState(() => _grade = v!),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _lastNameCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Familiyasi *',
-                        ),
-                        validator: (v) => v == null || v.isEmpty
-                            ? 'Familiyani kiriting'
-                            : null,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _firstNameCtrl,
-                        decoration: const InputDecoration(labelText: 'Ismi *'),
-                        validator: (v) =>
-                            v == null || v.isEmpty ? 'Ismni kiriting' : null,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _middleNameCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Otasining ismi',
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              initialValue: _gender,
+
+                      // 2. Ta'limiy ehtiyoj
+                      SurfaceCard(
+                        padding: const EdgeInsets.all(22),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle(
+                              icon: LucideIcons.heartHandshake,
+                              title: '2. Alohida Ta’limiy Ehtiyoj',
+                              subtitle:
+                                  'Ehtiyoj toifasi, qo‘llab-quvvatlash darajasi va tavsiyalar',
+                            ),
+                            const SizedBox(height: 18),
+                            DropdownButtonFormField<String>(
+                              initialValue: _primaryNeed,
+                              isExpanded: true,
                               decoration: const InputDecoration(
-                                labelText: 'Jinsi',
+                                labelText: 'Asosiy ta’limiy ehtiyoj toifasi',
                               ),
-                              items: ['Erkak', 'Ayol']
+                              items: _needs
                                   .map(
-                                    (g) => DropdownMenuItem(
-                                      value: g,
-                                      child: Text(g),
+                                    (n) => DropdownMenuItem(
+                                      value: n,
+                                      child: Text(
+                                        n,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
                                     ),
                                   )
                                   .toList(),
-                              onChanged: (v) => setState(() => _gender = v!),
+                              onChanged: (v) =>
+                                  setState(() => _primaryNeed = v!),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              initialValue: _grade,
+                            const SizedBox(height: 12),
+                            DropdownButtonFormField<String>(
+                              initialValue: _supportLevel,
+                              isExpanded: true,
                               decoration: const InputDecoration(
-                                labelText: 'Sinfi',
+                                labelText: 'Qo‘llab-quvvatlash darajasi',
                               ),
-                              items:
-                                  [
-                                        '1-A',
-                                        '1-B',
-                                        '2-A',
-                                        '2-B',
-                                        '3-A',
-                                        '3-B',
-                                        '4-A',
-                                        '5-A',
-                                      ]
-                                      .map(
-                                        (g) => DropdownMenuItem(
-                                          value: g,
-                                          child: Text(g),
-                                        ),
-                                      )
-                                      .toList(),
-                              onChanged: (v) => setState(() => _grade = v!),
+                              items: _supportLevels
+                                  .map(
+                                    (d) => DropdownMenuItem(
+                                      value: d,
+                                      child: Text(
+                                        d,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (v) =>
+                                  setState(() => _supportLevel = v!),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 2. Ta'limiy ehtiyoj
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '2. Alohida Ta’limiy Ehtiyoj va Qo‘llab-quvvatlash',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                            const SizedBox(height: 12),
+                            TextFormField(
+                              controller: _medicalNotesCtrl,
+                              maxLines: 2,
+                              decoration: const InputDecoration(
+                                labelText: 'Tibbiy xulosalar va cheklovlar',
+                                hintText:
+                                    'Masalan: Eshitish apparati taqqan, jismoniy zo‘riqish taqiqlangan',
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 16),
-                      DropdownButtonFormField<String>(
-                        initialValue: _primaryNeed,
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Asosiy ta’limiy ehtiyoj toifasi',
-                        ),
-                        items: _needs
-                            .map(
-                              (n) => DropdownMenuItem(
-                                value: n,
-                                child: Text(
-                                  n,
-                                  style: const TextStyle(fontSize: 13),
+
+                      // 3. Oila va Vasiylar
+                      SurfaceCard(
+                        padding: const EdgeInsets.all(22),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle(
+                              icon: LucideIcons.usersRound,
+                              title: '3. Qonuniy Vasiy (Ota-ona)',
+                              subtitle: 'Bog‘lanish uchun aloqa va manzil ma’lumotlari',
+                            ),
+                            const SizedBox(height: 18),
+                            TextFormField(
+                              controller: _guardianNameCtrl,
+                              decoration: const InputDecoration(
+                                labelText: 'Vasiy to‘liq F.I.Sh.',
+                                prefixIcon: Icon(
+                                  LucideIcons.userCheck,
+                                  size: 18,
                                 ),
                               ),
-                            )
-                            .toList(),
-                        onChanged: (v) => setState(() => _primaryNeed = v!),
-                      ),
-                      const SizedBox(height: 12),
-                      DropdownButtonFormField<String>(
-                        initialValue: _supportLevel,
-                        decoration: const InputDecoration(
-                          labelText: 'Qo‘llab-quvvatlash darajasi',
-                        ),
-                        items:
-                            [
-                                  '1-daraja (Yengil - minimal moslashtirish)',
-                                  '2-daraja (O‘rta yordam - doimiy korreksiya)',
-                                  '3-daraja (Intensiv yordam - maxsus dastur)',
+                            ),
+                            const SizedBox(height: 12),
+                            if (isCompact) ...[
+                              DropdownButtonFormField<String>(
+                                initialValue: _guardianRelation,
+                                isExpanded: true,
+                                decoration: const InputDecoration(
+                                  labelText: 'Qarindoshligi',
+                                ),
+                                items: [
+                                  'Onasi',
+                                  'Otasi',
+                                  'Bobosi',
+                                  'Buvasi',
+                                  'Vasiy',
                                 ]
-                                .map(
-                                  (d) => DropdownMenuItem(
-                                    value: d,
-                                    child: Text(
-                                      d,
-                                      style: const TextStyle(fontSize: 13),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged: (v) => setState(() => _supportLevel = v!),
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _medicalNotesCtrl,
-                        maxLines: 2,
-                        decoration: const InputDecoration(
-                          labelText: 'Tibbiy xulosalar va cheklovlar',
-                          hintText: 'Masalan: Eshitish apparati taqqan, jismoniy zo‘riqish taqiqlangan',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 3. Oila va Vasiylar
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '3. Qonuniy Vasiy (Ota-ona) Ma’lumotlari',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _guardianNameCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Vasiy to‘liq F.I.Sh.',
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              initialValue: _guardianRelation,
-                              decoration: const InputDecoration(
-                                labelText: 'Qarindoshligi',
+                                    .map(
+                                      (r) => DropdownMenuItem(
+                                        value: r,
+                                        child: Text(r),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (v) =>
+                                    setState(() => _guardianRelation = v!),
                               ),
-                              items:
-                                  [
+                              const SizedBox(height: 12),
+                              TextFormField(
+                                controller: _guardianPhoneCtrl,
+                                decoration: const InputDecoration(
+                                  labelText: 'Telefon raqami',
+                                  hintText: '+998 90 123-45-67',
+                                  prefixIcon: Icon(LucideIcons.phone, size: 17),
+                                ),
+                              ),
+                            ] else
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: DropdownButtonFormField<String>(
+                                      initialValue: _guardianRelation,
+                                      isExpanded: true,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Qarindoshligi',
+                                      ),
+                                      items: [
                                         'Onasi',
                                         'Otasi',
                                         'Bobosi',
                                         'Buvasi',
                                         'Vasiy',
                                       ]
-                                      .map(
-                                        (r) => DropdownMenuItem(
-                                          value: r,
-                                          child: Text(r),
+                                          .map(
+                                            (r) => DropdownMenuItem(
+                                              value: r,
+                                              child: Text(r),
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (v) => setState(
+                                        () => _guardianRelation = v!,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _guardianPhoneCtrl,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Telefon raqami',
+                                        hintText: '+998 90 123-45-67',
+                                        prefixIcon: Icon(
+                                          LucideIcons.phone,
+                                          size: 17,
                                         ),
-                                      )
-                                      .toList(),
-                              onChanged: (v) =>
-                                  setState(() => _guardianRelation = v!),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextFormField(
-                              controller: _guardianPhoneCtrl,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            const SizedBox(height: 12),
+                            TextFormField(
+                              controller: _addressCtrl,
                               decoration: const InputDecoration(
-                                labelText: 'Telefon raqami',
-                                hintText: '+998 90 123-45-67',
+                                labelText: 'Yashash manzili',
+                                prefixIcon: Icon(LucideIcons.mapPin, size: 17),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _addressCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Yashash manzili',
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
+                      const SizedBox(height: 22),
 
-              // Saqlash tugmasi
-              FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                icon: const Icon(Icons.check_circle_rounded),
-                label: const Text(
-                  'O‘quvchini tizimga saqlash',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                onPressed: _saveStudent,
+                      // Saqlash tugmasi
+                      FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        icon: const Icon(LucideIcons.circleCheck, size: 18),
+                        label: const Text(
+                          'O‘quvchini tizimga saqlash',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        onPressed: _saveStudent,
+                      ),
+                    ],
+                  );
+                },
               ),
-            ],
+            ),
           ),
         ),
       ),
