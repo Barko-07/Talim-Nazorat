@@ -1,102 +1,90 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Asosiy Brend & Apple-grade Royal Sapphire Ranglari
-  static const Color primary = Color(0xFF0057FF); // Luminous Apple Sapphire Blue
-  static const Color primaryDark = Color(0xFF003BB3); // Deep Sapphire
-  static const Color primaryLight = Color(0xFFEBF2FF); // Soft Ice Blue
-  static const Color primaryTint = Color(0xFFDCE8FF); // Cool Tint
+  // Asosiy Brend Ranglari — Sokin va jiddiy korporativ ko'k (Minimalist SaaS)
+  static const Color primary = Color(0xFF2563EB);
+  static const Color primaryDark = Color(0xFF1D4ED8);
+  static const Color primaryLight = Color(0xFFEFF6FF);
+  static const Color primaryTint = Color(0xFFDBEAFE);
 
-  // Fon va Yuzalar — Apple Spatial Mist (oq shisha qutilar "kesib olingandek" ajralib turishi uchun)
-  static const Color background = Color(0xFFE7EEF8); // Cool Silver-Ice Mist
-  static const Color backgroundDeep = Color(0xFFDDE7F5); // Deeper Ambient Mist
-  static const Color surface = Color(0xB8FFFFFF); // Translucent Frosted White
-  static const Color card = Color(0xB8FFFFFF);
+  // Fon va Yuzalar — Toza, sokin neytral oq-kulrang (ortiqcha rang va shovqinsiz)
+  static const Color background = Color(0xFFF6F7F9);
+  static const Color backgroundDeep = Color(0xFFF0F2F5);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color card = Color(0xFFFFFFFF);
 
-  // Apple "Cut-Out Frosted Glass" Qatlam Tokenlari
-  static const Color glassFill = Color(0xB0FFFFFF); // 69% sutdek shaffof oq
-  static const Color glassFillStrong = Color(0xC7FFFFFF); // 78% kesib olingan shisha
-  static const Color glassWellFill = Color(0x78FFFFFF); // 47% ichki o'yilgan shisha
-  static const Color glassRecessedFill = Color(0x66DCE6F5); // Ichki chuqurcha foni
-  static const Color glassSpecular = Color(0xF5FFFFFF); // 96% yorqin oq shisha qirrasi
-  static const Color glassWhiteBorder = Color(0xF2FFFFFF); // 95% sof oq border
-  static const Color glassInnerBorder = Color(0xCCFFFFFF); // 80% ichki oq border
-  static const Color hairlineBorder = Color(0x140F172A); // Ichki nozik ajratkich
+  // Minimalist Soft-Glass Qatlam Tokenlari
+  static const Color glassFill = Color(0xEBFFFFFF); // 92% toza oq
+  static const Color glassFillStrong = Color(0xF5FFFFFF); // 96% toza oq
+  static const Color glassWellFill = Color(0xFFF7F8FA); // Sokin ichki blok foni
+  static const Color glassRecessedFill = Color(0xFFF1F3F7);
+  static const Color glassSpecular = Color(0xFFFFFFFF);
+  static const Color glassWhiteBorder = Color(0xFFE6EAF0); // Nozik 1px karta chegarasi
+  static const Color glassInnerBorder = Color(0xFFECEFF4); // Ichki 0.85px nozik chegara
+  static const Color hairlineBorder = Color(0xFFECEFF4);
 
-  // Tipografiya (Yuqori kontrast, tiniq Apple SF/Jakarta uslubi)
-  static const Color textPrimary = Color(0xFF0B1324); // Deep Ink
-  static const Color textSecondary = Color(0xFF334155); // Slate 700
-  static const Color textMuted = Color(0xFF5B6B82); // Cool Muted Slate
-  static const Color textSubtle = Color(0xFF8998AD); // Placeholder Slate
+  // Tipografiya (Aniq va yuqori o'qiluvchanlik)
+  static const Color textPrimary = Color(0xFF0F172A);
+  static const Color textSecondary = Color(0xFF334155);
+  static const Color textMuted = Color(0xFF64748B);
+  static const Color textSubtle = Color(0xFF94A3B8);
 
-  // Chegaralar (Borders)
-  static const Color border = Color(0xE6FFFFFF); // Glassy White Border
-  static const Color borderSlate = Color(0xFFD5E0EE); // Soft Mist Divider
-  static const Color borderLight = Color(0xCCF4F7FC);
+  // Chegaralar (Hairline Borders)
+  static const Color border = Color(0xFFE2E7EE);
+  static const Color borderSlate = Color(0xFFD5DCE6);
+  static const Color borderLight = Color(0xFFF1F4F8);
 
-  // Holat ranglari (Semantics)
-  static const Color success = Color(0xFF059669); // Emerald 600
-  static const Color successBg = Color(0xB3ECFDF5);
-  static const Color successBorder = Color(0xCCA7F3D0);
+  // Holat ranglari (Sokin va tartibli semantika)
+  static const Color success = Color(0xFF059669);
+  static const Color successBg = Color(0xFFF0FDF4);
+  static const Color successBorder = Color(0xFFBBF7D0);
 
-  static const Color warning = Color(0xFFD97706); // Amber 600
-  static const Color warningBg = Color(0xB3FFFBEB);
-  static const Color warningBorder = Color(0xCCFDE68A);
+  static const Color warning = Color(0xFFD97706);
+  static const Color warningBg = Color(0xFFFFFBEB);
+  static const Color warningBorder = Color(0xFFFDE68A);
 
-  static const Color error = Color(0xFFDC2626); // Red 600
-  static const Color errorBg = Color(0xB3FEF2F2);
-  static const Color errorBorder = Color(0xCCFECACA);
+  static const Color error = Color(0xFFDC2626);
+  static const Color errorBg = Color(0xFFFEF2F2);
+  static const Color errorBorder = Color(0xFFFECACA);
 
-  static const Color info = Color(0xFF0284C7); // Sky 600
-  static const Color infoBg = Color(0xB3F0F9FF);
-  static const Color infoBorder = Color(0xCCBAE6FD);
+  static const Color info = Color(0xFF0284C7);
+  static const Color infoBg = Color(0xFFF0F9FF);
+  static const Color infoBorder = Color(0xFFBAE6FD);
 
-  static const Color purple = Color(0xFF7C3AED); // Violet 600
-  static const Color purpleBg = Color(0xB3F5F3FF);
-  static const Color purpleBorder = Color(0xCCDDD6FE);
+  static const Color purple = Color(0xFF6D28D9);
+  static const Color purpleBg = Color(0xFFF5F3FF);
+  static const Color purpleBorder = Color(0xFFDDD6FE);
 
   // Davlat Xizmatlari / MyGov Ranglari
-  static const Color myGovBlue = Color(0xFF0057FF);
-  static const Color myGovBlueDark = Color(0xFF003BB3);
-  static const Color myGovBlueLight = Color(0xFFEBF2FF);
+  static const Color myGovBlue = Color(0xFF2563EB);
+  static const Color myGovBlueDark = Color(0xFF1D4ED8);
+  static const Color myGovBlueLight = Color(0xFFEFF6FF);
 
-  // Kesib olingan shisha (Cut-out Glass) uchun mayin hajmli soyalar
+  // Minimalist mayin neytral soyalar (ortiqcha rangli glow'siz)
   static const List<BoxShadow> softShadow = [
     BoxShadow(
-      color: Color(0x0D0F172A),
-      blurRadius: 24,
-      spreadRadius: -4,
-      offset: Offset(0, 10),
-    ),
-    BoxShadow(
-      color: Color(0x060057FF),
-      blurRadius: 12,
+      color: Color(0x070F172A),
+      blurRadius: 16,
       spreadRadius: -2,
-      offset: Offset(0, 3),
+      offset: Offset(0, 4),
     ),
   ];
 
   static const List<BoxShadow> elevatedShadow = [
     BoxShadow(
-      color: Color(0x140F172A),
-      blurRadius: 34,
-      spreadRadius: -4,
-      offset: Offset(0, 16),
-    ),
-    BoxShadow(
-      color: Color(0x0D0057FF),
-      blurRadius: 16,
-      spreadRadius: -2,
-      offset: Offset(0, 6),
+      color: Color(0x0D0F172A),
+      blurRadius: 24,
+      spreadRadius: -3,
+      offset: Offset(0, 8),
     ),
   ];
 
   static const List<BoxShadow> primaryGlow = [
     BoxShadow(
-      color: Color(0x380057FF),
-      blurRadius: 22,
-      spreadRadius: -4,
-      offset: Offset(0, 10),
+      color: Color(0x162563EB),
+      blurRadius: 14,
+      spreadRadius: -3,
+      offset: Offset(0, 4),
     ),
   ];
 }
