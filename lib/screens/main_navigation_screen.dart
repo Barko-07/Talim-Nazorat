@@ -45,20 +45,6 @@ class _NavItemData {
   });
 }
 
-class _BottomIslandSlot {
-  final IconData icon;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _BottomIslandSlot({
-    required this.icon,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-}
-
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
@@ -1514,137 +1500,231 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget _buildMobileFrostedBottomBar(BuildContext context, AppProvider app) {
     final quickTabs = [_navItems[0], _navItems[1], _navItems[2], _navItems[3]];
     final isMoreActive = _selectedIndex >= 4;
-    final activeSlot = isMoreActive ? 4 : _selectedIndex;
+    final mediaPadding = MediaQuery.paddingOf(context);
 
-    final allSlots = <_BottomIslandSlot>[
-      ...quickTabs.map(
-        (item) => _BottomIslandSlot(
-          icon: item.icon,
-          label: item.shortLabel,
-          isSelected: _selectedIndex == item.index,
-          onTap: () => _selectTab(item.index),
-        ),
-      ),
-      _BottomIslandSlot(
-        icon: isMoreActive
-            ? _navItems[_selectedIndex].icon
-            : LucideIcons.layoutGrid,
-        label: isMoreActive
-            ? _navItems[_selectedIndex].shortLabel
-            : 'Barchasi',
-        isSelected: isMoreActive,
-        onTap: () => _showMobileModulesSheet(context, app),
-      ),
-    ];
+    const leftIslandRadius = BorderRadius.only(
+      topLeft: Radius.zero,
+      bottomLeft: Radius.zero,
+      topRight: Radius.circular(28),
+      bottomRight: Radius.circular(28),
+    );
+    const rightIslandRadius = BorderRadius.only(
+      topLeft: Radius.circular(28),
+      bottomLeft: Radius.circular(28),
+      topRight: Radius.zero,
+      bottomRight: Radius.zero,
+    );
 
     return SafeArea(
       top: false,
+      left: false,
+      right: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          heightFactor: 1.0,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 460),
-            child: SizedBox(
-              height: 58,
-              child: GlassSurface(
-                borderRadius: 999,
-                blur: 22,
-                opacity: 0.94,
-                borderColor: AppColors.border,
-                padding: EdgeInsets.zero,
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x140F172A),
-                    blurRadius: 24,
-                    spreadRadius: -2,
-                    offset: Offset(0, 8),
-                  ),
-                  BoxShadow(
-                    color: Color(0x080F172A),
-                    blurRadius: 6,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(999),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final slotWidth =
-                          constraints.maxWidth / allSlots.length;
+        padding: const EdgeInsets.only(bottom: 10),
+        child: SizedBox(
+          height: 54,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 1. Chap tarafga yopishgan asosiy kengayuvchi Island
+              Expanded(
+                flex: isMoreActive ? 14 : 23,
+                child: GlassSurface(
+                  customBorderRadius: leftIslandRadius,
+                  borderColor: AppColors.border,
+                  useBlur: true,
+                  blur: 24,
+                  opacity: 0.14,
+                  boxShadow: const [],
+                  padding: EdgeInsets.zero,
+                  child: ClipRRect(
+                    borderRadius: leftIslandRadius,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: mediaPadding.left),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: quickTabs.map((item) {
+                          final isSelected =
+                              !isMoreActive && _selectedIndex == item.index;
+                          final isFirst = item.index == 0;
+                          final pillRadius = isFirst
+                              ? leftIslandRadius
+                              : BorderRadius.circular(28);
 
-                      return Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          AnimatedPositioned(
-                            duration: const Duration(milliseconds: 260),
-                            curve: Curves.easeOutCubic,
-                            left: activeSlot * slotWidth,
-                            top: 0,
-                            bottom: 0,
-                            width: slotWidth,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                            ),
-                          ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: allSlots.map((slot) {
-                              final fgColor = slot.isSelected
-                                  ? Colors.white
-                                  : AppColors.textMuted;
-
-                              return Expanded(
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: slot.onTap,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          slot.icon,
-                                          size: 19.5,
-                                          color: fgColor,
-                                        ),
-                                        const SizedBox(height: 3),
-                                        Text(
-                                          slot.label,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            height: 1.1,
-                                            fontWeight: slot.isSelected
-                                                ? FontWeight.w700
-                                                : FontWeight.w600,
-                                            color: fgColor,
-                                            letterSpacing: -0.1,
+                          return Expanded(
+                            flex: isSelected ? 22 : 10,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: pillRadius,
+                                onTap: () => _selectTab(item.index),
+                                splashColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 220),
+                                  curve: Curves.easeOutCubic,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: isSelected ? 12 : 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? AppColors.primary
+                                            .withValues(alpha: 0.12)
+                                        : Colors.transparent,
+                                    borderRadius: pillRadius,
+                                    border: isSelected
+                                        ? Border.all(
+                                            color: AppColors.primary
+                                                .withValues(alpha: 0.24),
+                                            width: 1.0,
+                                          )
+                                        : null,
+                                  ),
+                                  child: isSelected
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              item.icon,
+                                              size: 19,
+                                              color: AppColors.primary,
+                                            ),
+                                            const SizedBox(width: 7),
+                                            Flexible(
+                                              child: Text(
+                                                item.shortLabel,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 12.5,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppColors.primary,
+                                                  letterSpacing: -0.2,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : Center(
+                                          child: Icon(
+                                            item.icon,
+                                            size: 19.5,
+                                            color: AppColors.textMuted,
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
                                 ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      );
-                    },
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              const SizedBox(width: 10),
+              // 2. O'ng tarafga yopishgan "Barchasi" Island
+              Expanded(
+                flex: isMoreActive ? 16 : 7,
+                child: GlassSurface(
+                  customBorderRadius: rightIslandRadius,
+                  borderColor: isMoreActive
+                      ? AppColors.primary.withValues(alpha: 0.28)
+                      : AppColors.border,
+                  useBlur: true,
+                  blur: 24,
+                  opacity: 0.14,
+                  boxShadow: const [],
+                  padding: EdgeInsets.zero,
+                  child: ClipRRect(
+                    borderRadius: rightIslandRadius,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: rightIslandRadius,
+                        onTap: () => _showMobileModulesSheet(context, app),
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                          padding: EdgeInsets.fromLTRB(
+                            isMoreActive ? 12 : 16,
+                            0,
+                            (isMoreActive ? 12 : 16) + mediaPadding.right,
+                            0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isMoreActive
+                                ? AppColors.primary.withValues(alpha: 0.12)
+                                : Colors.transparent,
+                            borderRadius: rightIslandRadius,
+                            border: isMoreActive
+                                ? Border.all(
+                                    color: AppColors.primary
+                                        .withValues(alpha: 0.24),
+                                    width: 1.0,
+                                  )
+                                : null,
+                          ),
+                          child: isMoreActive
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      _navItems[_selectedIndex].icon,
+                                      size: 19,
+                                      color: AppColors.primary,
+                                    ),
+                                    const SizedBox(width: 7),
+                                    Flexible(
+                                      child: Text(
+                                        _navItems[_selectedIndex].shortLabel,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primary,
+                                          letterSpacing: -0.2,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Center(
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      const Icon(
+                                        LucideIcons.layoutGrid,
+                                        size: 20,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                      if (app.alerts.any((a) => !a.isResolved))
+                                        Positioned(
+                                          top: -2,
+                                          right: -3,
+                                          child: Container(
+                                            width: 6,
+                                            height: 6,
+                                            decoration: const BoxDecoration(
+                                              color: AppColors.error,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
