@@ -45,9 +45,24 @@ class _NavItemData {
   });
 }
 
+class _BottomIslandSlot {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _BottomIslandSlot({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+}
+
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
+  bool _isDesktopSidebarOpen = true;
 
   static const List<_NavItemData> _navItems = [
     _NavItemData(
@@ -744,11 +759,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return AmbientMeshBackground(
       child: Scaffold(
         key: _scaffoldKey,
+        extendBody: !isDesktop,
         backgroundColor: Colors.transparent,
         drawer: isDesktop ? null : _buildMobileDrawer(context, auth, app, user),
         body: Row(
           children: [
-            if (isDesktop) _buildDesktopGlassSidebar(context, auth, app, user),
+            if (isDesktop && _isDesktopSidebarOpen)
+              _buildDesktopGlassSidebar(context, auth, app, user),
             Expanded(
               child: Column(
                 children: [
@@ -786,6 +803,34 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
+  Widget _buildHeaderIconAction({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onTap,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: SizedBox(
+            width: 35,
+            height: 35,
+            child: Center(
+              child: Icon(
+                icon,
+                size: 18.5,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTopGlassHeader({
     required BuildContext context,
     required bool isDesktop,
@@ -794,319 +839,390 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     required AuthProvider auth,
     required int unreadNotifCount,
   }) {
+    final showMenuIsland = !isDesktop || !_isDesktopSidebarOpen;
+    final mediaPadding = MediaQuery.paddingOf(context);
+    const menuIslandRadius = BorderRadius.only(
+      topLeft: Radius.zero,
+      bottomLeft: Radius.zero,
+      topRight: Radius.circular(28),
+      bottomRight: Radius.circular(28),
+    );
+    const mainBarRadius = BorderRadius.only(
+      topLeft: Radius.circular(28),
+      bottomLeft: Radius.circular(28),
+      topRight: Radius.zero,
+      bottomRight: Radius.zero,
+    );
+
     return SafeArea(
       bottom: false,
+      left: false,
+      right: false,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-          isDesktop ? 24 : 14,
-          isDesktop ? 16 : 10,
-          isDesktop ? 28 : 14,
-          4,
+          showMenuIsland ? 0 : 20,
+          isDesktop ? 14 : 8,
+          0,
+          6,
         ),
-        child: GlassSurface(
-          borderRadius: 16,
-          blur: 16,
-          opacity: 0.94,
-          padding: EdgeInsets.symmetric(
-            horizontal: isDesktop ? 18 : 12,
-            vertical: 9.5,
-          ),
+        child: IntrinsicHeight(
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (!isDesktop) ...[
-                IconButton(
-                  visualDensity: VisualDensity.compact,
-                  tooltip: 'Menyu',
-                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                  icon: const Icon(
-                    LucideIcons.panelLeft,
-                    size: 20,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(
-                  LucideIcons.landmark,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: 9),
-              ],
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isDesktop ? currentNav.title : 'TA’LIM NAZORAT',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: isDesktop ? 16.5 : 14.5,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.3,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    Text(
-                      user?.institutionName ??
-                          '9-sonli inklyuziv ta’lim tayanch maktabi',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 11.5,
-                        color: AppColors.textMuted,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              if (isDesktop)
-                Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: InkWell(
-                    onTap: () => _showQuickSearchModal(context),
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.glassWellFill,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.border, width: 1.0),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            LucideIcons.search,
-                            size: 15,
-                            color: AppColors.primary,
+              if (showMenuIsland) ...[
+                GlassSurface(
+                  customBorderRadius: menuIslandRadius,
+                  borderColor: AppColors.border,
+                  blur: 18,
+                  opacity: 0.95,
+                  padding: EdgeInsets.zero,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: menuIslandRadius,
+                      onTap: () {
+                        if (isDesktop) {
+                          setState(() => _isDesktopSidebarOpen = true);
+                        } else {
+                          _scaffoldKey.currentState?.openDrawer();
+                        }
+                      },
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 54),
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            15 + mediaPadding.left,
+                            0,
+                            18,
+                            0,
                           ),
-                          SizedBox(width: 8),
-                          Text(
-                            'O‘quvchi qidirish...',
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.textMuted,
-                              fontWeight: FontWeight.w600,
+                          child: const Center(
+                            child: Tooltip(
+                              message: 'Menyu',
+                              child: Icon(
+                                LucideIcons.panelLeft,
+                                size: 20,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              else
-                IconButton(
-                  visualDensity: VisualDensity.compact,
-                  tooltip: 'Qidirish',
-                  onPressed: () => _showQuickSearchModal(context),
-                  icon: const Icon(
-                    LucideIcons.search,
-                    size: 19,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    tooltip: 'Bildirishnomalar',
-                    onPressed: () => _showNotificationsSheet(context),
-                    icon: const Icon(
-                      LucideIcons.bell,
-                      size: 19,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  if (unreadNotifCount > 0)
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 4.5,
-                          vertical: 1.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.error,
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 1.5,
-                          ),
-                        ),
-                        constraints: const BoxConstraints(minWidth: 16),
-                        child: Text(
-                          '$unreadNotifCount',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w800,
-                            fontFeatures: [FontFeature.tabularFigures()],
-                          ),
                         ),
                       ),
                     ),
-                ],
-              ),
-
-              const SizedBox(width: 6),
-
-              PopupMenuButton<String>(
-                tooltip: 'Profil menyusi',
-                offset: const Offset(0, 48),
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  side: const BorderSide(color: AppColors.border, width: 1.0),
+                  ),
                 ),
-                onSelected: (val) async {
-                  if (val == 'settings') {
-                    _selectTab(9);
-                  } else if (val == 'logout') {
-                    await auth.logout();
-                    if (context.mounted) {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (_) => const LoginScreen(),
-                        ),
-                      );
-                    }
-                  }
-                },
-                itemBuilder: (_) => [
-                  PopupMenuItem(
-                    enabled: false,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user?.fullName ?? 'Mutaxassis',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          user?.role.label ?? '',
-                          style: const TextStyle(
-                            fontSize: 11.5,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
+                SizedBox(width: isDesktop ? 12 : 10),
+              ],
+              Expanded(
+                child: GlassSurface(
+                  customBorderRadius: mainBarRadius,
+                  borderColor: AppColors.border,
+                  blur: 18,
+                  opacity: 0.95,
+                  padding: EdgeInsets.fromLTRB(
+                    isDesktop ? 22 : 16,
+                    8,
+                    (isDesktop ? 24 : 12) + mediaPadding.right,
+                    8,
                   ),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem(
-                    value: 'settings',
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 38),
                     child: Row(
                       children: [
-                        Icon(LucideIcons.settings, size: 16),
-                        SizedBox(width: 10),
-                        Text(
-                          'Sozlamalar',
-                          style: TextStyle(fontSize: 13),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'logout',
-                    child: Row(
-                      children: [
-                        Icon(
-                          LucideIcons.logOut,
-                          size: 16,
-                          color: AppColors.error,
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          'Tizimdan chiqish',
-                          style: TextStyle(
-                            color: AppColors.error,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isDesktop ? 11 : 6,
-                    vertical: 5.5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.glassWellFill,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.border, width: 1.0),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircleAvatar(
-                        radius: 13.5,
-                        backgroundColor: AppColors.primaryLight,
-                        child: Text(
-                          (user?.fullName ?? 'U').substring(0, 1),
-                          style: const TextStyle(
+                        if (showMenuIsland) ...[
+                          const Icon(
+                            LucideIcons.landmark,
                             color: AppColors.primary,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 12,
+                            size: 19.5,
                           ),
-                        ),
-                      ),
-                      if (isDesktop) ...[
-                        const SizedBox(width: 9),
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 145),
+                          const SizedBox(width: 9),
+                        ],
+                        Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                user?.fullName ?? '',
+                                isDesktop ? currentNav.title : 'TA’LIM NAZORAT',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
+                                style: TextStyle(
+                                  fontSize: isDesktop ? 16 : 13.8,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.3,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
                               Text(
-                                user?.role.label ?? '',
+                                user?.institutionName ??
+                                    '9-sonli inklyuziv ta’lim tayanch maktabi',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontSize: 10.5,
+                                  fontSize: 11,
                                   color: AppColors.textMuted,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
                           ),
                         ),
+                        const SizedBox(width: 4),
+                        if (isDesktop)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: InkWell(
+                              onTap: () => _showQuickSearchModal(context),
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.glassWellFill,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: AppColors.border,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      LucideIcons.search,
+                                      size: 15,
+                                      color: AppColors.primary,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'O‘quvchi qidirish...',
+                                      style: TextStyle(
+                                        fontSize: 12.5,
+                                        color: AppColors.textMuted,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          _buildHeaderIconAction(
+                            icon: LucideIcons.search,
+                            tooltip: 'Qidirish',
+                            onTap: () => _showQuickSearchModal(context),
+                          ),
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            _buildHeaderIconAction(
+                              icon: LucideIcons.bell,
+                              tooltip: 'Bildirishnomalar',
+                              onTap: () => _showNotificationsSheet(context),
+                            ),
+                            if (unreadNotifCount > 0)
+                              Positioned(
+                                top: 2,
+                                right: 2,
+                                child: IgnorePointer(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4.5,
+                                      vertical: 1.5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.error,
+                                      borderRadius: BorderRadius.circular(999),
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    constraints: const BoxConstraints(
+                                      minWidth: 16,
+                                    ),
+                                    child: Text(
+                                      '$unreadNotifCount',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.w800,
+                                        fontFeatures: [
+                                          FontFeature.tabularFigures(),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
                         const SizedBox(width: 5),
-                        const Icon(
-                          LucideIcons.chevronDown,
-                          size: 14,
-                          color: AppColors.textMuted,
+                        PopupMenuButton<String>(
+                          tooltip: 'Profil menyusi',
+                          offset: const Offset(0, 48),
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            side: const BorderSide(
+                              color: AppColors.border,
+                              width: 1.0,
+                            ),
+                          ),
+                          onSelected: (val) async {
+                            if (val == 'settings') {
+                              _selectTab(9);
+                            } else if (val == 'logout') {
+                              await auth.logout();
+                              if (context.mounted) {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder: (_) => const LoginScreen(),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          itemBuilder: (_) => [
+                            PopupMenuItem(
+                              enabled: false,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user?.fullName ?? 'Mutaxassis',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    user?.role.label ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuDivider(),
+                            const PopupMenuItem(
+                              value: 'settings',
+                              child: Row(
+                                children: [
+                                  Icon(LucideIcons.settings, size: 16),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Sozlamalar',
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'logout',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    LucideIcons.logOut,
+                                    size: 16,
+                                    color: AppColors.error,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Tizimdan chiqish',
+                                    style: TextStyle(
+                                      color: AppColors.error,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isDesktop ? 11 : 5,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.glassWellFill,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: AppColors.border,
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircleAvatar(
+                                  radius: 13.5,
+                                  backgroundColor: AppColors.primaryLight,
+                                  child: Text(
+                                    (user?.fullName ?? 'U').substring(0, 1),
+                                    style: const TextStyle(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                                if (isDesktop) ...[
+                                  const SizedBox(width: 9),
+                                  ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 145,
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          user?.fullName ?? '',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColors.textPrimary,
+                                          ),
+                                        ),
+                                        Text(
+                                          user?.role.label ?? '',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 10.5,
+                                            color: AppColors.textMuted,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  const Icon(
+                                    LucideIcons.chevronDown,
+                                    size: 14,
+                                    color: AppColors.textMuted,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
                         ),
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -1155,9 +1271,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Brand Header (free-standing icon!)
+                // Brand Header (free-standing icon + collapse toggle)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(22, 22, 20, 16),
+                  padding: const EdgeInsets.fromLTRB(22, 20, 14, 16),
                   child: Row(
                     children: [
                       const Icon(
@@ -1189,6 +1305,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             ),
                           ],
                         ),
+                      ),
+                      _buildHeaderIconAction(
+                        icon: LucideIcons.panelLeftClose,
+                        tooltip: 'Menyuni yig‘ish',
+                        onTap: () =>
+                            setState(() => _isDesktopSidebarOpen = false),
                       ),
                     ],
                   ),
@@ -1382,127 +1504,137 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget _buildMobileFrostedBottomBar(BuildContext context, AppProvider app) {
     final quickTabs = [_navItems[0], _navItems[1], _navItems[2], _navItems[3]];
     final isMoreActive = _selectedIndex >= 4;
+    final activeSlot = isMoreActive ? 4 : _selectedIndex;
+
+    final allSlots = <_BottomIslandSlot>[
+      ...quickTabs.map(
+        (item) => _BottomIslandSlot(
+          icon: item.icon,
+          label: item.shortLabel,
+          isSelected: _selectedIndex == item.index,
+          onTap: () => _selectTab(item.index),
+        ),
+      ),
+      _BottomIslandSlot(
+        icon: isMoreActive
+            ? _navItems[_selectedIndex].icon
+            : LucideIcons.layoutGrid,
+        label: isMoreActive
+            ? _navItems[_selectedIndex].shortLabel
+            : 'Barchasi',
+        isSelected: isMoreActive,
+        onTap: () => _showMobileModulesSheet(context, app),
+      ),
+    ];
 
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
-        child: GlassSurface(
-          borderRadius: 20,
-          blur: 18,
-          opacity: 0.95,
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5.5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ...quickTabs.map((item) {
-                final isSelected = _selectedIndex == item.index;
-                return Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => _selectTab(item.index),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 160),
-                      curve: Curves.easeOutCubic,
-                      padding: const EdgeInsets.symmetric(vertical: 7),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primaryLight
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(13),
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.primaryTint
-                              : Colors.transparent,
-                          width: 0.85,
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+        padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          heightFactor: 1.0,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 460),
+            child: SizedBox(
+              height: 58,
+              child: GlassSurface(
+                borderRadius: 999,
+                blur: 22,
+                opacity: 0.94,
+                borderColor: AppColors.border,
+                padding: EdgeInsets.zero,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x140F172A),
+                    blurRadius: 24,
+                    spreadRadius: -2,
+                    offset: Offset(0, 8),
+                  ),
+                  BoxShadow(
+                    color: Color(0x080F172A),
+                    blurRadius: 6,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(999),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final slotWidth =
+                          constraints.maxWidth / allSlots.length;
+
+                      return Stack(
+                        fit: StackFit.expand,
                         children: [
-                          Icon(
-                            item.icon,
-                            size: 20,
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.textMuted,
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            item.shortLabel,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 10.5,
-                              fontWeight: isSelected
-                                  ? FontWeight.w800
-                                  : FontWeight.w500,
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : AppColors.textMuted,
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 260),
+                            curve: Curves.easeOutCubic,
+                            left: activeSlot * slotWidth,
+                            top: 0,
+                            bottom: 0,
+                            width: slotWidth,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }),
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => _showMobileModulesSheet(context, app),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 160),
-                    curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(vertical: 7),
-                    decoration: BoxDecoration(
-                      color: isMoreActive
-                          ? AppColors.primaryLight
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(13),
-                      border: Border.all(
-                        color: isMoreActive
-                            ? AppColors.primaryTint
-                            : Colors.transparent,
-                        width: 0.85,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isMoreActive
-                              ? _navItems[_selectedIndex].icon
-                              : LucideIcons.layoutGrid,
-                          size: 20,
-                          color: isMoreActive
-                              ? AppColors.primary
-                              : AppColors.textMuted,
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          isMoreActive
-                              ? _navItems[_selectedIndex].shortLabel
-                              : 'Barchasi',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: isMoreActive
-                                ? FontWeight.w800
-                                : FontWeight.w500,
-                            color: isMoreActive
-                                ? AppColors.primary
-                                : AppColors.textMuted,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: allSlots.map((slot) {
+                              final fgColor = slot.isSelected
+                                  ? Colors.white
+                                  : AppColors.textMuted;
+
+                              return Expanded(
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: slot.onTap,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          slot.icon,
+                                          size: 19.5,
+                                          color: fgColor,
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Text(
+                                          slot.label,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            height: 1.1,
+                                            fontWeight: slot.isSelected
+                                                ? FontWeight.w700
+                                                : FontWeight.w600,
+                                            color: fgColor,
+                                            letterSpacing: -0.1,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

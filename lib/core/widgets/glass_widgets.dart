@@ -92,6 +92,7 @@ class GlassSurface extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
   final double borderRadius;
+  final BorderRadius? customBorderRadius;
   final double blur;
   final double opacity;
   final Color? tintColor;
@@ -105,6 +106,7 @@ class GlassSurface extends StatelessWidget {
     this.padding,
     this.margin,
     this.borderRadius = 18,
+    this.customBorderRadius,
     this.blur = 16,
     this.opacity = 0.90,
     this.tintColor,
@@ -116,7 +118,7 @@ class GlassSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseColor = tintColor ?? Colors.white;
-    final radius = BorderRadius.circular(borderRadius);
+    final radius = customBorderRadius ?? BorderRadius.circular(borderRadius);
 
     Widget content = Container(
       padding: padding,
@@ -399,7 +401,7 @@ class ResponsivePageContainer extends StatelessWidget {
                 horizontal,
                 vertical,
                 horizontal,
-                width < 860 ? 28.0 : vertical,
+                width < 920 ? 96.0 : vertical,
               ),
           child: child,
         ),
