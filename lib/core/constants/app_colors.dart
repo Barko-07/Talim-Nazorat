@@ -19,9 +19,9 @@ class AppColors {
   static const Color glassWellFill = Color(0xFFF7F8FA); // Sokin ichki blok foni
   static const Color glassRecessedFill = Color(0xFFF1F3F7);
   static const Color glassSpecular = Color(0xFFFFFFFF);
-  static const Color glassWhiteBorder = Color(0xFFEEF2F6); // Nozik 1px oqish karta chegarasi
-  static const Color glassInnerBorder = Color(0xFFF1F4F8); // Ichki 0.85px nozik chegara
-  static const Color hairlineBorder = Color(0xFFF1F4F8);
+  static const Color glassWhiteBorder = Color(0xFFF3F6FA); // Nozik 1px oq rangga juda yaqin chegara
+  static const Color glassInnerBorder = Color(0xFFF5F8FC); // Ichki nozik chegara
+  static const Color hairlineBorder = Color(0xFFF5F8FC);
 
   // Tipografiya (Aniq va yuqori o'qiluvchanlik)
   static const Color textPrimary = Color(0xFF0F172A);
@@ -29,10 +29,10 @@ class AppColors {
   static const Color textMuted = Color(0xFF64748B);
   static const Color textSubtle = Color(0xFF94A3B8);
 
-  // Chegaralar (Hairline Borders - oq rangga yaqinroq, yumshoq)
-  static const Color border = Color(0xFFE9EEF4);
-  static const Color borderSlate = Color(0xFFDFE5EE);
-  static const Color borderLight = Color(0xFFF5F7FA);
+  // Chegaralar (Hairline Borders - yanada oqroq va mayin)
+  static const Color border = Color(0xFFEEF3F8);
+  static const Color borderSlate = Color(0xFFE5EBF2);
+  static const Color borderLight = Color(0xFFF8FAFC);
 
   // Holat ranglari (Sokin va tartibli semantika)
   static const Color success = Color(0xFF059669);

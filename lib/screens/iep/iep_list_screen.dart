@@ -656,19 +656,19 @@ class _IepListScreenState extends State<IepListScreen> {
                   )
                 : null,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 9),
           ModernPillFilterBar(
             items: filterItems,
             selectedItem: _selectedStatus,
             counts: counts,
             onSelected: (val) => setState(() => _selectedStatus = val),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 9),
           Expanded(
             child: plans.isEmpty
                 ? Center(
                     child: SurfaceCard(
-                      borderRadius: 22,
+                      borderRadius: 26,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 30,
                         vertical: 36,
@@ -722,7 +722,7 @@ class _IepListScreenState extends State<IepListScreen> {
                       width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
                     ),
                     itemCount: plans.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final p = plans[index];
                       final student = app.students.firstWhere(
@@ -780,8 +780,8 @@ class _IepListScreenState extends State<IepListScreen> {
             : AppColors.warning;
 
     return SurfaceCard(
-      borderRadius: 22,
-      padding: const EdgeInsets.all(22),
+      borderRadius: 26,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 540;

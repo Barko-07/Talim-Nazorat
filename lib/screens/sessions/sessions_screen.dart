@@ -429,7 +429,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
               onPressed: () => _showAddSessionDialog(context),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 9),
 
           ModernPillFilterBar(
             items: _filters,
@@ -437,13 +437,13 @@ class _SessionsScreenState extends State<SessionsScreen> {
             counts: counts,
             onSelected: (f) => setState(() => _filter = f),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 9),
 
           Expanded(
             child: filtered.isEmpty
                 ? Center(
                     child: SurfaceCard(
-                      borderRadius: 22,
+                      borderRadius: 26,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 30,
                         vertical: 36,
@@ -488,7 +488,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                       width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
                     ),
                     itemCount: filtered.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final s = filtered[index];
                       final isDone = s.status == 'Bajarildi';
@@ -507,8 +507,11 @@ class _SessionsScreenState extends State<SessionsScreen> {
                       final df = DateFormat('dd.MM.yyyy HH:mm');
 
                       return SurfaceCard(
-                        borderRadius: 22,
-                        padding: const EdgeInsets.all(20),
+                        borderRadius: 26,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 22,
+                          vertical: 20,
+                        ),
                         onTap: () {
                           Navigator.push(
                             context,

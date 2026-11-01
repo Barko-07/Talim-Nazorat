@@ -42,11 +42,11 @@ class StudentsListScreen extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 9),
 
           // Kesib olingan shisha qidiruv va sinf filtri paneli (Mobil va desktopga mos)
           SurfaceCard(
-            borderRadius: 18,
+            borderRadius: 22,
             padding: const EdgeInsets.all(14),
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -156,14 +156,14 @@ class StudentsListScreen extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 9),
 
           // Bolalar ro'yxati
           Expanded(
             child: students.isEmpty
                 ? Center(
                     child: SurfaceCard(
-                      borderRadius: 22,
+                      borderRadius: 26,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 30,
                         vertical: 34,
@@ -206,7 +206,7 @@ class StudentsListScreen extends StatelessWidget {
                       width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
                     ),
                     itemCount: students.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final student = students[index];
                       return _buildStudentCard(context, student);
@@ -234,8 +234,8 @@ class StudentsListScreen extends StatelessWidget {
         : 'Vasiy kiritilmagan';
 
     return SurfaceCard(
-      borderRadius: 22,
-      padding: const EdgeInsets.all(18),
+      borderRadius: 26,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
       onTap: () {
         Navigator.push(
           context,

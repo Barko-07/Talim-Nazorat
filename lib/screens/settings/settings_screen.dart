@@ -53,7 +53,7 @@ class SettingsScreen extends StatelessWidget {
 
             // 1. Joriy Foydalanuvchi Profili (Minimalist Soft-Glass Hero Card)
             GlassSurface(
-              borderRadius: 22,
+              borderRadius: 26,
               blur: 16,
               opacity: 0.96,
               padding: const EdgeInsets.all(20),
@@ -174,7 +174,7 @@ class SettingsScreen extends StatelessWidget {
 
             // 2. Biriktirilgan kasbiy profil va shaxsiy javobgarlik
             SurfaceCard(
-              borderRadius: 22,
+              borderRadius: 26,
               padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +301,7 @@ class SettingsScreen extends StatelessWidget {
 
             // 3. Ta'lim muassasasi (Dinamik haqiqiy hudud ma'lumotlari bilan)
             SurfaceCard(
-              borderRadius: 22,
+              borderRadius: 26,
               padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,7 +356,7 @@ class SettingsScreen extends StatelessWidget {
 
             // 4. Ma'lumotlar bazasi va xavfsizlik
             SurfaceCard(
-              borderRadius: 22,
+              borderRadius: 26,
               padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

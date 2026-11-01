@@ -230,7 +230,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
             child: ResponsivePageContainer(
               maxWidth: 520,
               child: SurfaceCard(
-                borderRadius: 22,
+                borderRadius: 26,
                 padding: const EdgeInsets.all(28),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -300,7 +300,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                   // 1. MUTAXASSISLIKNING RASMIY KASBIY VAKOLAT BANNERI
                   GlassSurface(
                     padding: const EdgeInsets.all(18),
-                    borderRadius: 22,
+                    borderRadius: 26,
                     opacity: 0.96,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -403,7 +403,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
                   // 2. O'QUVCHI VA MA'LUMOTLAR
                   SurfaceCard(
-                    borderRadius: 22,
+                    borderRadius: 26,
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -503,7 +503,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
                   // 3. SOHAGA MOS RUBRIKA MEZONLARI
                   SurfaceCard(
-                    borderRadius: 22,
+                    borderRadius: 26,
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -648,7 +648,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
                   // 4. MUTAXASSIS XULOSASI VA TAVSIYALARI
                   SurfaceCard(
-                    borderRadius: 22,
+                    borderRadius: 26,
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

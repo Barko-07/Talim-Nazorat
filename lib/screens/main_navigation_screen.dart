@@ -352,7 +352,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => GlassSurface(
-        borderRadius: 22,
+        borderRadius: 26,
         blur: 18,
         opacity: 0.97,
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 26),
@@ -504,7 +504,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           final notifications = app.myNotifications;
           final unreadCount = app.myUnreadNotificationCount;
           return GlassSurface(
-            borderRadius: 22,
+            borderRadius: 26,
             blur: 18,
             opacity: 0.97,
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),

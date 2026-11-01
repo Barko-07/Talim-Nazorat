@@ -301,7 +301,7 @@ class ReportsScreen extends StatelessWidget {
 
             // 2. ITR ijrosi jadvali
             SurfaceCard(
-              borderRadius: 22,
+              borderRadius: 26,
               padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -419,7 +419,7 @@ class ReportsScreen extends StatelessWidget {
     required Color accent,
   }) {
     return SurfaceCard(
-      borderRadius: 22,
+      borderRadius: 26,
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
