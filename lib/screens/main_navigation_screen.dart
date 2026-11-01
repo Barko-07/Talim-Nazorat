@@ -48,6 +48,7 @@ class _NavItemData {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
+  bool _isMovingForward = true;
   bool _isDesktopSidebarOpen = true;
 
   static const List<_NavItemData> _navItems = [
@@ -137,7 +138,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   void _selectTab(int index) {
     if (index >= 0 && index < 10 && _selectedIndex != index) {
-      setState(() => _selectedIndex = index);
+      setState(() {
+        _isMovingForward = index > _selectedIndex;
+        _selectedIndex = index;
+      });
     }
   }
 
@@ -758,13 +762,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 children: [
                   Positioned.fill(
                     child: PageTransitionSwitcher(
-                      duration: const Duration(milliseconds: 220),
+                      duration: const Duration(milliseconds: 280),
+                      reverse: !_isMovingForward,
                       transitionBuilder:
                           (child, primaryAnimation, secondaryAnimation) {
-                        return FadeThroughTransition(
-                          fillColor: Colors.transparent,
+                        return SharedAxisTransition(
                           animation: primaryAnimation,
                           secondaryAnimation: secondaryAnimation,
+                          transitionType: SharedAxisTransitionType.horizontal,
+                          fillColor: Colors.transparent,
                           child: child,
                         );
                       },
