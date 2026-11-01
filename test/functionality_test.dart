@@ -17,6 +17,14 @@ import 'package:talim_nazorat/core/constants/psychological_methods_data.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  // Barcha ruxsat tekshiruvlaridan o'tadigan sinov administratori
+  final testAdmin = UserModel(
+    id: 'test_super_admin',
+    email: 'test.admin@talim.uz',
+    fullName: 'Sinov Administratori',
+    role: UserRole.superAdmin,
+  );
+
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });
@@ -79,7 +87,7 @@ void main() {
     });
 
     test('Staff is strictly isolated to their own institution', () {
-      // Teacher in same school can view student
+      // Teacher in same school can view student — only once assigned to them
       expect(
         access.isSameInstitution(
           chortoqTeacher,
@@ -88,7 +96,11 @@ void main() {
         ),
         true,
       );
-      expect(access.canViewStudent(chortoqTeacher, studentChortoq), true);
+      expect(access.canViewStudent(chortoqTeacher, studentChortoq), false);
+      final assignedTeacher = chortoqTeacher.copyWith(
+        assignedStudentIds: [studentChortoq.id],
+      );
+      expect(access.canViewStudent(assignedTeacher, studentChortoq), true);
 
       // Psychologist from another school cannot view or edit student
       expect(
@@ -127,12 +139,14 @@ void main() {
         final db = LocalDbService();
         await db.init();
 
-        final existingSpecialist = db.getUsers().first;
+        final existingSpecialist = db
+            .getUsers()
+            .firstWhere((u) => u.role == UserRole.psychologist);
 
         final student = StudentModel(
           id: 'stud_test_archive',
-          institutionId: 'inst_chortoq_1',
-          institutionName: '1-sonli maktab',
+          institutionId: 'inst_chortoq_5',
+          institutionName: '5-sonli umumiy o‘rta ta’lim maktabi',
           firstName: 'Farrux',
           lastName: 'Sobirov',
           dateOfBirth: DateTime(2016, 8, 20),
@@ -146,7 +160,7 @@ void main() {
         );
 
         // 1. Add student
-        await db.addStudent(student);
+        await db.addStudent(student, byUser: testAdmin);
         var fetched = db
             .getStudents(includeArchived: true)
             .firstWhere((s) => s.id == student.id);
@@ -154,7 +168,11 @@ void main() {
         expect(fetched.assignedSpecialistIds.isEmpty, true);
 
         // 2. Assign specialist
-        await db.assignSpecialistToStudent(student.id, existingSpecialist.id);
+        await db.assignSpecialistToStudent(
+          student.id,
+          existingSpecialist.id,
+          byUser: testAdmin,
+        );
         fetched = db
             .getStudents(includeArchived: true)
             .firstWhere((s) => s.id == student.id);
@@ -167,6 +185,7 @@ void main() {
         await db.deactivateStudent(
           student.id,
           'Boshqa ixtisoslashtirilgan maktabga o‘tkazildi',
+          byUser: testAdmin,
         );
         fetched = db
             .getStudents(includeArchived: true)
@@ -212,7 +231,7 @@ void main() {
 
           final ass1 = AssessmentModel(
             id: 'ass_test_1',
-            studentId: 'stud_lookup_test',
+            studentId: 'student_01',
             studentName: 'Temur Oripov',
             specialistId: 'spec_1',
             specialistName: 'Dilnoza Psixolog',
@@ -227,11 +246,11 @@ void main() {
             assessmentDate: DateTime.now().subtract(const Duration(days: 30)),
           );
 
-          await db.addAssessment(ass1);
+          await db.addAssessment(ass1, byUser: testAdmin);
 
           // Look up previous assessment for same student and category from database
           final matching = db.getAssessments(
-            studentId: 'stud_lookup_test',
+            studentId: 'student_01',
             category: 'Kognitiv soha',
           );
           expect(matching.isNotEmpty, true);
@@ -241,7 +260,7 @@ void main() {
           // Add second assessment referencing real previous score
           final ass2 = AssessmentModel(
             id: 'ass_test_2',
-            studentId: 'stud_lookup_test',
+            studentId: 'student_01',
             studentName: 'Temur Oripov',
             specialistId: 'spec_1',
             specialistName: 'Dilnoza Psixolog',
@@ -257,7 +276,7 @@ void main() {
             assessmentDate: DateTime.now(),
           );
 
-          await db.addAssessment(ass2);
+          await db.addAssessment(ass2, byUser: testAdmin);
           expect(ass2.trend, 'O‘sish');
         },
       );
@@ -273,7 +292,7 @@ void main() {
 
       final session1 = SessionModel(
         id: 'sess_dup_1',
-        studentId: 'stud_dup_test',
+        studentId: 'student_01',
         studentName: 'Sardor',
         specialistId: 'spec_dup_test',
         specialistName: 'Nodira Logoped',
@@ -285,13 +304,13 @@ void main() {
         status: 'Rejalashtirilgan',
       );
 
-      final res1 = await db.addSession(session1);
+      final res1 = await db.addSession(session1, byUser: testAdmin);
       expect(res1['success'], true);
 
       // Attempt duplicate session
       final sessionDuplicate = SessionModel(
         id: 'sess_dup_2',
-        studentId: 'stud_dup_test',
+        studentId: 'student_01',
         studentName: 'Sardor',
         specialistId: 'spec_dup_test',
         specialistName: 'Nodira Logoped',
@@ -303,7 +322,7 @@ void main() {
         status: 'Rejalashtirilgan',
       );
 
-      final res2 = await db.addSession(sessionDuplicate);
+      final res2 = await db.addSession(sessionDuplicate, byUser: testAdmin);
       expect(res2['success'], false);
       expect(
         res2['message'].toString().contains(
@@ -321,7 +340,7 @@ void main() {
 
         final session = SessionModel(
           id: 'sess_complete_test',
-          studentId: 'stud_c_test',
+          studentId: 'student_02',
           studentName: 'Aziza',
           specialistId: 'spec_c_test',
           specialistName: 'Karima Defektolog',
@@ -333,11 +352,12 @@ void main() {
           status: 'Rejalashtirilgan',
         );
 
-        await db.addSession(session);
+        await db.addSession(session, byUser: testAdmin);
         await db.completeSession(
           session.id,
           observations: 'O‘quvchi topshiriqlarni faol bajardi va mustaqil yozishga harakat qildi.',
           nextSteps: 'Keyingi darsda applikatsiya mashg‘ulotini o‘tkazish.',
+          byUser: testAdmin,
         );
 
         final updated = db.getSessions().firstWhere((s) => s.id == session.id);
@@ -750,7 +770,7 @@ void main() {
 
         final referral = ReferralModel(
           id: 'ref_test_flow',
-          studentId: 's_ref_test',
+          studentId: 'student_01',
           studentName: 'Sarvar Akramov',
           fromSpecialistId: 'user_teacher',
           fromSpecialistName: 'Sinf rahbari',
@@ -762,17 +782,17 @@ void main() {
         );
 
         // 1. Submit referral
-        await db.addReferral(referral);
+        await db.addReferral(referral, byUser: testAdmin);
         var fetched = db.getReferrals().firstWhere((r) => r.id == referral.id);
         expect(fetched.status, 'Yuborildi');
 
         // 2. Accept referral
-        await db.updateReferralStatus(referral.id, 'Qabul qilindi');
+        await db.updateReferralStatus(referral.id, 'Qabul qilindi', byUser: testAdmin);
         fetched = db.getReferrals().firstWhere((r) => r.id == referral.id);
         expect(fetched.status, 'Qabul qilindi');
 
         // 3. Mark in progress
-        await db.updateReferralStatus(referral.id, 'Jarayonda');
+        await db.updateReferralStatus(referral.id, 'Jarayonda', byUser: testAdmin);
         fetched = db.getReferrals().firstWhere((r) => r.id == referral.id);
         expect(fetched.status, 'Jarayonda');
 
@@ -784,6 +804,7 @@ void main() {
           outcomeNotes: 'Disgrafiya tashxisi dastlabki belgilari tasdiqlandi. Haftasiga 2 marta maxsus mashg‘ulot tayinlandi.',
           followUpAction: 'Oraliq nazorat tekshiruvi o‘tkazish',
           followUpDate: followUp,
+          byUser: testAdmin,
         );
 
         fetched = db.getReferrals().firstWhere((r) => r.id == referral.id);
@@ -990,6 +1011,7 @@ void main() {
       specialization: 'Maktab amaliyotchi psixologi',
       institutionId: 'inst_chortoq_5',
       institutionName: '5-sonli umumiy o‘rta ta’lim maktabi',
+      assignedStudentIds: const ['student_01'],
     );
 
     setUp(() async {

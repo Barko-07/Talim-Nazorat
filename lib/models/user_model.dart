@@ -7,6 +7,7 @@ enum UserRole {
   psychologist,
   speechTherapist,
   specialEducation,
+  specialEdTeacher,
   teacher,
   reviewer,
   parent,
@@ -27,6 +28,8 @@ extension UserRoleExtension on UserRole {
         return 'Logoped-defektolog';
       case UserRole.specialEducation:
         return 'Maxsus pedagog (Defektolog)';
+      case UserRole.specialEdTeacher:
+        return 'Maxsus ta’lim o‘qituvchisi';
       case UserRole.teacher:
         return 'Fan o‘qituvchisi / Sinf rahbari';
       case UserRole.reviewer:
@@ -50,6 +53,8 @@ extension UserRoleExtension on UserRole {
         return 'Logopediya va nutq rivojlanishi';
       case UserRole.specialEducation:
         return 'Maxsus pedagogika va sensorika';
+      case UserRole.specialEdTeacher:
+        return 'Maxsus ta’lim va o‘quv dasturi';
       case UserRole.teacher:
         return 'Pedagogik monitoring va ta’lim';
       case UserRole.reviewer:
@@ -73,6 +78,8 @@ extension UserRoleExtension on UserRole {
         return 'Tovushlar talaffuzi, artikulyatsion apparat, fonematik eshitish va bog‘lanishli nutq tahlili.';
       case UserRole.specialEducation:
         return 'Sensor integratsiya, mayda va yirik motorika, fazoviy mo‘ljal va hayotiy moslashuv.';
+      case UserRole.specialEdTeacher:
+        return 'Fanlar bo‘yicha bilim darajasini DTS talablari asosida baholash, topshiriqlar berish va individual ta’lim rejasini tuzish.';
       case UserRole.teacher:
         return 'Sinfdagi dars faoliyati, o‘quv motivatsiyasi, topshiriqlar ijrosi va ijtimoiy munosabatlar.';
       case UserRole.reviewer:
@@ -96,6 +103,8 @@ extension UserRoleExtension on UserRole {
         return Icons.record_voice_over_rounded;
       case UserRole.specialEducation:
         return Icons.extension_rounded;
+      case UserRole.specialEdTeacher:
+        return Icons.school_rounded;
       case UserRole.teacher:
         return Icons.menu_book_rounded;
       case UserRole.reviewer:
@@ -119,6 +128,8 @@ extension UserRoleExtension on UserRole {
         return const Color(0xFF0284C7); // Sky Blue
       case UserRole.specialEducation:
         return const Color(0xFFD97706); // Amber
+      case UserRole.specialEdTeacher:
+        return const Color(0xFF2563EB); // Blue
       case UserRole.teacher:
         return const Color(0xFF059669); // Emerald
       case UserRole.reviewer:
@@ -154,6 +165,12 @@ extension UserRoleExtension on UserRole {
           'Mayda motorika va grafomotorika',
           'Yirik motorika va harakat koordinatsiyasi',
           'Hayotiy amaliy va o‘z-o‘ziga xizmat',
+        ];
+      case UserRole.specialEdTeacher:
+        return [
+          'Fanlar bo‘yicha bilim darajasi (DTS)',
+          'O‘quv ko‘nikmalari (o‘qish, yozish, hisoblash)',
+          'Topshiriqni mustaqil bajarish',
         ];
       case UserRole.teacher:
         return [
@@ -306,6 +323,8 @@ extension UserRoleExtension on UserRole {
         return 'SPEECH_THERAPIST';
       case UserRole.specialEducation:
         return 'SPECIAL_EDUCATION';
+      case UserRole.specialEdTeacher:
+        return 'SPECIAL_ED_TEACHER';
       case UserRole.teacher:
         return 'TEACHER';
       case UserRole.reviewer:
@@ -329,6 +348,8 @@ extension UserRoleExtension on UserRole {
         return UserRole.speechTherapist;
       case 'SPECIAL_EDUCATION':
         return UserRole.specialEducation;
+      case 'SPECIAL_ED_TEACHER':
+        return UserRole.specialEdTeacher;
       case 'TEACHER':
         return UserRole.teacher;
       case 'PARENT':

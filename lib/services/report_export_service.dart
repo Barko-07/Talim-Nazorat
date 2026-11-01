@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import '../models/student_model.dart';
 import '../models/assessment_model.dart';
 import '../models/session_model.dart';
@@ -5,6 +7,10 @@ import '../models/iep_model.dart';
 import '../models/monitoring_alert_model.dart';
 import '../models/referral_model.dart';
 import '../models/audit_log_model.dart';
+import '../models/work_record_model.dart';
+import 'child_status_service.dart';
+import 'dynamics_service.dart';
+import 'report_service.dart';
 
 class ReportExportService {
   static final ReportExportService _instance = ReportExportService._internal();
@@ -14,9 +20,14 @@ class ReportExportService {
   /// UTF-8 BOM Excel dasturida o'zbekcha harflar (o‘, g‘, sh, ch) buzilmasligi uchun
   static const String utf8Bom = '\uFEFF';
 
+  /// RFC 4180 bo'yicha qiymatni qo'shtirnoqqa olish. "=", "+", "-", "@" bilan boshlanadigan
+  /// qiymat Excel'da formula sifatida bajarilmasligi uchun oldiga apostrof qo'yiladi
+  /// (CSV formula injection himoyasi).
   String _sanitizeCsv(String? value) {
     if (value == null) return '""';
-    final escaped = value.replaceAll('"', '""');
+    var v = value;
+    if (v.isNotEmpty && '=+-@\t\r'.contains(v[0])) v = "'$v";
+    final escaped = v.replaceAll('"', '""');
     return '"$escaped"';
   }
 
@@ -260,5 +271,57 @@ class ReportExportService {
 
     return buffer.toString();
   }
-}
 
+  // ==================== UMUMIY MONITORING HISOBOTI CSV ====================
+  String generateMonitoringReportCsv(MonitoringReport r) {
+    final df = DateFormat('dd.MM.yyyy');
+    final b = StringBuffer()..write(utf8Bom);
+    void row(String label, Object value) =>
+        b.writeln('${_sanitizeCsv(label)},${_sanitizeCsv(value.toString())}');
+
+    row('Hisobot davri', '${df.format(r.from)} — ${df.format(r.to)}');
+    row('Jami bolalar', r.totalChildren);
+    row('Mutaxassislar bilan ishlangan', r.childrenWorkedWith);
+    row('Hali ishlanmagan', r.childrenNotWorkedWith);
+    for (final c in StatusColor.values) {
+      row('Holat: ${c.label}', r.statusCounts[c] ?? 0);
+    }
+    for (final k in WorkKind.values) {
+      row('${k.label}lar soni', r.workCounts[k] ?? 0);
+    }
+    for (final d in DynamicsStatus.values) {
+      row('Dinamika: ${d.label}', r.dynamicsCounts[d] ?? 0);
+    }
+    row('ITR maqsadlari (jami)', r.iepObjectivesTotal);
+    row('ITR maqsadlari (bajarilgan)', r.iepObjectivesCompleted);
+    for (final e in r.referralsByStatus.entries) {
+      row('Yo‘naltirishlar: ${e.key}', e.value);
+    }
+    if (r.notWorkedWithNames.isNotEmpty) {
+      row('Hali ishlanmagan bolalar', r.notWorkedWithNames.join('; '));
+    }
+    return b.toString();
+  }
+
+  String generateSpecialistActivityCsv(MonitoringReport r) {
+    final df = DateFormat('dd.MM.yyyy');
+    final b = StringBuffer()..write(utf8Bom);
+    b.writeln(
+      'F.I.SH,Lavozim,Biriktirilgan bolalar,Ishlangan bolalar,Qamrov (%),'
+      '${WorkKind.values.map((k) => k.label).join(',')},Jami yozuvlar,Oxirgi faollik',
+    );
+    for (final s in r.specialists) {
+      b.writeln([
+        _sanitizeCsv(s.fullName),
+        _sanitizeCsv(s.role),
+        s.childrenAssigned,
+        s.childrenWorkedWith,
+        (s.coverage * 100).round(),
+        ...WorkKind.values.map((k) => s.recordsByKind[k] ?? 0),
+        s.totalRecords,
+        _sanitizeCsv(s.lastActivity == null ? '—' : df.format(s.lastActivity!)),
+      ].join(','));
+    }
+    return b.toString();
+  }
+}

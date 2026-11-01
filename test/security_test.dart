@@ -75,7 +75,12 @@ void main() {
     test('blocked user cannot log in', () async {
       final auth = await registeredAuth();
       final user = db.findUserByEmailOrPhone('test.psy@talim.uz')!;
-      await db.updateUser(user.copyWith(isActive: false));
+      await db.updateUser(
+        user.copyWith(isActive: false),
+        byUser: UserModel(
+          id: 'adm', email: 'adm@talim.uz', fullName: 'Admin', role: UserRole.superAdmin,
+        ),
+      );
       final res = await auth.login('test.psy@talim.uz', 'OwnPass99');
       expect(res['success'], false);
       expect(auth.isAuthenticated, false);
@@ -179,6 +184,7 @@ void main() {
         role: UserRole.psychologist,
         institutionId: student.institutionId,
         institutionName: student.institutionName,
+        assignedStudentIds: [student.id],
       );
       final teacher = UserModel(
         id: 'teacher_x',
@@ -187,8 +193,10 @@ void main() {
         role: UserRole.teacher,
         institutionId: student.institutionId,
         institutionName: student.institutionName,
+        assignedStudentIds: [student.id],
       );
       await db.addObservation(
+        byUser: author,
         PsychologicalObservationModel(
           id: 'obs_secret',
           studentId: student.id,

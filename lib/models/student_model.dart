@@ -1,3 +1,5 @@
+import 'development_profile_model.dart';
+
 class GuardianModel {
   final String id;
   final String fullName;
@@ -75,6 +77,10 @@ class StudentModel {
   final String? deactivationReason;
   final DateTime? deactivatedAt;
   final DateTime createdAt;
+  // Imkoniyatlar profili (psixolog to'ldiradi). null = hali to'ldirilmagan
+  final StudentAccessProfile? accessProfile;
+  // Yo'nalish nomi -> ishchi daraja
+  final Map<String, DomainLevel> domainLevels;
 
   StudentModel({
     required this.id,
@@ -98,6 +104,8 @@ class StudentModel {
     this.deactivationReason,
     this.deactivatedAt,
     required this.createdAt,
+    this.accessProfile,
+    this.domainLevels = const {},
   });
 
   String get fullName => '$lastName $firstName ${middleName ?? ''}'.trim();
@@ -136,6 +144,8 @@ class StudentModel {
     String? deactivationReason,
     DateTime? deactivatedAt,
     DateTime? createdAt,
+    StudentAccessProfile? accessProfile,
+    Map<String, DomainLevel>? domainLevels,
   }) {
     return StudentModel(
       id: id ?? this.id,
@@ -160,6 +170,8 @@ class StudentModel {
       deactivationReason: deactivationReason ?? this.deactivationReason,
       deactivatedAt: deactivatedAt ?? this.deactivatedAt,
       createdAt: createdAt ?? this.createdAt,
+      accessProfile: accessProfile ?? this.accessProfile,
+      domainLevels: domainLevels ?? this.domainLevels,
     );
   }
 
@@ -185,6 +197,8 @@ class StudentModel {
     'deactivationReason': deactivationReason,
     'deactivatedAt': deactivatedAt?.toIso8601String(),
     'createdAt': createdAt.toIso8601String(),
+    'accessProfile': accessProfile?.toJson(),
+    'domainLevels': domainLevels.values.map((d) => d.toJson()).toList(),
   };
 
   factory StudentModel.fromJson(Map<String, dynamic> json) => StudentModel(
@@ -220,5 +234,18 @@ class StudentModel {
         ? DateTime.parse(json['deactivatedAt'] as String)
         : null,
     createdAt: DateTime.parse(json['createdAt'] as String),
+    accessProfile: json['accessProfile'] is Map<String, dynamic>
+        ? StudentAccessProfile.fromJson(
+            json['accessProfile'] as Map<String, dynamic>,
+          )
+        : null,
+    domainLevels: {
+      for (final d
+          in (json['domainLevels'] as List<dynamic>? ?? const [])
+              .whereType<Map<String, dynamic>>()
+              .map(DomainLevel.fromJson)
+              .whereType<DomainLevel>())
+        d.domain: d,
+    },
   );
 }

@@ -11,13 +11,34 @@ import '../models/user_model.dart';
 import '../models/notification_model.dart';
 import '../models/psychologist_observation_model.dart';
 import '../models/assessment_question_model.dart';
-import '../models/assessment_response_model.dart';
 import '../services/local_db_service.dart';
 import '../services/report_export_service.dart';
+import '../services/question_selection_service.dart';
+import '../services/subject_level_service.dart';
+import '../services/dynamics_service.dart';
+import '../services/workspace_service.dart';
+import '../services/child_status_service.dart';
+import '../services/achievement_service.dart';
+import '../services/report_service.dart';
+import '../models/achievement_model.dart';
+import '../models/case_conference_model.dart';
+import '../models/workspace_model.dart';
+import '../models/subject_task_model.dart';
+import '../models/curriculum_model.dart';
+import '../models/progress_measurement_model.dart';
+import '../models/assessment_plan_model.dart';
+import '../models/development_profile_model.dart';
 
 class AppProvider extends ChangeNotifier {
   final LocalDbService _db = LocalDbService();
   final ReportExportService _exportService = ReportExportService();
+  final QuestionSelectionService _selection = QuestionSelectionService();
+  final SubjectLevelService _subjectLevels = SubjectLevelService();
+  final DynamicsService _dynamics = DynamicsService();
+  final WorkspaceService _workspaces = WorkspaceService();
+  final ChildStatusService _childStatus = ChildStatusService();
+  final AchievementService _achievementService = AchievementService();
+  final ReportService _reports = ReportService();
 
   UserModel? _currentUser;
   bool _isLoading = false;
@@ -151,17 +172,23 @@ class AppProvider extends ChangeNotifier {
   Future<void> addStudent(StudentModel student, {UserModel? byUser}) async {
     _isLoading = true;
     notifyListeners();
-    await _db.addStudent(student, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.addStudent(student, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> updateStudent(StudentModel student, {UserModel? byUser}) async {
     _isLoading = true;
     notifyListeners();
-    await _db.updateStudent(student, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.updateStudent(student, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> deactivateStudent(
@@ -171,12 +198,30 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.deactivateStudent(
+    try {
+      await _db.deactivateStudent(
+        studentId,
+        reason,
+        byUser: byUser ?? _requireUser(),
+      );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Biriktirishni bekor qilish (koordinator yoki muassasa rahbari)
+  Future<void> unassignSpecialistFromStudent(
+    String studentId,
+    String specialistId, {
+    String? reason,
+  }) async {
+    await _db.unassignSpecialistFromStudent(
       studentId,
-      reason,
-      byUser: byUser ?? _currentUser,
+      specialistId,
+      reason: reason,
+      byUser: _requireUser(),
     );
-    _isLoading = false;
     notifyListeners();
   }
 
@@ -187,13 +232,16 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.assignSpecialistToStudent(
-      studentId,
-      specialistId,
-      byUser: byUser ?? _currentUser,
-    );
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.assignSpecialistToStudent(
+        studentId,
+        specialistId,
+        byUser: byUser ?? _requireUser(),
+      );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> addAssessment(
@@ -202,9 +250,12 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.addAssessment(assessment, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.addAssessment(assessment, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> updateAssessment(
@@ -213,9 +264,12 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.updateAssessment(assessment, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.updateAssessment(assessment, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> deleteAssessment(
@@ -224,9 +278,12 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.deleteAssessment(id, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.deleteAssessment(id, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> addQuestion(
@@ -235,9 +292,12 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.addQuestion(question, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.addQuestion(question, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> updateQuestion(
@@ -246,9 +306,12 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.updateQuestion(question, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.updateQuestion(question, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> deleteQuestion(
@@ -257,9 +320,12 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.deleteQuestion(id, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.deleteQuestion(id, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<Map<String, dynamic>> addSession(
@@ -268,10 +334,12 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    final res = await _db.addSession(session, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
-    return res;
+    try {
+      return await _db.addSession(session, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> completeSession(
@@ -284,7 +352,7 @@ class AppProvider extends ChangeNotifier {
       id,
       observations: observations,
       nextSteps: nextSteps,
-      byUser: byUser ?? _currentUser,
+      byUser: byUser ?? _requireUser(),
     );
     notifyListeners();
   }
@@ -299,13 +367,13 @@ class AppProvider extends ChangeNotifier {
       id,
       status,
       notes: notes,
-      byUser: byUser ?? _currentUser,
+      byUser: byUser ?? _requireUser(),
     );
     notifyListeners();
   }
 
   Future<void> deleteSession(String id, {UserModel? byUser}) async {
-    await _db.deleteSession(id, byUser: byUser ?? _currentUser);
+    await _db.deleteSession(id, byUser: byUser ?? _requireUser());
     notifyListeners();
   }
 
@@ -315,9 +383,12 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.addIepPlan(plan, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.addIepPlan(plan, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> updateIepPlan(
@@ -326,9 +397,12 @@ class AppProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-    await _db.updateIepPlan(plan, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.updateIepPlan(plan, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> updateObjectiveProgress(
@@ -343,7 +417,7 @@ class AppProvider extends ChangeNotifier {
       objId,
       progress,
       evidenceNotes: evidenceNotes,
-      byUser: byUser ?? _currentUser,
+      byUser: byUser ?? _requireUser(),
     );
     notifyListeners();
   }
@@ -353,12 +427,12 @@ class AppProvider extends ChangeNotifier {
     String notes, {
     UserModel? byUser,
   }) async {
-    await _db.resolveAlert(alertId, notes, byUser: byUser ?? _currentUser);
+    await _db.resolveAlert(alertId, notes, byUser: byUser ?? _requireUser());
     notifyListeners();
   }
 
   Future<void> addReferral(ReferralModel referral, {UserModel? byUser}) async {
-    await _db.addReferral(referral, byUser: byUser ?? _currentUser);
+    await _db.addReferral(referral, byUser: byUser ?? _requireUser());
     notifyListeners();
   }
 
@@ -376,31 +450,34 @@ class AppProvider extends ChangeNotifier {
       outcomeNotes: outcomeNotes,
       followUpAction: followUpAction,
       followUpDate: followUpDate,
-      byUser: byUser ?? _currentUser,
+      byUser: byUser ?? _requireUser(),
     );
     notifyListeners();
   }
 
   Future<void> markNotificationAsRead(String notifId) async {
-    await _db.markNotificationAsRead(notifId);
+    await _db.markNotificationAsRead(notifId, byUser: _requireUser());
     notifyListeners();
   }
 
   Future<void> markAllNotificationsAsRead(String userId) async {
-    await _db.markAllNotificationsAsRead(userId);
+    await _db.markAllNotificationsAsRead(byUser: _requireUser());
     notifyListeners();
   }
 
   Future<void> addUser(UserModel user, {UserModel? byUser}) async {
     _isLoading = true;
     notifyListeners();
-    await _db.addUser(user, byUser: byUser ?? _currentUser);
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _db.addUser(user, byUser: byUser ?? _requireUser());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> updateUser(UserModel updated, {UserModel? byUser}) async {
-    await _db.updateUser(updated, byUser: byUser ?? _currentUser);
+    await _db.updateUser(updated, byUser: byUser ?? _requireUser());
     notifyListeners();
   }
 
@@ -412,13 +489,13 @@ class AppProvider extends ChangeNotifier {
     await _db.toggleUserActive(
       userId,
       isActive,
-      byUser: byUser ?? _currentUser,
+      byUser: byUser ?? _requireUser(),
     );
     notifyListeners();
   }
 
   Future<void> deleteUser(String userId, {UserModel? byUser}) async {
-    await _db.deleteUser(userId, byUser: byUser ?? _currentUser);
+    await _db.deleteUser(userId, byUser: byUser ?? _requireUser());
     notifyListeners();
   }
 
@@ -448,12 +525,443 @@ class AppProvider extends ChangeNotifier {
     PsychologicalObservationModel observation, {
     UserModel? byUser,
   }) async {
-    await _db.addObservation(observation, byUser: byUser ?? _currentUser);
+    await _db.addObservation(observation, byUser: byUser ?? _requireUser());
     notifyListeners();
   }
 
   Future<void> deleteObservation(String id, {UserModel? byUser}) async {
-    await _db.deleteObservation(id, byUser: byUser ?? _currentUser);
+    await _db.deleteObservation(id, byUser: byUser ?? _requireUser());
     notifyListeners();
+  }
+
+  // ==================== SAVOL TANLASH VA RIVOJLANISH PROFILI ====================
+  /// Bola uchun odatiy savollar to'plami: o'z sinfi (yoki psixolog belgilagan ishchi
+  /// sinf) uchun standart savollar, bajarib bo'lmaydiganlari chiqarilgan.
+  List<QuestionFit> defaultQuestionsForStudent(
+    StudentModel student, {
+    String? domain,
+  }) => _selection.defaultSet(questions, student, domain: domain);
+
+  /// Barcha savollarni bola uchun tartiblab qaytaradi (mos -> moslashtirish kerak ->
+  /// mos emas), har biri sabablari bilan. Psixolog o'zi tanlaydi.
+  List<QuestionFit> rankQuestionsForStudent(
+    StudentModel student, {
+    String? domain,
+    int? grade,
+  }) {
+    return _selection.rankForStudent(
+      questions,
+      student,
+      domain: domain,
+      grade: grade,
+    );
+  }
+
+  /// Bitta savolning bolaga mosligi
+  QuestionFit evaluateQuestion(
+    AssessmentQuestionModel question,
+    StudentModel student, {
+    int? grade,
+  }) => _selection.evaluate(question, student, grade: grade);
+
+  /// Yo'nalish bo'yicha ishchi sinf (odatda bolaning o'z sinfi)
+  int workingGradeFor(StudentModel student, String domain) =>
+      _selection.workingGrade(student, domain);
+
+  /// Baholash natijasidan keyin ishchi sinf bo'yicha tavsiya
+  LevelChangeAdvice adviseLevelChange(AssessmentModel assessment, int currentGrade) {
+    final ratio = assessment.maxScore > 0
+        ? assessment.totalScore / assessment.maxScore
+        : 0.0;
+    return _selection.adviseLevelChange(ratio, currentGrade);
+  }
+
+  /// Ikki baholashni foiz bo'yicha solishtirish mumkinmi (bir xil savollar to'plami)
+  bool areAssessmentsComparable(AssessmentModel a, AssessmentModel b) =>
+      _selection.areComparable(a, b);
+
+  Future<StudentModel> updateStudentAccessProfile(
+    String studentId,
+    StudentAccessProfile profile,
+  ) async {
+    final user = _requireUser();
+    final updated = await _db.updateAccessProfile(
+      studentId,
+      profile,
+      byUser: user,
+    );
+    notifyListeners();
+    return updated;
+  }
+
+  /// [workingGrade] = null — bola yana o'z sinfi savollarini oladi
+  Future<StudentModel> setStudentWorkingGrade(
+    String studentId,
+    String domain,
+    int? workingGrade, {
+    String? note,
+  }) async {
+    final user = _requireUser();
+    final updated = await _db.setDomainLevel(
+      studentId,
+      domain,
+      workingGrade,
+      note: note,
+      byUser: user,
+    );
+    notifyListeners();
+    return updated;
+  }
+
+  /// Bolaning shaxsiy savollar to'plamlari (tarix bilan)
+  List<AssessmentPlanModel> assessmentPlansFor(
+    String studentId, {
+    String? domain,
+    bool onlyActive = false,
+  }) {
+    final user = _currentUser;
+    if (user == null) return [];
+    return _db.getAssessmentPlans(
+      forUser: user,
+      studentId: studentId,
+      domain: domain,
+      onlyActive: onlyActive,
+    );
+  }
+
+  /// Qayta baholash uchun joriy to'plam
+  AssessmentPlanModel? activeAssessmentPlan(String studentId, String domain) {
+    final user = _currentUser;
+    if (user == null) return null;
+    return _db.getActivePlan(
+      forUser: user,
+      studentId: studentId,
+      domain: domain,
+    );
+  }
+
+  Future<AssessmentPlanModel> saveAssessmentPlan(AssessmentPlanModel plan) async {
+    final user = _requireUser();
+    final saved = await _db.saveAssessmentPlan(plan, byUser: user);
+    notifyListeners();
+    return saved;
+  }
+
+  // ==================== DTS: FAN BO'YICHA HAQIQIY DARAJA ====================
+  List<String> get curriculumSubjects => _db.getCurriculumSubjects();
+
+  List<CurriculumStandard> curriculumStandards({String? subject, int? grade}) =>
+      _db.getCurriculumStandards(subject: subject, grade: grade);
+
+  /// Bilim darajasini baholash: o'qituvchi talablarni belgilaydi, tizim darajani
+  /// tavsiya qiladi. [confirmedGrade] — o'qituvchi tasdiqlagan daraja (ixtiyoriy).
+  Future<SubjectLevelAssessment> saveSubjectLevel({
+    required String studentId,
+    required String subject,
+    required Map<String, Mastery> results,
+    int? confirmedGrade,
+    String? notes,
+  }) async {
+    final saved = await _db.saveSubjectLevel(
+      studentId: studentId,
+      subject: subject,
+      results: results,
+      confirmedGrade: confirmedGrade,
+      notes: notes,
+      byUser: _requireUser(),
+    );
+    notifyListeners();
+    return saved;
+  }
+
+  /// Saqlashdan oldin ko'rsatish uchun: natijalardan tavsiya etiladigan daraja
+  int? previewSubjectLevel(String subject, Map<String, Mastery> results) =>
+      _subjectLevels.suggestGrade(results, curriculumStandards(subject: subject));
+
+  /// Quyiroq sinf talablarini ham tekshirish kerakmi?
+  bool subjectLevelNeedsLowerCheck(String subject, Map<String, Mastery> results) =>
+      _subjectLevels.needsLowerGradeCheck(
+        results,
+        curriculumStandards(subject: subject),
+      );
+
+  List<SubjectLevelAssessment> subjectLevelHistory(String studentId, {String? subject}) {
+    final user = _currentUser;
+    if (user == null) return [];
+    return _db.getSubjectLevels(forUser: user, studentId: studentId, subject: subject);
+  }
+
+  SubjectLevelAssessment? currentSubjectLevel(String studentId, String subject) {
+    final user = _currentUser;
+    if (user == null) return null;
+    return _db.latestSubjectLevel(forUser: user, studentId: studentId, subject: subject);
+  }
+
+  /// "7-sinf o'quvchisi, Matematika: 3-sinf darajasi (sinfidan 4 sinf past)"
+  String describeSubjectLevel(SubjectLevelAssessment a) => _subjectLevels.describe(a);
+
+  /// Hozirgi darajaga mos keyingi talablar — topshiriq va ITR maqsadlari uchun
+  List<CurriculumStandard> nextStandardsFor(String studentId, String subject) {
+    final current = currentSubjectLevel(studentId, subject);
+    if (current == null) return [];
+    return _subjectLevels.nextStandards(
+      current.confirmedGrade,
+      current.results,
+      curriculumStandards(subject: subject),
+    );
+  }
+
+  /// Fan bo'yicha daraja dinamikasi (tasdiqlangan darajalar bo'yicha)
+  DynamicsResult subjectLevelDynamics(
+    String studentId,
+    String subject, {
+    DynamicsPeriod period = DynamicsPeriod.measurement,
+  }) {
+    final points = subjectLevelHistory(studentId, subject: subject)
+        .map((a) => DataPoint(a.assessedAt, a.confirmedGrade.toDouble()))
+        .toList();
+    return _dynamics.evaluate(
+      points,
+      period: period,
+      absoluteThreshold: 0.5,
+      unit: 'sinf darajasi',
+    );
+  }
+
+  // ==================== O'LCHOVLAR VA DINAMIKA ====================
+  List<ProgressMetric> get progressMetrics => _db.getProgressMetrics();
+
+  Future<ProgressMetric> addCustomMetric(ProgressMetric metric) async {
+    final saved = await _db.addCustomMetric(metric, byUser: _requireUser());
+    notifyListeners();
+    return saved;
+  }
+
+  Future<ProgressMeasurement> addMeasurement(ProgressMeasurement measurement) async {
+    final saved = await _db.addMeasurement(measurement, byUser: _requireUser());
+    notifyListeners();
+    return saved;
+  }
+
+  List<ProgressMeasurement> measurementsFor(String studentId, {String? metricId}) {
+    final user = _currentUser;
+    if (user == null) return [];
+    return _db.getMeasurements(forUser: user, studentId: studentId, metricId: metricId);
+  }
+
+  /// Ko'rsatkich bo'yicha dinamika: o'sish / pasayish / barqaror / samarasiz.
+  /// [period] — har bir o'lchov, oylik yoki choraklik taqqoslash.
+  DynamicsResult measurementDynamics(
+    String studentId,
+    String metricId, {
+    DynamicsPeriod period = DynamicsPeriod.measurement,
+  }) {
+    final metric = _db.getProgressMetric(metricId);
+    final points = measurementsFor(studentId, metricId: metricId)
+        .map((m) => DataPoint(m.measuredAt, m.value))
+        .toList();
+    return _dynamics.evaluate(
+      points,
+      higherIsBetter: metric?.higherIsBetter ?? true,
+      period: period,
+      unit: metric?.unit ?? '',
+    );
+  }
+
+  /// Bir xil savollar to'plami bilan o'tkazilgan baholashlar bo'yicha dinamika (foizda)
+  DynamicsResult assessmentDynamics(
+    String studentId,
+    List<String> questionIds, {
+    DynamicsPeriod period = DynamicsPeriod.measurement,
+  }) {
+    final set = questionIds.toSet();
+    final points = assessments
+        .where((a) => a.studentId == studentId && a.status == 'completed')
+        .where((a) => a.questionIds.toSet().length == set.length &&
+            a.questionIds.toSet().containsAll(set))
+        .where((a) => a.maxScore > 0)
+        .map((a) => DataPoint(a.assessmentDate, a.totalScore / a.maxScore * 100))
+        .toList();
+    return _dynamics.evaluate(points, period: period, unit: '%');
+  }
+
+  // ==================== MUTAXASSIS KABINETI ====================
+  /// Joriy foydalanuvchi kabineti: bo'limlar (tartibi bilan), ruxsatlar, yo'nalishlar,
+  /// ko'rsatkichlar, mashg'ulot shablonlari va yo'naltirish manzillari.
+  SpecialistWorkspace? get workspace {
+    final user = _currentUser;
+    return user == null ? null : _workspaces.workspaceFor(user);
+  }
+
+  bool canUseModule(WorkspaceModule module, {bool edit = false}) {
+    final user = _currentUser;
+    return user != null && _workspaces.canUse(user, module, edit: edit);
+  }
+
+  /// Kabinet bosh sahifasi: o'quvchilarim, hali ishlanmaganlar, e'tibor talab qiladiganlar,
+  /// kelgan yo'naltirishlar, yaqin 7 kunlik mashg'ulotlar.
+  WorkspaceDashboard? get workspaceDashboard {
+    final user = _currentUser;
+    return user == null ? null : _workspaces.dashboardFor(user);
+  }
+
+  List<StudentModel> get myCaseload {
+    final user = _currentUser;
+    return user == null ? [] : _workspaces.caseloadFor(user);
+  }
+
+  /// Kabinetga mos savollar banki (mutaxassis yo'nalishlari bo'yicha), bola uchun tartiblangan
+  List<QuestionFit> workspaceQuestionsFor(StudentModel student) {
+    final domains = workspace?.assessmentDomains ?? const <String>[];
+    final all = rankQuestionsForStudent(student);
+    if (domains.isEmpty) return all;
+    return all.where((f) => domains.contains(f.question.domain)).toList();
+  }
+
+  /// Kabinetga mos o'lchov ko'rsatkichlari
+  List<ProgressMetric> get workspaceMetrics {
+    final ids = workspace?.metricIds ?? const <String>[];
+    return progressMetrics.where((m) => ids.contains(m.id)).toList();
+  }
+
+  // ==================== FAN TOPSHIRIQLARI ====================
+  /// Bolaning haqiqiy darajasiga mos topshiriq qoralamalari (keyingi DTS talablaridan).
+  /// O'qituvchi tanlaydi, tahrirlaydi va assignSubjectTask bilan beradi.
+  List<SubjectTask> suggestSubjectTasks(String studentId, String subject) {
+    final user = _currentUser;
+    final current = currentSubjectLevel(studentId, subject);
+    if (user == null || current == null) return [];
+    return nextStandardsFor(studentId, subject)
+        .map((s) => SubjectTask(
+              id: 'task_${s.id}_${DateTime.now().millisecondsSinceEpoch}',
+              studentId: studentId,
+              subject: subject,
+              levelGrade: s.grade,
+              standardId: s.id,
+              title: s.description,
+              assignedById: user.id,
+              assignedByName: user.fullName,
+              assignedAt: DateTime.now(),
+            ))
+        .toList();
+  }
+
+  Future<SubjectTask> assignSubjectTask(SubjectTask task) async {
+    final saved = await _db.assignSubjectTask(task, byUser: _requireUser());
+    notifyListeners();
+    return saved;
+  }
+
+  Future<SubjectTask> completeSubjectTask(String taskId, Mastery result, {String? note}) async {
+    final saved = await _db.completeSubjectTask(taskId, result, note: note, byUser: _requireUser());
+    notifyListeners();
+    return saved;
+  }
+
+  List<SubjectTask> subjectTasksFor(String studentId, {String? subject, bool onlyOpen = false}) {
+    final user = _currentUser;
+    if (user == null) return [];
+    return _db.getSubjectTasks(
+      forUser: user, studentId: studentId, subject: subject, onlyOpen: onlyOpen,
+    );
+  }
+
+  // ==================== MONITORING: QIZIL / SARIQ / YASHIL ====================
+  /// Ko'rinadigan barcha bolalar holati (qizil -> sariq -> yashil), sanoqlar bilan
+  MonitoringSummary? get monitoringSummary {
+    final user = _currentUser;
+    return user == null ? null : _childStatus.summaryFor(user);
+  }
+
+  /// Bitta bolaning holati va uning sabablari
+  ChildStatus childStatus(StudentModel student) =>
+      _childStatus.statusFor(student, _requireUser());
+
+  // ==================== YUTUQLAR PASPORTI ====================
+  /// "Mening yutuqlar pasportim": qo'lda va avtomatik aniqlangan yutuqlar (yangidan eskiga)
+  AchievementPassport achievementPassport(String studentId) =>
+      _achievementService.passportFor(studentId, _requireUser());
+
+  Future<Achievement> addAchievement(Achievement achievement) async {
+    final saved = await _db.addAchievement(achievement, byUser: _requireUser());
+    notifyListeners();
+    return saved;
+  }
+
+  Future<void> deleteAchievement(String id) async {
+    await _db.deleteAchievement(id, byUser: _requireUser());
+    notifyListeners();
+  }
+
+  // ==================== HISOBOTLAR ====================
+  /// Umumiy hisobot (davr berilmasa — oxirgi 30 kun)
+  MonitoringReport buildReport({DateTime? from, DateTime? to}) =>
+      _reports.build(_requireUser(), from: from, to: to);
+
+  String exportMonitoringReportCsv({DateTime? from, DateTime? to}) =>
+      _exportService.generateMonitoringReportCsv(buildReport(from: from, to: to));
+
+  String exportSpecialistActivityCsv({DateTime? from, DateTime? to}) =>
+      _exportService.generateSpecialistActivityCsv(buildReport(from: from, to: to));
+
+  // ==================== KONSILIUM ====================
+  List<CaseConference> conferencesFor({String? studentId}) {
+    final user = _currentUser;
+    if (user == null) return [];
+    return _db.getConferences(forUser: user, studentId: studentId);
+  }
+
+  Future<CaseConference> scheduleConference(CaseConference conference) async {
+    final saved = await _db.scheduleConference(conference, byUser: _requireUser());
+    notifyListeners();
+    return saved;
+  }
+
+  Future<CaseConference> addConferenceContribution(
+    String conferenceId, {
+    required String summary,
+    String? recommendations,
+  }) async {
+    final saved = await _db.addConferenceContribution(
+      conferenceId,
+      summary: summary,
+      recommendations: recommendations,
+      byUser: _requireUser(),
+    );
+    notifyListeners();
+    return saved;
+  }
+
+  Future<CaseConference> finalizeConference(
+    String conferenceId, {
+    required String conclusion,
+    required List<ConferenceDecision> decisions,
+  }) async {
+    final saved = await _db.finalizeConference(
+      conferenceId,
+      conclusion: conclusion,
+      decisions: decisions,
+      byUser: _requireUser(),
+    );
+    notifyListeners();
+    return saved;
+  }
+
+  Future<CaseConference> completeConferenceDecision(String conferenceId, String decisionId) async {
+    final saved = await _db.completeConferenceDecision(
+      conferenceId,
+      decisionId,
+      byUser: _requireUser(),
+    );
+    notifyListeners();
+    return saved;
+  }
+
+  UserModel _requireUser() {
+    final user = _currentUser;
+    if (user == null) {
+      throw Exception('Foydalanuvchi tizimga kirmagan.');
+    }
+    return user;
   }
 }

@@ -216,14 +216,23 @@ class MonitoringRuleEngine {
       }
     }
 
-    // Mavjud ogohlantirishlar bilan birlashtirish (takrorlanmasligi uchun ID bo'yicha)
-    final existingMap = {for (var a in existingAlerts) a.id: a};
+    // Mavjud ogohlantirishlar bilan birlashtirish. Takrorlanish "bola + qoida" bo'yicha
+    // tekshiriladi: shu bola uchun shu qoida bo'yicha ochiq signal bo'lsa, yangisi
+    // qo'shilmaydi (ID boshqacha bo'lsa ham — masalan, oldindan kiritilgan signal).
+    final merged = {for (var a in existingAlerts) a.id: a};
+    final openRuleKeys = {
+      for (final a in existingAlerts)
+        if (!a.isResolved) '${a.studentId}_${a.ruleCode}',
+    };
     for (final generated in generatedAlerts) {
-      if (!existingMap.containsKey(generated.id)) {
-        existingMap[generated.id] = generated;
+      final key = '${generated.studentId}_${generated.ruleCode}';
+      if (merged.containsKey(generated.id) || openRuleKeys.contains(key)) {
+        continue;
       }
+      merged[generated.id] = generated;
+      openRuleKeys.add(key);
     }
 
-    return existingMap.values.toList();
+    return merged.values.toList();
   }
 }

@@ -15,8 +15,20 @@ import '../models/audit_log_model.dart';
 import '../models/notification_model.dart';
 import '../models/psychologist_observation_model.dart';
 import '../models/assessment_question_model.dart';
+import '../models/assessment_plan_model.dart';
+import '../models/development_profile_model.dart';
+import '../models/curriculum_model.dart';
+import '../models/progress_measurement_model.dart';
+import '../models/subject_task_model.dart';
+import '../models/work_record_model.dart';
+import '../models/achievement_model.dart';
+import '../models/case_conference_model.dart';
+import '../core/constants/curriculum_standards_seed.dart';
+import '../core/constants/progress_metrics.dart';
+import 'subject_level_service.dart';
 import '../core/constants/psychological_questions_seed.dart';
 import 'access_control_service.dart';
+import 'app_exceptions.dart';
 import 'password_hasher.dart';
 import 'monitoring_rule_engine.dart';
 import 'seed_data.dart';
@@ -30,6 +42,7 @@ class LocalDbService {
   final _uuid = const Uuid();
   final _accessControl = AccessControlService();
   final _ruleEngine = MonitoringRuleEngine();
+  final _subjectLevels = SubjectLevelService();
 
   // Xotiradagi kesh jadvallari (Doimiy SharedPreferences bilan sinxron)
   List<UserModel> _users = [];
@@ -43,11 +56,44 @@ class LocalDbService {
   List<NotificationModel> _notifications = [];
   List<PsychologicalObservationModel> _observations = [];
   List<AssessmentQuestionModel> _questions = [];
+  List<AssessmentPlanModel> _plans = [];
+  List<CurriculumStandard> _curriculum = [];
+  List<SubjectLevelAssessment> _subjectLevelRecords = [];
+  List<ProgressMeasurement> _measurements = [];
+  List<ProgressMetric> _customMetrics = [];
+  List<SubjectTask> _subjectTasks = [];
+  List<Achievement> _achievements = [];
+  List<CaseConference> _conferences = [];
 
   bool _isInitialized = false;
 
   // O'qishda buzilgan deb topilgan jadvallar (ustidan yozilmaydi)
   final Set<String> _corruptedKeys = {};
+
+  /// Xotiradagi barcha jadvallarni tozalash — init() har doim toza holatdan boshlanadi
+  /// (oldingi holatdan qolgan yozuvlar yangi bazaga aralashmasin).
+  void _clearMemory() {
+    _users = [];
+    _students = [];
+    _assessments = [];
+    _sessions = [];
+    _iepPlans = [];
+    _alerts = [];
+    _referrals = [];
+    _auditLogs = [];
+    _notifications = [];
+    _observations = [];
+    _questions = [];
+    _plans = [];
+    _curriculum = [];
+    _subjectLevelRecords = [];
+    _measurements = [];
+    _customMetrics = [];
+    _subjectTasks = [];
+    _achievements = [];
+    _conferences = [];
+    _corruptedKeys.clear();
+  }
 
   /// Testlar uchun: keyingi init() ma'lumotlarni qaytadan o'qishi uchun.
   @visibleForTesting
@@ -61,6 +107,7 @@ class LocalDbService {
 
     final prefs = await SharedPreferences.getInstance();
     final isSeeded = prefs.getBool('app_db_seeded_v2') ?? false;
+    _clearMemory();
 
     if (!isSeeded && !kDebugMode) {
       // Release build: real foydalanuvchilarga namunaviy bolalar ma'lumoti ko'rsatilmaydi
@@ -88,6 +135,8 @@ class LocalDbService {
     }
 
     await _migratePlainTextPasswords();
+    await _syncStandardQuestions();
+    await _syncCurriculumSeed();
 
     // Monitoring qoidalarini bazadagi mavjud real faktlar bo'yicha baholash
     _reEvaluateRules();
@@ -132,6 +181,46 @@ class LocalDbService {
       AssessmentQuestionModel.fromJson,
       // Savollar kutubxonasi — metodik kontent, shaxsiy ma'lumot emas
       fallback: () => List.from(PsychologicalQuestionsSeed.initialQuestions),
+    );
+    _plans = _decodeTable(
+      prefs,
+      'db_assessment_plans',
+      AssessmentPlanModel.fromJson,
+    );
+    _curriculum = _decodeTable(
+      prefs,
+      'db_curriculum',
+      CurriculumStandard.fromJson,
+    );
+    _subjectLevelRecords = _decodeTable(
+      prefs,
+      'db_subject_levels',
+      SubjectLevelAssessment.fromJson,
+    );
+    _measurements = _decodeTable(
+      prefs,
+      'db_measurements',
+      ProgressMeasurement.fromJson,
+    );
+    _customMetrics = _decodeTable(
+      prefs,
+      'db_custom_metrics',
+      ProgressMetric.fromJson,
+    );
+    _subjectTasks = _decodeTable(
+      prefs,
+      'db_subject_tasks',
+      SubjectTask.fromJson,
+    );
+    _achievements = _decodeTable(
+      prefs,
+      'db_achievements',
+      Achievement.fromJson,
+    );
+    _conferences = _decodeTable(
+      prefs,
+      'db_conferences',
+      CaseConference.fromJson,
     );
   }
 
@@ -189,6 +278,46 @@ class LocalDbService {
       'db_questions',
       _questions.map((e) => e.toJson()),
     );
+    await _writeTable(
+      prefs,
+      'db_assessment_plans',
+      _plans.map((e) => e.toJson()),
+    );
+    await _writeTable(
+      prefs,
+      'db_curriculum',
+      _curriculum.map((e) => e.toJson()),
+    );
+    await _writeTable(
+      prefs,
+      'db_subject_levels',
+      _subjectLevelRecords.map((e) => e.toJson()),
+    );
+    await _writeTable(
+      prefs,
+      'db_measurements',
+      _measurements.map((e) => e.toJson()),
+    );
+    await _writeTable(
+      prefs,
+      'db_custom_metrics',
+      _customMetrics.map((e) => e.toJson()),
+    );
+    await _writeTable(
+      prefs,
+      'db_subject_tasks',
+      _subjectTasks.map((e) => e.toJson()),
+    );
+    await _writeTable(
+      prefs,
+      'db_achievements',
+      _achievements.map((e) => e.toJson()),
+    );
+    await _writeTable(
+      prefs,
+      'db_conferences',
+      _conferences.map((e) => e.toJson()),
+    );
   }
 
   Future<void> _writeTable(
@@ -209,6 +338,366 @@ class LocalDbService {
       iepPlans: _iepPlans,
       existingAlerts: _alerts,
     );
+  }
+
+  // ==================== KONSILIUM ====================
+  /// Konsiliumni rejalashtirish (koordinator, muassasa rahbari yoki tizim administratori).
+  /// Ishtirokchilar — shu maktabning bolalar bilan ishlaydigan faol mutaxassislari (kamida 2 nafar).
+  Future<CaseConference> scheduleConference(
+    CaseConference conference, {
+    required UserModel byUser,
+  }) async {
+    final student = _studentOrThrow(conference.studentId);
+    _require(
+      _accessControl.canAssignSpecialists(byUser, student),
+      'konsiliumni koordinator yoki muassasa rahbari chaqiradi.',
+    );
+    if (conference.agenda.trim().isEmpty) {
+      throw const ValidationException('Konsilium kun tartibini kiriting.');
+    }
+    final participants = conference.participantIds.toSet().toList();
+    if (participants.length < 2) {
+      throw const ValidationException('Konsiliumda kamida 2 nafar mutaxassis ishtirok etishi kerak.');
+    }
+    for (final id in participants) {
+      final u = getUserById(id);
+      if (u == null || !_accessControl.canBeAssigned(u, student)) {
+        throw ValidationException(
+          'Ishtirokchi ${u?.fullName ?? id} shu maktabning faol mutaxassisi emas.',
+        );
+      }
+    }
+    final saved = CaseConference(
+      id: conference.id,
+      studentId: student.id,
+      studentName: student.fullName,
+      agenda: conference.agenda.trim(),
+      scheduledAt: conference.scheduledAt,
+      convenedById: byUser.id,
+      convenedByName: byUser.fullName,
+      participantIds: participants,
+    );
+    _conferences.removeWhere((c) => c.id == saved.id);
+    _conferences.add(saved);
+    for (final id in participants) {
+      _notifications.insert(
+        0,
+        NotificationModel(
+          id: 'notif_${_uuid.v4().substring(0, 8)}',
+          recipientUserId: id,
+          title: 'Konsiliumga taklif',
+          body: '${student.fullName} bo‘yicha konsilium: ${saved.agenda}',
+          type: 'CONFERENCE',
+          relatedRecordId: saved.id,
+          relatedStudentId: student.id,
+          relatedStudentName: student.fullName,
+          createdAt: DateTime.now(),
+        ),
+      );
+    }
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'CREATE',
+      entity: 'CaseConference',
+      details: '${student.fullName} bo‘yicha konsilium rejalashtirildi (${participants.length} ishtirokchi)',
+    );
+    return saved;
+  }
+
+  CaseConference _conferenceOrThrow(String id) {
+    final c = _conferences.where((c) => c.id == id);
+    if (c.isEmpty) throw const NotFoundException('Konsilium topilmadi.');
+    return c.first;
+  }
+
+  void _replaceConference(CaseConference updated) {
+    final i = _conferences.indexWhere((c) => c.id == updated.id);
+    _conferences[i] = updated;
+  }
+
+  /// Ishtirokchi o'z xulosasini kiritadi (qayta yuborilsa — yangilanadi)
+  Future<CaseConference> addConferenceContribution(
+    String conferenceId, {
+    required String summary,
+    String? recommendations,
+    required UserModel byUser,
+  }) async {
+    final conf = _conferenceOrThrow(conferenceId);
+    _require(
+      conf.participantIds.contains(byUser.id),
+      'xulosani faqat konsilium ishtirokchisi kiritadi.',
+    );
+    if (conf.status != ConferenceStatus.planned) {
+      throw const ValidationException('Konsilium yakunlangan — xulosa qo‘shib bo‘lmaydi.');
+    }
+    if (summary.trim().isEmpty) {
+      throw const ValidationException('Xulosa matnini kiriting.');
+    }
+    final updated = conf.copyWith(
+      contributions: [
+        ...conf.contributions.where((c) => c.userId != byUser.id),
+        ConferenceContribution(
+          userId: byUser.id,
+          userName: byUser.fullName,
+          role: byUser.role.label,
+          summary: summary.trim(),
+          recommendations: recommendations,
+          at: DateTime.now(),
+        ),
+      ],
+    );
+    _replaceConference(updated);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'CaseConference',
+      details: '${conf.studentName} konsiliumiga xulosa kiritildi',
+    );
+    return updated;
+  }
+
+  /// Konsiliumni yakunlash: umumiy xulosa va qarorlar (chaqiruvchi yoki tizim administratori)
+  Future<CaseConference> finalizeConference(
+    String conferenceId, {
+    required String conclusion,
+    required List<ConferenceDecision> decisions,
+    required UserModel byUser,
+  }) async {
+    final conf = _conferenceOrThrow(conferenceId);
+    _require(
+      conf.convenedById == byUser.id || byUser.role == UserRole.superAdmin,
+      'konsiliumni uni chaqirgan mas’ul yakunlaydi.',
+    );
+    if (conf.status != ConferenceStatus.planned) {
+      throw const ValidationException('Konsilium allaqachon yakunlangan yoki bekor qilingan.');
+    }
+    if (conclusion.trim().isEmpty) {
+      throw const ValidationException('Konsiliumning umumiy xulosasini kiriting.');
+    }
+    for (final d in decisions) {
+      if (d.text.trim().isEmpty) {
+        throw const ValidationException('Har bir qaror matnini kiriting.');
+      }
+      if (!conf.isParticipant(d.responsibleId)) {
+        throw const ValidationException('Qaror mas’uli konsilium ishtirokchilaridan bo‘lishi kerak.');
+      }
+    }
+    final now = DateTime.now();
+    final updated = conf.copyWith(
+      status: ConferenceStatus.held,
+      conclusion: conclusion.trim(),
+      decisions: [
+        for (final d in decisions)
+          ConferenceDecision(
+            id: d.id,
+            text: d.text.trim(),
+            responsibleId: d.responsibleId,
+            responsibleName: getUserById(d.responsibleId)?.fullName ?? d.responsibleName,
+            dueDate: d.dueDate,
+          ),
+      ],
+      heldAt: now,
+    );
+    _replaceConference(updated);
+    for (final d in updated.decisions) {
+      if (d.responsibleId == byUser.id) continue;
+      _notifications.insert(
+        0,
+        NotificationModel(
+          id: 'notif_${_uuid.v4().substring(0, 8)}',
+          recipientUserId: d.responsibleId,
+          title: 'Konsilium qarori: sizga topshiriq',
+          body: '${conf.studentName}: ${d.text}',
+          type: 'CONFERENCE_DECISION',
+          relatedRecordId: conf.id,
+          relatedStudentId: conf.studentId,
+          relatedStudentName: conf.studentName,
+          createdAt: now,
+        ),
+      );
+    }
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'CaseConference',
+      details: '${conf.studentName} konsiliumi yakunlandi (${decisions.length} ta qaror)',
+    );
+    return updated;
+  }
+
+  /// Qarorni bajarilgan deb belgilash (mas'ul yoki konsiliumni chaqirgan shaxs)
+  Future<CaseConference> completeConferenceDecision(
+    String conferenceId,
+    String decisionId, {
+    required UserModel byUser,
+  }) async {
+    final conf = _conferenceOrThrow(conferenceId);
+    final decision = conf.decisions.where((d) => d.id == decisionId);
+    if (decision.isEmpty) throw const NotFoundException('Qaror topilmadi.');
+    _require(
+      decision.first.responsibleId == byUser.id ||
+          conf.convenedById == byUser.id ||
+          byUser.role == UserRole.superAdmin,
+      'qarorni faqat uning mas’uli yoki konsilium chaqiruvchisi yopadi.',
+    );
+    final updated = conf.copyWith(
+      decisions: [
+        for (final d in conf.decisions)
+          d.id == decisionId ? d.markDone(DateTime.now()) : d,
+      ],
+    );
+    _replaceConference(updated);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'CaseConference',
+      details: '${conf.studentName}: konsilium qarori bajarildi — ${decision.first.text}',
+    );
+    return updated;
+  }
+
+  /// Konsiliumlar: ishtirokchilar, maktab rahbariyati va koordinator ko'radi
+  List<CaseConference> getConferences({
+    required UserModel forUser,
+    String? studentId,
+  }) {
+    return _conferences.where((c) {
+      if (studentId != null && c.studentId != studentId) return false;
+      final student = getStudentById(c.studentId);
+      if (student == null) return false;
+      final schoolWide = forUser.role == UserRole.superAdmin ||
+          AccessControlService.schoolWideRoles.contains(forUser.role);
+      if (schoolWide) return _accessControl.canViewStudent(forUser, student);
+      return forUser.isActive && c.isParticipant(forUser.id);
+    }).toList()
+      ..sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
+  }
+
+  // ==================== YUTUQLAR PASPORTI ====================
+  /// Mutaxassis qo'lda kiritgan yutuqlar (avtomatik yutuqlar AchievementService'da hisoblanadi)
+  List<Achievement> getManualAchievements(String studentId) =>
+      _achievements.where((a) => a.studentId == studentId).toList();
+
+  Future<Achievement> addAchievement(
+    Achievement achievement, {
+    required UserModel byUser,
+  }) async {
+    final student = _studentOrThrow(achievement.studentId);
+    _require(
+      _accessControl.canCreateAssessment(byUser, student),
+      'yutuqni faqat bola bilan ishlaydigan mutaxassis kiritadi.',
+    );
+    if (achievement.title.trim().isEmpty) {
+      throw const ValidationException('Yutuq nomini kiriting.');
+    }
+    if (achievement.achievedAt.isAfter(DateTime.now().add(const Duration(days: 1)))) {
+      throw const ValidationException('Yutuq sanasi kelajakda bo‘lishi mumkin emas.');
+    }
+    final saved = Achievement(
+      id: achievement.id,
+      studentId: achievement.studentId,
+      category: achievement.category,
+      title: achievement.title.trim(),
+      description: achievement.description,
+      achievedAt: achievement.achievedAt,
+      recordedById: byUser.id,
+      recordedByName: byUser.fullName,
+    );
+    _achievements.removeWhere((a) => a.id == saved.id);
+    _achievements.add(saved);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'CREATE',
+      entity: 'Achievement',
+      details: '${student.fullName}: yutuq qayd etildi — ${saved.title}',
+    );
+    return saved;
+  }
+
+  Future<void> deleteAchievement(String id, {required UserModel byUser}) async {
+    final index = _achievements.indexWhere((a) => a.id == id);
+    if (index == -1) throw const NotFoundException('Yutuq topilmadi.');
+    final target = _achievements[index];
+    _require(
+      target.recordedById == byUser.id || byUser.role == UserRole.superAdmin,
+      'yutuqni faqat uni kiritgan mutaxassis o‘chiradi.',
+    );
+    _achievements.removeAt(index);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'DELETE',
+      entity: 'Achievement',
+      details: 'Yutuq o‘chirildi: ${target.title}',
+    );
+  }
+
+  // ==================== ISH YOZUVLARI (MONITORING UCHUN) ====================
+  /// Bola bilan qilingan barcha ishlar: kim, qachon, qanday ish. Mazmunsiz (maxfiy
+  /// kuzatuv matni ochilmaydi). Chaqiruvchi bolani ko'rish huquqini o'zi tekshiradi.
+  List<WorkRecord> getWorkRecords(String studentId) {
+    return [
+      for (final a in _assessments)
+        if (a.studentId == studentId)
+          WorkRecord(a.specialistId, a.assessmentDate, WorkKind.assessment),
+      for (final s in _sessions)
+        if (s.studentId == studentId && s.isCompleted)
+          WorkRecord(s.specialistId, s.scheduledAt, WorkKind.session),
+      for (final o in _observations)
+        if (o.studentId == studentId)
+          WorkRecord(o.psychologistId, o.date, WorkKind.observation),
+      for (final m in _measurements)
+        if (m.studentId == studentId)
+          WorkRecord(m.recordedById, m.measuredAt, WorkKind.measurement),
+      for (final l in _subjectLevelRecords)
+        if (l.studentId == studentId)
+          WorkRecord(l.assessedById, l.assessedAt, WorkKind.subjectLevel),
+      for (final t in _subjectTasks)
+        if (t.studentId == studentId)
+          WorkRecord(
+            t.assignedById,
+            t.completedAt ?? t.assignedAt,
+            WorkKind.subjectTask,
+          ),
+      for (final c in _conferences)
+        if (c.studentId == studentId)
+          for (final contribution in c.contributions)
+            WorkRecord(contribution.userId, contribution.at, WorkKind.conference),
+    ]..sort((a, b) => a.at.compareTo(b.at));
+  }
+
+  // ==================== RUXSAT YORDAMCHILARI ====================
+  void _require(bool allowed, String reason) {
+    if (!allowed) throw PermissionDeniedException(reason);
+  }
+
+  StudentModel _studentOrThrow(String id) {
+    final s = getStudentById(id);
+    if (s == null) throw const NotFoundException('O‘quvchi topilmadi.');
+    return s;
+  }
+
+  /// [actor] [target] foydalanuvchini boshqara oladimi (o'z maktabi doirasida)
+  bool _canManageUser(UserModel actor, UserModel target) {
+    if (!_accessControl.canManageUsers(actor)) return false;
+    if (actor.role == UserRole.superAdmin) return true;
+    return target.role != UserRole.superAdmin &&
+        _accessControl.isSameInstitution(
+          actor,
+          target.institutionId,
+          target.institutionName,
+        );
   }
 
   // ==================== FOYDALANUVCHILAR VA XAVFSIZLIK ====================
@@ -265,6 +754,39 @@ class LocalDbService {
     return user.copyWith(password: PasswordHasher.hash(pass));
   }
 
+  /// Ilova yangilanganda standart savollar bankini yangilash: yangi standart savollar
+  /// qo'shiladi, mavjudlarida bo'sh qolgan sinf va talab ma'lumotlari to'ldiriladi.
+  /// Psixologlar yozgan savollarga tegilmaydi.
+  Future<void> _syncStandardQuestions() async {
+    if (_corruptedKeys.contains('db_questions')) return;
+    var changed = false;
+    for (final seed in PsychologicalQuestionsSeed.initialQuestions) {
+      final i = _questions.indexWhere((q) => q.id == seed.id);
+      if (i == -1) {
+        _questions.add(seed);
+        changed = true;
+        continue;
+      }
+      final cur = _questions[i];
+      if (!cur.isStandard) continue;
+      final needsFill =
+          (cur.requirements == null && seed.requirements != null) ||
+          (cur.adaptationHint == null && seed.adaptationHint != null) ||
+          (cur.minGrade == null && seed.minGrade != null) ||
+          (cur.maxGrade == null && seed.maxGrade != null);
+      if (needsFill) {
+        _questions[i] = cur.copyWith(
+          requirements: cur.requirements ?? seed.requirements,
+          adaptationHint: cur.adaptationHint ?? seed.adaptationHint,
+          minGrade: cur.minGrade ?? seed.minGrade,
+          maxGrade: cur.maxGrade ?? seed.maxGrade,
+        );
+        changed = true;
+      }
+    }
+    if (changed) await _persistAll();
+  }
+
   /// Eski versiyalarda ochiq matn sifatida saqlangan parollarni xeshlash
   Future<void> _migratePlainTextPasswords() async {
     var changed = false;
@@ -286,8 +808,34 @@ class LocalDbService {
     }
   }
 
+  /// O'zini o'zi ro'yxatdan o'tkazishi mumkin bo'lgan rollar. Rahbariyat, koordinator va
+  /// administrator hisoblari faqat administrator tomonidan yaratiladi (addUser).
+  static const selfRegistrationRoles = {
+    UserRole.psychologist,
+    UserRole.speechTherapist,
+    UserRole.specialEducation,
+    UserRole.specialEdTeacher,
+    UserRole.teacher,
+  };
+
+  /// Mutaxassisning o'zini ro'yxatdan o'tkazishi
   Future<void> registerUser(UserModel user) async {
-    user = _withHashedPassword(user);
+    _require(
+      selfRegistrationRoles.contains(user.role),
+      'bu rol bilan o‘zingiz ro‘yxatdan o‘ta olmaysiz — hisobni administrator yaratadi.',
+    );
+    if (findUserByEmailOrPhone(user.email) != null ||
+        (user.phone != null &&
+            user.phone!.isNotEmpty &&
+            findUserByEmailOrPhone(user.phone!) != null)) {
+      throw const ValidationException(
+        'Ushbu telefon raqam yoki pochta bilan hisob allaqachon mavjud.',
+      );
+    }
+    // Biriktirishlar faqat koordinator orqali; yangi hisob faol holatda boshlanadi
+    user = _withHashedPassword(
+      user.copyWith(assignedStudentIds: const [], isActive: true),
+    );
     _users.insert(0, user);
     await _persistAll();
     await addAuditLog(
@@ -300,26 +848,30 @@ class LocalDbService {
     );
   }
 
-  /// Administrator tomonidan yangi foydalanuvchi yaratish (Backend huquq tekshiruvi bilan)
-  Future<void> addUser(UserModel user, {UserModel? byUser}) async {
-    if (byUser != null && !_accessControl.canManageUsers(byUser)) {
-      throw Exception(
-        'Ruxsat cheklangan: Faqat administrator foydalanuvchi qo‘sha oladi.',
+  /// Administrator tomonidan yangi foydalanuvchi yaratish
+  Future<void> addUser(UserModel user, {required UserModel byUser}) async {
+    _require(
+      _canManageUser(byUser, user),
+      'foydalanuvchini faqat tizim administratori yoki o‘z maktabi rahbari qo‘sha oladi.',
+    );
+    if (findUserByEmailOrPhone(user.email) != null) {
+      throw const ValidationException(
+        'Ushbu elektron pochta manzili bilan foydalanuvchi mavjud.',
       );
     }
-
-    if (findUserByEmailOrPhone(user.email) != null) {
-      throw Exception('Ushbu elektron pochta manzili bilan foydalanuvchi mavjud.');
-    }
-    if (user.phone != null && user.phone!.isNotEmpty && findUserByEmailOrPhone(user.phone!) != null) {
-      throw Exception('Ushbu telefon raqam bilan foydalanuvchi ro‘yxatdan o‘tgan.');
+    if (user.phone != null &&
+        user.phone!.isNotEmpty &&
+        findUserByEmailOrPhone(user.phone!) != null) {
+      throw const ValidationException(
+        'Ushbu telefon raqam bilan foydalanuvchi ro‘yxatdan o‘tgan.',
+      );
     }
 
     _users.insert(0, _withHashedPassword(user));
     await _persistAll();
     await addAuditLog(
-      userFullName: byUser?.fullName ?? 'Administrator',
-      userRole: byUser?.role.label ?? 'Tizim administratori',
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
       action: 'CREATE',
       entity: 'User',
       details:
@@ -327,84 +879,104 @@ class LocalDbService {
     );
   }
 
-  Future<void> updateUser(UserModel updated, {UserModel? byUser}) async {
-    if (byUser != null && !_accessControl.canManageUsers(byUser) && byUser.id != updated.id) {
-      throw Exception(
-        'Ruxsat cheklangan: Boshqa foydalanuvchi ma’lumotlarini o‘zgartirish huquqi yo‘q.',
+  /// Foydalanuvchi ma'lumotlarini yangilash. Oddiy foydalanuvchi faqat o'z profilini
+  /// (ism, telefon, parol...) o'zgartiradi — rol, muassasa, holat va biriktirishlarni emas.
+  Future<void> updateUser(UserModel updated, {required UserModel byUser}) async {
+    final index = _users.indexWhere((u) => u.id == updated.id);
+    if (index == -1) throw const NotFoundException('Foydalanuvchi topilmadi.');
+    final current = _users[index];
+
+    final isManager =
+        _canManageUser(byUser, current) && _canManageUser(byUser, updated);
+    if (!isManager) {
+      _require(
+        byUser.id == updated.id,
+        'boshqa foydalanuvchi ma’lumotlarini o‘zgartirish huquqi yo‘q.',
+      );
+      final privilegedChange =
+          current.role != updated.role ||
+          current.isActive != updated.isActive ||
+          current.institutionId != updated.institutionId ||
+          current.institutionName != updated.institutionName ||
+          !listEquals(current.assignedStudentIds, updated.assignedStudentIds);
+      _require(
+        !privilegedChange,
+        'o‘z rolingiz, muassasangiz, holatingiz yoki biriktirilgan o‘quvchilaringizni o‘zgartira olmaysiz.',
       );
     }
 
-    final index = _users.indexWhere((u) => u.id == updated.id);
-    if (index != -1) {
-      _users[index] = _withHashedPassword(updated);
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? updated.fullName,
-        userRole: byUser?.role.label ?? updated.role.label,
-        action: 'UPDATE',
-        entity: 'User',
-        details:
-            '${updated.fullName} (${updated.role.label}) ma’lumotlari tahrirlandi.',
-      );
-    }
+    _users[index] = _withHashedPassword(updated);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'User',
+      details:
+          '${updated.fullName} (${updated.role.label}) ma’lumotlari tahrirlandi.',
+    );
   }
 
   Future<void> toggleUserActive(
     String userId,
     bool isActive, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
-    if (byUser != null && !_accessControl.canManageUsers(byUser)) {
-      throw Exception(
-        'Ruxsat cheklangan: Foydalanuvchi faolligini o‘zgartirish uchun administrator huquqi talab qilinadi.',
-      );
-    }
-
     final index = _users.indexWhere((u) => u.id == userId);
-    if (index != -1) {
-      // Super adminning o'zini bloklashidan himoya
-      if (_users[index].role == UserRole.superAdmin && !isActive) {
-        throw Exception('Asosiy tizim administratorini bloklash taqiqlanadi.');
-      }
-
-      _users[index] = _users[index].copyWith(isActive: isActive);
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? 'Administrator',
-        userRole: byUser?.role.label ?? 'Tizim administratori',
-        action: 'PERMISSION_CHANGE',
-        entity: 'User',
-        details:
-            '${_users[index].fullName} hisobi ${isActive ? 'faollashtirildi' : 'bloklandi'}.',
+    if (index == -1) throw const NotFoundException('Foydalanuvchi topilmadi.');
+    final target = _users[index];
+    _require(
+      _canManageUser(byUser, target),
+      'foydalanuvchi holatini o‘zgartirish uchun administrator huquqi talab qilinadi.',
+    );
+    if (target.role == UserRole.superAdmin && !isActive) {
+      throw const ValidationException(
+        'Asosiy tizim administratorini bloklash taqiqlanadi.',
       );
     }
+    if (target.id == byUser.id && !isActive) {
+      throw const ValidationException('O‘z hisobingizni bloklay olmaysiz.');
+    }
+
+    _users[index] = target.copyWith(isActive: isActive);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'PERMISSION_CHANGE',
+      entity: 'User',
+      details:
+          '${target.fullName} hisobi ${isActive ? 'faollashtirildi' : 'bloklandi'}.',
+    );
   }
 
-  Future<void> deleteUser(String userId, {UserModel? byUser}) async {
-    if (byUser != null && !_accessControl.canManageUsers(byUser)) {
-      throw Exception(
-        'Ruxsat cheklangan: Foydalanuvchini o‘chirish huquqi mavjud emas.',
-      );
-    }
-
+  Future<void> deleteUser(String userId, {required UserModel byUser}) async {
     final index = _users.indexWhere((u) => u.id == userId);
-    if (index != -1) {
-      final target = _users[index];
-      if (target.role == UserRole.superAdmin) {
-        throw Exception('Asosiy tizim administratorini o‘chirib bo‘lmaydi.');
-      }
-
-      _users.removeAt(index);
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? 'Administrator',
-        userRole: byUser?.role.label ?? 'Tizim administratori',
-        action: 'DELETE',
-        entity: 'User',
-        details:
-            'Foydalanuvchi tizimdan o‘chirildi: ${target.fullName} (${target.role.label})',
+    if (index == -1) throw const NotFoundException('Foydalanuvchi topilmadi.');
+    final target = _users[index];
+    _require(
+      _canManageUser(byUser, target),
+      'foydalanuvchini o‘chirish huquqi mavjud emas.',
+    );
+    if (target.role == UserRole.superAdmin) {
+      throw const ValidationException(
+        'Asosiy tizim administratorini o‘chirib bo‘lmaydi.',
       );
     }
+    if (target.id == byUser.id) {
+      throw const ValidationException('O‘z hisobingizni o‘chira olmaysiz.');
+    }
+
+    _users.removeAt(index);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'DELETE',
+      entity: 'User',
+      details:
+          'Foydalanuvchi tizimdan o‘chirildi: ${target.fullName} (${target.role.label})',
+    );
   }
 
   // ==================== MUASSASALAR VA SINFLAR REYESTRI ====================
@@ -577,13 +1149,26 @@ class LocalDbService {
     }
   }
 
-  Future<void> addStudent(StudentModel student, {UserModel? byUser}) async {
+  Future<void> addStudent(
+    StudentModel student, {
+    required UserModel byUser,
+  }) async {
+    _require(
+      _accessControl.canEditStudent(byUser, student),
+      'o‘quvchini faqat muassasa rahbari yoki koordinator ro‘yxatga oladi (o‘z maktabiga).',
+    );
+    if (_students.any((s) => s.id == student.id)) {
+      throw const ValidationException('Bunday o‘quvchi allaqachon mavjud.');
+    }
+    if (student.firstName.trim().isEmpty || student.lastName.trim().isEmpty) {
+      throw const ValidationException('O‘quvchining ismi va familiyasini kiriting.');
+    }
     _students.insert(0, student);
     _reEvaluateRules();
     await _persistAll();
     await addAuditLog(
-      userFullName: byUser?.fullName ?? 'Foydalanuvchi',
-      userRole: byUser?.role.label ?? 'Xodim',
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
       action: 'CREATE',
       entity: 'Student',
       details:
@@ -591,81 +1176,159 @@ class LocalDbService {
     );
   }
 
-  Future<void> updateStudent(StudentModel updated, {UserModel? byUser}) async {
+  /// O'quvchi anketasini tahrirlash. Biriktirishlar va rivojlanish profili bu yerda
+  /// o'zgarmaydi — ular uchun alohida metodlar bor (eskirgan nusxa ustidan yozilmasin).
+  Future<void> updateStudent(
+    StudentModel updated, {
+    required UserModel byUser,
+  }) async {
     final index = _students.indexWhere((s) => s.id == updated.id);
-    if (index != -1) {
-      _students[index] = updated;
-      _reEvaluateRules();
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? 'Foydalanuvchi',
-        userRole: byUser?.role.label ?? 'Xodim',
-        action: 'UPDATE',
-        entity: 'Student',
-        details: '${updated.fullName} anketasi tahrirlandi',
-      );
-    }
+    if (index == -1) throw const NotFoundException('O‘quvchi topilmadi.');
+    final current = _students[index];
+    _require(
+      _accessControl.canEditStudent(byUser, current) &&
+          _accessControl.canEditStudent(byUser, updated),
+      'o‘quvchi anketasini faqat muassasa rahbari yoki koordinator tahrirlaydi.',
+    );
+    _students[index] = updated.copyWith(
+      assignedSpecialistIds: current.assignedSpecialistIds,
+      accessProfile: current.accessProfile,
+      domainLevels: current.domainLevels,
+    );
+    _reEvaluateRules();
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'Student',
+      details: '${updated.fullName} anketasi tahrirlandi',
+    );
   }
 
   Future<void> deactivateStudent(
     String studentId,
     String reason, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
     final index = _students.indexWhere((s) => s.id == studentId);
-    if (index != -1) {
-      final cur = _students[index];
-      _students[index] = cur.copyWith(
-        status: 'Arxivlangan',
-        deactivationReason: reason,
-        deactivatedAt: DateTime.now(),
-      );
-      _reEvaluateRules();
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? 'Administrator',
-        userRole: byUser?.role.label ?? 'Administrator',
-        action: 'ARCHIVE',
-        entity: 'Student',
-        details: '${cur.fullName} arxivlandi. Sabab: $reason',
-      );
+    if (index == -1) throw const NotFoundException('O‘quvchi topilmadi.');
+    final cur = _students[index];
+    _require(
+      _accessControl.canArchiveStudent(byUser, cur),
+      'o‘quvchini faqat muassasa rahbari arxivlay oladi.',
+    );
+    if (reason.trim().isEmpty) {
+      throw const ValidationException('Arxivlash sababini kiriting.');
     }
+    _students[index] = cur.copyWith(
+      status: 'Arxivlangan',
+      deactivationReason: reason,
+      deactivatedAt: DateTime.now(),
+    );
+    _reEvaluateRules();
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'ARCHIVE',
+      entity: 'Student',
+      details: '${cur.fullName} arxivlandi. Sabab: $reason',
+    );
   }
 
+  /// Bolaga mutaxassis biriktirish (koordinator yoki muassasa rahbari)
   Future<void> assignSpecialistToStudent(
     String studentId,
     String specialistId, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
+    final student = _studentOrThrow(studentId);
+    final specialist = getUserById(specialistId);
+    if (specialist == null) {
+      throw const NotFoundException('Mutaxassis topilmadi.');
+    }
+    _require(
+      _accessControl.canAssignSpecialists(byUser, student),
+      'mutaxassisni faqat koordinator yoki muassasa rahbari biriktiradi.',
+    );
+    if (!_accessControl.canBeAssigned(specialist, student)) {
+      throw const ValidationException(
+        'Bu foydalanuvchini biriktirib bo‘lmaydi: u faol, bolalar bilan ishlaydigan va shu maktab xodimi bo‘lishi kerak.',
+      );
+    }
+    await _assign(student, specialist, actor: byUser);
+  }
+
+  /// Biriktirishni bekor qilish (koordinator yoki muassasa rahbari)
+  Future<void> unassignSpecialistFromStudent(
+    String studentId,
+    String specialistId, {
+    required UserModel byUser,
+    String? reason,
+  }) async {
+    final student = _studentOrThrow(studentId);
+    _require(
+      _accessControl.canAssignSpecialists(byUser, student),
+      'biriktirishni faqat koordinator yoki muassasa rahbari bekor qiladi.',
+    );
     final sIndex = _students.indexWhere((s) => s.id == studentId);
+    _students[sIndex] = student.copyWith(
+      assignedSpecialistIds: student.assignedSpecialistIds
+          .where((id) => id != specialistId)
+          .toList(),
+    );
     final uIndex = _users.indexWhere((u) => u.id == specialistId);
-    if (sIndex != -1 && uIndex != -1) {
-      final student = _students[sIndex];
-      final specialist = _users[uIndex];
-
-      final updatedSpecIds = List<String>.from(student.assignedSpecialistIds);
-      if (!updatedSpecIds.contains(specialistId)) {
-        updatedSpecIds.add(specialistId);
-      }
-
-      final updatedStudentIds = List<String>.from(
-        specialist.assignedStudentIds,
+    if (uIndex != -1) {
+      final u = _users[uIndex];
+      _users[uIndex] = u.copyWith(
+        assignedStudentIds: u.assignedStudentIds
+            .where((id) => id != studentId)
+            .toList(),
       );
-      if (!updatedStudentIds.contains(studentId)) {
-        updatedStudentIds.add(studentId);
-      }
+    }
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'PERMISSION_CHANGE',
+      entity: 'Assignment',
+      details:
+          '${student.fullName}dan mutaxassis biriktirishi bekor qilindi${reason != null ? '. Sabab: $reason' : ''}',
+    );
+  }
 
-      _students[sIndex] = student.copyWith(
-        assignedSpecialistIds: updatedSpecIds,
-      );
-      _users[uIndex] = specialist.copyWith(
-        assignedStudentIds: updatedStudentIds,
-      );
+  /// Biriktirish (ruxsat tekshirilgandan keyin chaqiriladi). Takroriy chaqiruv xavfsiz.
+  Future<void> _assign(
+    StudentModel student,
+    UserModel specialist, {
+    required UserModel actor,
+  }) async {
+    final already =
+        student.assignedSpecialistIds.contains(specialist.id) &&
+        specialist.assignedStudentIds.contains(student.id);
+    if (already) return;
 
-      await createNotification(
+    final sIndex = _students.indexWhere((s) => s.id == student.id);
+    final uIndex = _users.indexWhere((u) => u.id == specialist.id);
+    _students[sIndex] = student.copyWith(
+      assignedSpecialistIds: {
+        ...student.assignedSpecialistIds,
+        specialist.id,
+      }.toList(),
+    );
+    if (uIndex != -1) {
+      final u = _users[uIndex];
+      _users[uIndex] = u.copyWith(
+        assignedStudentIds: {...u.assignedStudentIds, student.id}.toList(),
+      );
+    }
+    if (actor.id != specialist.id) {
+      _notifications.insert(
+        0,
         NotificationModel(
           id: 'notif_${_uuid.v4().substring(0, 8)}',
-          recipientUserId: specialistId,
+          recipientUserId: specialist.id,
           title: 'Yangi o‘quvchi biriktirildi',
           body: '${student.fullName} sizning nazoratingizga biriktirildi.',
           type: 'ASSIGNMENT',
@@ -675,17 +1338,520 @@ class LocalDbService {
           createdAt: DateTime.now(),
         ),
       );
+    }
+    await _persistAll();
+    await addAuditLog(
+      userFullName: actor.fullName,
+      userRole: actor.role.label,
+      action: 'PERMISSION_CHANGE',
+      entity: 'Assignment',
+      details:
+          '${specialist.fullName} ${student.fullName}ga mutaxassis sifatida biriktirildi',
+    );
+  }
 
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? 'Administrator',
-        userRole: byUser?.role.label ?? 'Administrator',
-        action: 'PERMISSION_CHANGE',
-        entity: 'Assignment',
-        details:
-            '${specialist.fullName} ${student.fullName}ga mutaxassis sifatida biriktirildi',
+  // ==================== RIVOJLANISH PROFILI ====================
+  /// Bolaning imkoniyatlar profilini saqlash (psixolog to'ldiradi)
+  Future<StudentModel> updateAccessProfile(
+    String studentId,
+    StudentAccessProfile profile, {
+    required UserModel byUser,
+  }) async {
+    final index = _students.indexWhere((s) => s.id == studentId);
+    if (index == -1) throw NotFoundException('O‘quvchi topilmadi.');
+    final student = _students[index];
+    if (!_accessControl.canEditDevelopmentProfile(byUser, student)) {
+      throw PermissionDeniedException(
+        'imkoniyatlar profilini faqat bolani baholovchi mutaxassis o‘zgartira oladi.',
       );
     }
+    final updated = student.copyWith(
+      accessProfile: profile.copyWith(
+        updatedAt: DateTime.now(),
+        updatedById: byUser.id,
+      ),
+    );
+    _students[index] = updated;
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'StudentAccessProfile',
+      details: '${student.fullName} imkoniyatlar profili yangilandi',
+    );
+    return updated;
+  }
+
+  /// Yo'nalish bo'yicha ishchi sinfni belgilash. [workingGrade] = null — bola yana
+  /// o'z sinfi savollarini oladi (odatiy holat).
+  Future<StudentModel> setDomainLevel(
+    String studentId,
+    String domain,
+    int? workingGrade, {
+    String? note,
+    required UserModel byUser,
+  }) async {
+    final index = _students.indexWhere((s) => s.id == studentId);
+    if (index == -1) throw NotFoundException('O‘quvchi topilmadi.');
+    final student = _students[index];
+    if (!_accessControl.canEditDevelopmentProfile(byUser, student)) {
+      throw PermissionDeniedException(
+        'darajani faqat bolani baholovchi mutaxassis belgilay oladi.',
+      );
+    }
+    final levels = Map<String, DomainLevel>.from(student.domainLevels);
+    final previous = levels[domain];
+    if (workingGrade == null) {
+      levels.remove(domain);
+    } else {
+      levels[domain] = DomainLevel(
+        domain: domain,
+        workingGrade: workingGrade.clamp(
+          GradeBand.lowestGrade,
+          GradeBand.highestGrade,
+        ),
+        setAt: DateTime.now(),
+        setById: byUser.id,
+        note: note,
+      );
+    }
+    final updated = student.copyWith(domainLevels: levels);
+    _students[index] = updated;
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'DomainLevel',
+      details:
+          '${student.fullName}: "$domain" ishchi sinfi ${previous != null ? GradeBand.gradeLabel(previous.workingGrade) : 'o‘z sinfi'} → ${workingGrade != null ? GradeBand.gradeLabel(workingGrade) : 'o‘z sinfi'}',
+    );
+    return updated;
+  }
+
+  // ==================== SHAXSIY BAHOLASH TO'PLAMLARI ====================
+  List<AssessmentPlanModel> getAssessmentPlans({
+    required UserModel forUser,
+    required String studentId,
+    String? domain,
+    bool onlyActive = false,
+  }) {
+    final student = getStudentById(studentId);
+    if (student == null || !_accessControl.canViewStudent(forUser, student)) {
+      return [];
+    }
+    return _plans.where((p) {
+      if (p.studentId != studentId) return false;
+      if (domain != null && p.domain != domain) return false;
+      if (onlyActive && !p.isActive) return false;
+      return true;
+    }).toList();
+  }
+
+  AssessmentPlanModel? getActivePlan({
+    required UserModel forUser,
+    required String studentId,
+    required String domain,
+  }) {
+    final plans = getAssessmentPlans(
+      forUser: forUser,
+      studentId: studentId,
+      domain: domain,
+      onlyActive: true,
+    );
+    return plans.isEmpty ? null : plans.first;
+  }
+
+  /// Yangi shaxsiy to'plamni saqlash. Shu bola va yo'nalish uchun avvalgi faol to'plam
+  /// faolsizlantiriladi (o'chirilmaydi — tarix uchun saqlanadi).
+  Future<AssessmentPlanModel> saveAssessmentPlan(
+    AssessmentPlanModel plan, {
+    required UserModel byUser,
+  }) async {
+    final student = getStudentById(plan.studentId);
+    if (student == null) throw NotFoundException('O‘quvchi topilmadi.');
+    if (!_accessControl.canCreateAssessment(byUser, student)) {
+      throw PermissionDeniedException(
+        'bu o‘quvchi uchun baholash to‘plamini yaratish huquqi yo‘q.',
+      );
+    }
+    if (plan.questionIds.isEmpty) {
+      throw ValidationException('To‘plamda kamida bitta savol bo‘lishi kerak.');
+    }
+    for (var i = 0; i < _plans.length; i++) {
+      final p = _plans[i];
+      if (p.isActive &&
+          p.studentId == plan.studentId &&
+          p.domain == plan.domain &&
+          p.id != plan.id) {
+        _plans[i] = p.copyWith(isActive: false, replacedByPlanId: plan.id);
+      }
+    }
+    final saved = AssessmentPlanModel(
+      id: plan.id,
+      studentId: plan.studentId,
+      domain: plan.domain,
+      workingGrade: plan.workingGrade,
+      questionIds: plan.questionIds,
+      createdById: byUser.id,
+      createdByName: byUser.fullName,
+      createdAt: DateTime.now(),
+      note: plan.note,
+    );
+    _plans.removeWhere((p) => p.id == plan.id);
+    _plans.insert(0, saved);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'CREATE',
+      entity: 'AssessmentPlan',
+      details:
+          '${student.fullName}: "${plan.domain}" uchun shaxsiy to‘plam (${plan.questionIds.length} ta savol, ${GradeBand.gradeLabel(plan.workingGrade)} darajasi)',
+    );
+    return saved;
+  }
+
+  // ==================== DTS TALABLARI VA FAN BO'YICHA DARAJA ====================
+  List<CurriculumStandard> getCurriculumStandards({String? subject, int? grade}) {
+    return _curriculum.where((s) {
+      if (subject != null && s.subject != subject) return false;
+      if (grade != null && s.grade != grade) return false;
+      return true;
+    }).toList()..sort((a, b) {
+      final g = a.grade.compareTo(b.grade);
+      return g != 0 ? g : a.id.compareTo(b.id);
+    });
+  }
+
+  /// Fanlar ro'yxati (talablar mavjud bo'lganlar)
+  List<String> getCurriculumSubjects() =>
+      _curriculum.map((s) => s.subject).toSet().toList()..sort();
+
+  /// Rasmiy DTS talablarini yuklash (faqat tizim administratori).
+  /// Yuklangan fanlar bo'yicha namunaviy (rasmiy bo'lmagan) talablar o'chiriladi.
+  Future<int> importCurriculumStandards(
+    List<CurriculumStandard> standards, {
+    required UserModel byUser,
+  }) async {
+    if (!_accessControl.canManageSystemSettings(byUser)) {
+      throw PermissionDeniedException(
+        'DTS talablarini faqat tizim administratori yuklay oladi.',
+      );
+    }
+    final subjects = standards.map((s) => s.subject).toSet();
+    _curriculum.removeWhere(
+      (s) => subjects.contains(s.subject) && !s.isOfficial,
+    );
+    for (final s in standards) {
+      _curriculum.removeWhere((c) => c.id == s.id);
+      _curriculum.add(s);
+    }
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'IMPORT',
+      entity: 'CurriculumStandard',
+      details:
+          '${standards.length} ta DTS talabi yuklandi (${subjects.join(', ')})',
+    );
+    return standards.length;
+  }
+
+  /// Namunaviy talablarni qo'shish — faqat rasmiy talablari yuklanmagan fanlar uchun
+  Future<void> _syncCurriculumSeed() async {
+    if (_corruptedKeys.contains('db_curriculum')) return;
+    final officialSubjects = _curriculum
+        .where((s) => s.isOfficial)
+        .map((s) => s.subject)
+        .toSet();
+    final existing = _curriculum.map((s) => s.id).toSet();
+    var changed = false;
+    for (final s in CurriculumStandardsSeed.standards) {
+      if (officialSubjects.contains(s.subject) || existing.contains(s.id)) {
+        continue;
+      }
+      _curriculum.add(s);
+      changed = true;
+    }
+    if (changed) await _persistAll();
+  }
+
+  /// Fan bo'yicha bilim darajasini saqlash. Tizim darajani tavsiya qiladi
+  /// ([suggestedGrade]); [confirmedGrade] berilmasa, tavsiya qilingan daraja olinadi.
+  Future<SubjectLevelAssessment> saveSubjectLevel({
+    required String studentId,
+    required String subject,
+    required Map<String, Mastery> results,
+    int? confirmedGrade,
+    String? notes,
+    required UserModel byUser,
+  }) async {
+    final student = getStudentById(studentId);
+    if (student == null) throw NotFoundException('O‘quvchi topilmadi.');
+    if (!_accessControl.canAssessSubjectLevel(byUser, student)) {
+      throw PermissionDeniedException(
+        'bilim darajasini maxsus ta’lim o‘qituvchisi yoki sinf o‘qituvchisi baholaydi.',
+      );
+    }
+    final standards = getCurriculumStandards(subject: subject);
+    final known = standards.map((s) => s.id).toSet();
+    final cleanResults = {
+      for (final e in results.entries)
+        if (known.contains(e.key)) e.key: e.value,
+    };
+    if (cleanResults.isEmpty && confirmedGrade == null) {
+      throw ValidationException('Kamida bitta talab bo‘yicha natija kiriting.');
+    }
+    final suggested = _subjectLevels.suggestGrade(cleanResults, standards);
+    final classGrade =
+        GradeBand.parseGrade(student.grade) ??
+        (student.age - 6).clamp(GradeBand.lowestGrade, GradeBand.highestGrade);
+    final assessment = SubjectLevelAssessment(
+      id: 'sla_${_uuid.v4().substring(0, 8)}',
+      studentId: studentId,
+      subject: subject,
+      classGrade: classGrade,
+      results: cleanResults,
+      suggestedGrade: suggested,
+      confirmedGrade: (confirmedGrade ?? suggested ?? 0).clamp(
+        GradeBand.lowestGrade,
+        GradeBand.highestGrade,
+      ),
+      assessedById: byUser.id,
+      assessedByName: byUser.fullName,
+      assessedAt: DateTime.now(),
+      notes: notes,
+    );
+    _subjectLevelRecords.insert(0, assessment);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'CREATE',
+      entity: 'SubjectLevel',
+      details: _subjectLevels.describe(assessment),
+    );
+    return assessment;
+  }
+
+  /// Bolaning fan bo'yicha baholashlari (eskidan yangiga)
+  List<SubjectLevelAssessment> getSubjectLevels({
+    required UserModel forUser,
+    required String studentId,
+    String? subject,
+  }) {
+    final student = getStudentById(studentId);
+    if (student == null || !_accessControl.canViewStudent(forUser, student)) {
+      return [];
+    }
+    return _subjectLevelRecords
+        .where((a) => a.studentId == studentId)
+        .where((a) => subject == null || a.subject == subject)
+        .toList()
+      ..sort((a, b) => a.assessedAt.compareTo(b.assessedAt));
+  }
+
+  SubjectLevelAssessment? latestSubjectLevel({
+    required UserModel forUser,
+    required String studentId,
+    required String subject,
+  }) {
+    final list = getSubjectLevels(
+      forUser: forUser,
+      studentId: studentId,
+      subject: subject,
+    );
+    return list.isEmpty ? null : list.last;
+  }
+
+  // ==================== FAN TOPSHIRIQLARI VA O'QUV NATIJALARI ====================
+  Future<SubjectTask> assignSubjectTask(
+    SubjectTask task, {
+    required UserModel byUser,
+  }) async {
+    final student = getStudentById(task.studentId);
+    if (student == null) throw NotFoundException('O‘quvchi topilmadi.');
+    if (!_accessControl.canAssessSubjectLevel(byUser, student)) {
+      throw PermissionDeniedException(
+        'fan topshiriqlarini maxsus ta’lim o‘qituvchisi yoki sinf o‘qituvchisi beradi.',
+      );
+    }
+    if (task.title.trim().isEmpty) {
+      throw ValidationException('Topshiriq nomini kiriting.');
+    }
+    final saved = SubjectTask(
+      id: task.id,
+      studentId: task.studentId,
+      subject: task.subject,
+      levelGrade: task.levelGrade,
+      standardId: task.standardId,
+      title: task.title.trim(),
+      description: task.description,
+      assignedById: byUser.id,
+      assignedByName: byUser.fullName,
+      assignedAt: DateTime.now(),
+      dueDate: task.dueDate,
+    );
+    _subjectTasks.removeWhere((t) => t.id == saved.id);
+    _subjectTasks.add(saved);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'CREATE',
+      entity: 'SubjectTask',
+      details:
+          '${student.fullName}: ${task.subject} topshirig‘i (${task.levelGrade}-sinf darajasi): ${saved.title}',
+    );
+    return saved;
+  }
+
+  /// Topshiriq natijasini qayd etish (o'quv natijasi)
+  Future<SubjectTask> completeSubjectTask(
+    String taskId,
+    Mastery result, {
+    String? note,
+    required UserModel byUser,
+  }) async {
+    final index = _subjectTasks.indexWhere((t) => t.id == taskId);
+    if (index == -1) throw NotFoundException('Topshiriq topilmadi.');
+    final task = _subjectTasks[index];
+    final student = getStudentById(task.studentId);
+    if (student == null ||
+        !_accessControl.canAssessSubjectLevel(byUser, student)) {
+      throw PermissionDeniedException(
+        'natijani kiritish huquqi yo‘q.');
+    }
+    final done = task.complete(result, note: note);
+    _subjectTasks[index] = done;
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'SubjectTask',
+      details: '${student.fullName}: "${task.title}" — ${result.label}',
+    );
+    return done;
+  }
+
+  List<SubjectTask> getSubjectTasks({
+    required UserModel forUser,
+    required String studentId,
+    String? subject,
+    bool onlyOpen = false,
+  }) {
+    final student = getStudentById(studentId);
+    if (student == null || !_accessControl.canViewStudent(forUser, student)) {
+      return [];
+    }
+    return _subjectTasks
+        .where((t) => t.studentId == studentId)
+        .where((t) => subject == null || t.subject == subject)
+        .where((t) => !onlyOpen || !t.isCompleted)
+        .toList()
+      ..sort((a, b) => a.assignedAt.compareTo(b.assignedAt));
+  }
+
+  // ==================== O'LCHOVLAR (BIRLIKLI NATIJALAR) ====================
+  /// Standart va foydalanuvchi qo'shgan ko'rsatkichlar
+  List<ProgressMetric> getProgressMetrics() => [
+    ...ProgressMetrics.all,
+    ..._customMetrics,
+  ];
+
+  ProgressMetric? getProgressMetric(String id) {
+    for (final m in getProgressMetrics()) {
+      if (m.id == id) return m;
+    }
+    return null;
+  }
+
+  Future<ProgressMetric> addCustomMetric(
+    ProgressMetric metric, {
+    required UserModel byUser,
+  }) async {
+    if (!byUser.isActive || !byUser.role.canCreateAssessments) {
+      throw PermissionDeniedException(
+        'ko‘rsatkich qo‘shish huquqi yo‘q.');
+    }
+    if (metric.name.trim().isEmpty || metric.unit.trim().isEmpty) {
+      throw ValidationException('Ko‘rsatkich nomi va o‘lchov birligini kiriting.');
+    }
+    if (getProgressMetric(metric.id) != null) {
+      throw ValidationException('Bunday ko‘rsatkich allaqachon mavjud.');
+    }
+    _customMetrics.add(metric);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'CREATE',
+      entity: 'ProgressMetric',
+      details: 'Yangi ko‘rsatkich: ${metric.name} (${metric.unit})',
+    );
+    return metric;
+  }
+
+  Future<ProgressMeasurement> addMeasurement(
+    ProgressMeasurement measurement, {
+    required UserModel byUser,
+  }) async {
+    final student = getStudentById(measurement.studentId);
+    if (student == null) throw NotFoundException('O‘quvchi topilmadi.');
+    if (!_accessControl.canCreateAssessment(byUser, student)) {
+      throw PermissionDeniedException(
+        'bu o‘quvchi uchun natija kiritish huquqi yo‘q.',
+      );
+    }
+    final metric = getProgressMetric(measurement.metricId);
+    if (metric == null) throw NotFoundException('Ko‘rsatkich topilmadi.');
+    if (measurement.value.isNaN || measurement.value < 0) {
+      throw ValidationException('Qiymat manfiy bo‘lmagan son bo‘lishi kerak.');
+    }
+    final saved = ProgressMeasurement(
+      id: measurement.id,
+      studentId: measurement.studentId,
+      metricId: measurement.metricId,
+      value: measurement.value,
+      measuredAt: measurement.measuredAt,
+      recordedById: byUser.id,
+      recordedByName: byUser.fullName,
+      note: measurement.note,
+      iepObjectiveId: measurement.iepObjectiveId,
+    );
+    _measurements.removeWhere((m) => m.id == saved.id);
+    _measurements.add(saved);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'CREATE',
+      entity: 'ProgressMeasurement',
+      details:
+          '${student.fullName}: ${metric.name} — ${saved.value} ${metric.unit}',
+    );
+    return saved;
+  }
+
+  /// Bolaning o'lchovlari (eskidan yangiga)
+  List<ProgressMeasurement> getMeasurements({
+    required UserModel forUser,
+    required String studentId,
+    String? metricId,
+  }) {
+    final student = getStudentById(studentId);
+    if (student == null || !_accessControl.canViewStudent(forUser, student)) {
+      return [];
+    }
+    return _measurements
+        .where((m) => m.studentId == studentId)
+        .where((m) => metricId == null || m.metricId == metricId)
+        .toList()
+      ..sort((a, b) => a.measuredAt.compareTo(b.measuredAt));
   }
 
   // ==================== BAHOLASHLAR (ASSESSMENTS) ====================
@@ -719,14 +1885,24 @@ class LocalDbService {
 
   Future<void> addAssessment(
     AssessmentModel assessment, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
+    final student = _studentOrThrow(assessment.studentId);
+    _require(
+      _accessControl.canCreateAssessment(byUser, student),
+      'bu o‘quvchi sizga biriktirilmagan yoki baholash huquqingiz yo‘q.',
+    );
+    _require(
+      assessment.specialistId == byUser.id ||
+          byUser.role == UserRole.superAdmin,
+      'baholashni faqat o‘z nomingizdan kiritishingiz mumkin.',
+    );
     _assessments.insert(0, assessment);
     _reEvaluateRules();
     await _persistAll();
     await addAuditLog(
-      userFullName: byUser?.fullName ?? assessment.specialistName,
-      userRole: byUser?.role.label ?? assessment.specialistRole,
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
       action: 'CREATE',
       entity: 'Assessment',
       details:
@@ -736,42 +1912,54 @@ class LocalDbService {
 
   Future<void> updateAssessment(
     AssessmentModel updated, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
     final index = _assessments.indexWhere((a) => a.id == updated.id);
-    if (index != -1) {
-      _assessments[index] = updated.copyWith(updatedAt: DateTime.now());
-      _reEvaluateRules();
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? updated.specialistName,
-        userRole: byUser?.role.label ?? updated.specialistRole,
-        action: 'UPDATE',
-        entity: 'Assessment',
-        details:
-            '${updated.studentName} uchun ${updated.title} baholash yangilandi (Holati: ${updated.status})',
+    if (index == -1) throw const NotFoundException('Baholash topilmadi.');
+    final current = _assessments[index];
+    _require(
+      _accessControl.canModifyAssessment(byUser, current),
+      'baholashni faqat uni o‘tkazgan mutaxassis yoki rahbariyat o‘zgartiradi.',
+    );
+    if (updated.studentId != current.studentId) {
+      throw const ValidationException(
+        'Baholashni boshqa o‘quvchiga ko‘chirib bo‘lmaydi.',
       );
     }
+    _assessments[index] = updated.copyWith(updatedAt: DateTime.now());
+    _reEvaluateRules();
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'Assessment',
+      details:
+          '${updated.studentName} uchun ${updated.title} baholash yangilandi (Holati: ${updated.status})',
+    );
   }
 
   Future<void> deleteAssessment(
     String id, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
     final index = _assessments.indexWhere((a) => a.id == id);
-    if (index != -1) {
-      final target = _assessments[index];
-      _assessments.removeAt(index);
-      _reEvaluateRules();
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? target.specialistName,
-        userRole: byUser?.role.label ?? target.specialistRole,
-        action: 'DELETE',
-        entity: 'Assessment',
-        details: '${target.studentName} uchun ${target.title} baholash o‘chirildi',
-      );
-    }
+    if (index == -1) throw const NotFoundException('Baholash topilmadi.');
+    final target = _assessments[index];
+    _require(
+      _accessControl.canModifyAssessment(byUser, target),
+      'baholashni faqat uni o‘tkazgan mutaxassis yoki rahbariyat o‘chiradi.',
+    );
+    _assessments.removeAt(index);
+    _reEvaluateRules();
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'DELETE',
+      entity: 'Assessment',
+      details: '${target.studentName} uchun ${target.title} baholash o‘chirildi',
+    );
   }
 
   // ==================== SAVOLLAR KUTUBXONASI (QUESTION LIBRARY) ====================
@@ -819,13 +2007,27 @@ class LocalDbService {
 
   Future<void> addQuestion(
     AssessmentQuestionModel question, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
-    _questions.insert(0, question);
+    _require(
+      _accessControl.canCreateQuestion(byUser),
+      'savol qo‘shish huquqi yo‘q.',
+    );
+    if (question.text.trim().isEmpty) {
+      throw const ValidationException('Savol matnini kiriting.');
+    }
+    if (_questions.any((q) => q.id == question.id)) {
+      throw const ValidationException('Bunday savol allaqachon mavjud.');
+    }
+    // Foydalanuvchi qo'shgan savol standart bo'la olmaydi
+    final saved = byUser.role == UserRole.superAdmin
+        ? question
+        : question.copyWith(isStandard: false);
+    _questions.insert(0, saved);
     await _persistAll();
     await addAuditLog(
-      userFullName: byUser?.fullName ?? question.authorName,
-      userRole: byUser?.role.label ?? 'Amaliyotchi psixolog',
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
       action: 'CREATE',
       entity: 'Question',
       details:
@@ -835,40 +2037,51 @@ class LocalDbService {
 
   Future<void> updateQuestion(
     AssessmentQuestionModel question, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
     final index = _questions.indexWhere((q) => q.id == question.id);
-    if (index != -1) {
-      _questions[index] = question.copyWith(updatedAt: DateTime.now());
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? question.authorName,
-        userRole: byUser?.role.label ?? 'Amaliyotchi psixolog',
-        action: 'UPDATE',
-        entity: 'Question',
-        details: 'Savol tahrirlandi: ${question.id} (${question.domain})',
-      );
-    }
+    if (index == -1) throw const NotFoundException('Savol topilmadi.');
+    final current = _questions[index];
+    _require(
+      _accessControl.canModifyQuestion(byUser, current),
+      'standart savollarni faqat tizim administratori, boshqalarini — muallif o‘zgartiradi.',
+    );
+    _questions[index] = question.copyWith(
+      updatedAt: DateTime.now(),
+      isStandard: current.isStandard,
+      authorId: current.authorId,
+    );
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'Question',
+      details: 'Savol tahrirlandi: ${question.id} (${question.domain})',
+    );
   }
 
   Future<void> deleteQuestion(
     String questionId, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
     final index = _questions.indexWhere((q) => q.id == questionId);
-    if (index != -1) {
-      final target = _questions[index];
-      _questions.removeAt(index);
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? 'Mutaxassis',
-        userRole: byUser?.role.label ?? 'Amaliyotchi psixolog',
-        action: 'DELETE',
-        entity: 'Question',
-        details:
-            'Kutubxonadan savol o‘chirildi: ${target.text.length > 40 ? "${target.text.substring(0, 40)}..." : target.text}',
-      );
-    }
+    if (index == -1) throw const NotFoundException('Savol topilmadi.');
+    final target = _questions[index];
+    _require(
+      _accessControl.canModifyQuestion(byUser, target),
+      'standart savollarni faqat tizim administratori, boshqalarini — muallif o‘chiradi.',
+    );
+    _questions.removeAt(index);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'DELETE',
+      entity: 'Question',
+      details:
+          'Kutubxonadan savol o‘chirildi: ${target.text.length > 40 ? "${target.text.substring(0, 40)}..." : target.text}',
+    );
   }
 
   // ==================== MASHG'ULOTLAR (SESSIONS) ====================
@@ -894,9 +2107,22 @@ class LocalDbService {
 
   Future<Map<String, dynamic>> addSession(
     SessionModel session, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
-    // 1. Takroriy seans tekshiruvi (Bir xil o'quvchi va mutaxassis uchun bir xil vaqtda seans bormi?)
+    final student = _studentOrThrow(session.studentId);
+    _require(
+      _accessControl.canScheduleSession(byUser, student),
+      'bu o‘quvchi sizga biriktirilmagan.',
+    );
+    final schedulesForOthers =
+        byUser.role == UserRole.superAdmin ||
+        AccessControlService.schoolWideRoles.contains(byUser.role);
+    _require(
+      session.specialistId == byUser.id || schedulesForOthers,
+      'mashg‘ulotni faqat o‘zingiz uchun rejalashtira olasiz.',
+    );
+
+    // Takroriy seans: bir xil o'quvchi va mutaxassis uchun bir xil vaqt
     final duplicate = _sessions.any(
       (s) =>
           s.studentId == session.studentId &&
@@ -907,11 +2133,11 @@ class LocalDbService {
           s.scheduledAt.hour == session.scheduledAt.hour &&
           s.scheduledAt.minute == session.scheduledAt.minute,
     );
-
     if (duplicate) {
       return {
         'success': false,
-        'message': 'Ushbu vaqtda bu mutaxassis va o‘quvchi uchun allaqachon mashg‘ulot rejalashtirilgan.',
+        'message':
+            'Ushbu vaqtda bu mutaxassis va o‘quvchi uchun allaqachon mashg‘ulot rejalashtirilgan.',
       };
     }
 
@@ -919,8 +2145,8 @@ class LocalDbService {
     _reEvaluateRules();
     await _persistAll();
     await addAuditLog(
-      userFullName: byUser?.fullName ?? session.specialistName,
-      userRole: byUser?.role.label ?? session.specialistRole,
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
       action: 'CREATE',
       entity: 'Session',
       details:
@@ -929,76 +2155,97 @@ class LocalDbService {
     return {'success': true};
   }
 
+  SessionModel _sessionForChange(String sessionId, UserModel byUser) {
+    final index = _sessions.indexWhere((s) => s.id == sessionId);
+    if (index == -1) throw const NotFoundException('Mashg‘ulot topilmadi.');
+    final cur = _sessions[index];
+    _require(
+      _accessControl.canCompleteSession(byUser, cur),
+      'mashg‘ulotni faqat mas’ul mutaxassis yoki rahbariyat o‘zgartiradi.',
+    );
+    return cur;
+  }
+
   Future<void> completeSession(
     String sessionId, {
     required String observations,
     String? nextSteps,
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
-    final index = _sessions.indexWhere((s) => s.id == sessionId);
-    if (index != -1) {
-      final cur = _sessions[index];
-      _sessions[index] = cur.copyWith(
-        status: 'Bajarildi',
-        attendanceConfirmed: true,
-        observations: observations,
-        nextSteps: nextSteps ?? cur.nextSteps,
-      );
-      _reEvaluateRules();
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? cur.specialistName,
-        userRole: byUser?.role.label ?? cur.specialistRole,
-        action: 'UPDATE',
-        entity: 'Session',
-        details:
-            '${cur.studentName} bilan ${cur.topic} mashg‘uloti bajarilgan deb tasdiqlandi',
+    final cur = _sessionForChange(sessionId, byUser);
+    if (observations.trim().isEmpty) {
+      throw const ValidationException(
+        'Mashg‘ulotni yakunlash uchun kuzatuv natijasini yozing.',
       );
     }
+    final index = _sessions.indexWhere((s) => s.id == sessionId);
+    _sessions[index] = cur.copyWith(
+      status: 'Bajarildi',
+      attendanceConfirmed: true,
+      observations: observations,
+      nextSteps: nextSteps ?? cur.nextSteps,
+    );
+    _reEvaluateRules();
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'Session',
+      details:
+          '${cur.studentName} bilan ${cur.topic} mashg‘uloti bajarilgan deb tasdiqlandi',
+    );
   }
+
+  static const sessionStatuses = {
+    'Rejalashtirilgan',
+    'Bajarildi',
+    'Qatnashmadi',
+    'Bekor qilindi',
+  };
 
   Future<void> updateSessionStatus(
     String sessionId,
     String status, {
     String? notes,
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
-    final index = _sessions.indexWhere((s) => s.id == sessionId);
-    if (index != -1) {
-      final cur = _sessions[index];
-      _sessions[index] = cur.copyWith(
-        status: status,
-        observations: notes ?? cur.observations,
-        attendanceConfirmed: status == 'Bajarildi',
-      );
-      _reEvaluateRules();
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? cur.specialistName,
-        userRole: byUser?.role.label ?? cur.specialistRole,
-        action: 'UPDATE',
-        entity: 'Session',
-        details:
-            '${cur.studentName} bilan mashg‘ulot holati: $status ga o‘zgardi',
-      );
+    final cur = _sessionForChange(sessionId, byUser);
+    if (!sessionStatuses.contains(status)) {
+      throw ValidationException('Noma’lum mashg‘ulot holati: $status');
     }
+    final index = _sessions.indexWhere((s) => s.id == sessionId);
+    _sessions[index] = cur.copyWith(
+      status: status,
+      observations: notes ?? cur.observations,
+      attendanceConfirmed: status == 'Bajarildi',
+    );
+    _reEvaluateRules();
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'Session',
+      details: '${cur.studentName} bilan mashg‘ulot holati: $status ga o‘zgardi',
+    );
   }
 
-  Future<void> deleteSession(String sessionId, {UserModel? byUser}) async {
-    final index = _sessions.indexWhere((s) => s.id == sessionId);
-    if (index != -1) {
-      final cur = _sessions[index];
-      _sessions.removeAt(index);
-      _reEvaluateRules();
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? cur.specialistName,
-        userRole: byUser?.role.label ?? cur.specialistRole,
-        action: 'DELETE',
-        entity: 'Session',
-        details: '${cur.studentName} bilan ${cur.topic} mashg‘uloti o‘chirildi',
-      );
-    }
+  Future<void> deleteSession(
+    String sessionId, {
+    required UserModel byUser,
+  }) async {
+    final cur = _sessionForChange(sessionId, byUser);
+    _sessions.removeWhere((s) => s.id == sessionId);
+    _reEvaluateRules();
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'DELETE',
+      entity: 'Session',
+      details: '${cur.studentName} bilan ${cur.topic} mashg‘uloti o‘chirildi',
+    );
   }
 
   // ==================== INDIVIDUAL TA'LIM REJASI (ITR / IEP) ====================
@@ -1030,14 +2277,23 @@ class LocalDbService {
 
   Future<void> addIepPlan(
     IndividualEducationPlanModel plan, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
+    final student = _studentOrThrow(plan.studentId);
+    _require(
+      _accessControl.canManageIep(byUser, null) &&
+          _accessControl.canViewStudent(byUser, student),
+      'individual rejani koordinator, rahbariyat yoki bolaga biriktirilgan maxsus ta’lim o‘qituvchisi tuzadi.',
+    );
+    if (_iepPlans.any((p) => p.id == plan.id)) {
+      throw const ValidationException('Bunday reja allaqachon mavjud.');
+    }
     _iepPlans.insert(0, plan);
     _reEvaluateRules();
     await _persistAll();
     await addAuditLog(
-      userFullName: byUser?.fullName ?? plan.responsibleTeacherName,
-      userRole: byUser?.role.label ?? 'Koordinator',
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
       action: 'CREATE',
       entity: 'IEP',
       details:
@@ -1047,21 +2303,28 @@ class LocalDbService {
 
   Future<void> updateIepPlan(
     IndividualEducationPlanModel plan, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
     final index = _iepPlans.indexWhere((p) => p.id == plan.id);
-    if (index != -1) {
-      _iepPlans[index] = plan;
-      _reEvaluateRules();
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? plan.responsibleTeacherName,
-        userRole: byUser?.role.label ?? 'Koordinator',
-        action: 'UPDATE',
-        entity: 'IEP',
-        details: '${plan.studentName} ning ITR rejasi yangilandi',
-      );
+    if (index == -1) throw const NotFoundException('Reja topilmadi.');
+    final current = _iepPlans[index];
+    _require(
+      _accessControl.canManageIep(byUser, current),
+      'rejani tahrirlash huquqi yo‘q.',
+    );
+    if (plan.studentId != current.studentId) {
+      throw const ValidationException('Rejani boshqa o‘quvchiga ko‘chirib bo‘lmaydi.');
     }
+    _iepPlans[index] = plan;
+    _reEvaluateRules();
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'IEP',
+      details: '${plan.studentName} ning ITR rejasi yangilandi',
+    );
   }
 
   Future<void> updateObjectiveProgress(
@@ -1069,39 +2332,43 @@ class LocalDbService {
     String objectiveId,
     int progress, {
     String? evidenceNotes,
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
     final pIndex = _iepPlans.indexWhere((p) => p.id == iepId);
-    if (pIndex != -1) {
-      final plan = _iepPlans[pIndex];
-      final newObjectives = plan.objectives.map((obj) {
-        if (obj.id == objectiveId) {
-          final newStatus = progress >= 100
-              ? 'Bajarildi'
-              : progress > 0
-              ? 'Jarayonda'
-              : 'Rejalashtirilgan';
-          return obj.copyWith(
-            progressPercent: progress,
-            status: newStatus,
-            evidenceNotes: evidenceNotes ?? obj.evidenceNotes,
-          );
-        }
-        return obj;
-      }).toList();
-
-      _iepPlans[pIndex] = plan.copyWith(objectives: newObjectives);
-      _reEvaluateRules();
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? 'Mutaxassis',
-        userRole: byUser?.role.label ?? 'Xodim',
-        action: 'UPDATE',
-        entity: 'IEP_Objective',
-        details:
-            '${plan.studentName} ITR maqsadi bo‘yicha progress: $progress% qilib belgilandi',
+    if (pIndex == -1) throw const NotFoundException('Reja topilmadi.');
+    final plan = _iepPlans[pIndex];
+    final objective = plan.objectives.where((o) => o.id == objectiveId);
+    if (objective.isEmpty) throw const NotFoundException('Maqsad topilmadi.');
+    _require(
+      _accessControl.canUpdateObjectiveProgress(byUser, plan, objective.first),
+      'bu maqsad bo‘yicha natija kiritish huquqi yo‘q.',
+    );
+    final value = progress.clamp(0, 100);
+    final newObjectives = plan.objectives.map((obj) {
+      if (obj.id != objectiveId) return obj;
+      final newStatus = value >= 100
+          ? 'Bajarildi'
+          : value > 0
+          ? 'Jarayonda'
+          : 'Rejalashtirilgan';
+      return obj.copyWith(
+        progressPercent: value,
+        status: newStatus,
+        evidenceNotes: evidenceNotes ?? obj.evidenceNotes,
       );
-    }
+    }).toList();
+
+    _iepPlans[pIndex] = plan.copyWith(objectives: newObjectives);
+    _reEvaluateRules();
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'IEP_Objective',
+      details:
+          '${plan.studentName} ITR maqsadi bo‘yicha progress: $value% qilib belgilandi',
+    );
   }
 
   // ==================== MONITORING VA ALERT TRIAGE ====================
@@ -1127,26 +2394,33 @@ class LocalDbService {
   Future<void> resolveAlert(
     String alertId,
     String notes, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
     final index = _alerts.indexWhere((a) => a.id == alertId);
-    if (index != -1) {
-      final cur = _alerts[index];
-      _alerts[index] = cur.copyWith(
-        isResolved: true,
-        status: 'Hal qilindi',
-        resolvedNotes: notes,
-        resolvedAt: DateTime.now(),
-      );
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? 'Mutaxassis',
-        userRole: byUser?.role.label ?? 'Xodim',
-        action: 'RESOLVE',
-        entity: 'Alert',
-        details: 'Monitoring signali (${cur.ruleTitle}) hal etildi: $notes',
-      );
+    if (index == -1) throw const NotFoundException('Monitoring signali topilmadi.');
+    final cur = _alerts[index];
+    final student = _studentOrThrow(cur.studentId);
+    _require(
+      _accessControl.canResolveAlert(byUser, student),
+      'bu signalni hal qilish huquqi yo‘q.',
+    );
+    if (notes.trim().isEmpty) {
+      throw const ValidationException('Qanday chora ko‘rilganini yozing.');
     }
+    _alerts[index] = cur.copyWith(
+      isResolved: true,
+      status: 'Hal qilindi',
+      resolvedNotes: notes,
+      resolvedAt: DateTime.now(),
+    );
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'RESOLVE',
+      entity: 'Alert',
+      details: 'Monitoring signali (${cur.ruleTitle}) hal etildi: $notes',
+    );
   }
 
   // ==================== YO'NALTIRISHLAR (REFERRALS) ====================
@@ -1161,67 +2435,120 @@ class LocalDbService {
     }).toList();
   }
 
-  Future<void> addReferral(ReferralModel referral, {UserModel? byUser}) async {
-    _referrals.insert(0, referral);
-    await _persistAll();
+  static const referralStatuses = {
+    'Qoralamada',
+    'Yuborildi',
+    'Qabul qilindi',
+    'Jarayonda',
+    'Yakunlandi',
+    'Rad etildi',
+  };
 
-    // Agar yo'naltirilgan mutaxassis mavjud bo'lsa unga notifikatsiya jo'natish
-    if (referral.toSpecialistId != null &&
-        referral.toSpecialistId!.isNotEmpty) {
-      await createNotification(
+  Future<void> addReferral(
+    ReferralModel referral, {
+    required UserModel byUser,
+  }) async {
+    final student = _studentOrThrow(referral.studentId);
+    _require(
+      _accessControl.canCreateReferral(byUser) &&
+          _accessControl.canViewStudent(byUser, student),
+      'bu o‘quvchini yo‘naltirish huquqi yo‘q.',
+    );
+    if (referral.reason.trim().isEmpty) {
+      throw const ValidationException('Yo‘naltirish sababini kiriting.');
+    }
+    final saved = referral.copyWith(
+      fromSpecialistId: byUser.id,
+      fromSpecialistName: byUser.fullName,
+      fromSpecialistRole: byUser.role.label,
+    );
+    _referrals.insert(0, saved);
+
+    // Aniq mutaxassisga yo'naltirilgan bo'lsa — unga bildirishnoma
+    if (saved.toSpecialistId != null && saved.toSpecialistId!.isNotEmpty) {
+      _notifications.insert(
+        0,
         NotificationModel(
           id: 'notif_${_uuid.v4().substring(0, 8)}',
-          recipientUserId: referral.toSpecialistId!,
-          title: 'Yangi yo‘naltirish (${referral.priority})',
+          recipientUserId: saved.toSpecialistId!,
+          title: 'Yangi yo‘naltirish (${saved.priority})',
           body:
-              '${referral.fromSpecialistName} ${referral.studentName}ni ko‘rikdan o‘tkazish uchun yo‘naltirdi.',
+              '${saved.fromSpecialistName} ${saved.studentName}ni ko‘rikdan o‘tkazish uchun yo‘naltirdi.',
           type: 'REFERRAL',
-          relatedRecordId: referral.id,
-          relatedStudentId: referral.studentId,
-          relatedStudentName: referral.studentName,
+          relatedRecordId: saved.id,
+          relatedStudentId: saved.studentId,
+          relatedStudentName: saved.studentName,
           createdAt: DateTime.now(),
         ),
       );
     }
-
+    await _persistAll();
     await addAuditLog(
-      userFullName: byUser?.fullName ?? referral.fromSpecialistName,
-      userRole: byUser?.role.label ?? 'Mutaxassis',
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
       action: 'CREATE',
       entity: 'Referral',
       details:
-          '${referral.studentName} -> ${referral.toSpecialistType} xizmatiga yo‘naltirildi. Sabab: ${referral.reason}',
+          '${saved.studentName} -> ${saved.toSpecialistType} xizmatiga yo‘naltirildi. Sabab: ${saved.reason}',
     );
   }
 
+  /// Yo'naltirish holatini o'zgartirish. Qabul qiluvchi mutaxassis yo'naltirishni
+  /// qabul qilganda u bolaga avtomatik biriktiriladi — shundan keyin bolaning
+  /// ma'lumotlarini ko'ra va natija kirita oladi.
   Future<void> updateReferralStatus(
     String referralId,
     String newStatus, {
     String? outcomeNotes,
     String? followUpAction,
     DateTime? followUpDate,
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
     final index = _referrals.indexWhere((r) => r.id == referralId);
-    if (index != -1) {
-      final cur = _referrals[index];
-      _referrals[index] = cur.copyWith(
-        status: newStatus,
-        outcomeNotes: outcomeNotes ?? cur.outcomeNotes,
-        followUpAction: followUpAction ?? cur.followUpAction,
-        followUpDate: followUpDate ?? cur.followUpDate,
-        updatedAt: DateTime.now(),
-      );
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? 'Mutaxassis',
-        userRole: byUser?.role.label ?? 'Xodim',
-        action: 'UPDATE',
-        entity: 'Referral',
-        details:
-            'Yo‘naltirish holati: $newStatus deb belgilandi (${cur.studentName})',
-      );
+    if (index == -1) throw const NotFoundException('Yo‘naltirish topilmadi.');
+    final cur = _referrals[index];
+    _require(
+      _accessControl.canProcessReferral(byUser, cur),
+      'bu yo‘naltirish bilan ishlash huquqi yo‘q.',
+    );
+    if (!referralStatuses.contains(newStatus)) {
+      throw ValidationException('Noma’lum yo‘naltirish holati: $newStatus');
     }
+
+    final isRecipient =
+        cur.toSpecialistId == byUser.id ||
+        cur.toSpecialistType == byUser.role.label;
+    final accepting = newStatus == 'Qabul qilindi' || newStatus == 'Jarayonda';
+
+    _referrals[index] = cur.copyWith(
+      status: newStatus,
+      outcomeNotes: outcomeNotes ?? cur.outcomeNotes,
+      followUpAction: followUpAction ?? cur.followUpAction,
+      followUpDate: followUpDate ?? cur.followUpDate,
+      toSpecialistId: accepting && isRecipient ? byUser.id : cur.toSpecialistId,
+      toSpecialistName: accepting && isRecipient
+          ? byUser.fullName
+          : cur.toSpecialistName,
+      updatedAt: DateTime.now(),
+    );
+
+    if (accepting && isRecipient) {
+      final student = getStudentById(cur.studentId);
+      final me = getUserById(byUser.id) ?? byUser;
+      if (student != null && _accessControl.canBeAssigned(me, student)) {
+        await _assign(student, me, actor: byUser);
+      }
+    }
+
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'UPDATE',
+      entity: 'Referral',
+      details:
+          'Yo‘naltirish holati: $newStatus deb belgilandi (${cur.studentName})',
+    );
   }
 
   // ==================== IN-APP NOTIFIKATSIYALAR ====================
@@ -1235,22 +2562,24 @@ class LocalDbService {
         .length;
   }
 
-  Future<void> createNotification(NotificationModel notification) async {
-    _notifications.insert(0, notification);
+  /// Bildirishnomani o'qilgan deb belgilash — faqat qabul qiluvchi
+  Future<void> markNotificationAsRead(
+    String notificationId, {
+    required UserModel byUser,
+  }) async {
+    final index = _notifications.indexWhere((n) => n.id == notificationId);
+    if (index == -1) return;
+    _require(
+      _notifications[index].recipientUserId == byUser.id,
+      'boshqa foydalanuvchining bildirishnomasi.',
+    );
+    _notifications[index] = _notifications[index].copyWith(isRead: true);
     await _persistAll();
   }
 
-  Future<void> markNotificationAsRead(String notificationId) async {
-    final index = _notifications.indexWhere((n) => n.id == notificationId);
-    if (index != -1) {
-      _notifications[index] = _notifications[index].copyWith(isRead: true);
-      await _persistAll();
-    }
-  }
-
-  Future<void> markAllNotificationsAsRead(String userId) async {
+  Future<void> markAllNotificationsAsRead({required UserModel byUser}) async {
     for (int i = 0; i < _notifications.length; i++) {
-      if (_notifications[i].recipientUserId == userId &&
+      if (_notifications[i].recipientUserId == byUser.id &&
           !_notifications[i].isRead) {
         _notifications[i] = _notifications[i].copyWith(isRead: true);
       }
@@ -1315,13 +2644,26 @@ class LocalDbService {
 
   Future<void> addObservation(
     PsychologicalObservationModel observation, {
-    UserModel? byUser,
+    required UserModel byUser,
   }) async {
+    final student = _studentOrThrow(observation.studentId);
+    _require(
+      _accessControl.canWriteObservation(byUser, student),
+      'psixologik kuzatuvni faqat bolaga biriktirilgan psixolog yozadi.',
+    );
+    _require(
+      observation.psychologistId == byUser.id ||
+          byUser.role == UserRole.superAdmin,
+      'kuzatuvni faqat o‘z nomingizdan yozishingiz mumkin.',
+    );
+    if (observation.observationText.trim().isEmpty) {
+      throw const ValidationException('Kuzatuv matnini kiriting.');
+    }
     _observations.insert(0, observation);
     await _persistAll();
     await addAuditLog(
-      userFullName: byUser?.fullName ?? observation.psychologistName,
-      userRole: byUser?.role.label ?? 'Amaliyotchi psixolog',
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
       action: 'CREATE',
       entity: 'Observation',
       details:
@@ -1329,19 +2671,26 @@ class LocalDbService {
     );
   }
 
-  Future<void> deleteObservation(String id, {UserModel? byUser}) async {
+  Future<void> deleteObservation(
+    String id, {
+    required UserModel byUser,
+  }) async {
     final index = _observations.indexWhere((o) => o.id == id);
-    if (index != -1) {
-      final obs = _observations.removeAt(index);
-      await _persistAll();
-      await addAuditLog(
-        userFullName: byUser?.fullName ?? 'Psixolog',
-        userRole: byUser?.role.label ?? 'Amaliyotchi psixolog',
-        action: 'DELETE',
-        entity: 'Observation',
-        details:
-            '${obs.studentName} ning ${obs.category} bo‘yicha kuzatuvi o‘chirildi',
-      );
-    }
+    if (index == -1) throw const NotFoundException('Kuzatuv topilmadi.');
+    final obs = _observations[index];
+    _require(
+      obs.psychologistId == byUser.id || byUser.role == UserRole.superAdmin,
+      'kuzatuvni faqat muallif o‘chiradi.',
+    );
+    _observations.removeAt(index);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'DELETE',
+      entity: 'Observation',
+      details:
+          '${obs.studentName} ning ${obs.category} bo‘yicha kuzatuvi o‘chirildi',
+    );
   }
 }

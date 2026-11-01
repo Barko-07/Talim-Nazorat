@@ -1,26 +1,71 @@
 import '../models/user_model.dart';
 import '../models/student_model.dart';
 import '../models/assessment_model.dart';
+import '../models/assessment_question_model.dart';
 import '../models/session_model.dart';
 import '../models/iep_model.dart';
 import '../models/referral_model.dart';
 
+/// Rollar bo'yicha ruxsatlar matritsasi (yagona manba).
+///
+/// Asosiy tamoyillar:
+/// - Har bir foydalanuvchi faqat o'z muassasasi bilan ishlaydi (tizim administratoridan tashqari).
+/// - Bolalar bilan bevosita ishlaydigan mutaxassislar va o'qituvchilar faqat o'zlariga
+///   biriktirilgan bolalarni ko'radi. Koordinator, rahbariyat va kuzatuvchi — butun maktabni.
+/// - Bola ma'lumotini o'zgartirish uchun avvalo uni ko'rish huquqi bo'lishi shart.
+/// - Bloklangan foydalanuvchi hech narsa qila olmaydi.
 class AccessControlService {
   static final AccessControlService _instance =
       AccessControlService._internal();
   factory AccessControlService() => _instance;
   AccessControlService._internal();
 
-  // ==================== MAKTAB / TASHKILOT BO'YICHA IZOLYATSIYA ====================
-  /// Foydalanuvchi va o'quvchi bir xil muassasaga tegishlimi?
+  /// Butun maktab bolalarini ko'radigan rollar
+  static const schoolWideRoles = {
+    UserRole.institutionAdmin,
+    UserRole.coordinator,
+    UserRole.reviewer,
+  };
+
+  /// Bolalar bilan bevosita ishlaydigan va bolalar biriktiriladigan rollar
+  static const childFacingRoles = {
+    UserRole.psychologist,
+    UserRole.speechTherapist,
+    UserRole.specialEducation,
+    UserRole.specialEdTeacher,
+    UserRole.teacher,
+  };
+
+  /// Bolaning rivojlanish profilini (imkoniyatlar profili, ishchi sinf) o'zgartiradiganlar.
+  /// Keyinchalik ota-onaga ham ruxsat berish shu yerda qo'shiladi.
+  static const developmentProfileEditors = {
+    UserRole.psychologist,
+    UserRole.speechTherapist,
+    UserRole.specialEducation,
+  };
+
+  /// Fan bo'yicha bilim darajasini baholaydigan va fan topshiriqlarini beradiganlar
+  static const subjectLevelAssessors = {
+    UserRole.specialEdTeacher,
+    UserRole.specialEducation,
+    UserRole.teacher,
+    UserRole.coordinator,
+  };
+
+  /// Bolalarga mutaxassis biriktira oladiganlar
+  static const specialistAssigners = {
+    UserRole.institutionAdmin,
+    UserRole.coordinator,
+  };
+
+  // ==================== MAKTAB IZOLYATSIYASI ====================
+  /// Foydalanuvchi va yozuv bir xil muassasaga tegishlimi?
   bool isSameInstitution(
     UserModel user,
     String? institutionId,
     String? institutionName,
   ) {
-    if (user.role == UserRole.superAdmin) {
-      return true; // Tizim administratori butun viloyatni ko'radi
-    }
+    if (user.role == UserRole.superAdmin) return true;
     if (user.institutionId != null && institutionId != null) {
       if (user.institutionId == institutionId) return true;
     }
@@ -37,62 +82,27 @@ class AccessControlService {
   String _normalizeName(String name) =>
       name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 
-  // ==================== O'QUVCHILARGA RUXSAT ====================
+  bool _sameSchool(UserModel user, StudentModel student) =>
+      isSameInstitution(user, student.institutionId, student.institutionName);
+
+  // ==================== O'QUVCHINI KO'RISH ====================
   /// O'quvchi ma'lumotlarini ko'rish ruxsati
   bool canViewStudent(UserModel user, StudentModel student) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin) return true;
-
-    // Maktab izolyatsiyasi tekshiruvi
-    final sameSchool = isSameInstitution(
-      user,
-      student.institutionId,
-      student.institutionName,
-    );
-    if (!sameSchool) return false;
-
-    // Maktab rahbari, koordinator yoki sinf o'qituvchisi butun maktab o'quvchilarini ko'ra oladi
-    if (user.role == UserRole.institutionAdmin ||
-        user.role == UserRole.coordinator ||
-        user.role == UserRole.reviewer) {
-      return true;
+    if (!_sameSchool(user, student)) return false;
+    if (schoolWideRoles.contains(user.role)) return true;
+    if (childFacingRoles.contains(user.role)) {
+      return isStudentAssignedTo(user, student);
     }
-
-    // Mutaxassislar (Psixolog, Logoped, Defektolog, O'qituvchi):
-    // Biriktirilgan o'quvchilarni yoki o'z maktabining ro'yxatidagi bolalarni ko'rish
-    return true;
+    return false;
   }
 
-  /// O'quvchi faqat ushbu mutaxassisga bevosita biriktirilganmi?
+  /// O'quvchi shu foydalanuvchiga bevosita biriktirilganmi?
   bool isStudentAssignedTo(UserModel user, StudentModel student) {
     if (student.assignedSpecialistIds.contains(user.id)) return true;
     if (user.assignedStudentIds.contains(student.id)) return true;
     if (student.coordinatorId == user.id) return true;
-    return false;
-  }
-
-  /// O'quvchi anketasini yaratish yoki tahrirlash huquqi
-  bool canEditStudent(UserModel user, StudentModel? student) {
-    if (!user.isActive) return false;
-    if (user.role == UserRole.superAdmin) return true;
-    if (user.role == UserRole.institutionAdmin ||
-        user.role == UserRole.coordinator) {
-      if (student == null) return true;
-      return isSameInstitution(
-        user,
-        student.institutionId,
-        student.institutionName,
-      );
-    }
-    if (user.role == UserRole.teacher) {
-      // Sinf rahbari o'z sinfidagi o'quvchini tahrirlay oladi
-      if (student == null) return true;
-      return isSameInstitution(
-        user,
-        student.institutionId,
-        student.institutionName,
-      );
-    }
     return false;
   }
 
@@ -102,12 +112,12 @@ class AccessControlService {
     return user.role == UserRole.superAdmin ||
         user.role == UserRole.institutionAdmin ||
         user.role == UserRole.psychologist ||
+        user.role == UserRole.speechTherapist ||
         user.role == UserRole.specialEducation ||
         user.role == UserRole.coordinator;
   }
 
   /// Maxfiy psixologik kuzatuvni ko'rish: faqat muallif, psixologlar va tizim administratori.
-  /// (Psixologik sir — o'qituvchi va kuzatuvchilar ko'rmaydi)
   bool canViewConfidentialObservation(UserModel user, String psychologistId) {
     if (!user.isActive) return false;
     if (user.id == psychologistId) return true;
@@ -115,63 +125,98 @@ class AccessControlService {
         user.role == UserRole.superAdmin;
   }
 
-  /// O'quvchini arxivlash yoki holatini o'zgartirish
+  // ==================== O'QUVCHINI BOSHQARISH ====================
+  /// O'quvchi anketasini yaratish ([student] — yangi yoki mavjud) yoki tahrirlash
+  bool canEditStudent(UserModel user, StudentModel? student) {
+    if (!user.isActive) return false;
+    if (user.role == UserRole.superAdmin) return true;
+    if (user.role != UserRole.institutionAdmin &&
+        user.role != UserRole.coordinator) {
+      return false;
+    }
+    return student == null || _sameSchool(user, student);
+  }
+
+  /// O'quvchini arxivlash
   bool canArchiveStudent(UserModel user, StudentModel student) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin) return true;
-    if (user.role == UserRole.institutionAdmin) {
-      return isSameInstitution(
-        user,
-        student.institutionId,
-        student.institutionName,
-      );
-    }
-    return false;
+    return user.role == UserRole.institutionAdmin && _sameSchool(user, student);
   }
 
-  // ==================== BAHOLASHLARGA RUXSAT ====================
-  /// Baholash o'tkazish ruxsati
-  bool canCreateAssessment(UserModel user, StudentModel student) {
+  /// Bolaga mutaxassis biriktirish yoki biriktirishni bekor qilish
+  bool canAssignSpecialists(UserModel user, StudentModel student) {
     if (!user.isActive) return false;
-    if (user.role == UserRole.reviewer || user.role == UserRole.parent) {
-      return false;
-    }
-    if (!isSameInstitution(
-      user,
-      student.institutionId,
-      student.institutionName,
-    )) {
-      return false;
-    }
-
-    // Mutaxassislar (Psixolog, Logoped, Defektolog, O'qituvchi, Koordinator, Admin)
-    return user.role.canCreateAssessments;
+    if (user.role == UserRole.superAdmin) return true;
+    return specialistAssigners.contains(user.role) && _sameSchool(user, student);
   }
 
-  /// Baholashni o'chirish yoki o'zgartirish (Faqat muallif yoki Admin)
+  /// [specialist] shu bolaga biriktirilishi mumkinmi (faol, bolalar bilan ishlaydi, shu maktabdan)
+  bool canBeAssigned(UserModel specialist, StudentModel student) {
+    return specialist.isActive &&
+        childFacingRoles.contains(specialist.role) &&
+        _sameSchool(specialist, student);
+  }
+
+  bool canEditDevelopmentProfile(UserModel user, StudentModel student) {
+    if (!user.isActive) return false;
+    if (user.role == UserRole.superAdmin) return true;
+    return developmentProfileEditors.contains(user.role) &&
+        canViewStudent(user, student);
+  }
+
+  bool canAssessSubjectLevel(UserModel user, StudentModel student) {
+    if (!user.isActive) return false;
+    if (user.role == UserRole.superAdmin) return true;
+    return subjectLevelAssessors.contains(user.role) &&
+        canViewStudent(user, student);
+  }
+
+  // ==================== BAHOLASH VA SAVOLLAR ====================
+  /// Baholash o'tkazish va natija/o'lchov kiritish
+  bool canCreateAssessment(UserModel user, StudentModel student) {
+    if (!user.isActive || !user.role.canCreateAssessments) return false;
+    if (user.role == UserRole.superAdmin) return true;
+    return canViewStudent(user, student);
+  }
+
+  /// Baholashni o'zgartirish yoki o'chirish (muallif yoki rahbariyat)
   bool canModifyAssessment(UserModel user, AssessmentModel assessment) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin) return true;
     if (assessment.specialistId == user.id) return true;
-    if (user.role == UserRole.institutionAdmin) return true;
-    return false;
+    return user.role == UserRole.institutionAdmin;
   }
 
-  // ==================== MASHG'ULOTLARGA RUXSAT ====================
-  /// Mashg'ulot rejalashtirish
+  bool canCreateQuestion(UserModel user) =>
+      user.isActive && user.role.canCreateAssessments;
+
+  /// Standart savollarni faqat tizim administratori o'zgartiradi; boshqalarini — muallif
+  bool canModifyQuestion(UserModel user, AssessmentQuestionModel question) {
+    if (!user.isActive) return false;
+    if (user.role == UserRole.superAdmin) return true;
+    if (question.isStandard) return false;
+    return question.authorId == user.id;
+  }
+
+  /// Psixologik kuzatuv yozish (psixolog kabineti)
+  bool canWriteObservation(UserModel user, StudentModel student) {
+    if (!user.isActive) return false;
+    if (user.role == UserRole.superAdmin) return true;
+    return user.role == UserRole.psychologist && canViewStudent(user, student);
+  }
+
+  // ==================== MASHG'ULOTLAR ====================
   bool canScheduleSession(UserModel user, StudentModel student) {
     if (!user.isActive) return false;
     if (user.role == UserRole.reviewer || user.role == UserRole.parent) {
       return false;
     }
-    return isSameInstitution(
-      user,
-      student.institutionId,
-      student.institutionName,
-    );
+    if (user.role == UserRole.superAdmin) return true;
+    return canViewStudent(user, student);
   }
 
-  /// Mashg'ulotni bajarilgan deb belgilash (Faqat mas'ul mutaxassis yoki Admin)
+  /// Mashg'ulotni yakunlash, holatini o'zgartirish yoki o'chirish (mas'ul mutaxassis yoki rahbariyat)
   bool canCompleteSession(UserModel user, SessionModel session) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin ||
@@ -181,44 +226,37 @@ class AccessControlService {
     return session.specialistId == user.id;
   }
 
-  // ==================== INDIVIDUAL TA'LIM REJASI (ITR) ====================
-  /// ITR yaratish yoki tahrirlash
+  // ==================== INDIVIDUAL TA'LIM REJASI ====================
   bool canManageIep(UserModel user, IndividualEducationPlanModel? plan) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin) return true;
+    final schoolOk =
+        plan == null || isSameInstitution(user, null, plan.institutionName);
     if (user.role == UserRole.institutionAdmin ||
-        user.role == UserRole.coordinator) {
-      return true;
+        user.role == UserRole.coordinator ||
+        user.role == UserRole.specialEdTeacher) {
+      return schoolOk;
     }
-    if (plan != null && plan.responsibleTeacherId == user.id) return true;
-    return false;
+    return plan != null && plan.responsibleTeacherId == user.id;
   }
 
-  /// ITR maqsadlaridagi progressni yangilash
   bool canUpdateObjectiveProgress(
     UserModel user,
     IndividualEducationPlanModel plan,
     PlanObjectiveModel objective,
   ) {
+    if (canManageIep(user, plan)) return true;
     if (!user.isActive) return false;
-    if (user.role == UserRole.superAdmin ||
-        user.role == UserRole.institutionAdmin ||
-        user.role == UserRole.coordinator) {
-      return true;
-    }
-    if (plan.responsibleTeacherId == user.id) return true;
-    if (objective.responsibleSpecialistId == user.id) return true;
-    return false;
+    return objective.responsibleSpecialistId == user.id;
   }
 
-  // ==================== YO'NALTIRISHLAR (REFERRALS) ====================
-  /// Bolani boshqa mutaxassisga yo'naltirish
+  // ==================== YO'NALTIRISHLAR VA MONITORING ====================
   bool canCreateReferral(UserModel user) {
     if (!user.isActive) return false;
     return user.role != UserRole.reviewer && user.role != UserRole.parent;
   }
 
-  /// Yo'naltirishni ko'rib chiqish va qabul qilish/yakunlash
+  /// Yo'naltirishni ko'rish va holatini o'zgartirish
   bool canProcessReferral(UserModel user, ReferralModel referral) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin ||
@@ -228,47 +266,41 @@ class AccessControlService {
     }
     if (referral.fromSpecialistId == user.id) return true;
     if (referral.toSpecialistId == user.id) return true;
-    if (referral.toSpecialistType == user.role.label ||
-        referral.toSpecialistType == user.specialization) {
-      return true;
-    }
-    return false;
+    return referral.toSpecialistType == user.role.label ||
+        referral.toSpecialistType == user.specialization;
   }
 
-  // ==================== FOYDALANUVCHILARNI VA TIZIMNI BOSHQARISH ====================
-  /// Yangi xodim qo'shish, rol va maktab biriktirish
+  /// Monitoring signalini hal qilish
+  bool canResolveAlert(UserModel user, StudentModel student) {
+    if (!user.isActive) return false;
+    if (user.role == UserRole.reviewer || user.role == UserRole.parent) {
+      return false;
+    }
+    return canViewStudent(user, student);
+  }
+
+  // ==================== TIZIMNI BOSHQARISH ====================
   bool canManageUsers(UserModel user) {
     if (!user.isActive) return false;
     return user.role == UserRole.superAdmin ||
         user.role == UserRole.institutionAdmin;
   }
 
-  /// Administrator portaliga to'liq kirish huquqi
-  bool canAccessAdminPortal(UserModel user) {
-    if (!user.isActive) return false;
-    return user.role == UserRole.superAdmin;
-  }
+  bool canAccessAdminPortal(UserModel user) =>
+      user.isActive && user.role == UserRole.superAdmin;
 
-  /// Tizim umumiy sozlamalarini boshqarish
-  bool canManageSystemSettings(UserModel user) {
-    if (!user.isActive) return false;
-    return user.role == UserRole.superAdmin;
-  }
+  bool canManageSystemSettings(UserModel user) =>
+      user.isActive && user.role == UserRole.superAdmin;
 
-  /// Rollar va ruxsatlar matritsasini boshqarish
-  bool canManageRolesAndPermissions(UserModel user) {
-    if (!user.isActive) return false;
-    return user.role == UserRole.superAdmin;
-  }
+  bool canManageRolesAndPermissions(UserModel user) =>
+      user.isActive && user.role == UserRole.superAdmin;
 
-  /// Muassasalar reyestri va ma'lumotlarini boshqarish
   bool canManageInstitutions(UserModel user) {
     if (!user.isActive) return false;
     return user.role == UserRole.superAdmin ||
         user.role == UserRole.institutionAdmin;
   }
 
-  /// Sinflar va guruhlar tarkibini boshqarish
   bool canManageClasses(UserModel user) {
     if (!user.isActive) return false;
     return user.role == UserRole.superAdmin ||
@@ -276,7 +308,6 @@ class AccessControlService {
         user.role == UserRole.coordinator;
   }
 
-  /// Audit jurnalini ko'rish
   bool canViewAuditLogs(UserModel user) {
     if (!user.isActive) return false;
     return user.role == UserRole.superAdmin ||

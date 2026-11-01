@@ -233,7 +233,7 @@ class AuthProvider extends ChangeNotifier {
     }
 
     final updated = _currentUser!.copyWith(password: newPassword.trim());
-    await _db.updateUser(updated, byUser: _currentUser);
+    await _db.updateUser(updated, byUser: _currentUser!);
     _currentUser = updated;
     notifyListeners();
 

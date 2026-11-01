@@ -89,6 +89,18 @@ class SeedData {
       specialization: 'Maxsus pedagog / Defektolog',
     ),
     UserModel(
+      id: 'user_special_ed_teacher',
+      email: 'maxsus.oqituvchi@talim.uz',
+      fullName: 'Rahmonova Dildora Akmalovna',
+      role: UserRole.specialEdTeacher,
+      region: 'Namangan viloyati',
+      district: 'Chortoq tumani',
+      institutionId: 'inst_chortoq_5',
+      institutionName: '5-sonli umumiy o‘rta ta’lim maktabi',
+      phone: '+998 99 234-12-34',
+      specialization: 'Maxsus ta’lim o‘qituvchisi (boshlang‘ich sinflar)',
+    ),
+    UserModel(
       id: 'user_teacher',
       email: 'oqituvchi@talim.uz',
       fullName: 'Nazarov Farrux Odilovich',

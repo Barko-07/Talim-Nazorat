@@ -1,3 +1,5 @@
+import 'development_profile_model.dart';
+
 class AssessmentQuestionOption {
   final String id;
   final String text;
@@ -51,6 +53,14 @@ class AssessmentQuestionModel {
   final String status; // 'ready', 'draft'
   final DateTime createdAt;
   final DateTime? updatedAt;
+  // Boladan talab qilinadigan imkoniyatlar. null = ko'rsatilmagan (qo'lda tekshirish kerak),
+  // bo'sh to'plam = maxsus talab yo'q (masalan, kuzatuv savoli)
+  final Set<QuestionRequirement>? requirements;
+  // Imkoniyati cheklangan bolaga savolni qanday moslashtirish mumkin
+  final String? adaptationHint;
+  // Savol mo'ljallangan sinflar (0 = tayyorlov). Ikkalasi null = barcha sinflar
+  final int? minGrade;
+  final int? maxGrade;
 
   const AssessmentQuestionModel({
     required this.id,
@@ -69,6 +79,10 @@ class AssessmentQuestionModel {
     this.status = 'ready',
     required this.createdAt,
     this.updatedAt,
+    this.requirements,
+    this.adaptationHint,
+    this.minGrade,
+    this.maxGrade,
   }) : text = text ?? questionText ?? '';
 
   bool get isReady => status == 'ready';
@@ -79,6 +93,41 @@ class AssessmentQuestionModel {
   String get safeAgeRange => targetAgeRange ?? 'Barcha yoshlar';
   String get safeCriteria => scoringCriteria ?? '';
   String get safeNotes => psychologistNotes ?? '';
+
+  /// Savol mo'ljallangan sinflar oralig'i. null = barcha sinflar.
+  /// Tartib: aniq minGrade/maxGrade -> matndagi '(1-4 sinf)' -> yosh oralig'idan
+  /// (1-sinf ≈ 7 yosh) taxminiy hisob.
+  ({int min, int max})? get gradeRange {
+    if (minGrade != null || maxGrade != null) {
+      return _ordered(minGrade ?? 0, maxGrade ?? 11);
+    }
+    final text = targetAgeRange ?? '';
+    final byGrade = RegExp(
+      r'(\d+)\s*[–—-]\s*(\d+)\s*-?\s*sinf',
+    ).firstMatch(text);
+    if (byGrade != null) {
+      return _ordered(int.parse(byGrade.group(1)!), int.parse(byGrade.group(2)!));
+    }
+    final byAge = RegExp(r'(\d+)\s*[–—-]\s*(\d+)').firstMatch(text);
+    if (byAge != null) {
+      return _ordered(
+        int.parse(byAge.group(1)!) - 6,
+        int.parse(byAge.group(2)!) - 6,
+      );
+    }
+    return null;
+  }
+
+  bool coversGrade(int grade) {
+    final r = gradeRange;
+    return r == null || (grade >= r.min && grade <= r.max);
+  }
+
+  static ({int min, int max}) _ordered(int a, int b) {
+    final lo = (a < b ? a : b).clamp(0, 11);
+    final hi = (a < b ? b : a).clamp(0, 11);
+    return (min: lo, max: hi);
+  }
 
   double get maxScore {
     if (questionType == 'open_text') return 0.0;
@@ -123,6 +172,10 @@ class AssessmentQuestionModel {
     String? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Set<QuestionRequirement>? requirements,
+    String? adaptationHint,
+    int? minGrade,
+    int? maxGrade,
   }) {
     return AssessmentQuestionModel(
       id: id ?? this.id,
@@ -140,6 +193,10 @@ class AssessmentQuestionModel {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      requirements: requirements ?? this.requirements,
+      adaptationHint: adaptationHint ?? this.adaptationHint,
+      minGrade: minGrade ?? this.minGrade,
+      maxGrade: maxGrade ?? this.maxGrade,
     );
   }
 
@@ -159,6 +216,10 @@ class AssessmentQuestionModel {
         'status': status,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
+        'requirements': requirements?.map((r) => r.name).toList(),
+        'adaptationHint': adaptationHint,
+        'minGrade': minGrade,
+        'maxGrade': maxGrade,
       };
 
   factory AssessmentQuestionModel.fromJson(Map<String, dynamic> json) =>
@@ -186,5 +247,12 @@ class AssessmentQuestionModel {
         updatedAt: json['updatedAt'] != null
             ? DateTime.parse(json['updatedAt'] as String)
             : null,
+        requirements: (json['requirements'] as List<dynamic>?)
+            ?.map((e) => QuestionRequirement.fromName(e as String?))
+            .whereType<QuestionRequirement>()
+            .toSet(),
+        adaptationHint: json['adaptationHint'] as String?,
+        minGrade: (json['minGrade'] as num?)?.toInt(),
+        maxGrade: (json['maxGrade'] as num?)?.toInt(),
       );
 }
