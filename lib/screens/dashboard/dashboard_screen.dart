@@ -62,12 +62,12 @@ class DashboardScreen extends StatelessWidget {
                     duration: 210.ms,
                     curve: Curves.easeOutCubic,
                   ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
 
               // 2. DIQQAT TALAB HOLATLAR BANNERI (Erkin ikonkali)
               if (alerts.isNotEmpty) ...[
                 SurfaceCard(
-                  borderRadius: 16,
+                  borderRadius: 18,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 18,
                     vertical: 15,
@@ -155,7 +155,7 @@ class DashboardScreen extends StatelessWidget {
                     },
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
               ],
 
               // 3. 4 TA ASOSIY KPI KARTALARI (0% overflow ResponsiveGlassGrid + Free-standing icons)
@@ -163,7 +163,7 @@ class DashboardScreen extends StatelessWidget {
                 mobileColumns: 2,
                 tabletColumns: 2,
                 desktopColumns: 4,
-                spacing: 16,
+                spacing: 12,
                 children: [
                   _buildKpiCard(
                     title: 'Jami o‘quvchilar',
@@ -220,15 +220,15 @@ class DashboardScreen extends StatelessWidget {
                     curve: Curves.easeOutCubic,
                   ),
 
-              const SizedBox(height: 22),
+              const SizedBox(height: 15),
 
               // 4. KASBIY ISH MAYDONI
               _buildRoleSpecificWorkspace(context, user),
-              const SizedBox(height: 22),
+              const SizedBox(height: 15),
 
               // 5. GRAFIK: OYLIK RIVOJLANISH DINAMIKASI
               _buildAnalyticsChartCard(),
-              const SizedBox(height: 22),
+              const SizedBox(height: 15),
 
               // 6. SO'NGGI BAHOLASHLAR VA KUTILAYOTGAN MASHG'ULOTLAR
               LayoutBuilder(
@@ -245,14 +245,14 @@ class DashboardScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(child: leftCard),
-                            const SizedBox(width: 20),
+                            const SizedBox(width: 14),
                             Expanded(child: rightCard),
                           ],
                         )
                       : Column(
                           children: [
                             leftCard,
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 14),
                             rightCard,
                           ],
                         );
@@ -302,7 +302,7 @@ class DashboardScreen extends StatelessWidget {
     final initials = _initialsFor(user?.fullName);
 
     return GlassSurface(
-      borderRadius: 18,
+      borderRadius: 22,
       blur: 16,
       opacity: 0.96,
       padding: EdgeInsets.zero,
@@ -541,7 +541,7 @@ class DashboardScreen extends StatelessWidget {
     const months = ['Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
 
     return SurfaceCard(
-      borderRadius: 18,
+      borderRadius: 22,
       padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -759,7 +759,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildRecentAssessmentsCard(BuildContext context, List assessments) {
     return SurfaceCard(
-      borderRadius: 18,
+      borderRadius: 22,
       padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -894,7 +894,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildUpcomingSessionsCard(BuildContext context, List sessions) {
     return SurfaceCard(
-      borderRadius: 18,
+      borderRadius: 22,
       padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1203,7 +1203,7 @@ class DashboardScreen extends StatelessWidget {
     }
 
     return SurfaceCard(
-      borderRadius: 18,
+      borderRadius: 22,
       padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1336,7 +1336,7 @@ class DashboardScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return SurfaceCard(
-      borderRadius: 18,
+      borderRadius: 22,
       padding: const EdgeInsets.all(20),
       onTap: onTap,
       child: Column(

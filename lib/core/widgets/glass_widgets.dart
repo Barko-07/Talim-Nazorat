@@ -105,7 +105,7 @@ class GlassSurface extends StatelessWidget {
     required this.child,
     this.padding,
     this.margin,
-    this.borderRadius = 18,
+    this.borderRadius = 22,
     this.customBorderRadius,
     this.blur = 16,
     this.opacity = 0.90,
@@ -154,7 +154,7 @@ class GlassSurface extends StatelessWidget {
   }
 }
 
-/// Minimalist asosiy karta: 18px radius, toza oq yuza va 1.0px nozik chegara
+/// Minimalist asosiy karta: 22px radius, toza oq yuza va 1.0px nozik chegara
 class SurfaceCard extends StatefulWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -170,7 +170,7 @@ class SurfaceCard extends StatefulWidget {
     required this.child,
     this.padding = const EdgeInsets.all(20),
     this.margin,
-    this.borderRadius = 18,
+    this.borderRadius = 22,
     this.onTap,
     this.backgroundColor,
     this.borderColor,

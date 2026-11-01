@@ -78,20 +78,20 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                     icon: LucideIcons.eye,
                   ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           ModernPillFilterBar(
             items: _categories,
             selectedItem: _selectedCategory,
             onSelected: (cat) => setState(() => _selectedCategory = cat),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
 
           Expanded(
             child: filtered.isEmpty
                 ? Center(
                     child: SurfaceCard(
-                      borderRadius: 18,
+                      borderRadius: 22,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 30,
                         vertical: 36,
@@ -136,7 +136,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                       width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
                     ),
                     itemCount: filtered.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 14),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       return _buildAssessmentCard(context, filtered[index]);
                     },
@@ -162,7 +162,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
             : AppColors.info;
 
     return SurfaceCard(
-      borderRadius: 18,
+      borderRadius: 22,
       padding: const EdgeInsets.all(20),
       onTap: () {
         Navigator.push(

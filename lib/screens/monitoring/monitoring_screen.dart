@@ -199,7 +199,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
 
             // 6 ta nazorat qoidalari bloki (Responsive 2-col desktop/tablet, 1-col mobile)
             SurfaceCard(
-              borderRadius: 18,
+              borderRadius: 22,
               padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,7 +263,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
 
             if (alerts.isEmpty)
               SurfaceCard(
-                borderRadius: 18,
+                borderRadius: 22,
                 padding: const EdgeInsets.symmetric(
                   vertical: 38,
                   horizontal: 24,
@@ -365,7 +365,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
 
     return SurfaceCard(
       margin: const EdgeInsets.only(bottom: 14),
-      borderRadius: 18,
+      borderRadius: 22,
       padding: const EdgeInsets.all(20),
       onTap: () {
         Navigator.push(

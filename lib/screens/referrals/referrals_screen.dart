@@ -357,7 +357,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
               onPressed: () => _showAddReferralDialog(context),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           ModernPillFilterBar(
             items: _statuses,
@@ -365,13 +365,13 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
             counts: counts,
             onSelected: (val) => setState(() => _statusFilter = val),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
 
           Expanded(
             child: referrals.isEmpty
                 ? Center(
                     child: SurfaceCard(
-                      borderRadius: 18,
+                      borderRadius: 22,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 30,
                         vertical: 36,
@@ -416,14 +416,14 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                       width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
                     ),
                     itemCount: referrals.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 14),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final ref = referrals[index];
                       final isUrgent = ref.priority == 'Shoshilinch';
                       final isCompleted = ref.status == 'Yakunlandi';
 
                       return SurfaceCard(
-                        borderRadius: 18,
+                        borderRadius: 22,
                         padding: const EdgeInsets.all(20),
                         onTap: () {
                           Navigator.push(

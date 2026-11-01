@@ -406,7 +406,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
       child: ResponsivePageContainer(
         maxWidth: 480,
         child: SurfaceCard(
-          borderRadius: 18,
+          borderRadius: 22,
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 38),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -512,7 +512,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             // Minimalist Soft-Glass Profil Hero Karta
             GlassSurface(
               padding: const EdgeInsets.all(20),
-              borderRadius: 18,
+              borderRadius: 22,
               opacity: 0.96,
               child: LayoutBuilder(
                 builder: (context, constraints) {
@@ -626,7 +626,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
             // Ta'limiy Ehtiyoj va Daraja (Erkin ikonkalar!)
             SurfaceCard(
-              borderRadius: 18,
+              borderRadius: 22,
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -733,7 +733,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
             // Biriktirilgan Mutaxassislar
             SurfaceCard(
-              borderRadius: 18,
+              borderRadius: 22,
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -835,7 +835,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
             // Vasiylar
             SurfaceCard(
-              borderRadius: 18,
+              borderRadius: 22,
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1028,7 +1028,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               return Padding(
                 padding: const EdgeInsets.only(bottom: 14),
                 child: SurfaceCard(
-                  borderRadius: 18,
+                  borderRadius: 22,
                   padding: const EdgeInsets.all(22),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1175,7 +1175,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             return Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: SurfaceCard(
-                borderRadius: 18,
+                borderRadius: 22,
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1305,7 +1305,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               return Padding(
                 padding: const EdgeInsets.only(bottom: 14),
                 child: SurfaceCard(
-                  borderRadius: 18,
+                  borderRadius: 22,
                   padding: const EdgeInsets.all(22),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1393,7 +1393,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           children: [
             GlassSurface(
               padding: const EdgeInsets.all(24),
-              borderRadius: 18,
+              borderRadius: 22,
               child: const Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1437,7 +1437,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
             if (sorted.length >= 2) ...[
               SurfaceCard(
-                borderRadius: 18,
+                borderRadius: 22,
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1580,7 +1580,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             ],
 
             SurfaceCard(
-              borderRadius: 18,
+              borderRadius: 22,
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1668,7 +1668,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             return Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: SurfaceCard(
-                borderRadius: 18,
+                borderRadius: 22,
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1759,7 +1759,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             return Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: SurfaceCard(
-                borderRadius: 18,
+                borderRadius: 22,
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [

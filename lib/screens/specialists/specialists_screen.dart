@@ -188,7 +188,7 @@ class SpecialistsScreen extends StatelessWidget {
                   )
                 : null,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           Expanded(
             child: ListView.separated(
@@ -199,7 +199,7 @@ class SpecialistsScreen extends StatelessWidget {
                 width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
               ),
               itemCount: staffList.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 14),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 final staff = staffList[index];
                 final assignedCount = allStudents
@@ -211,7 +211,7 @@ class SpecialistsScreen extends StatelessWidget {
                     staff.role != UserRole.superAdmin;
 
                 return SurfaceCard(
-                  borderRadius: 18,
+                  borderRadius: 22,
                   padding: const EdgeInsets.all(20),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
