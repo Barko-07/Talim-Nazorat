@@ -25,7 +25,6 @@
 
 ## 👥 Demo Foydalanuvchilar va Rollar (RBAC)
 
-Ilovada barcha mutaxassislar uchun standart parol: **`Parol2026!`**
 
 
 ---
