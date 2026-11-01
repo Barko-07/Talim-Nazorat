@@ -849,26 +849,13 @@ class _IepListScreenState extends State<IepListScreen> {
                         ),
                       );
                     },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          LucideIcons.userRound,
-                          size: 14,
-                          color: AppColors.primary,
-                        ),
-                        const SizedBox(width: 5),
-                        Flexible(
-                          child: Text(
-                            '${p.studentName} (${p.studentGrade}-sinf)',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      '${p.studentName} (${p.studentGrade}-sinf)',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                   Text(

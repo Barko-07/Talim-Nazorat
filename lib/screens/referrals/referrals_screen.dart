@@ -473,31 +473,15 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                               ),
                             ),
                             const SizedBox(height: 10),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 2),
-                                  child: Icon(
-                                    LucideIcons.arrowUpRight,
-                                    size: 20,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                                const SizedBox(width: 9),
-                                Expanded(
-                                  child: Text(
-                                    ref.toSpecialistType,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 15.5,
-                                      color: AppColors.textPrimary,
-                                      letterSpacing: -0.25,
-                                      height: 1.3,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              ref.toSpecialistType,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15.5,
+                                color: AppColors.textPrimary,
+                                letterSpacing: -0.25,
+                                height: 1.3,
+                              ),
                             ),
                             const SizedBox(height: 14),
                             GlassWell(

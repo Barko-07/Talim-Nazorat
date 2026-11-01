@@ -524,7 +524,6 @@ class _SessionsScreenState extends State<SessionsScreen> {
                         },
                         child: LayoutBuilder(
                           builder: (context, constraints) {
-                            final isCompact = constraints.maxWidth < 450;
                             final isVeryNarrow = constraints.maxWidth < 360;
 
                             final statusBadge = StatusPill(
@@ -540,57 +539,26 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 2),
-                                      child: Icon(
-                                        isDone
-                                            ? LucideIcons.circleCheck
-                                            : (isAbsent
-                                                ? LucideIcons.circleX
-                                                : LucideIcons.clock),
-                                        color: accent,
-                                        size: 22,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          if (isCompact) ...[
-                                            statusBadge,
-                                            const SizedBox(height: 8),
-                                          ],
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  s.topic,
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w800,
-                                                    fontSize: 15,
-                                                    color:
-                                                        AppColors.textPrimary,
-                                                    letterSpacing: -0.25,
-                                                    height: 1.3,
-                                                  ),
-                                                ),
-                                              ),
-                                              if (!isCompact) ...[
-                                                const SizedBox(width: 12),
-                                                statusBadge,
-                                              ],
-                                            ],
+                                          Text(
+                                            s.topic,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 15,
+                                              color: AppColors.textPrimary,
+                                              letterSpacing: -0.25,
+                                              height: 1.3,
+                                            ),
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            'O‘quvchi: ${s.studentName} • ${s.specialistName}',
+                                            '${s.studentName} • ${s.specialistName}',
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
@@ -603,7 +571,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                           const SizedBox(height: 4),
                                           Text(
                                             '${s.sessionType} • ${df.format(s.scheduledAt)} (${s.durationMinutes} daqiqa)',
-                                            maxLines: 2,
+                                            maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                               fontSize: 12,
@@ -616,6 +584,8 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                         ],
                                       ),
                                     ),
+                                    const SizedBox(width: 10),
+                                    statusBadge,
                                   ],
                                 ),
                                 if (s.observations != null &&

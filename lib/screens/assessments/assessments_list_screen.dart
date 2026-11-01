@@ -257,30 +257,14 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                     ),
                     if (a.recommendations.isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(top: 2),
-                            child: Icon(
-                              LucideIcons.sparkles,
-                              size: 14,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          const SizedBox(width: 7),
-                          Expanded(
-                            child: Text(
-                              'Tavsiya: ${a.recommendations}',
-                              style: const TextStyle(
-                                fontSize: 12.5,
-                                color: AppColors.primaryDark,
-                                fontWeight: FontWeight.w600,
-                                height: 1.4,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Tavsiya: ${a.recommendations}',
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          color: AppColors.primaryDark,
+                          fontWeight: FontWeight.w600,
+                          height: 1.4,
+                        ),
                       ),
                     ],
                   ],
@@ -289,12 +273,6 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
               const SizedBox(height: 14),
               Row(
                 children: [
-                  const Icon(
-                    LucideIcons.userCheck,
-                    size: 15,
-                    color: AppColors.textMuted,
-                  ),
-                  const SizedBox(width: 7),
                   Expanded(
                     child: Text(
                       '${a.specialistName} • ${a.specialistRole}',

@@ -204,25 +204,13 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
-                    children: [
-                      Icon(
-                        LucideIcons.cpu,
-                        size: 20,
-                        color: AppColors.primary,
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          '6 ta doimiy ishlovchi avtomatik nazorat algoritmi',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15.5,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ],
+                  const Text(
+                    '6 ta doimiy ishlovchi avtomatik nazorat algoritmi',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15.5,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   ResponsiveGlassGrid(
@@ -239,25 +227,13 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
             ),
             const SizedBox(height: 24),
 
-            Row(
-              children: [
-                const Icon(
-                  LucideIcons.bellRing,
-                  size: 18,
-                  color: AppColors.primary,
-                ),
-                const SizedBox(width: 9),
-                Expanded(
-                  child: Text(
-                    'Aniqlangan signallar (${alerts.length} ta)',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 16,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ],
+            Text(
+              'Aniqlangan signallar (${alerts.length} ta)',
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 16,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 14),
 
