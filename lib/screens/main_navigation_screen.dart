@@ -47,6 +47,7 @@ class _NavItemData {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey _profileMenuKey = GlobalKey();
   int _selectedIndex = 0;
   bool _isMovingForward = true;
   bool _isDesktopSidebarOpen = true;
@@ -491,6 +492,80 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showProfileRightMenu(
+    BuildContext context,
+    UserModel? user,
+    AuthProvider auth,
+  ) {
+    final media = MediaQuery.of(context);
+    final isDesktop = media.size.width >= 1024;
+
+    final renderBox =
+        _profileMenuKey.currentContext?.findRenderObject() as RenderBox?;
+    final offset = renderBox?.localToGlobal(Offset.zero);
+    final size = renderBox?.size;
+    final topOffset =
+        (offset?.dy ?? (media.padding.top + (isDesktop ? 14.0 : 8.0) + 6.0)) +
+            (size?.height ?? 38.0) +
+            8.0;
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Profil menyusi',
+      barrierColor: Colors.black.withValues(alpha: 0.08),
+      transitionDuration: const Duration(milliseconds: 180),
+      pageBuilder: (dialogCtx, anim1, anim2) {
+        return Stack(
+          children: [
+            Positioned(
+              top: topOffset,
+              right: 0,
+              child: Material(
+                color: Colors.transparent,
+                child: _ProfileRightDropdownMenu(
+                  user: user,
+                  isDesktop: isDesktop,
+                  onSettings: () {
+                    Navigator.of(dialogCtx).pop();
+                    _selectTab(9);
+                  },
+                  onLogout: () async {
+                    Navigator.of(dialogCtx).pop();
+                    await auth.logout();
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (_) => const LoginScreen(),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+      transitionBuilder: (dialogCtx, anim, secondaryAnim, child) {
+        final curved = CurvedAnimation(
+          parent: anim,
+          curve: Curves.easeOutCubic,
+        );
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.12, 0),
+            end: Offset.zero,
+          ).animate(curved),
+          child: FadeTransition(
+            opacity: curved,
+            child: child,
+          ),
+        );
+      },
     );
   }
 
@@ -1061,92 +1136,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           ],
                         ),
                         const SizedBox(width: 5),
-                        PopupMenuButton<String>(
-                          tooltip: 'Profil menyusi',
-                          offset: const Offset(0, 48),
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            side: const BorderSide(
-                              color: AppColors.border,
-                              width: 1.0,
-                            ),
-                          ),
-                          onSelected: (val) async {
-                            if (val == 'settings') {
-                              _selectTab(9);
-                            } else if (val == 'logout') {
-                              await auth.logout();
-                              if (context.mounted) {
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (_) => const LoginScreen(),
-                                  ),
-                                );
-                              }
-                            }
-                          },
-                          itemBuilder: (_) => [
-                            PopupMenuItem(
-                              enabled: false,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    user?.fullName ?? 'Mutaxassis',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w800,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    user?.role.label ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 11.5,
-                                      color: AppColors.textMuted,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuDivider(),
-                            const PopupMenuItem(
-                              value: 'settings',
-                              child: Row(
-                                children: [
-                                  Icon(LucideIcons.settings, size: 16),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Sozlamalar',
-                                    style: TextStyle(fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'logout',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    LucideIcons.logOut,
-                                    size: 16,
-                                    color: AppColors.error,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Tizimdan chiqish',
-                                    style: TextStyle(
-                                      color: AppColors.error,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        TactileBounce(
+                          key: _profileMenuKey,
+                          onTap: () => _showProfileRightMenu(context, user, auth),
+                          pressedScale: 0.95,
                           child: Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: isDesktop ? 11 : 5,
@@ -1928,6 +1921,151 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// O'ng tarafga to'liq yopishgan va shishasimon (glassy) profil menyusi
+class _ProfileRightDropdownMenu extends StatelessWidget {
+  final UserModel? user;
+  final bool isDesktop;
+  final VoidCallback onSettings;
+  final VoidCallback onLogout;
+
+  const _ProfileRightDropdownMenu({
+    required this.user,
+    required this.isDesktop,
+    required this.onSettings,
+    required this.onLogout,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const radius = BorderRadius.only(
+      topLeft: Radius.circular(22),
+      bottomLeft: Radius.circular(22),
+      topRight: Radius.zero,
+      bottomRight: Radius.zero,
+    );
+
+    return GlassSurface(
+      customBorderRadius: radius,
+      borderColor: AppColors.navGlassBorder,
+      useBlur: true,
+      blur: 24,
+      opacity: AppColors.navGlassOpacity,
+      boxShadow: AppColors.navShadow,
+      padding: EdgeInsets.zero,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: isDesktop ? 260 : 235,
+          maxWidth: isDesktop ? 285 : 260,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    user?.fullName ?? 'Mutaxassis',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      letterSpacing: -0.2,
+                      height: 1.25,
+                    ),
+                  ),
+                  const SizedBox(height: 3.5),
+                  Text(
+                    user?.role.label ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      color: AppColors.textMuted,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(
+              height: 1,
+              thickness: 0.85,
+              color: Color(0x180F172A),
+              indent: 14,
+              endIndent: 0,
+            ),
+            const SizedBox(height: 4),
+            _buildMenuItem(
+              icon: LucideIcons.settings,
+              iconColor: AppColors.textSecondary,
+              label: 'Sozlamalar',
+              textColor: AppColors.textPrimary,
+              onTap: onSettings,
+            ),
+            _buildMenuItem(
+              icon: LucideIcons.logOut,
+              iconColor: AppColors.error,
+              label: 'Tizimdan chiqish',
+              textColor: AppColors.error,
+              isDestructive: true,
+              onTap: onLogout,
+            ),
+            const SizedBox(height: 6),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem({
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required Color textColor,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    return TactileBounce(
+      onTap: onTap,
+      pressedScale: 0.965,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.transparent,
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 16.5, color: iconColor),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight:
+                        isDestructive ? FontWeight.w700 : FontWeight.w600,
+                    color: textColor,
+                    letterSpacing: -0.1,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
