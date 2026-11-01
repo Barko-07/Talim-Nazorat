@@ -43,7 +43,7 @@ class AmbientMeshBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subtleAlpha = intense ? 0.045 : 0.025;
+    final subtleAlpha = intense ? 0.07 : 0.055;
 
     return Stack(
       fit: StackFit.expand,
@@ -54,13 +54,14 @@ class AmbientMeshBackground extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color(0xFFF2F5F8),
-                Color(0xFFEFF2F6),
-                Color(0xFFECF0F5),
+                Color(0xFFEDF1F6),
+                Color(0xFFEBEFF4),
+                Color(0xFFE7ECF2),
               ],
             ),
           ),
         ),
+        // Tepa o'ng burchakdagi mayin ko'k nur
         Positioned(
           top: -180,
           right: -120,
@@ -74,6 +75,26 @@ class AmbientMeshBackground extends StatelessWidget {
                   colors: [
                     AppColors.primary.withValues(alpha: subtleAlpha),
                     AppColors.primary.withValues(alpha: 0.0),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Pastki chap burchakdagi juda mayin binafsha-ko'k nur
+        Positioned(
+          bottom: -200,
+          left: -160,
+          child: IgnorePointer(
+            child: Container(
+              width: 560,
+              height: 560,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF6366F1).withValues(alpha: subtleAlpha * 0.7),
+                    const Color(0xFF6366F1).withValues(alpha: 0.0),
                   ],
                 ),
               ),
@@ -193,19 +214,29 @@ class _SurfaceCardState extends State<SurfaceCard> {
     final effectiveBorderColor = widget.borderColor ??
         (_hovered && interactive
             ? AppColors.borderSlate
-            : AppColors.glassWhiteBorder);
+            : AppColors.cardGlassBorder);
 
-    final bgColor = widget.backgroundColor ??
-        Colors.white.withValues(
-          alpha: _hovered && interactive ? 0.99 : 0.95,
-        );
+    final hasCustomBg = widget.backgroundColor != null;
+    final topAlpha = _hovered && interactive ? 0.98 : 0.94;
+    final bottomAlpha = _hovered && interactive ? 0.92 : 0.82;
 
     Widget cardBody = AnimatedContainer(
       duration: const Duration(milliseconds: 160),
       curve: Curves.easeOutCubic,
       margin: widget.margin,
       decoration: BoxDecoration(
-        color: bgColor,
+        color: hasCustomBg ? widget.backgroundColor : null,
+        // Minimal "glassy" yuza: tepadan pastga mayin shaffoflashuvchi oq
+        gradient: hasCustomBg
+            ? null
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: topAlpha),
+                  Colors.white.withValues(alpha: bottomAlpha),
+                ],
+              ),
         borderRadius: radius,
         border: Border.all(
           color: effectiveBorderColor,

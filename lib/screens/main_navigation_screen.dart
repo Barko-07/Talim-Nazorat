@@ -864,11 +864,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               if (showMenuIsland) ...[
                 GlassSurface(
                   customBorderRadius: menuIslandRadius,
-                  borderColor: AppColors.border,
+                  borderColor: AppColors.navGlassBorder,
                   useBlur: true,
                   blur: 24,
-                  opacity: 0.12,
-                  boxShadow: const [],
+                  opacity: AppColors.navGlassOpacity,
+                  boxShadow: AppColors.navShadow,
                   padding: EdgeInsets.zero,
                   child: Material(
                     color: Colors.transparent,
@@ -910,11 +910,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Expanded(
                 child: GlassSurface(
                   customBorderRadius: mainBarRadius,
-                  borderColor: AppColors.border,
+                  borderColor: AppColors.navGlassBorder,
                   useBlur: true,
                   blur: 24,
-                  opacity: 0.12,
-                  boxShadow: const [],
+                  opacity: AppColors.navGlassOpacity,
+                  boxShadow: AppColors.navShadow,
                   padding: EdgeInsets.fromLTRB(
                     isDesktop ? 22 : 16,
                     8,
@@ -1531,11 +1531,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 flex: isMoreActive ? 14 : 23,
                 child: GlassSurface(
                   customBorderRadius: leftIslandRadius,
-                  borderColor: AppColors.border,
+                  borderColor: AppColors.navGlassBorder,
                   useBlur: true,
                   blur: 24,
-                  opacity: 0.14,
-                  boxShadow: const [],
+                  opacity: AppColors.navGlassOpacity,
+                  boxShadow: AppColors.navShadow,
                   padding: EdgeInsets.fromLTRB(
                     mediaPadding.left + 5,
                     5,
@@ -1630,11 +1630,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   customBorderRadius: rightIslandRadius,
                   borderColor: isMoreActive
                       ? AppColors.primary.withValues(alpha: 0.28)
-                      : AppColors.border,
+                      : AppColors.navGlassBorder,
                   useBlur: true,
                   blur: 24,
-                  opacity: 0.14,
-                  boxShadow: const [],
+                  opacity: AppColors.navGlassOpacity,
+                  boxShadow: AppColors.navShadow,
                   padding: EdgeInsets.fromLTRB(
                     5,
                     5,

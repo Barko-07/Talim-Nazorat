@@ -8,8 +8,8 @@ class AppColors {
   static const Color primaryTint = Color(0xFFDBEAFE);
 
   // Fon va Yuzalar — Clean Slate & Pearl (Oppoq kartalar chiroyli ajralib turishi uchun)
-  static const Color background = Color(0xFFEFF2F6);
-  static const Color backgroundDeep = Color(0xFFE8EDF3);
+  static const Color background = Color(0xFFEBEFF4);
+  static const Color backgroundDeep = Color(0xFFE5EAF1);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color card = Color(0xFFFFFFFF);
 
@@ -63,12 +63,27 @@ class AppColors {
   // Minimalist mayin neytral soyalar (ortiqcha rangli glow'siz)
   static const List<BoxShadow> softShadow = [
     BoxShadow(
-      color: Color(0x070F172A),
-      blurRadius: 16,
-      spreadRadius: -2,
+      color: Color(0x090F172A),
+      blurRadius: 18,
+      spreadRadius: -3,
+      offset: Offset(0, 5),
+    ),
+  ];
+
+  // Navbarlar uchun oqish shisha (fondan ajralib turishi uchun)
+  static const double navGlassOpacity = 0.74;
+  static const Color navGlassBorder = Color(0xE6FFFFFF); // 90% oq qirra
+  static const List<BoxShadow> navShadow = [
+    BoxShadow(
+      color: Color(0x0A0F172A),
+      blurRadius: 18,
+      spreadRadius: -4,
       offset: Offset(0, 4),
     ),
   ];
+
+  // Kartalar uchun minimal "glassy" qirra
+  static const Color cardGlassBorder = Color(0xF2FFFFFF); // 95% oq qirra
 
   static const List<BoxShadow> elevatedShadow = [
     BoxShadow(
