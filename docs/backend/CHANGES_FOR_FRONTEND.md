@@ -4,6 +4,23 @@ The backend team doesn't edit `lib/screens/`. This file lists what the UI should
 
 ---
 
+## ⚠️ Edits made to your screens during the merge (06ef2e9)
+
+When your UI redesign was merged with the backend branch, **your design was kept** in every conflicting file. Only the functionality below was added on top. Please review it:
+
+| File | What changed |
+|---|---|
+| `main_navigation_screen.dart` | For a psychologist: Dashboard / Students / Assessments / Sessions / ITR / Reports open the screens in `psychologist/tabs/`. Three extra items in a **"PSIXOLOGIK XIZMAT"** group (Observations, Development map, Methods). `_navItems` is now a getter; `_currentNavItem` is safe when the role changes |
+| `login_screen.dart` | Pre-filled demo login and demo buttons appear **only in debug builds** (`kDebugMode`). The password comes from `SeedData.demoPassword`, not hard-coded. Registration roles: psychologist, speech therapist, defectologist, **special-education teacher**, teacher (the backend refuses director and inspector) |
+| `add_student_screen.dart` | Date-of-birth picker; district + school picker that defaults to the user's own school (**the hard-coded "Toshkent 14-maktab" was removed**, because a student saved there was invisible at the real school); full grade list; error message on save; no fake guardian name or phone is saved |
+| `students_list_screen.dart` | Grade filter can't crash (`_gradeOptions`) |
+| `assessments_list_screen.dart` | A psychologist is sent to `PsychologistAssessmentsTab` |
+| `glass_widgets.dart` | `premiumRoleIcon`: added the `specialEdTeacher` case |
+
+Longer term, the menu can be built from `app.workspace.modules` (see below), so every specialist gets their own menu.
+
+---
+
 ## Defectologist methods library, licensed tests, data warnings
 
 ### 1. Each workspace shows its own methods library
