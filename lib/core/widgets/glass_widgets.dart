@@ -43,25 +43,49 @@ class AmbientMeshBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subtleAlpha = intense ? 0.07 : 0.055;
+    final subtleAlpha = intense ? 0.05 : 0.038;
 
     return Stack(
       fit: StackFit.expand,
       children: [
+        // 1. Asosiy ko'p bosqichli kulrang kombinatsiyasi (Cool Slate & Pearl Mesh)
         const DecoratedBox(
           decoration: BoxDecoration(
+            color: AppColors.background,
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: [
-                Color(0xFFEDF1F6),
-                Color(0xFFEBEFF4),
-                Color(0xFFE7ECF2),
+                Color(0xFFE9EDF3), // Tepa chap: nozik va toza yorug' kulrang
+                Color(0xFFE2E7EF), // Markaz: silliq neytral slate-kulrang
+                Color(0xFFD9E0E9), // Quyi: chuqurroq jiddiy kulrang
+                Color(0xFFD0D7E2), // Pastki o'ng: barqaror anchor kulrang
               ],
+              stops: [0.0, 0.32, 0.68, 1.0],
             ),
           ),
         ),
-        // Tepa o'ng burchakdagi mayin ko'k nur
+        // 2. Tepa chap burchakdan tushuvchi mayin oq nur (quyosh/yorug'lik aksi - glass effekti uchun)
+        Positioned(
+          top: -160,
+          left: -100,
+          child: IgnorePointer(
+            child: Container(
+              width: 520,
+              height: 520,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    Colors.white.withValues(alpha: 0.38),
+                    Colors.white.withValues(alpha: 0.0),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        // 3. Tepa o'ng burchakdagi juda mayin brend nuri (och ko'k tus)
         Positioned(
           top: -180,
           right: -120,
@@ -81,10 +105,10 @@ class AmbientMeshBackground extends StatelessWidget {
             ),
           ),
         ),
-        // Pastki chap burchakdagi juda mayin binafsha-ko'k nur
+        // 4. Pastki qismdagi mayin chuqur kulrang hajm
         Positioned(
           bottom: -200,
-          left: -160,
+          left: -140,
           child: IgnorePointer(
             child: Container(
               width: 560,
@@ -93,8 +117,8 @@ class AmbientMeshBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF6366F1).withValues(alpha: subtleAlpha * 0.7),
-                    const Color(0xFF6366F1).withValues(alpha: 0.0),
+                    const Color(0xFF64748B).withValues(alpha: subtleAlpha * 0.9),
+                    const Color(0xFF64748B).withValues(alpha: 0.0),
                   ],
                 ),
               ),
@@ -185,6 +209,8 @@ class SurfaceCard extends StatefulWidget {
   final Color? backgroundColor;
   final Color? borderColor;
   final bool elevated;
+  final bool useBlur;
+  final double blur;
 
   const SurfaceCard({
     super.key,
@@ -196,6 +222,8 @@ class SurfaceCard extends StatefulWidget {
     this.backgroundColor,
     this.borderColor,
     this.elevated = true,
+    this.useBlur = true,
+    this.blur = 16,
   });
 
   @override
@@ -218,15 +246,12 @@ class _SurfaceCardState extends State<SurfaceCard> {
 
     final hasCustomBg = widget.backgroundColor != null;
     final topAlpha = _hovered && interactive ? 0.98 : 0.94;
-    final bottomAlpha = _hovered && interactive ? 0.92 : 0.82;
+    final bottomAlpha = _hovered && interactive ? 0.92 : 0.80;
 
-    Widget cardBody = AnimatedContainer(
-      duration: const Duration(milliseconds: 160),
-      curve: Curves.easeOutCubic,
-      margin: widget.margin,
+    Widget cardInner = Container(
       decoration: BoxDecoration(
         color: hasCustomBg ? widget.backgroundColor : null,
-        // Minimal "glassy" yuza: tepadan pastga mayin shaffoflashuvchi oq
+        // Silliq "glassy" yuza: tepadan pastga mayin shaffoflashuvchi oq
         gradient: hasCustomBg
             ? null
             : LinearGradient(
@@ -242,11 +267,6 @@ class _SurfaceCardState extends State<SurfaceCard> {
           color: effectiveBorderColor,
           width: 1.0,
         ),
-        boxShadow: widget.elevated
-            ? (_hovered && interactive
-                ? AppColors.elevatedShadow
-                : AppColors.softShadow)
-            : null,
       ),
       child: Material(
         color: Colors.transparent,
@@ -265,6 +285,34 @@ class _SurfaceCardState extends State<SurfaceCard> {
           ),
         ),
       ),
+    );
+
+    Widget frostedCard = widget.useBlur && widget.blur > 0
+        ? ClipRRect(
+            borderRadius: radius,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: widget.blur,
+                sigmaY: widget.blur,
+              ),
+              child: cardInner,
+            ),
+          )
+        : cardInner;
+
+    Widget cardBody = AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
+      curve: Curves.easeOutCubic,
+      margin: widget.margin,
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        boxShadow: widget.elevated
+            ? (_hovered && interactive
+                ? AppColors.elevatedShadow
+                : AppColors.softShadow)
+            : null,
+      ),
+      child: frostedCard,
     );
 
     if (!interactive) return cardBody;
