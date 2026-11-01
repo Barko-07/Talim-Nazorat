@@ -51,12 +51,12 @@ class AmbientMeshBackground extends StatelessWidget {
         const DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
               colors: [
-                Color(0xFFF8F9FB),
-                Color(0xFFF5F6F9),
-                Color(0xFFF7F8FA),
+                Color(0xFFF2F5F8),
+                Color(0xFFEFF2F6),
+                Color(0xFFECF0F5),
               ],
             ),
           ),

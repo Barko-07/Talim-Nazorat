@@ -7,9 +7,9 @@ class AppColors {
   static const Color primaryLight = Color(0xFFEFF6FF);
   static const Color primaryTint = Color(0xFFDBEAFE);
 
-  // Fon va Yuzalar — Toza, sokin neytral oq-kulrang (ortiqcha rang va shovqinsiz)
-  static const Color background = Color(0xFFF6F7F9);
-  static const Color backgroundDeep = Color(0xFFF0F2F5);
+  // Fon va Yuzalar — Clean Slate & Pearl (Oppoq kartalar chiroyli ajralib turishi uchun)
+  static const Color background = Color(0xFFEFF2F6);
+  static const Color backgroundDeep = Color(0xFFE8EDF3);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color card = Color(0xFFFFFFFF);
 
