@@ -27,17 +27,6 @@
 
 Ilovada barcha mutaxassislar uchun standart parol: **`Parol2026!`**
 
-| Rol | Login (Email) | Huquq va Doira |
-| :--- | :--- | :--- |
-| **Tizim administratori** | `admin@talim.uz` | Barcha muassasalar, audit jurnali, monitoring qoidalari va foydalanuvchilar nazorati |
-| **Muassasa rahbari** | `maktab14.admin@talim.uz` | 14-Inklyuziv maktab o‘quvchilari, mutaxassislari, yuklama va hisobotlari |
-| **Amaliyotchi psixolog** | `psixolog@talim.uz` | Psixologik baholashlar, ITR maqsadlari, kognitiv mashg‘ulotlar |
-| **Logoped-defektolog** | `logoped@talim.uz` | Nutqiy rivojlanish baholashlari, artikulyatsiya darslari |
-| **Maxsus pedagog (Defektolog)** | `defektolog@talim.uz` | Sensor va motorika mashg‘ulotlari, defektologik monitoring |
-| **Fan o‘qituvchisi / Sinf rahbari** | `oqituvchi@talim.uz` | Dars davomati, o‘quv mashg‘ulotlari, ITR progressi |
-| **Kuzatuvchi / Metodist** | `kuzatuvchi@talim.uz` | Faqat o‘qish huquqi (Read-only analitika va hisobotlar) |
-
-*(Eslatma: Kirish oynasida rollarni 1 ta klik bilan tanlab tezkor kirish tugmalari ham mavjud).*
 
 ---
 
