@@ -152,8 +152,8 @@ class GlassSurface extends StatelessWidget {
     this.margin,
     this.borderRadius = 26,
     this.customBorderRadius,
-    this.blur = 16,
-    this.opacity = 0.90,
+    this.blur = 20,
+    this.opacity = 0.82,
     this.tintColor,
     this.borderColor,
     this.boxShadow,
@@ -223,7 +223,7 @@ class SurfaceCard extends StatefulWidget {
     this.borderColor,
     this.elevated = true,
     this.useBlur = true,
-    this.blur = 16,
+    this.blur = 22,
   });
 
   @override
@@ -245,8 +245,8 @@ class _SurfaceCardState extends State<SurfaceCard> {
             : AppColors.cardGlassBorder);
 
     final hasCustomBg = widget.backgroundColor != null;
-    final topAlpha = _hovered && interactive ? 0.98 : 0.94;
-    final bottomAlpha = _hovered && interactive ? 0.92 : 0.80;
+    final topAlpha = _hovered && interactive ? 0.94 : 0.86;
+    final bottomAlpha = _hovered && interactive ? 0.88 : 0.72;
 
     Widget cardInner = Container(
       decoration: BoxDecoration(

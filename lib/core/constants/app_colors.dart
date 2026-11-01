@@ -95,7 +95,7 @@ class AppColors {
   ];
 
   // Kartalar uchun minimal "glassy" qirra
-  static const Color cardGlassBorder = Color(0xF5FFFFFF); // 96% toza oq qirra
+  static const Color cardGlassBorder = Color(0xFAFFFFFF); // 98% toza oq qirra
 
   static const List<BoxShadow> elevatedShadow = [
     BoxShadow(
