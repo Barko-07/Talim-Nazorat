@@ -25,15 +25,17 @@ class AccessControlService {
       if (user.institutionId == institutionId) return true;
     }
     if (user.institutionName != null && institutionName != null) {
-      final uName = user.institutionName!.trim().toLowerCase();
-      final tName = institutionName.trim().toLowerCase();
-      if (uName.isNotEmpty &&
-          (uName == tName || uName.contains(tName) || tName.contains(uName))) {
-        return true;
-      }
+      // Faqat to'liq mos nom. Qisman moslik ("1" ↔ "14-sonli maktab") boshqa
+      // maktab bolalarini ochib qo'yardi.
+      final uName = _normalizeName(user.institutionName!);
+      final tName = _normalizeName(institutionName);
+      if (uName.isNotEmpty && uName == tName) return true;
     }
     return false;
   }
+
+  String _normalizeName(String name) =>
+      name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 
   // ==================== O'QUVCHILARGA RUXSAT ====================
   /// O'quvchi ma'lumotlarini ko'rish ruxsati
@@ -102,6 +104,15 @@ class AccessControlService {
         user.role == UserRole.psychologist ||
         user.role == UserRole.specialEducation ||
         user.role == UserRole.coordinator;
+  }
+
+  /// Maxfiy psixologik kuzatuvni ko'rish: faqat muallif, psixologlar va tizim administratori.
+  /// (Psixologik sir — o'qituvchi va kuzatuvchilar ko'rmaydi)
+  bool canViewConfidentialObservation(UserModel user, String psychologistId) {
+    if (!user.isActive) return false;
+    if (user.id == psychologistId) return true;
+    return user.role == UserRole.psychologist ||
+        user.role == UserRole.superAdmin;
   }
 
   /// O'quvchini arxivlash yoki holatini o'zgartirish
@@ -224,12 +235,45 @@ class AccessControlService {
     return false;
   }
 
-  // ==================== FOYDALANUVCHILARNI BOSHQARISH ====================
+  // ==================== FOYDALANUVCHILARNI VA TIZIMNI BOSHQARISH ====================
   /// Yangi xodim qo'shish, rol va maktab biriktirish
   bool canManageUsers(UserModel user) {
     if (!user.isActive) return false;
     return user.role == UserRole.superAdmin ||
         user.role == UserRole.institutionAdmin;
+  }
+
+  /// Administrator portaliga to'liq kirish huquqi
+  bool canAccessAdminPortal(UserModel user) {
+    if (!user.isActive) return false;
+    return user.role == UserRole.superAdmin;
+  }
+
+  /// Tizim umumiy sozlamalarini boshqarish
+  bool canManageSystemSettings(UserModel user) {
+    if (!user.isActive) return false;
+    return user.role == UserRole.superAdmin;
+  }
+
+  /// Rollar va ruxsatlar matritsasini boshqarish
+  bool canManageRolesAndPermissions(UserModel user) {
+    if (!user.isActive) return false;
+    return user.role == UserRole.superAdmin;
+  }
+
+  /// Muassasalar reyestri va ma'lumotlarini boshqarish
+  bool canManageInstitutions(UserModel user) {
+    if (!user.isActive) return false;
+    return user.role == UserRole.superAdmin ||
+        user.role == UserRole.institutionAdmin;
+  }
+
+  /// Sinflar va guruhlar tarkibini boshqarish
+  bool canManageClasses(UserModel user) {
+    if (!user.isActive) return false;
+    return user.role == UserRole.superAdmin ||
+        user.role == UserRole.institutionAdmin ||
+        user.role == UserRole.coordinator;
   }
 
   /// Audit jurnalini ko'rish

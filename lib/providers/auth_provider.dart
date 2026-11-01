@@ -30,7 +30,13 @@ class AuthProvider extends ChangeNotifier {
     final savedUserId = prefs.getString('auth_user_id');
 
     if (savedUserId != null) {
-      _currentUser = _db.getUserById(savedUserId);
+      final user = _db.getUserById(savedUserId);
+      // Bloklangan hisobning saqlangan sessiyasi bekor qilinadi
+      if (user != null && user.isActive) {
+        _currentUser = user;
+      } else {
+        await prefs.remove('auth_user_id');
+      }
     }
 
     _isLoading = false;
@@ -94,15 +100,22 @@ class AuthProvider extends ChangeNotifier {
       }
     }
 
-    // Parol tekshiruvi: Agar yangi ro'yxatdan o'tgan bo'lsa o'z paroli, aks holda 'Parol2026!'
-    final expectedPassword = user.password ?? 'Parol2026!';
-    if (password.trim() != expectedPassword &&
-        password.trim() != 'Parol2026!') {
+    if (!_db.verifyPassword(user, password.trim())) {
       _isLoading = false;
       notifyListeners();
       return {
         'success': false,
         'message': 'Kiritilgan parol noto‘g‘ri. Iltimos, qayta urinib ko‘ring.',
+      };
+    }
+
+    if (!user.isActive) {
+      _isLoading = false;
+      notifyListeners();
+      return {
+        'success': false,
+        'message':
+            'Ushbu hisob bloklangan. Iltimos, administrator bilan bog‘laning.',
       };
     }
 
@@ -205,9 +218,7 @@ class AuthProvider extends ChangeNotifier {
       return {'success': false, 'message': 'Foydalanuvchi tizimga kirmagan.'};
     }
 
-    final expectedPassword = _currentUser!.password ?? 'Parol2026!';
-    if (currentPassword.trim() != expectedPassword &&
-        currentPassword.trim() != 'Parol2026!') {
+    if (!_db.verifyPassword(_currentUser!, currentPassword.trim())) {
       return {
         'success': false,
         'message': 'Amaldagi parol noto‘g‘ri kiritildi.',
@@ -238,13 +249,6 @@ class AuthProvider extends ChangeNotifier {
       'success': true,
       'message': 'Parolingiz muvaffaqiyatli o‘zgartirildi.',
     };
-  }
-
-  Future<void> switchRole(UserModel targetUser) async {
-    _currentUser = targetUser;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('auth_user_id', targetUser.id);
-    notifyListeners();
   }
 
   Future<void> logout() async {

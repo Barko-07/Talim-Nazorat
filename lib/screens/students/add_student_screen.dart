@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/namangan_data.dart';
 import '../../models/student_model.dart';
 import '../../providers/app_provider.dart';
+import '../../providers/auth_provider.dart';
 
 class AddStudentScreen extends StatefulWidget {
   const AddStudentScreen({super.key});
@@ -31,9 +33,38 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   String _primaryNeed =
       'Nutqiy rivojlanishdan orqada qolish (Fonetik-fonematik)';
   String _guardianRelation = 'Onasi';
-  final DateTime _dob = DateTime(2018, 5, 10);
+  DateTime _dob = DateTime(2018, 5, 10);
 
-  final List<String> _needs = [
+  String _selectedDistrict = 'Chortoq tumani';
+  String _selectedInstitution = '5-sonli umumiy o‘rta ta’lim maktabi';
+
+  static const List<String> _genders = ['Erkak', 'Ayol'];
+  static const List<String> _grades = [
+    'Tayyorlov guruhi',
+    '1-A',
+    '1-B',
+    '2-A',
+    '2-B',
+    '3-A',
+    '3-B',
+    '4-A',
+    '4-B',
+    '5-A',
+    '5-B',
+    '6-A',
+    '7-A',
+    '8-A',
+    '9-A',
+  ];
+  static const List<String> _relations = [
+    'Onasi',
+    'Otasi',
+    'Bobosi',
+    'Buvasi',
+    'Vasiy',
+  ];
+
+  static const List<String> _needs = [
     'Nutqiy rivojlanishdan orqada qolish (Fonetik-fonematik)',
     'Umumiy nutq rivojlanmaganligi (1-3 darajalar)',
     'Diqqat yetishmasligi va giperaktivlik (ADHD)',
@@ -42,6 +73,37 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     'Eshitish zaifligi (1-2 daraja)',
     'Bolalar serebral falaji (Harakat tayanch tizimi)',
   ];
+
+  static const List<String> _supportLevels = [
+    '1-daraja (Yengil yordam)',
+    '2-daraja (O‘rta yordam)',
+    '3-daraja (Intensiv yordam)',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = context.read<AuthProvider>().currentUser;
+      if (user != null) {
+        setState(() {
+          if (user.district != null &&
+              NamanganData.districts.contains(user.district)) {
+            _selectedDistrict = user.district!;
+          }
+          final schools =
+              NamanganData.districtSchools[_selectedDistrict] ?? [];
+          if (user.institutionName != null &&
+              user.institutionName!.isNotEmpty &&
+              schools.contains(user.institutionName)) {
+            _selectedInstitution = user.institutionName!;
+          } else if (schools.isNotEmpty) {
+            _selectedInstitution = schools.first;
+          }
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -59,10 +121,23 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   void _saveStudent() async {
     if (_formKey.currentState!.validate()) {
       final app = context.read<AppProvider>();
+      final auth = context.read<AuthProvider>();
+      final currentUser = auth.currentUser;
+
+      final schoolName = _selectedInstitution.trim().isNotEmpty
+          ? _selectedInstitution.trim()
+          : (currentUser?.institutionName?.isNotEmpty == true
+              ? currentUser!.institutionName!
+              : '5-sonli umumiy o‘rta ta’lim maktabi');
+
+      final schoolId = currentUser?.institutionId?.isNotEmpty == true
+          ? currentUser!.institutionId!
+          : 'inst_chortoq_5';
+
       final newStudent = StudentModel(
         id: 'std_${const Uuid().v4().substring(0, 8)}',
-        institutionId: 'inst_tashkent_14',
-        institutionName: 'Toshkent shahar 14-Inklyuziv maktab',
+        institutionId: schoolId,
+        institutionName: schoolName,
         firstName: _firstNameCtrl.text.trim(),
         lastName: _lastNameCtrl.text.trim(),
         middleName: _middleNameCtrl.text.trim().isEmpty
@@ -98,7 +173,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
         createdAt: DateTime.now(),
       );
 
-      await app.addStudent(newStudent);
+      await app.addStudent(newStudent, byUser: currentUser);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -167,12 +242,44 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                       Row(
                         children: [
                           Expanded(
+                            child: InkWell(
+                              onTap: () async {
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: _dob,
+                                  firstDate: DateTime(2005),
+                                  lastDate: DateTime.now(),
+                                );
+                                if (picked != null) {
+                                  setState(() => _dob = picked);
+                                }
+                              },
+                              child: InputDecorator(
+                                decoration: const InputDecoration(
+                                  labelText: 'Tug‘ilgan sanasi *',
+                                  suffixIcon: Icon(
+                                    Icons.calendar_today_rounded,
+                                    size: 18,
+                                  ),
+                                ),
+                                child: Text(
+                                  '${_dob.day.toString().padLeft(2, '0')}.${_dob.month.toString().padLeft(2, '0')}.${_dob.year}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _gender,
+                              value: _genders.contains(_gender)
+                                  ? _gender
+                                  : _genders.first,
+                              isExpanded: true,
                               decoration: const InputDecoration(
                                 labelText: 'Jinsi',
                               ),
-                              items: ['Erkak', 'Ayol']
+                              items: _genders
                                   .map(
                                     (g) => DropdownMenuItem(
                                       value: g,
@@ -180,35 +287,36 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                     ),
                                   )
                                   .toList(),
-                              onChanged: (v) => setState(() => _gender = v!),
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() => _gender = v);
+                                }
+                              },
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _grade,
+                              value: _grades.contains(_grade)
+                                  ? _grade
+                                  : _grades[1],
+                              isExpanded: true,
                               decoration: const InputDecoration(
-                                labelText: 'Sinfi',
+                                labelText: 'Sinfi / Guruhi',
                               ),
-                              items:
-                                  [
-                                        '1-A',
-                                        '1-B',
-                                        '2-A',
-                                        '2-B',
-                                        '3-A',
-                                        '3-B',
-                                        '4-A',
-                                        '5-A',
-                                      ]
-                                      .map(
-                                        (g) => DropdownMenuItem(
-                                          value: g,
-                                          child: Text(g),
-                                        ),
-                                      )
-                                      .toList(),
-                              onChanged: (v) => setState(() => _grade = v!),
+                              items: _grades
+                                  .map(
+                                    (g) => DropdownMenuItem(
+                                      value: g,
+                                      child: Text(g),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() => _grade = v);
+                                }
+                              },
                             ),
                           ),
                         ],
@@ -219,7 +327,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               ),
               const SizedBox(height: 16),
 
-              // 2. Ta'limiy ehtiyoj
+              // 2. Ta'lim muassasasi
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -227,7 +335,111 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        '2. Alohida Ta’limiy Ehtiyoj va Qo‘llab-quvvatlash',
+                        '2. Ta’lim Tashkiloti (Muassasa)',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: DropdownButtonFormField<String>(
+                              value:
+                                  NamanganData.districts.contains(_selectedDistrict)
+                                      ? _selectedDistrict
+                                      : NamanganData.defaultDistrict,
+                              isExpanded: true,
+                              decoration: const InputDecoration(
+                                labelText: 'Tuman / Shahar',
+                              ),
+                              items: NamanganData.districts
+                                  .map(
+                                    (d) => DropdownMenuItem(
+                                      value: d,
+                                      child: Text(d),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() {
+                                    _selectedDistrict = v;
+                                    final schools =
+                                        NamanganData.districtSchools[v] ?? [];
+                                    if (schools.isNotEmpty) {
+                                      _selectedInstitution = schools.first;
+                                    }
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 3,
+                            child: DropdownButtonFormField<String>(
+                              value:
+                                  (NamanganData.districtSchools[
+                                                _selectedDistrict
+                                              ] ??
+                                              [])
+                                          .contains(_selectedInstitution)
+                                      ? _selectedInstitution
+                                      : (NamanganData
+                                              .districtSchools[
+                                                _selectedDistrict
+                                              ]
+                                              ?.first ??
+                                          _selectedInstitution),
+                              isExpanded: true,
+                              decoration: const InputDecoration(
+                                labelText: 'Ta’lim muassasasi',
+                              ),
+                              items:
+                                  (NamanganData.districtSchools[
+                                                _selectedDistrict
+                                              ] ??
+                                              [_selectedInstitution])
+                                      .map(
+                                        (s) => DropdownMenuItem(
+                                          value: s,
+                                          child: Text(
+                                            s,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() => _selectedInstitution = v);
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // 3. Ta'limiy ehtiyoj
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '3. Alohida Ta’limiy Ehtiyoj va Qo‘llab-quvvatlash',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -235,7 +447,9 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: _primaryNeed,
+                        value: _needs.contains(_primaryNeed)
+                            ? _primaryNeed
+                            : _needs.first,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           labelText: 'Asosiy ta’limiy ehtiyoj toifasi',
@@ -251,31 +465,37 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               ),
                             )
                             .toList(),
-                        onChanged: (v) => setState(() => _primaryNeed = v!),
+                        onChanged: (v) {
+                          if (v != null) {
+                            setState(() => _primaryNeed = v);
+                          }
+                        },
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
-                        value: _supportLevel,
+                        value: _supportLevels.contains(_supportLevel)
+                            ? _supportLevel
+                            : _supportLevels[1],
+                        isExpanded: true,
                         decoration: const InputDecoration(
                           labelText: 'Qo‘llab-quvvatlash darajasi',
                         ),
-                        items:
-                            [
-                                  '1-daraja (Yengil - minimal moslashtirish)',
-                                  '2-daraja (O‘rta yordam - doimiy korreksiya)',
-                                  '3-daraja (Intensiv yordam - maxsus dastur)',
-                                ]
-                                .map(
-                                  (d) => DropdownMenuItem(
-                                    value: d,
-                                    child: Text(
-                                      d,
-                                      style: const TextStyle(fontSize: 13),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged: (v) => setState(() => _supportLevel = v!),
+                        items: _supportLevels
+                            .map(
+                              (d) => DropdownMenuItem(
+                                value: d,
+                                child: Text(
+                                  d,
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (v) {
+                          if (v != null) {
+                            setState(() => _supportLevel = v);
+                          }
+                        },
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
@@ -283,7 +503,8 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                         maxLines: 2,
                         decoration: const InputDecoration(
                           labelText: 'Tibbiy xulosalar va cheklovlar',
-                          hintText: 'Masalan: Eshitish apparati taqqan, jismoniy zo‘riqish taqiqlangan',
+                          hintText:
+                              'Masalan: Eshitish apparati taqqan, jismoniy zo‘riqish taqiqlangan',
                         ),
                       ),
                     ],
@@ -292,7 +513,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               ),
               const SizedBox(height: 16),
 
-              // 3. Oila va Vasiylar
+              // 4. Oila va Vasiylar
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -300,7 +521,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        '3. Qonuniy Vasiy (Ota-ona) Ma’lumotlari',
+                        '4. Qonuniy Vasiy (Ota-ona) Ma’lumotlari',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -318,27 +539,26 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _guardianRelation,
+                              value: _relations.contains(_guardianRelation)
+                                  ? _guardianRelation
+                                  : _relations.first,
+                              isExpanded: true,
                               decoration: const InputDecoration(
                                 labelText: 'Qarindoshligi',
                               ),
-                              items:
-                                  [
-                                        'Onasi',
-                                        'Otasi',
-                                        'Bobosi',
-                                        'Buvasi',
-                                        'Vasiy',
-                                      ]
-                                      .map(
-                                        (r) => DropdownMenuItem(
-                                          value: r,
-                                          child: Text(r),
-                                        ),
-                                      )
-                                      .toList(),
-                              onChanged: (v) =>
-                                  setState(() => _guardianRelation = v!),
+                              items: _relations
+                                  .map(
+                                    (r) => DropdownMenuItem(
+                                      value: r,
+                                      child: Text(r),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() => _guardianRelation = v);
+                                }
+                              },
                             ),
                           ),
                           const SizedBox(width: 12),

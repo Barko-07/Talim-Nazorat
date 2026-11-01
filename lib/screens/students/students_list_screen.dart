@@ -109,19 +109,57 @@ class StudentsListScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: DropdownButton<String?>(
-                      value: app.selectedGrade,
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.textMuted),
+                      value: [
+                        '1-A',
+                        '1-B',
+                        '2-A',
+                        '2-B',
+                        '3-A',
+                        '3-B',
+                        '4-A',
+                        '4-B',
+                        '5-A',
+                      ].contains(app.selectedGrade)
+                          ? app.selectedGrade
+                          : null,
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 18,
+                        color: AppColors.textMuted,
+                      ),
                       hint: const Text(
                         'Sinf',
-                        style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       items: [
                         const DropdownMenuItem(
                           value: null,
-                          child: Text('Barchasi', style: TextStyle(fontSize: 12)),
+                          child: Text(
+                            'Barchasi',
+                            style: TextStyle(fontSize: 12),
+                          ),
                         ),
-                        ...['1-A', '2-A', '2-B', '3-A', '3-B', '4-A'].map(
-                          (g) => DropdownMenuItem(value: g, child: Text(g, style: const TextStyle(fontSize: 12))),
+                        ...[
+                          '1-A',
+                          '1-B',
+                          '2-A',
+                          '2-B',
+                          '3-A',
+                          '3-B',
+                          '4-A',
+                          '4-B',
+                          '5-A',
+                        ].map(
+                          (g) => DropdownMenuItem(
+                            value: g,
+                            child: Text(
+                              g,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
                         ),
                       ],
                       onChanged: (val) => app.setFilterGrade(val),

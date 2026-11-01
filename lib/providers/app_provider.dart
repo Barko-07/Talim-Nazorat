@@ -9,6 +9,9 @@ import '../models/referral_model.dart';
 import '../models/audit_log_model.dart';
 import '../models/user_model.dart';
 import '../models/notification_model.dart';
+import '../models/psychologist_observation_model.dart';
+import '../models/assessment_question_model.dart';
+import '../models/assessment_response_model.dart';
 import '../services/local_db_service.dart';
 import '../services/report_export_service.dart';
 
@@ -80,6 +83,33 @@ class AppProvider extends ChangeNotifier {
       onlyUnresolved ? unresolvedAlerts : alerts;
   List<ReferralModel> get referrals => _db.getReferrals(forUser: _currentUser);
   List<AuditLogModel> get auditLogs => _db.getAuditLogs(forUser: _currentUser);
+  List<PsychologicalObservationModel> get observations =>
+      _db.getObservations(forUser: _currentUser);
+  List<AssessmentQuestionModel> get questions =>
+      _db.getQuestions(forUser: _currentUser);
+  List<AssessmentQuestionModel> get myQuestions =>
+      _db.getQuestions(forUser: _currentUser, myQuestionsOnly: true);
+
+  List<AssessmentQuestionModel> getQuestionsFiltered({
+    String? domain,
+    String? query,
+    bool? myQuestionsOnly,
+    String? status,
+    String? questionType,
+  }) {
+    return _db.getQuestions(
+      forUser: _currentUser,
+      domain: domain,
+      query: query,
+      myQuestionsOnly: myQuestionsOnly,
+      status: status,
+      questionType: questionType,
+    );
+  }
+
+  AssessmentQuestionModel? getQuestionById(String id) =>
+      _db.getQuestionById(id);
+
   List<UserModel> get specialists => _db
       .getUsers(forUser: _currentUser)
       .where((u) => u.role != UserRole.superAdmin)
@@ -177,6 +207,61 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateAssessment(
+    AssessmentModel assessment, {
+    UserModel? byUser,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    await _db.updateAssessment(assessment, byUser: byUser ?? _currentUser);
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> deleteAssessment(
+    String id, {
+    UserModel? byUser,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    await _db.deleteAssessment(id, byUser: byUser ?? _currentUser);
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> addQuestion(
+    AssessmentQuestionModel question, {
+    UserModel? byUser,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    await _db.addQuestion(question, byUser: byUser ?? _currentUser);
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> updateQuestion(
+    AssessmentQuestionModel question, {
+    UserModel? byUser,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    await _db.updateQuestion(question, byUser: byUser ?? _currentUser);
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> deleteQuestion(
+    String id, {
+    UserModel? byUser,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    await _db.deleteQuestion(id, byUser: byUser ?? _currentUser);
+    _isLoading = false;
+    notifyListeners();
+  }
+
   Future<Map<String, dynamic>> addSession(
     SessionModel session, {
     UserModel? byUser,
@@ -216,6 +301,11 @@ class AppProvider extends ChangeNotifier {
       notes: notes,
       byUser: byUser ?? _currentUser,
     );
+    notifyListeners();
+  }
+
+  Future<void> deleteSession(String id, {UserModel? byUser}) async {
+    await _db.deleteSession(id, byUser: byUser ?? _currentUser);
     notifyListeners();
   }
 
@@ -301,6 +391,14 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> addUser(UserModel user, {UserModel? byUser}) async {
+    _isLoading = true;
+    notifyListeners();
+    await _db.addUser(user, byUser: byUser ?? _currentUser);
+    _isLoading = false;
+    notifyListeners();
+  }
+
   Future<void> updateUser(UserModel updated, {UserModel? byUser}) async {
     await _db.updateUser(updated, byUser: byUser ?? _currentUser);
     notifyListeners();
@@ -319,6 +417,16 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteUser(String userId, {UserModel? byUser}) async {
+    await _db.deleteUser(userId, byUser: byUser ?? _currentUser);
+    notifyListeners();
+  }
+
+  // ==================== MUASSASALAR VA SINFLAR REYESTRI ====================
+  List<Map<String, dynamic>> get institutionsSummary =>
+      _db.getInstitutionsSummary();
+  List<Map<String, dynamic>> get classesSummary => _db.getClassesSummary();
+
   // ==================== CSV EXPORT ====================
   String exportStudentsCsv() => _exportService.generateStudentsCsv(students);
   String exportAssessmentsCsv() =>
@@ -327,4 +435,25 @@ class AppProvider extends ChangeNotifier {
   String exportIepCsv() => _exportService.generateIepCsv(iepPlans);
   String exportAlertsCsv() => _exportService.generateAlertsCsv(alerts);
   String exportReferralsCsv() => _exportService.generateReferralsCsv(referrals);
+  String exportAuditLogsCsv() => _exportService.generateAuditLogsCsv(auditLogs);
+  String exportObservationsCsv() =>
+      _exportService.generateObservationsCsv(observations);
+
+  // ==================== PSIXOLOGIK KUZATUVLAR ====================
+  List<PsychologicalObservationModel> getObservationsForStudent(String studentId) {
+    return _db.getObservations(forUser: _currentUser, studentId: studentId);
+  }
+
+  Future<void> addObservation(
+    PsychologicalObservationModel observation, {
+    UserModel? byUser,
+  }) async {
+    await _db.addObservation(observation, byUser: byUser ?? _currentUser);
+    notifyListeners();
+  }
+
+  Future<void> deleteObservation(String id, {UserModel? byUser}) async {
+    await _db.deleteObservation(id, byUser: byUser ?? _currentUser);
+    notifyListeners();
+  }
 }

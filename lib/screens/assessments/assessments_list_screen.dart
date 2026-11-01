@@ -8,6 +8,7 @@ import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import 'new_assessment_screen.dart';
+import '../psychologist/tabs/psychologist_assessments_tab.dart';
 
 class AssessmentsListScreen extends StatefulWidget {
   const AssessmentsListScreen({super.key});
@@ -40,6 +41,10 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
     final auth = context.watch<AuthProvider>();
     final currentUser = auth.currentUser;
     final currentRole = currentUser?.role ?? UserRole.psychologist;
+
+    if (currentRole == UserRole.psychologist) {
+      return const PsychologistAssessmentsTab();
+    }
 
     return Scaffold(
       body: Padding(

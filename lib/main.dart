@@ -5,8 +5,10 @@ import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/app_provider.dart';
 import 'services/local_db_service.dart';
+import 'models/user_model.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_navigation_screen.dart';
+import 'screens/admin/admin_portal_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +44,9 @@ class TalimNazoratApp extends StatelessWidget {
             );
           }
           if (auth.isAuthenticated) {
+            if (auth.currentUser?.role == UserRole.superAdmin) {
+              return const AdminPortalScreen();
+            }
             return const MainNavigationScreen();
           }
           return const LoginScreen();

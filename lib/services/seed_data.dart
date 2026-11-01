@@ -7,8 +7,13 @@ import '../models/monitoring_alert_model.dart';
 import '../models/referral_model.dart';
 import '../models/audit_log_model.dart';
 import '../models/notification_model.dart';
+import '../models/psychologist_observation_model.dart';
 
 class SeedData {
+  /// Namunaviy hisoblar paroli. Faqat debug rejimida qabul qilinadi
+  /// (LocalDbService.verifyPassword) — release buildda ishlamaydi.
+  static const demoPassword = 'Parol2026!';
+
   static List<UserModel> get users => [
     UserModel(
       id: 'user_admin',
@@ -581,6 +586,81 @@ class SeedData {
       relatedStudentId: 'student_01',
       relatedStudentName: 'Aliyev Jasur',
       isRead: true,
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+  ];
+
+  static List<PsychologicalObservationModel> get observations => [
+    PsychologicalObservationModel(
+      id: 'obs_01',
+      studentId: 'student_01',
+      studentName: 'Aliyev Jasur',
+      studentGrade: '3-A',
+      psychologistId: 'user_psychologist',
+      psychologistName: 'Usmonova Dilnoza (Psixolog)',
+      date: DateTime.now().subtract(const Duration(days: 2)),
+      category: 'Darsdagi xulq-atvor',
+      emotionalState: 'Barqaror / Ijobiy',
+      triggerOrContext: 'Yangi mavzu tushuntirilganda',
+      observationText:
+          'Dars boshida diqqati barqaror bo‘ldi. Rangli kartochkalar bilan ishlashda qiziqish ko‘rsatdi. O‘qituvchining ko‘rsatmalariga ijobiy javob berdi.',
+      recommendationOrAction:
+          'Vizual qo‘llanmalar orqali rag‘batlantirishni davom ettirish.',
+      isConfidential: true,
+      createdAt: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    PsychologicalObservationModel(
+      id: 'obs_02',
+      studentId: 'student_02',
+      studentName: 'Karimova Madina',
+      studentGrade: '2-B',
+      psychologistId: 'user_psychologist',
+      psychologistName: 'Usmonova Dilnoza (Psixolog)',
+      date: DateTime.now().subtract(const Duration(days: 3)),
+      category: 'Hissiy holat (Affektiv)',
+      emotionalState: 'Xavotirli',
+      triggerOrContext: 'Yozma mustaqil ish topshirilganda',
+      observationText:
+          'Vazifani bajarishda xato qilishdan qo‘rqish belgilari kuzatildi. Barmoqlarini asabiy qisirlatish holati bo‘ldi.',
+      recommendationOrAction:
+          'Xavotirni kamaytiruvchi nafas mashqlari o‘rgatildi, o‘qituvchiga kichik hajmli topshiriqlar berish tavsiya qilindi.',
+      isConfidential: true,
+      createdAt: DateTime.now().subtract(const Duration(days: 3)),
+    ),
+    PsychologicalObservationModel(
+      id: 'obs_03',
+      studentId: 'student_03',
+      studentName: 'Usmonov Botir',
+      studentGrade: '1-A',
+      psychologistId: 'user_psychologist',
+      psychologistName: 'Usmonova Dilnoza (Psixolog)',
+      date: DateTime.now().subtract(const Duration(days: 5)),
+      category: 'Tengdoshlar bilan muloqot',
+      emotionalState: 'Tirishqoq / Chalg‘uvchan',
+      triggerOrContext: 'Tanaffus paytida jamoaviy o‘yinda',
+      observationText:
+          'Tengdoshlari bilan muloqotga kirishishga harakat qildi, biroq o‘yin qoidalarini oxirigacha kutishda sabrsizlik qildi.',
+      recommendationOrAction:
+          'Rolli ijtimoiy moslashuv o‘yinlarida psixolog nazoratida qatnashtirish.',
+      isConfidential: true,
+      createdAt: DateTime.now().subtract(const Duration(days: 5)),
+    ),
+    PsychologicalObservationModel(
+      id: 'obs_04',
+      studentId: 'student_01',
+      studentName: 'Aliyev Jasur',
+      studentGrade: '3-A',
+      psychologistId: 'user_psychologist',
+      psychologistName: 'Usmonova Dilnoza (Psixolog)',
+      date: DateTime.now().subtract(const Duration(days: 1)),
+      category: 'Kognitiv faollik va diqqat',
+      emotionalState: 'Barqaror / Ijobiy',
+      triggerOrContext: 'Korreksion individual mashg‘ulotda',
+      observationText:
+          'Landolt halqalari bo‘yicha diqqat tezligi 15% ga yaxshilandi. Chalg‘ish soni kamaydi.',
+      recommendationOrAction:
+          'Mantiqiy ketma-ketlik vazifalarini bosqichma-bosqich murakkablashtirish.',
+      isConfidential: true,
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
     ),
   ];

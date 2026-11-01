@@ -1,8 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talim_nazorat/services/local_db_service.dart';
+import 'package:talim_nazorat/providers/app_provider.dart';
+import 'package:talim_nazorat/providers/auth_provider.dart';
 import 'package:talim_nazorat/models/user_model.dart';
 import 'package:talim_nazorat/models/student_model.dart';
+import 'package:talim_nazorat/screens/students/add_student_screen.dart';
 import 'package:talim_nazorat/core/constants/namangan_data.dart';
 
 void main() {
@@ -120,5 +125,27 @@ void main() {
         expect(user.institutionName, '12-sonli inklyuziv maktab');
       },
     );
+
+    testWidgets('AddStudentScreen renders without DropdownButton assertion errors', (tester) async {
+      final appProvider = AppProvider();
+      final authProvider = AuthProvider();
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: appProvider),
+            ChangeNotifierProvider.value(value: authProvider),
+          ],
+          child: const MaterialApp(
+            home: AddStudentScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Yangi o‘quvchini ro‘yxatga olish'), findsOneWidget);
+      expect(find.text('Familiyasi *'), findsOneWidget);
+      expect(find.text('Qo‘llab-quvvatlash darajasi'), findsOneWidget);
+    });
   });
 }

@@ -4,6 +4,7 @@ import '../models/session_model.dart';
 import '../models/iep_model.dart';
 import '../models/monitoring_alert_model.dart';
 import '../models/referral_model.dart';
+import '../models/audit_log_model.dart';
 
 class ReportExportService {
   static final ReportExportService _instance = ReportExportService._internal();
@@ -202,4 +203,62 @@ class ReportExportService {
 
     return buffer.toString();
   }
+
+  // ==================== AUDIT JURNALI CSV ====================
+  String generateAuditLogsCsv(List<AuditLogModel> auditLogs) {
+    final buffer = StringBuffer();
+    buffer.write(utf8Bom);
+    buffer.writeln(
+      'ID,Sana va vaqt,Foydalanuvchi,Roli,Amal turi,Ob’ekt,Tafsilotlar',
+    );
+
+    for (final log in auditLogs) {
+      final timeStr =
+          '${log.timestamp.year}-${log.timestamp.month.toString().padLeft(2, '0')}-${log.timestamp.day.toString().padLeft(2, '0')} ${log.timestamp.hour.toString().padLeft(2, '0')}:${log.timestamp.minute.toString().padLeft(2, '0')}:${log.timestamp.second.toString().padLeft(2, '0')}';
+      buffer.writeln(
+        [
+          _sanitizeCsv(log.id),
+          _sanitizeCsv(timeStr),
+          _sanitizeCsv(log.userFullName),
+          _sanitizeCsv(log.userRole),
+          _sanitizeCsv(log.action),
+          _sanitizeCsv(log.entity),
+          _sanitizeCsv(log.details),
+        ].join(','),
+      );
+    }
+
+    return buffer.toString();
+  }
+
+  // ==================== PSIXOLOGIK KUZATUVLAR JURNALI CSV ====================
+  String generateObservationsCsv(List<dynamic> observations) {
+    final buffer = StringBuffer();
+    buffer.write(utf8Bom);
+    buffer.writeln(
+      'ID,Sana,O‘quvchi,Sinf,Kategoriya,Emotsional holat,Kontekst,Kuzatuv xulosasi,Tavsiyalar,Maxfiylik',
+    );
+
+    for (final o in observations) {
+      final dateStr =
+          '${o.date.year}-${o.date.month.toString().padLeft(2, '0')}-${o.date.day.toString().padLeft(2, '0')}';
+      buffer.writeln(
+        [
+          _sanitizeCsv(o.id),
+          _sanitizeCsv(dateStr),
+          _sanitizeCsv(o.studentName),
+          _sanitizeCsv(o.studentGrade),
+          _sanitizeCsv(o.category),
+          _sanitizeCsv(o.emotionalState),
+          _sanitizeCsv(o.triggerOrContext ?? ''),
+          _sanitizeCsv(o.observationText),
+          _sanitizeCsv(o.recommendationOrAction ?? ''),
+          _sanitizeCsv(o.isConfidential ? 'Maxfiy' : 'Standart'),
+        ].join(','),
+      );
+    }
+
+    return buffer.toString();
+  }
 }
+

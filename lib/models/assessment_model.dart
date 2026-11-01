@@ -1,3 +1,5 @@
+import 'assessment_response_model.dart';
+
 class AssessmentCriterionResult {
   final String criterionName;
   final double score;
@@ -35,8 +37,8 @@ class AssessmentModel {
   final String specialistName;
   final String specialistRole;
   final DateTime assessmentDate;
-  final String type; // Standart balli (Rubrikali), Sifatli pedagogik kuzatuv
-  final String category; // Nutq, Kognitiv, Sensor, Xulq-atvor, O'quv
+  final String type; // Standart balli (Rubrikali), Savollar kutubxonasi asosida, Sifatli pedagogik kuzatuv
+  final String category; // Kognitiv va intellekt, Diqqat va xotira, Emotsional va xavotir, Ijtimoiy moslashuv, Kompleks
   final String title;
   final String notes;
   final String recommendations;
@@ -44,9 +46,16 @@ class AssessmentModel {
   final double maxScore;
   final double? previousScore;
   final List<AssessmentCriterionResult> criteria;
+  final List<AssessmentResponseModel> responses;
+  final List<String> questionIds;
+  final String status; // 'completed', 'draft'
+  final String? generalConclusion;
+  final Map<String, double>? domainScores;
   final String? followUpAction;
   final DateTime? reviewDate;
   final bool isDraft;
+  final DateTime? updatedAt;
+  final DateTime? createdAt;
 
   AssessmentModel({
     required this.id,
@@ -65,12 +74,21 @@ class AssessmentModel {
     required this.maxScore,
     this.previousScore,
     this.criteria = const [],
+    this.responses = const [],
+    this.questionIds = const [],
+    this.status = 'completed',
+    this.generalConclusion,
+    this.domainScores,
     this.followUpAction,
     this.reviewDate,
     this.isDraft = false,
+    this.updatedAt,
+    this.createdAt,
   });
 
   double get percentage => maxScore > 0 ? (totalScore / maxScore) * 100 : 0;
+
+  bool get isCompleted => status == 'completed' && !isDraft;
 
   String get trend {
     if (previousScore == null) return 'Boshlang‘ich (Baseline)';
@@ -97,9 +115,16 @@ class AssessmentModel {
     double? maxScore,
     double? previousScore,
     List<AssessmentCriterionResult>? criteria,
+    List<AssessmentResponseModel>? responses,
+    List<String>? questionIds,
+    String? status,
+    String? generalConclusion,
+    Map<String, double>? domainScores,
     String? followUpAction,
     DateTime? reviewDate,
     bool? isDraft,
+    DateTime? updatedAt,
+    DateTime? createdAt,
   }) {
     return AssessmentModel(
       id: id ?? this.id,
@@ -118,9 +143,16 @@ class AssessmentModel {
       maxScore: maxScore ?? this.maxScore,
       previousScore: previousScore ?? this.previousScore,
       criteria: criteria ?? this.criteria,
+      responses: responses ?? this.responses,
+      questionIds: questionIds ?? this.questionIds,
+      status: status ?? this.status,
+      generalConclusion: generalConclusion ?? this.generalConclusion,
+      domainScores: domainScores ?? this.domainScores,
       followUpAction: followUpAction ?? this.followUpAction,
       reviewDate: reviewDate ?? this.reviewDate,
       isDraft: isDraft ?? this.isDraft,
+      updatedAt: updatedAt ?? this.updatedAt,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -141,9 +173,16 @@ class AssessmentModel {
     'maxScore': maxScore,
     'previousScore': previousScore,
     'criteria': criteria.map((c) => c.toJson()).toList(),
+    'responses': responses.map((r) => r.toJson()).toList(),
+    'questionIds': questionIds,
+    'status': status,
+    'generalConclusion': generalConclusion,
+    'domainScores': domainScores,
     'followUpAction': followUpAction,
     'reviewDate': reviewDate?.toIso8601String(),
     'isDraft': isDraft,
+    'updatedAt': updatedAt?.toIso8601String(),
+    'createdAt': createdAt?.toIso8601String(),
   };
 
   factory AssessmentModel.fromJson(Map<String, dynamic> json) =>
@@ -155,13 +194,13 @@ class AssessmentModel {
         specialistName: json['specialistName'] as String? ?? '',
         specialistRole: json['specialistRole'] as String? ?? '',
         assessmentDate: DateTime.parse(json['assessmentDate'] as String),
-        type: json['type'] as String,
-        category: json['category'] as String,
-        title: json['title'] as String,
-        notes: json['notes'] as String,
-        recommendations: json['recommendations'] as String,
-        totalScore: (json['totalScore'] as num).toDouble(),
-        maxScore: (json['maxScore'] as num).toDouble(),
+        type: json['type'] as String? ?? 'Standart balli (Rubrikali)',
+        category: json['category'] as String? ?? 'Kognitiv va intellekt',
+        title: json['title'] as String? ?? '',
+        notes: json['notes'] as String? ?? '',
+        recommendations: json['recommendations'] as String? ?? '',
+        totalScore: (json['totalScore'] as num?)?.toDouble() ?? 0.0,
+        maxScore: (json['maxScore'] as num?)?.toDouble() ?? 100.0,
         previousScore: (json['previousScore'] as num?)?.toDouble(),
         criteria:
             (json['criteria'] as List<dynamic>?)
@@ -172,10 +211,36 @@ class AssessmentModel {
                 )
                 .toList() ??
             [],
+        responses:
+            (json['responses'] as List<dynamic>?)
+                ?.map(
+                  (r) => AssessmentResponseModel.fromJson(
+                    r as Map<String, dynamic>,
+                  ),
+                )
+                .toList() ??
+            [],
+        questionIds:
+            (json['questionIds'] as List<dynamic>?)
+                ?.map((q) => q.toString())
+                .toList() ??
+            [],
+        status: json['status'] as String? ??
+            ((json['isDraft'] as bool? ?? false) ? 'draft' : 'completed'),
+        generalConclusion: json['generalConclusion'] as String?,
+        domainScores: (json['domainScores'] as Map<String, dynamic>?)?.map(
+          (k, v) => MapEntry(k, (v as num).toDouble()),
+        ),
         followUpAction: json['followUpAction'] as String?,
         reviewDate: json['reviewDate'] != null
             ? DateTime.parse(json['reviewDate'] as String)
             : null,
         isDraft: json['isDraft'] as bool? ?? false,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'] as String)
+            : null,
+        createdAt: json['createdAt'] != null
+            ? DateTime.tryParse(json['createdAt'] as String)
+            : null,
       );
 }

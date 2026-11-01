@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -12,9 +13,14 @@ import '../models/monitoring_alert_model.dart';
 import '../models/referral_model.dart';
 import '../models/audit_log_model.dart';
 import '../models/notification_model.dart';
+import '../models/psychologist_observation_model.dart';
+import '../models/assessment_question_model.dart';
+import '../core/constants/psychological_questions_seed.dart';
 import 'access_control_service.dart';
+import 'password_hasher.dart';
 import 'monitoring_rule_engine.dart';
 import 'seed_data.dart';
+import '../core/constants/namangan_data.dart';
 
 class LocalDbService {
   static final LocalDbService _instance = LocalDbService._internal();
@@ -35,8 +41,20 @@ class LocalDbService {
   List<ReferralModel> _referrals = [];
   List<AuditLogModel> _auditLogs = [];
   List<NotificationModel> _notifications = [];
+  List<PsychologicalObservationModel> _observations = [];
+  List<AssessmentQuestionModel> _questions = [];
 
   bool _isInitialized = false;
+
+  // O'qishda buzilgan deb topilgan jadvallar (ustidan yozilmaydi)
+  final Set<String> _corruptedKeys = {};
+
+  /// Testlar uchun: keyingi init() ma'lumotlarni qaytadan o'qishi uchun.
+  @visibleForTesting
+  void resetForTest() => _isInitialized = false;
+
+  /// Ishga tushishda o'qib bo'lmagan jadvallar. Bo'sh bo'lmasa, foydalanuvchini ogohlantirish kerak.
+  List<String> get loadErrors => List.unmodifiable(_corruptedKeys);
 
   Future<void> init() async {
     if (_isInitialized) return;
@@ -44,8 +62,13 @@ class LocalDbService {
     final prefs = await SharedPreferences.getInstance();
     final isSeeded = prefs.getBool('app_db_seeded_v2') ?? false;
 
-    if (!isSeeded) {
-      // Yangilangan Chortoq va Koordinator ma'lumotlari bilan boshlang'ich to'ldirish
+    if (!isSeeded && !kDebugMode) {
+      // Release build: real foydalanuvchilarga namunaviy bolalar ma'lumoti ko'rsatilmaydi
+      _questions = List.from(PsychologicalQuestionsSeed.initialQuestions);
+      await _persistAll();
+      await prefs.setBool('app_db_seeded_v2', true);
+    } else if (!isSeeded) {
+      // Faqat debug rejimida: namunaviy ma'lumotlar bilan boshlang'ich to'ldirish
       _users = List.from(SeedData.users);
       _students = List.from(SeedData.students);
       _assessments = List.from(SeedData.assessments);
@@ -55,12 +78,16 @@ class LocalDbService {
       _referrals = List.from(SeedData.referrals);
       _auditLogs = List.from(SeedData.auditLogs);
       _notifications = List.from(SeedData.notifications);
+      _observations = List.from(SeedData.observations);
+      _questions = List.from(PsychologicalQuestionsSeed.initialQuestions);
 
       await _persistAll();
       await prefs.setBool('app_db_seeded_v2', true);
     } else {
       _loadFromPrefs(prefs);
     }
+
+    await _migratePlainTextPasswords();
 
     // Monitoring qoidalarini bazadagi mavjud real faktlar bo'yicha baholash
     _reEvaluateRules();
@@ -69,120 +96,109 @@ class LocalDbService {
   }
 
   void _loadFromPrefs(SharedPreferences prefs) {
+    // Har bir jadval alohida o'qiladi. Biror jadval buzilgan bo'lsa, faqat o'sha
+    // jadval zaxiralanadi va yozishdan himoyalanadi — boshqa ma'lumotlar saqlanib qoladi.
+    // Hech qachon real ma'lumot namunaviy (seed) ma'lumot bilan almashtirilmaydi.
+    _corruptedKeys.clear();
+    _users = _decodeTable(prefs, 'db_users', UserModel.fromJson);
+    _students = _decodeTable(prefs, 'db_students', StudentModel.fromJson);
+    _assessments = _decodeTable(
+      prefs,
+      'db_assessments',
+      AssessmentModel.fromJson,
+    );
+    _sessions = _decodeTable(prefs, 'db_sessions', SessionModel.fromJson);
+    _iepPlans = _decodeTable(
+      prefs,
+      'db_iep',
+      IndividualEducationPlanModel.fromJson,
+    );
+    _alerts = _decodeTable(prefs, 'db_alerts', MonitoringAlertModel.fromJson);
+    _referrals = _decodeTable(prefs, 'db_referrals', ReferralModel.fromJson);
+    _auditLogs = _decodeTable(prefs, 'db_audit', AuditLogModel.fromJson);
+    _notifications = _decodeTable(
+      prefs,
+      'db_notifications',
+      NotificationModel.fromJson,
+    );
+    _observations = _decodeTable(
+      prefs,
+      'db_observations',
+      PsychologicalObservationModel.fromJson,
+    );
+    _questions = _decodeTable(
+      prefs,
+      'db_questions',
+      AssessmentQuestionModel.fromJson,
+      // Savollar kutubxonasi — metodik kontent, shaxsiy ma'lumot emas
+      fallback: () => List.from(PsychologicalQuestionsSeed.initialQuestions),
+    );
+  }
+
+  List<T> _decodeTable<T>(
+    SharedPreferences prefs,
+    String key,
+    T Function(Map<String, dynamic>) fromJson, {
+    List<T> Function()? fallback,
+  }) {
+    final raw = prefs.getString(key);
+    if (raw == null) return fallback?.call() ?? <T>[];
     try {
-      final usersRaw = prefs.getString('db_users');
-      _users = usersRaw != null
-          ? (jsonDecode(usersRaw) as List)
-                .map((e) => UserModel.fromJson(e))
-                .toList()
-          : List.from(SeedData.users);
-
-      final studentsRaw = prefs.getString('db_students');
-      _students = studentsRaw != null
-          ? (jsonDecode(studentsRaw) as List)
-                .map((e) => StudentModel.fromJson(e))
-                .toList()
-          : List.from(SeedData.students);
-
-      final assessmentsRaw = prefs.getString('db_assessments');
-      _assessments = assessmentsRaw != null
-          ? (jsonDecode(assessmentsRaw) as List)
-                .map((e) => AssessmentModel.fromJson(e))
-                .toList()
-          : List.from(SeedData.assessments);
-
-      final sessionsRaw = prefs.getString('db_sessions');
-      _sessions = sessionsRaw != null
-          ? (jsonDecode(sessionsRaw) as List)
-                .map((e) => SessionModel.fromJson(e))
-                .toList()
-          : List.from(SeedData.sessions);
-
-      final iepRaw = prefs.getString('db_iep');
-      _iepPlans = iepRaw != null
-          ? (jsonDecode(iepRaw) as List)
-                .map((e) => IndividualEducationPlanModel.fromJson(e))
-                .toList()
-          : List.from(SeedData.iepPlans);
-
-      final alertsRaw = prefs.getString('db_alerts');
-      _alerts = alertsRaw != null
-          ? (jsonDecode(alertsRaw) as List)
-                .map((e) => MonitoringAlertModel.fromJson(e))
-                .toList()
-          : List.from(SeedData.monitoringAlerts);
-
-      final referralsRaw = prefs.getString('db_referrals');
-      _referrals = referralsRaw != null
-          ? (jsonDecode(referralsRaw) as List)
-                .map((e) => ReferralModel.fromJson(e))
-                .toList()
-          : List.from(SeedData.referrals);
-
-      final auditRaw = prefs.getString('db_audit');
-      _auditLogs = auditRaw != null
-          ? (jsonDecode(auditRaw) as List)
-                .map((e) => AuditLogModel.fromJson(e))
-                .toList()
-          : List.from(SeedData.auditLogs);
-
-      final notifRaw = prefs.getString('db_notifications');
-      _notifications = notifRaw != null
-          ? (jsonDecode(notifRaw) as List)
-                .map((e) => NotificationModel.fromJson(e))
-                .toList()
-          : List.from(SeedData.notifications);
-    } catch (_) {
-      _users = List.from(SeedData.users);
-      _students = List.from(SeedData.students);
-      _assessments = List.from(SeedData.assessments);
-      _sessions = List.from(SeedData.sessions);
-      _iepPlans = List.from(SeedData.iepPlans);
-      _alerts = List.from(SeedData.monitoringAlerts);
-      _referrals = List.from(SeedData.referrals);
-      _auditLogs = List.from(SeedData.auditLogs);
-      _notifications = List.from(SeedData.notifications);
+      return (jsonDecode(raw) as List)
+          .map((e) => fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      // Asl ma'lumotni zaxiralash va jadvalni ustidan yozishdan himoyalash
+      _corruptedKeys.add(key);
+      prefs.setString('${key}_corrupt_backup', raw);
+      debugPrint('LocalDbService: "$key" jadvalini o‘qib bo‘lmadi: $e');
+      return <T>[];
     }
   }
 
   Future<void> _persistAll() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      'db_users',
-      jsonEncode(_users.map((e) => e.toJson()).toList()),
-    );
-    await prefs.setString(
-      'db_students',
-      jsonEncode(_students.map((e) => e.toJson()).toList()),
-    );
-    await prefs.setString(
+    await _writeTable(prefs, 'db_users', _users.map((e) => e.toJson()));
+    await _writeTable(prefs, 'db_students', _students.map((e) => e.toJson()));
+    await _writeTable(
+      prefs,
       'db_assessments',
-      jsonEncode(_assessments.map((e) => e.toJson()).toList()),
+      _assessments.map((e) => e.toJson()),
     );
-    await prefs.setString(
-      'db_sessions',
-      jsonEncode(_sessions.map((e) => e.toJson()).toList()),
-    );
-    await prefs.setString(
-      'db_iep',
-      jsonEncode(_iepPlans.map((e) => e.toJson()).toList()),
-    );
-    await prefs.setString(
-      'db_alerts',
-      jsonEncode(_alerts.map((e) => e.toJson()).toList()),
-    );
-    await prefs.setString(
+    await _writeTable(prefs, 'db_sessions', _sessions.map((e) => e.toJson()));
+    await _writeTable(prefs, 'db_iep', _iepPlans.map((e) => e.toJson()));
+    await _writeTable(prefs, 'db_alerts', _alerts.map((e) => e.toJson()));
+    await _writeTable(
+      prefs,
       'db_referrals',
-      jsonEncode(_referrals.map((e) => e.toJson()).toList()),
+      _referrals.map((e) => e.toJson()),
     );
-    await prefs.setString(
-      'db_audit',
-      jsonEncode(_auditLogs.map((e) => e.toJson()).toList()),
-    );
-    await prefs.setString(
+    await _writeTable(prefs, 'db_audit', _auditLogs.map((e) => e.toJson()));
+    await _writeTable(
+      prefs,
       'db_notifications',
-      jsonEncode(_notifications.map((e) => e.toJson()).toList()),
+      _notifications.map((e) => e.toJson()),
     );
+    await _writeTable(
+      prefs,
+      'db_observations',
+      _observations.map((e) => e.toJson()),
+    );
+    await _writeTable(
+      prefs,
+      'db_questions',
+      _questions.map((e) => e.toJson()),
+    );
+  }
+
+  Future<void> _writeTable(
+    SharedPreferences prefs,
+    String key,
+    Iterable<Map<String, dynamic>> rows,
+  ) async {
+    // Buzilgan jadval ustidan yozilmaydi — asl ma'lumotni tiklash imkoniyati saqlanadi
+    if (_corruptedKeys.contains(key)) return;
+    await prefs.setString(key, jsonEncode(rows.toList()));
   }
 
   void _reEvaluateRules() {
@@ -212,21 +228,54 @@ class LocalDbService {
 
   UserModel? findUserByEmailOrPhone(String identifier) {
     final cleanId = identifier.trim().toLowerCase();
-    final digitsOnly = cleanId.replaceAll(RegExp(r'\D'), '');
+    if (cleanId.isEmpty) return null;
+    final phoneKey = _phoneKey(cleanId);
 
     for (final u in _users) {
       if (u.email.toLowerCase() == cleanId) return u;
-      if (u.phone != null) {
-        final userDigits = u.phone!.replaceAll(RegExp(r'\D'), '');
-        if (digitsOnly.isNotEmpty &&
-            (userDigits == digitsOnly ||
-                userDigits.endsWith(digitsOnly) ||
-                digitsOnly.endsWith(userDigits))) {
-          return u;
-        }
+      // Telefon faqat to'liq mos kelganda (oxirgi 9 raqam: operator kodi + raqam)
+      if (phoneKey != null && u.phone != null && _phoneKey(u.phone!) == phoneKey) {
+        return u;
       }
     }
     return null;
+  }
+
+  /// Telefon raqamini taqqoslash kaliti: +998 dan keyingi 9 raqam.
+  /// 9 tadan kam raqam kiritilsa — telefon sifatida qabul qilinmaydi.
+  String? _phoneKey(String input) {
+    if (input.contains('@')) return null;
+    final digits = input.replaceAll(RegExp(r'\D'), '');
+    if (digits.length < 9) return null;
+    return digits.substring(digits.length - 9);
+  }
+
+  /// Kiritilgan parolni saqlangan xesh bilan tekshirish.
+  bool verifyPassword(UserModel user, String password) {
+    if (PasswordHasher.verify(password, user.password)) return true;
+    // Namunaviy (seed) hisoblarda parol yo'q — ular faqat debug rejimida ishlaydi
+    return kDebugMode &&
+        user.password == null &&
+        password == SeedData.demoPassword;
+  }
+
+  UserModel _withHashedPassword(UserModel user) {
+    final pass = user.password;
+    if (pass == null || PasswordHasher.isHashed(pass)) return user;
+    return user.copyWith(password: PasswordHasher.hash(pass));
+  }
+
+  /// Eski versiyalarda ochiq matn sifatida saqlangan parollarni xeshlash
+  Future<void> _migratePlainTextPasswords() async {
+    var changed = false;
+    for (var i = 0; i < _users.length; i++) {
+      final hashed = _withHashedPassword(_users[i]);
+      if (!identical(hashed, _users[i])) {
+        _users[i] = hashed;
+        changed = true;
+      }
+    }
+    if (changed) await _persistAll();
   }
 
   UserModel? getUserById(String id) {
@@ -238,6 +287,7 @@ class LocalDbService {
   }
 
   Future<void> registerUser(UserModel user) async {
+    user = _withHashedPassword(user);
     _users.insert(0, user);
     await _persistAll();
     await addAuditLog(
@@ -250,17 +300,51 @@ class LocalDbService {
     );
   }
 
+  /// Administrator tomonidan yangi foydalanuvchi yaratish (Backend huquq tekshiruvi bilan)
+  Future<void> addUser(UserModel user, {UserModel? byUser}) async {
+    if (byUser != null && !_accessControl.canManageUsers(byUser)) {
+      throw Exception(
+        'Ruxsat cheklangan: Faqat administrator foydalanuvchi qo‘sha oladi.',
+      );
+    }
+
+    if (findUserByEmailOrPhone(user.email) != null) {
+      throw Exception('Ushbu elektron pochta manzili bilan foydalanuvchi mavjud.');
+    }
+    if (user.phone != null && user.phone!.isNotEmpty && findUserByEmailOrPhone(user.phone!) != null) {
+      throw Exception('Ushbu telefon raqam bilan foydalanuvchi ro‘yxatdan o‘tgan.');
+    }
+
+    _users.insert(0, _withHashedPassword(user));
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser?.fullName ?? 'Administrator',
+      userRole: byUser?.role.label ?? 'Tizim administratori',
+      action: 'CREATE',
+      entity: 'User',
+      details:
+          'Yangi foydalanuvchi yaratildi: ${user.fullName} (${user.role.label}, ${user.institutionName ?? 'Muassasa ko‘rsatilmagan'})',
+    );
+  }
+
   Future<void> updateUser(UserModel updated, {UserModel? byUser}) async {
+    if (byUser != null && !_accessControl.canManageUsers(byUser) && byUser.id != updated.id) {
+      throw Exception(
+        'Ruxsat cheklangan: Boshqa foydalanuvchi ma’lumotlarini o‘zgartirish huquqi yo‘q.',
+      );
+    }
+
     final index = _users.indexWhere((u) => u.id == updated.id);
     if (index != -1) {
-      _users[index] = updated;
+      _users[index] = _withHashedPassword(updated);
       await _persistAll();
       await addAuditLog(
         userFullName: byUser?.fullName ?? updated.fullName,
         userRole: byUser?.role.label ?? updated.role.label,
         action: 'UPDATE',
         entity: 'User',
-        details: '${updated.fullName} ma’lumotlari tahrirlandi.',
+        details:
+            '${updated.fullName} (${updated.role.label}) ma’lumotlari tahrirlandi.',
       );
     }
   }
@@ -270,8 +354,19 @@ class LocalDbService {
     bool isActive, {
     UserModel? byUser,
   }) async {
+    if (byUser != null && !_accessControl.canManageUsers(byUser)) {
+      throw Exception(
+        'Ruxsat cheklangan: Foydalanuvchi faolligini o‘zgartirish uchun administrator huquqi talab qilinadi.',
+      );
+    }
+
     final index = _users.indexWhere((u) => u.id == userId);
     if (index != -1) {
+      // Super adminning o'zini bloklashidan himoya
+      if (_users[index].role == UserRole.superAdmin && !isActive) {
+        throw Exception('Asosiy tizim administratorini bloklash taqiqlanadi.');
+      }
+
       _users[index] = _users[index].copyWith(isActive: isActive);
       await _persistAll();
       await addAuditLog(
@@ -283,6 +378,155 @@ class LocalDbService {
             '${_users[index].fullName} hisobi ${isActive ? 'faollashtirildi' : 'bloklandi'}.',
       );
     }
+  }
+
+  Future<void> deleteUser(String userId, {UserModel? byUser}) async {
+    if (byUser != null && !_accessControl.canManageUsers(byUser)) {
+      throw Exception(
+        'Ruxsat cheklangan: Foydalanuvchini o‘chirish huquqi mavjud emas.',
+      );
+    }
+
+    final index = _users.indexWhere((u) => u.id == userId);
+    if (index != -1) {
+      final target = _users[index];
+      if (target.role == UserRole.superAdmin) {
+        throw Exception('Asosiy tizim administratorini o‘chirib bo‘lmaydi.');
+      }
+
+      _users.removeAt(index);
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? 'Administrator',
+        userRole: byUser?.role.label ?? 'Tizim administratori',
+        action: 'DELETE',
+        entity: 'User',
+        details:
+            'Foydalanuvchi tizimdan o‘chirildi: ${target.fullName} (${target.role.label})',
+      );
+    }
+  }
+
+  // ==================== MUASSASALAR VA SINFLAR REYESTRI ====================
+  List<Map<String, dynamic>> getInstitutionsSummary() {
+    final Map<String, Map<String, dynamic>> map = {};
+
+    // 1. Dastlab ma'lumotlar bazasidagi o'quvchilar va mutaxassislar orqali aniqlash
+    for (final s in _students) {
+      final name = s.institutionName.trim();
+      if (name.isEmpty) continue;
+      if (!map.containsKey(name)) {
+        map[name] = {
+          'name': name,
+          'district': 'Chortoq tumani',
+          'type': name.contains('internat')
+              ? 'Ixtisoslashtirilgan maktab-internati'
+              : name.contains('inklyuziv')
+                  ? 'Inklyuziv tayanch maktab'
+                  : 'Umumiy o‘rta ta’lim maktabi',
+          'studentsCount': 0,
+          'specialistsCount': 0,
+          'activeIepCount': 0,
+        };
+      }
+      map[name]!['studentsCount'] = (map[name]!['studentsCount'] as int) + 1;
+    }
+
+    for (final u in _users) {
+      final name = u.institutionName?.trim() ?? '';
+      if (name.isEmpty) continue;
+      if (!map.containsKey(name)) {
+        map[name] = {
+          'name': name,
+          'district': u.district ?? 'Namangan viloyati',
+          'type': name.contains('boshqarma')
+              ? 'Davlat boshqaruv organi'
+              : 'Ta’lim muassasasi',
+          'studentsCount': 0,
+          'specialistsCount': 0,
+          'activeIepCount': 0,
+        };
+      }
+      map[name]!['specialistsCount'] = (map[name]!['specialistsCount'] as int) + 1;
+      if (u.district != null && u.district!.isNotEmpty) {
+        map[name]!['district'] = u.district!;
+      }
+    }
+
+    for (final iep in _iepPlans) {
+      final name = iep.institutionName.trim();
+      if (map.containsKey(name) && iep.status == 'Faol') {
+        map[name]!['activeIepCount'] = (map[name]!['activeIepCount'] as int) + 1;
+      }
+    }
+
+    // 2. Namangan viloyatining namunaviy bazasidagi maktablarni qo'shish (agar bo'sh bo'lsa)
+    for (final district in NamanganData.districts) {
+      final schools = NamanganData.getSchoolsForDistrict(district);
+      for (final sch in schools.take(4)) {
+        if (!map.containsKey(sch)) {
+          map[sch] = {
+            'name': sch,
+            'district': district,
+            'type': sch.contains('internat')
+                ? 'Ixtisoslashtirilgan maktab-internati'
+                : sch.contains('inklyuziv')
+                    ? 'Inklyuziv tayanch maktab'
+                    : 'Umumiy o‘rta ta’lim maktabi',
+            'studentsCount': 0,
+            'specialistsCount': 0,
+            'activeIepCount': 0,
+          };
+        }
+      }
+    }
+
+    final list = map.values.toList();
+    list.sort((a, b) {
+      final sComp = (b['studentsCount'] as int).compareTo(a['studentsCount'] as int);
+      if (sComp != 0) return sComp;
+      return (a['name'] as String).compareTo(b['name'] as String);
+    });
+    return list;
+  }
+
+  List<Map<String, dynamic>> getClassesSummary() {
+    final Map<String, Map<String, dynamic>> map = {};
+
+    for (final s in _students) {
+      final grade = s.grade.trim();
+      if (grade.isEmpty) continue;
+      final key = '${s.institutionName}_$grade';
+
+      if (!map.containsKey(key)) {
+        // Sinf rahbarini topish
+        String teacherName = 'Biriktirilmagan';
+        for (final u in _users) {
+          if (u.role == UserRole.teacher &&
+              u.institutionName == s.institutionName) {
+            teacherName = u.fullName;
+            break;
+          }
+        }
+
+        map[key] = {
+          'key': key,
+          'grade': grade,
+          'institutionName': s.institutionName,
+          'studentsCount': 0,
+          'needs': <String>{},
+          'teacherName': teacherName,
+          'specialistsCount': s.assignedSpecialistIds.length,
+        };
+      }
+
+      map[key]!['studentsCount'] = (map[key]!['studentsCount'] as int) + 1;
+      (map[key]!['needs'] as Set<String>).add(s.primaryNeed);
+    }
+
+    final list = map.values.toList();
+    list.sort((a, b) => (a['grade'] as String).compareTo(b['grade'] as String));
+    return list;
   }
 
   // ==================== BOLALAR (STUDENTS) ====================
@@ -455,7 +699,8 @@ class LocalDbService {
       if (category != null && a.category != category) return false;
       if (forUser != null) {
         final student = getStudentById(a.studentId);
-        if (student != null &&
+        // Bolasi topilmagan (yetim) yozuvlar ham yashiriladi
+        if (student == null ||
             !_accessControl.canViewStudent(forUser, student)) {
           return false;
         }
@@ -489,6 +734,143 @@ class LocalDbService {
     );
   }
 
+  Future<void> updateAssessment(
+    AssessmentModel updated, {
+    UserModel? byUser,
+  }) async {
+    final index = _assessments.indexWhere((a) => a.id == updated.id);
+    if (index != -1) {
+      _assessments[index] = updated.copyWith(updatedAt: DateTime.now());
+      _reEvaluateRules();
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? updated.specialistName,
+        userRole: byUser?.role.label ?? updated.specialistRole,
+        action: 'UPDATE',
+        entity: 'Assessment',
+        details:
+            '${updated.studentName} uchun ${updated.title} baholash yangilandi (Holati: ${updated.status})',
+      );
+    }
+  }
+
+  Future<void> deleteAssessment(
+    String id, {
+    UserModel? byUser,
+  }) async {
+    final index = _assessments.indexWhere((a) => a.id == id);
+    if (index != -1) {
+      final target = _assessments[index];
+      _assessments.removeAt(index);
+      _reEvaluateRules();
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? target.specialistName,
+        userRole: byUser?.role.label ?? target.specialistRole,
+        action: 'DELETE',
+        entity: 'Assessment',
+        details: '${target.studentName} uchun ${target.title} baholash o‘chirildi',
+      );
+    }
+  }
+
+  // ==================== SAVOLLAR KUTUBXONASI (QUESTION LIBRARY) ====================
+  List<AssessmentQuestionModel> getQuestions({
+    UserModel? forUser,
+    String? domain,
+    String? query,
+    bool? myQuestionsOnly,
+    String? status,
+    String? questionType,
+  }) {
+    return _questions.where((q) {
+      if (domain != null && domain != 'Barchasi' && q.domain != domain) {
+        return false;
+      }
+      if (status != null && status != 'Barchasi' && q.status != status) {
+        return false;
+      }
+      if (questionType != null &&
+          questionType != 'Barchasi' &&
+          q.questionType != questionType) {
+        return false;
+      }
+      if (myQuestionsOnly == true && forUser != null) {
+        if (q.authorId != forUser.id) return false;
+      }
+      if (query != null && query.trim().isNotEmpty) {
+        final qLower = query.toLowerCase().trim();
+        final textMatches = q.text.toLowerCase().contains(qLower);
+        final titleMatches = q.title?.toLowerCase().contains(qLower) ?? false;
+        final domainMatches = q.domain.toLowerCase().contains(qLower);
+        if (!textMatches && !titleMatches && !domainMatches) return false;
+      }
+      return true;
+    }).toList();
+  }
+
+  AssessmentQuestionModel? getQuestionById(String id) {
+    try {
+      return _questions.firstWhere((q) => q.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> addQuestion(
+    AssessmentQuestionModel question, {
+    UserModel? byUser,
+  }) async {
+    _questions.insert(0, question);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser?.fullName ?? question.authorName,
+      userRole: byUser?.role.label ?? 'Amaliyotchi psixolog',
+      action: 'CREATE',
+      entity: 'Question',
+      details:
+          'Kutubxonaga yangi savol qo‘shildi: "${question.text.length > 50 ? "${question.text.substring(0, 50)}..." : question.text}" (${question.domain})',
+    );
+  }
+
+  Future<void> updateQuestion(
+    AssessmentQuestionModel question, {
+    UserModel? byUser,
+  }) async {
+    final index = _questions.indexWhere((q) => q.id == question.id);
+    if (index != -1) {
+      _questions[index] = question.copyWith(updatedAt: DateTime.now());
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? question.authorName,
+        userRole: byUser?.role.label ?? 'Amaliyotchi psixolog',
+        action: 'UPDATE',
+        entity: 'Question',
+        details: 'Savol tahrirlandi: ${question.id} (${question.domain})',
+      );
+    }
+  }
+
+  Future<void> deleteQuestion(
+    String questionId, {
+    UserModel? byUser,
+  }) async {
+    final index = _questions.indexWhere((q) => q.id == questionId);
+    if (index != -1) {
+      final target = _questions[index];
+      _questions.removeAt(index);
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? 'Mutaxassis',
+        userRole: byUser?.role.label ?? 'Amaliyotchi psixolog',
+        action: 'DELETE',
+        entity: 'Question',
+        details:
+            'Kutubxonadan savol o‘chirildi: ${target.text.length > 40 ? "${target.text.substring(0, 40)}..." : target.text}',
+      );
+    }
+  }
+
   // ==================== MASHG'ULOTLAR (SESSIONS) ====================
   List<SessionModel> getSessions({
     UserModel? forUser,
@@ -500,7 +882,8 @@ class LocalDbService {
       if (specialistId != null && s.specialistId != specialistId) return false;
       if (forUser != null) {
         final student = getStudentById(s.studentId);
-        if (student != null &&
+        // Bolasi topilmagan (yetim) yozuvlar ham yashiriladi
+        if (student == null ||
             !_accessControl.canViewStudent(forUser, student)) {
           return false;
         }
@@ -601,6 +984,23 @@ class LocalDbService {
     }
   }
 
+  Future<void> deleteSession(String sessionId, {UserModel? byUser}) async {
+    final index = _sessions.indexWhere((s) => s.id == sessionId);
+    if (index != -1) {
+      final cur = _sessions[index];
+      _sessions.removeAt(index);
+      _reEvaluateRules();
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? cur.specialistName,
+        userRole: byUser?.role.label ?? cur.specialistRole,
+        action: 'DELETE',
+        entity: 'Session',
+        details: '${cur.studentName} bilan ${cur.topic} mashg‘uloti o‘chirildi',
+      );
+    }
+  }
+
   // ==================== INDIVIDUAL TA'LIM REJASI (ITR / IEP) ====================
   List<IndividualEducationPlanModel> getIepPlans({
     UserModel? forUser,
@@ -610,7 +1010,8 @@ class LocalDbService {
       if (studentId != null && p.studentId != studentId) return false;
       if (forUser != null) {
         final student = getStudentById(p.studentId);
-        if (student != null &&
+        // Bolasi topilmagan (yetim) yozuvlar ham yashiriladi
+        if (student == null ||
             !_accessControl.canViewStudent(forUser, student)) {
           return false;
         }
@@ -713,7 +1114,8 @@ class LocalDbService {
       if (onlyUnresolved == true && a.isResolved) return false;
       if (forUser != null) {
         final student = getStudentById(a.studentId);
-        if (student != null &&
+        // Bolasi topilmagan (yetim) yozuvlar ham yashiriladi
+        if (student == null ||
             !_accessControl.canViewStudent(forUser, student)) {
           return false;
         }
@@ -882,5 +1284,64 @@ class LocalDbService {
     );
     _auditLogs.insert(0, log);
     await _persistAll();
+  }
+
+  // ==================== PSIXOLOGIK KUZATUV JURNALI ====================
+  List<PsychologicalObservationModel> getObservations({
+    UserModel? forUser,
+    String? studentId,
+    String? category,
+  }) {
+    return _observations.where((o) {
+      if (studentId != null && o.studentId != studentId) return false;
+      if (category != null && o.category != category) return false;
+      if (forUser != null) {
+        final student = getStudentById(o.studentId);
+        if (student == null ||
+            !_accessControl.canViewStudent(forUser, student)) {
+          return false;
+        }
+        if (o.isConfidential &&
+            !_accessControl.canViewConfidentialObservation(
+              forUser,
+              o.psychologistId,
+            )) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
+  }
+
+  Future<void> addObservation(
+    PsychologicalObservationModel observation, {
+    UserModel? byUser,
+  }) async {
+    _observations.insert(0, observation);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser?.fullName ?? observation.psychologistName,
+      userRole: byUser?.role.label ?? 'Amaliyotchi psixolog',
+      action: 'CREATE',
+      entity: 'Observation',
+      details:
+          '${observation.studentName} uchun psixologik kuzatuv qayd etildi (${observation.category})',
+    );
+  }
+
+  Future<void> deleteObservation(String id, {UserModel? byUser}) async {
+    final index = _observations.indexWhere((o) => o.id == id);
+    if (index != -1) {
+      final obs = _observations.removeAt(index);
+      await _persistAll();
+      await addAuditLog(
+        userFullName: byUser?.fullName ?? 'Psixolog',
+        userRole: byUser?.role.label ?? 'Amaliyotchi psixolog',
+        action: 'DELETE',
+        entity: 'Observation',
+        details:
+            '${obs.studentName} ning ${obs.category} bo‘yicha kuzatuvi o‘chirildi',
+      );
+    }
   }
 }

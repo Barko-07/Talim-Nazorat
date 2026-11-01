@@ -11,6 +11,8 @@ import 'package:talim_nazorat/services/local_db_service.dart';
 import 'package:talim_nazorat/services/monitoring_rule_engine.dart';
 import 'package:talim_nazorat/services/report_export_service.dart';
 import 'package:talim_nazorat/core/constants/assessment_templates.dart';
+import 'package:talim_nazorat/models/psychologist_observation_model.dart';
+import 'package:talim_nazorat/core/constants/psychological_methods_data.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -854,4 +856,288 @@ void main() {
       expect(csv.contains('78'), true);
     });
   });
+
+  group('9. Professional State Administrator Portal & Backend Security', () {
+    final access = AccessControlService();
+    final db = LocalDbService();
+    final exportService = ReportExportService();
+
+    final superAdmin = UserModel(
+      id: 'admin_root',
+      email: 'root_admin@talim.uz',
+      fullName: 'Bosh Davlat Administratori',
+      role: UserRole.superAdmin,
+      isActive: true,
+    );
+
+    final teacher = UserModel(
+      id: 'teacher_sub',
+      email: 'oddiy_oqituvchi@talim.uz',
+      fullName: 'Oddiy O‘qituvchi',
+      role: UserRole.teacher,
+      isActive: true,
+    );
+
+    setUp(() async {
+      await db.init();
+    });
+
+    test('Administrator backend permissions are strictly enforced', () {
+      expect(access.canAccessAdminPortal(superAdmin), true);
+      expect(access.canAccessAdminPortal(teacher), false);
+
+      expect(access.canManageSystemSettings(superAdmin), true);
+      expect(access.canManageSystemSettings(teacher), false);
+
+      expect(access.canManageRolesAndPermissions(superAdmin), true);
+      expect(access.canManageRolesAndPermissions(teacher), false);
+
+      expect(access.canManageInstitutions(superAdmin), true);
+      expect(access.canManageClasses(superAdmin), true);
+      expect(access.canManageUsers(superAdmin), true);
+      expect(access.canManageUsers(teacher), false);
+    });
+
+    test('Non-admin user cannot add users to database (Backend check)', () async {
+      final newUser = UserModel(
+        id: 'u_test_fail',
+        email: 'fail_user@talim.uz',
+        fullName: 'Test Xodim',
+        role: UserRole.psychologist,
+      );
+
+      expect(
+        () async => await db.addUser(newUser, byUser: teacher),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('Admin successfully creates, toggles status, and updates user', () async {
+      final newUser = UserModel(
+        id: 'u_admin_success',
+        email: 'new_psych@talim.uz',
+        phone: '+998901112233',
+        fullName: 'Kamola Rustamova',
+        role: UserRole.psychologist,
+        institutionName: '5-sonli umumiy o‘rta ta’lim maktabi',
+        district: 'Chortoq tumani',
+        isActive: true,
+      );
+
+      await db.addUser(newUser, byUser: superAdmin);
+      final fetched = db.getUserById('u_admin_success');
+      expect(fetched != null, true);
+      expect(fetched!.fullName, 'Kamola Rustamova');
+
+      // Faolsizlantirish (Bloklash)
+      await db.toggleUserActive('u_admin_success', false, byUser: superAdmin);
+      final blocked = db.getUserById('u_admin_success');
+      expect(blocked!.isActive, false);
+
+      // Qayta faollashtirish
+      await db.toggleUserActive('u_admin_success', true, byUser: superAdmin);
+      final activated = db.getUserById('u_admin_success');
+      expect(activated!.isActive, true);
+
+      // Tahrirlash
+      final updated = activated.copyWith(experienceYears: 7);
+      await db.updateUser(updated, byUser: superAdmin);
+      expect(db.getUserById('u_admin_success')!.experienceYears, 7);
+    });
+
+    test('Protects superAdmin from being deactivated or deleted', () async {
+      final rootUser = db.getUsers().firstWhere((u) => u.role == UserRole.superAdmin);
+      expect(
+        () async => await db.toggleUserActive(rootUser.id, false, byUser: superAdmin),
+        throwsA(isA<Exception>()),
+      );
+      expect(
+        () async => await db.deleteUser(rootUser.id, byUser: superAdmin),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('Generates Institutions and Classes summaries with correct grouping', () {
+      final institutions = db.getInstitutionsSummary();
+      expect(institutions.isNotEmpty, true);
+      expect(institutions.any((inst) => inst['name'] != null), true);
+
+      final classes = db.getClassesSummary();
+      expect(classes.isNotEmpty, true);
+      expect(classes.any((cl) => cl['grade'] != null), true);
+    });
+
+    test('Exports Audit Logs CSV with RFC 4180 and UTF-8 BOM', () {
+      final logs = db.getAuditLogs();
+      expect(logs.isNotEmpty, true);
+
+      final csv = exportService.generateAuditLogsCsv(logs);
+      expect(csv.startsWith('\uFEFF'), true);
+      expect(csv.contains('Amal turi'), true);
+      expect(csv.contains('Ob’ekt'), true);
+    });
+  });
+
+  group('10. School Psychologist Specialized Workspace, Confidentiality & 9 Modules', () {
+    final db = LocalDbService();
+    final exportService = ReportExportService();
+
+    final psychologist = UserModel(
+      id: 'spec_psychologist_1',
+      email: 'psixolog@talim.uz',
+      fullName: 'Dilnoza Usmonova',
+      role: UserRole.psychologist,
+      specialization: 'Maktab amaliyotchi psixologi',
+      institutionId: 'inst_chortoq_5',
+      institutionName: '5-sonli umumiy o‘rta ta’lim maktabi',
+    );
+
+    setUp(() async {
+      await db.init();
+    });
+
+    test('PsychologicalObservationModel serializes and supports confidentiality flag', () {
+      final obs = PsychologicalObservationModel(
+        id: 'obs_test_1',
+        studentId: 'student_01',
+        studentName: 'Aliyev Jasur',
+        studentGrade: '3-A',
+        psychologistId: psychologist.id,
+        psychologistName: psychologist.fullName,
+        date: DateTime(2024, 10, 20),
+        category: 'Xulq-atvor va emotsiyalar',
+        emotionalState: 'Xavotirli',
+        triggerOrContext: 'Nazorat ishi vaqtidagi bezovtalik',
+        observationText: 'Vazifalarni bajarishda shoshqaloqlik va qo‘rquv belgilari',
+        recommendationOrAction: 'Nafas mashqlari va o‘z-o‘zini tinchlantirish texnikasi',
+        isConfidential: true,
+        createdAt: DateTime.now(),
+      );
+
+      final json = obs.toJson();
+      expect(json['id'], 'obs_test_1');
+      expect(json['isConfidential'], true);
+      expect(json['emotionalState'], 'Xavotirli');
+
+      final reconstructed = PsychologicalObservationModel.fromJson(json);
+      expect(reconstructed.id, obs.id);
+      expect(reconstructed.studentName, 'Aliyev Jasur');
+      expect(reconstructed.isConfidential, true);
+    });
+
+    test('LocalDbService manages psychologist observations with audit trail', () async {
+      final obs = PsychologicalObservationModel(
+        id: 'obs_db_test',
+        studentId: 'student_01',
+        studentName: 'Aliyev Jasur',
+        studentGrade: '3-A',
+        psychologistId: psychologist.id,
+        psychologistName: psychologist.fullName,
+        date: DateTime.now(),
+        category: 'Ijtimoiy moslashuv',
+        emotionalState: 'Faol va qiziquvchan',
+        observationText: 'Tengdoshlari bilan guruh topshirig‘ida faol ishladi',
+        isConfidential: false,
+        createdAt: DateTime.now(),
+      );
+
+      await db.addObservation(obs, byUser: psychologist);
+
+      final observations = db.getObservations(forUser: psychologist, studentId: 'student_01');
+      expect(observations.any((o) => o.id == 'obs_db_test'), true);
+
+      // O'chirish
+      await db.deleteObservation('obs_db_test', byUser: psychologist);
+      final remaining = db.getObservations(forUser: psychologist, studentId: 'student_01');
+      expect(remaining.any((o) => o.id == 'obs_db_test'), false);
+    });
+
+    test('PsychologicalMethodsData provides 8 approved standardized school test instruments', () {
+      final methods = PsychologicalMethodsData.methods;
+      expect(methods.length, 8);
+
+      final codes = methods.map((m) => m.code).toSet();
+      expect(codes.contains('RAVEN_CPM'), true);
+      expect(codes.contains('LANDOLT_RINGS'), true);
+      expect(codes.contains('PHILLIPS_ANXIETY'), true);
+      expect(codes.contains('LURIA_10_WORDS'), true);
+      expect(codes.contains('WISC_COGNITIVE'), true);
+      expect(codes.contains('YASYUKOVA_PRIMARY'), true);
+      expect(codes.contains('CATTELL_CPQ'), true);
+      expect(codes.contains('PROJECTIVE_HTP'), true);
+
+      for (final m in methods) {
+        expect(m.title.isNotEmpty, true);
+        expect(m.author.isNotEmpty, true);
+        expect(m.instructions.isNotEmpty, true);
+        expect(m.subscales.isNotEmpty, true);
+        expect(m.normCriteria.isNotEmpty, true);
+        expect(m.durationMinutes, greaterThan(0));
+      }
+    });
+
+    test('Psychologist can delete and complete sessions with required observations', () async {
+      final session = SessionModel(
+        id: 'sess_psych_test',
+        studentId: 'student_01',
+        studentName: 'Aliyev Jasur',
+        specialistId: psychologist.id,
+        specialistName: psychologist.fullName,
+        specialistRole: 'Maktab psixologi',
+        scheduledAt: DateTime.now().add(const Duration(days: 3)),
+        status: 'Rejalashtirilgan',
+        topic: 'Emotsional iroda korreksiyasi',
+      );
+
+      await db.addSession(session, byUser: psychologist);
+      final active = db.getSessions(forUser: psychologist, studentId: 'student_01');
+      expect(active.any((s) => s.id == 'sess_psych_test'), true);
+
+      // Mashg'ulotni bajarildi deb belgilash
+      await db.completeSession(
+        'sess_psych_test',
+        observations: 'Muvaffaqiyatli o‘tkazildi, o‘quvchi mashqlarni bajardi',
+        nextSteps: 'Guruh mashg‘ulotiga jalb etish',
+        byUser: psychologist,
+      );
+
+      final completed = db.getSessions(forUser: psychologist, studentId: 'student_01')
+          .firstWhere((s) => s.id == 'sess_psych_test');
+      expect(completed.status, 'Bajarildi');
+      expect(completed.attendanceConfirmed, true);
+      expect(completed.observations, isNotNull);
+
+      // Tozalash
+      await db.deleteSession('sess_psych_test', byUser: psychologist);
+      final afterDelete = db.getSessions(forUser: psychologist, studentId: 'student_01');
+      expect(afterDelete.any((s) => s.id == 'sess_psych_test'), false);
+    });
+
+    test('Exports Psychologist Observations CSV with UTF-8 BOM and correct headers', () {
+      final obsList = [
+        PsychologicalObservationModel(
+          id: 'obs_exp_1',
+          studentId: 'student_01',
+          studentName: 'Aliyev Jasur',
+          studentGrade: '3-A',
+          psychologistId: psychologist.id,
+          psychologistName: psychologist.fullName,
+          date: DateTime(2024, 10, 15),
+          category: 'Kognitiv va intellekt',
+          emotionalState: 'Diqqatli',
+          observationText: 'Tafakkur mashqlarida tezkorlik namoyon qildi',
+          isConfidential: true,
+          createdAt: DateTime.now(),
+        ),
+      ];
+
+      final csv = exportService.generateObservationsCsv(obsList);
+      expect(csv.startsWith('\uFEFF'), true);
+      expect(csv.contains('Emotsional holat'), true);
+      expect(csv.contains('Maxfiylik'), true);
+      expect(csv.contains('Maxfiy'), true);
+      expect(csv.contains('Aliyev Jasur'), true);
+    });
+  });
 }
+

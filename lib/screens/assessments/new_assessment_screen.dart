@@ -7,6 +7,7 @@ import '../../models/assessment_model.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../psychologist/assessment/create_assessment_flow.dart';
 
 class NewAssessmentScreen extends StatefulWidget {
   final String? initialStudentId;
@@ -210,6 +211,13 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
     final user = auth.currentUser;
     final role = user?.role ?? UserRole.psychologist;
     final students = app.students;
+
+    if (role == UserRole.psychologist) {
+      final initialStudent = widget.initialStudentId != null
+          ? students.where((s) => s.id == widget.initialStudentId).firstOrNull
+          : null;
+      return CreateAssessmentFlow(initialStudent: initialStudent);
+    }
 
     if (!role.canCreateAssessments) {
       return Scaffold(

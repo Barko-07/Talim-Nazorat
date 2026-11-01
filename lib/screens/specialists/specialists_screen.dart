@@ -7,6 +7,7 @@ import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/access_control_service.dart';
+import '../../services/password_hasher.dart';
 
 class SpecialistsScreen extends StatelessWidget {
   const SpecialistsScreen({super.key});
@@ -112,6 +113,7 @@ class SpecialistsScreen extends StatelessWidget {
                   return;
                 }
 
+                final tempPassword = PasswordHasher.generateTemporary();
                 final newStaff = UserModel(
                   id: 'usr_${const Uuid().v4().substring(0, 8)}',
                   fullName: nameCtrl.text.trim(),
@@ -127,18 +129,19 @@ class SpecialistsScreen extends StatelessWidget {
                   institutionName: user?.institutionName,
                   region: user?.region ?? 'Namangan viloyati',
                   district: user?.district ?? 'Chortoq tumani',
-                  password: 'Parol2026!',
+                  password: tempPassword,
                   isActive: true,
                 );
 
-                await app.updateUser(newStaff, byUser: user);
+                await app.addUser(newStaff, byUser: user);
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
-                        'Yangi xodim muvaffaqiyatli qo‘shildi! Boshlang‘ich parol: Parol2026!',
+                        'Yangi xodim muvaffaqiyatli qo‘shildi! Vaqtinchalik parol: $tempPassword',
                       ),
+                      duration: const Duration(seconds: 12),
                       backgroundColor: AppColors.success,
                     ),
                   );

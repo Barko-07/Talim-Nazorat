@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
@@ -23,8 +24,12 @@ class _LoginScreenState extends State<LoginScreen>
   late TabController _tabController;
 
   // --- LOGIN CONTROLLERS ---
-  final _loginIdentifierCtrl = TextEditingController();
-  final _loginPasswordCtrl = TextEditingController(text: 'Parol2026!');
+  final _loginIdentifierCtrl = TextEditingController(
+    text: kDebugMode ? 'psixolog@talim.uz' : '',
+  );
+  final _loginPasswordCtrl = TextEditingController(
+    text: kDebugMode ? SeedData.demoPassword : '',
+  );
   bool _loginObscure = true;
 
   // --- SIGN UP STEP MANAGEMENT (1 tadan so'rash uchun) ---
@@ -385,7 +390,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   void _selectDemoAccount(UserModel user) {
     _loginIdentifierCtrl.text = user.email;
-    _loginPasswordCtrl.text = 'Parol2026!';
+    _loginPasswordCtrl.text = SeedData.demoPassword;
     _handleLogin();
   }
 
@@ -594,14 +599,16 @@ class _LoginScreenState extends State<LoginScreen>
 
   // ===================== TAB 1: KIRISH (LOGIN) =====================
   Widget _buildLoginView(AuthProvider auth) {
-    // Namunaviy test profillari (faqat o'rganuvchilar uchun 1 klikli tezkor kirish)
+    // Namunaviy test profillari (1 klikli tezkor kirish)
     final demoProfiles = [
-      (SeedData.users.firstWhere((u) => u.role == UserRole.psychologist), 'Psixolog'),
-      (SeedData.users.firstWhere((u) => u.role == UserRole.speechTherapist), 'Logoped'),
-      (SeedData.users.firstWhere((u) => u.role == UserRole.specialEducation), 'Defektolog'),
-      (SeedData.users.firstWhere((u) => u.role == UserRole.teacher), 'O‘qituvchi'),
-      (SeedData.users.firstWhere((u) => u.role == UserRole.coordinator), 'Koordinator'),
-      (SeedData.users.firstWhere((u) => u.role == UserRole.superAdmin), 'Admin'),
+      (
+        SeedData.users.firstWhere((u) => u.role == UserRole.psychologist),
+        'Psixolog (Dilnoza Usmonova)',
+      ),
+      (
+        SeedData.users.firstWhere((u) => u.role == UserRole.superAdmin),
+        'Admin (Rahimov S.)',
+      ),
     ];
 
     return Column(
@@ -733,9 +740,9 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
 
+        // Tezkor sinash uchun namunaviy hisoblar (faqat debug rejimida)
+        if (kDebugMode) ...[
         const Divider(height: 24, color: Color(0xFFE2E8F0)),
-
-        // Tezkor sinash uchun namunaviy hisoblar
         const Text(
           'Namunaviy hisoblar (1-klikda sinash):',
           style: TextStyle(
@@ -767,6 +774,7 @@ class _LoginScreenState extends State<LoginScreen>
             );
           }).toList(),
         ),
+        ],
       ],
     );
   }
@@ -802,7 +810,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildStepProgressBar() {
-    final stepTitles = ['Ism-familiya', 'Kasb & Maktab', 'Aloqa', 'Parol'];
+    final stepTitles = ['Ism-familiya', 'Ta’lim muassasasi', 'Aloqa', 'Parol'];
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -942,28 +950,22 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 2-QADAM: KASBIY MUTAXASSISLIK VA MAKTAB
+  // 2-QADAM: TA’LIM MUASSASASI (KASB AVTOMATIK PSIXOLOG SIFATIDA BIRIKTIRILADI)
   Widget _buildStep2ProfessionalInfo() {
-    final availableRoles = [
-      (UserRole.psychologist, 'Amaliyotchi psixolog', Icons.psychology_outlined),
-      (UserRole.speechTherapist, 'Logoped-defektolog', Icons.record_voice_over_outlined),
-      (UserRole.specialEducation, 'Maxsus pedagog (Defektolog)', Icons.extension_outlined),
-      (UserRole.teacher, 'Fan o‘qituvchisi / Sinf rahbari', Icons.menu_book_rounded),
-      (UserRole.institutionAdmin, 'Maktab koordinatori', Icons.business_outlined),
-      (UserRole.reviewer, 'Metodik inspektor', Icons.remove_red_eye_outlined),
-    ];
+    _selectedRole = UserRole.psychologist;
+    _specializationCtrl.text = 'Maktab amaliyotchi psixologi';
 
     final selectedSchool = _institutionCtrl.text.isNotEmpty
         ? _institutionCtrl.text
         : 'Maktab tanlanmagan';
 
     return KeyedSubtree(
-      key: const ValueKey('step_2_profession'),
+      key: const ValueKey('step_2_institution'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Text(
-            '2-Qadam: Mutaxassislik va Ta’lim muassasasi',
+            '2-Qadam: Ta’lim muassasasi',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
@@ -972,69 +974,52 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           const SizedBox(height: 4),
           const Text(
-            'O‘z kasbingizni va Chortoq tumanidagi maktabingizni tanlang.',
+            'O‘zingiz faoliyat yuritadigan Chortoq tumanidagi umumta’lim maktabini tanlang.',
             style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
           ),
           const SizedBox(height: 14),
 
-          // Kasbni tanlash
-          const Text(
-            'Mutaxassislik sohasi *',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-          ),
-          const SizedBox(height: 8),
-
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: availableRoles.map((item) {
-              final r = item.$1;
-              final title = item.$2;
-              final icon = item.$3;
-              final isSelected = _selectedRole == r;
-
-              return InkWell(
-                onTap: () {
-                  setState(() {
-                    _selectedRole = r;
-                    _specializationCtrl.text = r.label;
-                  });
-                },
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFFEBF3FF) : Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isSelected ? const Color(0xFF0052CC) : const Color(0xFFE2E8F0),
-                      width: isSelected ? 1.5 : 1.0,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+          // Avtomatik Psixolog roli xabarnomasi
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEEF2FF),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFC7D2FE)),
+            ),
+            child: const Row(
+              children: [
+                Icon(
+                  Icons.psychology_rounded,
+                  color: Color(0xFF4F46E5),
+                  size: 22,
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(icon, size: 16, color: isSelected ? const Color(0xFF0052CC) : const Color(0xFF64748B)),
-                      const SizedBox(width: 6),
                       Text(
-                        title,
+                        'Lavozim: Maktab amaliyotchi psixologi',
                         style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                          color: isSelected ? const Color(0xFF0052CC) : const Color(0xFF0F172A),
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF312E81),
                         ),
                       ),
-                      if (isSelected) ...[
-                        const SizedBox(width: 4),
-                        const Icon(Icons.check_circle_rounded, color: Color(0xFF0052CC), size: 14),
-                      ],
+                      Text(
+                        'Psixologik xizmat portali vakolatlari avtomatik faollashtiriladi.',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF4338CA),
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              );
-            }).toList(),
+              ],
+            ),
           ),
-
           const SizedBox(height: 16),
 
           // Maktab tanlash
