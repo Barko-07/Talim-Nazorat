@@ -43,12 +43,12 @@ class AmbientMeshBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subtleAlpha = intense ? 0.05 : 0.038;
+    final subtleAlpha = intense ? 0.045 : 0.032;
 
     return Stack(
       fit: StackFit.expand,
       children: [
-        // 1. Asosiy ko'p bosqichli kulrang kombinatsiyasi (Cool Slate & Pearl Mesh)
+        // 1. Asosiy yorug' va nafas oladigan fon (Fresh Porcelain & Light Sky Mist)
         const DecoratedBox(
           decoration: BoxDecoration(
             color: AppColors.background,
@@ -56,28 +56,28 @@ class AmbientMeshBackground extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFFE9EDF3), // Tepa chap: nozik va toza yorug' kulrang
-                Color(0xFFE2E7EF), // Markaz: silliq neytral slate-kulrang
-                Color(0xFFD9E0E9), // Quyi: chuqurroq jiddiy kulrang
-                Color(0xFFD0D7E2), // Pastki o'ng: barqaror anchor kulrang
+                Color(0xFFF8FAFC), // Tepa chap: juda toza, yorug' kunduzgi oq-kulrang
+                Color(0xFFF1F5F9), // Markaz-tepa: nafis chinni-kulrang
+                Color(0xFFEAF0F6), // Markaz-quyi: mayin havo rangli sokin slate
+                Color(0xFFE2E9F2), // Pastki o'ng: engil tayanch fon (bo'g'iq emas)
               ],
-              stops: [0.0, 0.32, 0.68, 1.0],
+              stops: [0.0, 0.35, 0.70, 1.0],
             ),
           ),
         ),
-        // 2. Tepa chap burchakdan tushuvchi mayin oq nur (quyosh/yorug'lik aksi - glass effekti uchun)
+        // 2. Tepa qismdan tushuvchi keng mayin yorug'lik nuri (bo'g'iqlikni yo'qotuvchi kunduzgi nur)
         Positioned(
-          top: -160,
-          left: -100,
+          top: -140,
+          left: -80,
           child: IgnorePointer(
             child: Container(
-              width: 520,
-              height: 520,
+              width: 580,
+              height: 580,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    Colors.white.withValues(alpha: 0.38),
+                    Colors.white.withValues(alpha: 0.65),
                     Colors.white.withValues(alpha: 0.0),
                   ],
                 ),
@@ -85,14 +85,14 @@ class AmbientMeshBackground extends StatelessWidget {
             ),
           ),
         ),
-        // 3. Tepa o'ng burchakdagi juda mayin brend nuri (och ko'k tus)
+        // 3. Tepa o'ng burchakdagi juda mayin havorang havo nafasi
         Positioned(
           top: -180,
           right: -120,
           child: IgnorePointer(
             child: Container(
-              width: 520,
-              height: 520,
+              width: 540,
+              height: 540,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
@@ -105,20 +105,20 @@ class AmbientMeshBackground extends StatelessWidget {
             ),
           ),
         ),
-        // 4. Pastki qismdagi mayin chuqur kulrang hajm
+        // 4. Pastki chap tomondagi nozik binafsha-havorang jilo (og'ir qorong'i kulrangsiz)
         Positioned(
           bottom: -200,
           left: -140,
           child: IgnorePointer(
             child: Container(
-              width: 560,
-              height: 560,
+              width: 540,
+              height: 540,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF64748B).withValues(alpha: subtleAlpha * 0.9),
-                    const Color(0xFF64748B).withValues(alpha: 0.0),
+                    const Color(0xFF6366F1).withValues(alpha: subtleAlpha * 0.6),
+                    const Color(0xFF6366F1).withValues(alpha: 0.0),
                   ],
                 ),
               ),
@@ -223,7 +223,7 @@ class SurfaceCard extends StatefulWidget {
     this.borderColor,
     this.elevated = true,
     this.useBlur = true,
-    this.blur = 22,
+    this.blur = 20,
   });
 
   @override
@@ -245,8 +245,8 @@ class _SurfaceCardState extends State<SurfaceCard> {
             : AppColors.cardGlassBorder);
 
     final hasCustomBg = widget.backgroundColor != null;
-    final topAlpha = _hovered && interactive ? 0.94 : 0.86;
-    final bottomAlpha = _hovered && interactive ? 0.88 : 0.72;
+    final topAlpha = _hovered && interactive ? 0.96 : 0.90;
+    final bottomAlpha = _hovered && interactive ? 0.90 : 0.76;
 
     Widget cardInner = Container(
       decoration: BoxDecoration(
