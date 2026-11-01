@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/widgets/glass_widgets.dart';
 import '../../models/student_model.dart';
 import '../../providers/app_provider.dart';
-import 'student_detail_screen.dart';
 import 'add_student_screen.dart';
+import 'student_detail_screen.dart';
 
 class StudentsListScreen extends StatelessWidget {
   const StudentsListScreen({super.key});
@@ -14,306 +16,327 @@ class StudentsListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
     final students = app.students;
+    final canPop = Navigator.canPop(context);
+    final width = MediaQuery.sizeOf(context).width;
+    final mediaPadding = MediaQuery.paddingOf(context);
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive Sarlavha va Qo'shish tugmasi
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Bolalar elektron reyestri',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                          letterSpacing: -0.2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Jami ${students.length} nafar o‘quvchi ro‘yxatda',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+    final bodyContent = ResponsivePageContainer(
+      bottomPadding: 0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdaptivePageHeader(
+            title: 'Bolalar reyestri',
+            subtitle:
+                'Ro‘yxatda ${students.length} nafar inklyuziv ta’lim o‘quvchisi',
+            action: HeaderActionButton(
+              icon: LucideIcons.userPlus,
+              label: 'Yangi o‘quvchi',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AddStudentScreen(),
                   ),
-                ),
-                const SizedBox(width: 10),
-                FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  icon: const Icon(Icons.add_rounded, size: 16),
-                  label: const Text('Qo‘shish', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const AddStudentScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ],
+                );
+              },
             ),
-            const SizedBox(height: 14),
+          ),
+          const SizedBox(height: 9),
 
-            // Qidiruv va Filtrlar paneli
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Ism yoki ehtiyoj bo‘yicha qidirish...',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textMuted),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      suffixIcon: app.searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear_rounded, size: 16),
-                              onPressed: () => app.setSearchQuery(''),
-                            )
-                          : null,
+          // Kesib olingan shisha qidiruv va sinf filtri paneli (Mobil va desktopga mos)
+          SurfaceCard(
+            borderRadius: 22,
+            padding: const EdgeInsets.all(14),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 520;
+
+                final searchField = TextField(
+                  decoration: InputDecoration(
+                    hintText:
+                        'F.I.Sh. yoki ta’lim ehtiyoji bo‘yicha qidirish...',
+                    prefixIcon: const Icon(
+                      LucideIcons.search,
+                      size: 18,
+                      color: AppColors.primary,
                     ),
-                    onChanged: (val) => app.setSearchQuery(val),
+                    fillColor: const Color(0xFFF9FAFC),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 13,
+                    ),
+                    suffixIcon: app.searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(LucideIcons.x, size: 16),
+                            onPressed: () => app.setSearchQuery(''),
+                          )
+                        : null,
                   ),
-                ),
-                const SizedBox(width: 8),
-                // Sinf filtri
-                DropdownButtonHideUnderline(
+                  onChanged: (val) => app.setSearchQuery(val),
+                );
+
+                final gradeFilter = DropdownButtonHideUnderline(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 2,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    height: 45,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColors.border),
-                      borderRadius: BorderRadius.circular(10),
+                      color: const Color(0xFFF9FAFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border, width: 1.0),
                     ),
                     child: DropdownButton<String?>(
                       value: app.selectedGrade,
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.textMuted),
+                      isExpanded: isCompact,
+                      borderRadius: BorderRadius.circular(14),
+                      dropdownColor: Colors.white,
+                      icon: const Padding(
+                        padding: EdgeInsets.only(left: 6),
+                        child: Icon(
+                          LucideIcons.chevronDown,
+                          size: 16,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
                       hint: const Text(
-                        'Sinf',
-                        style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                        'Barcha sinflar',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       items: [
                         const DropdownMenuItem(
                           value: null,
-                          child: Text('Barchasi', style: TextStyle(fontSize: 12)),
+                          child: Text(
+                            'Barcha sinflar',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                         ...['1-A', '2-A', '2-B', '3-A', '3-B', '4-A'].map(
-                          (g) => DropdownMenuItem(value: g, child: Text(g, style: const TextStyle(fontSize: 12))),
+                          (g) => DropdownMenuItem(
+                            value: g,
+                            child: Text(
+                              '$g sinf',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                       onChanged: (val) => app.setFilterGrade(val),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
+                );
 
-            // Bolalar ro'yxati
-            Expanded(
-              child: students.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                if (isCompact) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      searchField,
+                      const SizedBox(height: 10),
+                      gradeFilter,
+                    ],
+                  );
+                }
+
+                return Row(
+                  children: [
+                    Expanded(child: searchField),
+                    const SizedBox(width: 12),
+                    gradeFilter,
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 9),
+
+          // Bolalar ro'yxati
+          Expanded(
+            child: students.isEmpty
+                ? Center(
+                    child: SurfaceCard(
+                      borderRadius: 26,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 34,
+                      ),
+                      child: const Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           Icon(
-                            Icons.search_off_rounded,
-                            size: 40,
-                            color: AppColors.textMuted,
+                            LucideIcons.userSearch,
+                            size: 36,
+                            color: AppColors.primary,
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 14),
                           Text(
                             'O‘quvchilar topilmadi',
                             style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          SizedBox(height: 5),
                           Text(
-                            'Qidiruv so‘zini o‘zgartirib ko‘ring',
+                            'Qidiruv so‘zini yoki sinf filtrini o‘zgartirib ko‘ring',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 13,
                               color: AppColors.textMuted,
                             ),
                           ),
                         ],
                       ),
-                    )
-                  : ListView.separated(
-                      itemCount: students.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        final student = students[index];
-                        return _buildStudentCard(context, student);
-                      },
                     ),
-            ),
-          ],
-        ),
+                  )
+                : ListView.separated(
+                    padding: EdgeInsets.fromLTRB(
+                      0,
+                      0,
+                      0,
+                      width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
+                    ),
+                    itemCount: students.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final student = students[index];
+                      return _buildStudentCard(context, student);
+                    },
+                  ),
+          ),
+        ],
       ),
+    );
+
+    return Scaffold(
+      backgroundColor: canPop ? AppColors.background : Colors.transparent,
+      appBar: canPop
+          ? AppBar(
+              title: const Text('Bolalar elektron reyestri'),
+            )
+          : null,
+      body: canPop ? AmbientMeshBackground(child: bodyContent) : bodyContent,
     );
   }
 
   Widget _buildStudentCard(BuildContext context, StudentModel s) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppColors.border, width: 1),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => StudentDetailScreen(studentId: s.id),
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            children: [
-              // Avatar
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: AppColors.primaryLight,
-                child: Text(
-                  s.firstName.substring(0, 1),
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
+    final guardianText = s.guardians.isNotEmpty
+        ? '${s.guardians.first.relationship}: ${s.guardians.first.fullName}'
+        : 'Vasiy kiritilmagan';
 
-              // O'quvchi ma'lumoti
-              Expanded(
-                child: Column(
+    return SurfaceCard(
+      borderRadius: 26,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => StudentDetailScreen(studentId: s.id),
+          ),
+        );
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: AppColors.primaryLight,
+            child: Text(
+              s.firstName.isNotEmpty ? s.firstName.substring(0, 1) : '?',
+              style: const TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w800,
+                fontSize: 17,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            s.fullName,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                    Expanded(
+                      child: Text(
+                        s.fullName,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.25,
                         ),
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 1.5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.background,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Text(
-                            s.grade,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      s.primaryNeed,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 4,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 1.5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.infoBg,
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: AppColors.infoBorder),
-                          ),
-                          child: Text(
-                            s.supportLevel,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.info,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '${s.age} yosh • ${s.guardians.isNotEmpty ? s.guardians.first.relationship : 'Vasiy'}: ${s.guardians.isNotEmpty ? s.guardians.first.fullName : ''}',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: AppColors.textMuted,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                    const SizedBox(width: 10),
+                    StatusPill(
+                      label: '${s.grade}-sinf',
+                      color: AppColors.primary,
+                      backgroundColor: AppColors.primaryLight,
                     ),
                   ],
                 ),
-              ),
-
-              const SizedBox(width: 4),
-              const Icon(
-                Icons.chevron_right_rounded,
-                size: 18,
-                color: AppColors.textMuted,
-              ),
-            ],
+                const SizedBox(height: 5),
+                Text(
+                  s.primaryNeed,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    StatusPill(
+                      label: s.supportLevel,
+                      color: AppColors.info,
+                      backgroundColor: AppColors.infoBg,
+                      maxWidth: 230,
+                    ),
+                    Text(
+                      '${s.age} yosh • $guardianText',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
+          const SizedBox(width: 8),
+          const Padding(
+            padding: EdgeInsets.only(top: 4),
+            child: Icon(
+              LucideIcons.chevronRight,
+              size: 18,
+              color: AppColors.textSubtle,
+            ),
+          ),
+        ],
       ),
     );
   }
