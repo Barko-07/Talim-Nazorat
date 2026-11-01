@@ -808,20 +808,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }) {
     return Tooltip(
       message: tooltip,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(999),
-          child: SizedBox(
-            width: 35,
-            height: 35,
-            child: Center(
-              child: Icon(
-                icon,
-                size: 18.5,
-                color: AppColors.textSecondary,
-              ),
+      child: TactileBounce(
+        onTap: onTap,
+        pressedScale: 0.88,
+        child: SizedBox(
+          width: 35,
+          height: 35,
+          child: Center(
+            child: Icon(
+              icon,
+              size: 18.5,
+              color: AppColors.textSecondary,
             ),
           ),
         ),
@@ -1559,70 +1556,65 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
                         return Expanded(
                           flex: isSelected ? 22 : 10,
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: pillRadius,
-                              onTap: () => _selectTab(item.index),
-                              splashColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 220),
-                                curve: Curves.easeOutCubic,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: isSelected ? 12 : 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? AppColors.primary
-                                          .withValues(alpha: 0.12)
-                                      : Colors.transparent,
-                                  borderRadius: pillRadius,
-                                  border: isSelected
-                                      ? Border.all(
-                                          color: AppColors.primary
-                                              .withValues(alpha: 0.22),
-                                          width: 1.0,
-                                        )
-                                      : null,
-                                ),
-                                  child: isSelected
-                                      ? Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              item.icon,
-                                              size: 19,
+                          child: TactileBounce(
+                            onTap: () => _selectTab(item.index),
+                            pressedScale: 0.92,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 220),
+                              curve: Curves.easeOutCubic,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isSelected ? 12 : 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppColors.primary
+                                        .withValues(alpha: 0.12)
+                                    : Colors.transparent,
+                                borderRadius: pillRadius,
+                                border: isSelected
+                                    ? Border.all(
+                                        color: AppColors.primary
+                                            .withValues(alpha: 0.22),
+                                        width: 1.0,
+                                      )
+                                    : null,
+                              ),
+                              child: isSelected
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          item.icon,
+                                          size: 19,
+                                          color: AppColors.primary,
+                                        ),
+                                        const SizedBox(width: 7),
+                                        Flexible(
+                                          child: Text(
+                                            item.shortLabel,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 12.5,
+                                              fontWeight: FontWeight.w700,
                                               color: AppColors.primary,
+                                              letterSpacing: -0.2,
                                             ),
-                                            const SizedBox(width: 7),
-                                            Flexible(
-                                              child: Text(
-                                                item.shortLabel,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 12.5,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: AppColors.primary,
-                                                  letterSpacing: -0.2,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      : Center(
-                                          child: Icon(
-                                            item.icon,
-                                            size: 19.5,
-                                            color: AppColors.textMuted,
                                           ),
                                         ),
-                                ),
-                              ),
+                                      ],
+                                    )
+                                  : Center(
+                                      child: Icon(
+                                        item.icon,
+                                        size: 19.5,
+                                        color: AppColors.textMuted,
+                                      ),
+                                    ),
                             ),
-                          );
+                          ),
+                        );
                         }).toList(),
                       ),
                     ),
@@ -1649,33 +1641,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   ),
                   child: ClipRRect(
                     borderRadius: rightIslandRadius,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
-                        onTap: () => _showMobileModulesSheet(context, app),
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOutCubic,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isMoreActive ? 12 : 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isMoreActive
-                                ? AppColors.primary.withValues(alpha: 0.12)
-                                : Colors.transparent,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20)),
-                            border: isMoreActive
-                                ? Border.all(
-                                    color: AppColors.primary
-                                        .withValues(alpha: 0.22),
-                                    width: 1.0,
-                                  )
-                                : null,
-                          ),
+                    child: TactileBounce(
+                      onTap: () => _showMobileModulesSheet(context, app),
+                      pressedScale: 0.94,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeOutCubic,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMoreActive ? 12 : 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isMoreActive
+                              ? AppColors.primary.withValues(alpha: 0.12)
+                              : Colors.transparent,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20)),
+                          border: isMoreActive
+                              ? Border.all(
+                                  color: AppColors.primary
+                                      .withValues(alpha: 0.22),
+                                  width: 1.0,
+                                )
+                              : null,
+                        ),
                           child: isMoreActive
                               ? Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1731,7 +1719,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),

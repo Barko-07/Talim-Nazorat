@@ -36,6 +36,8 @@ class AppTheme {
         error: AppColors.error,
         onError: Colors.white,
       ),
+      hoverColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xF5FFFFFF),
         foregroundColor: AppColors.textPrimary,
@@ -101,7 +103,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: const Color(0xFFF9FAFC),
-        hoverColor: Colors.white,
+        hoverColor: Colors.transparent,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 13.5,

@@ -199,6 +199,66 @@ class GlassSurface extends StatelessWidget {
   }
 }
 
+/// Mobil ilovalar kabi bosilganda (tap/press) ichkariga kirib-chiqadigan taktil animatsiya
+class TactileBounce extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+  final double pressedScale;
+  final HitTestBehavior behavior;
+
+  const TactileBounce({
+    super.key,
+    required this.child,
+    this.onTap,
+    this.pressedScale = 0.965,
+    this.behavior = HitTestBehavior.opaque,
+  });
+
+  @override
+  State<TactileBounce> createState() => _TactileBounceState();
+}
+
+class _TactileBounceState extends State<TactileBounce> {
+  bool _pressed = false;
+
+  void _handleTapDown(TapDownDetails details) {
+    if (widget.onTap != null) {
+      setState(() => _pressed = true);
+    }
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    if (_pressed) {
+      setState(() => _pressed = false);
+    }
+  }
+
+  void _handleTapCancel() {
+    if (_pressed) {
+      setState(() => _pressed = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.onTap == null) return widget.child;
+
+    return GestureDetector(
+      behavior: widget.behavior,
+      onTap: widget.onTap,
+      onTapDown: _handleTapDown,
+      onTapUp: _handleTapUp,
+      onTapCancel: _handleTapCancel,
+      child: AnimatedScale(
+        scale: _pressed ? widget.pressedScale : 1.0,
+        duration: Duration(milliseconds: _pressed ? 85 : 170),
+        curve: _pressed ? Curves.easeInCubic : Curves.easeOutCubic,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
 /// Minimalist asosiy karta: 26px radius, toza oq yuza va 1.0px nozik chegara
 class SurfaceCard extends StatefulWidget {
   final Widget child;
@@ -231,7 +291,6 @@ class SurfaceCard extends StatefulWidget {
 }
 
 class _SurfaceCardState extends State<SurfaceCard> {
-  bool _hovered = false;
   bool _pressed = false;
 
   @override
@@ -239,14 +298,12 @@ class _SurfaceCardState extends State<SurfaceCard> {
     final interactive = widget.onTap != null;
     final radius = BorderRadius.circular(widget.borderRadius);
 
-    final effectiveBorderColor = widget.borderColor ??
-        (_hovered && interactive
-            ? AppColors.borderSlate
-            : AppColors.cardGlassBorder);
+    final effectiveBorderColor =
+        widget.borderColor ?? AppColors.cardGlassBorder;
 
     final hasCustomBg = widget.backgroundColor != null;
-    final topAlpha = _hovered && interactive ? 0.96 : 0.90;
-    final bottomAlpha = _hovered && interactive ? 0.90 : 0.76;
+    const topAlpha = 0.90;
+    const bottomAlpha = 0.76;
 
     Widget cardInner = Container(
       decoration: BoxDecoration(
@@ -273,12 +330,17 @@ class _SurfaceCardState extends State<SurfaceCard> {
         borderRadius: radius,
         child: InkWell(
           onTap: widget.onTap,
+          onTapDown: interactive ? (_) => setState(() => _pressed = true) : null,
+          onTapUp: interactive ? (_) => setState(() => _pressed = false) : null,
+          onTapCancel: interactive ? () => setState(() => _pressed = false) : null,
+          onHighlightChanged: interactive
+              ? (value) {
+                  if (_pressed != value) setState(() => _pressed = value);
+                }
+              : null,
           borderRadius: radius,
           splashColor: AppColors.primary.withValues(alpha: 0.04),
-          highlightColor: AppColors.primary.withValues(alpha: 0.02),
-          onHighlightChanged: interactive
-              ? (value) => setState(() => _pressed = value)
-              : null,
+          highlightColor: Colors.transparent,
           child: Padding(
             padding: widget.padding,
             child: widget.child,
@@ -300,32 +362,22 @@ class _SurfaceCardState extends State<SurfaceCard> {
           )
         : cardInner;
 
-    Widget cardBody = AnimatedContainer(
-      duration: const Duration(milliseconds: 160),
-      curve: Curves.easeOutCubic,
+    Widget cardBody = Container(
       margin: widget.margin,
       decoration: BoxDecoration(
         borderRadius: radius,
-        boxShadow: widget.elevated
-            ? (_hovered && interactive
-                ? AppColors.elevatedShadow
-                : AppColors.softShadow)
-            : null,
+        boxShadow: widget.elevated ? AppColors.softShadow : null,
       ),
       child: frostedCard,
     );
 
     if (!interactive) return cardBody;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.988 : 1.0,
-        duration: const Duration(milliseconds: 130),
-        curve: Curves.easeOutCubic,
-        child: cardBody,
-      ),
+    return AnimatedScale(
+      scale: _pressed ? 0.968 : 1.0,
+      duration: Duration(milliseconds: _pressed ? 85 : 170),
+      curve: _pressed ? Curves.easeInCubic : Curves.easeOutCubic,
+      child: cardBody,
     );
   }
 }
@@ -524,7 +576,6 @@ class HeaderActionButton extends StatefulWidget {
 }
 
 class _HeaderActionButtonState extends State<HeaderActionButton> {
-  bool _hovered = false;
   bool _pressed = false;
 
   @override
@@ -542,8 +593,8 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
 
     switch (widget.variant) {
       case HeaderActionVariant.primary:
-        bg = _hovered ? AppColors.primaryDark : AppColors.primary;
-        border = _hovered ? AppColors.primaryDark : AppColors.primary;
+        bg = AppColors.primary;
+        border = AppColors.primary;
         fg = Colors.white;
         iconColor = Colors.white;
         shadow = [
@@ -555,8 +606,8 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
         ];
         break;
       case HeaderActionVariant.secondary:
-        bg = _hovered ? const Color(0xFFF8FAFC) : Colors.white;
-        border = _hovered ? AppColors.borderSlate : AppColors.border;
+        bg = Colors.white;
+        border = AppColors.border;
         fg = AppColors.textPrimary;
         iconColor = AppColors.primary;
         shadow = const [
@@ -568,7 +619,7 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
         ];
         break;
       case HeaderActionVariant.danger:
-        bg = _hovered ? AppColors.errorBg : Colors.white;
+        bg = Colors.white;
         border = AppColors.errorBorder;
         fg = AppColors.error;
         iconColor = AppColors.error;
@@ -588,36 +639,36 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
         ? EdgeInsets.fromLTRB(isMobile ? 10.5 : 12.5, 0, isMobile ? 12 : 14, 0)
         : EdgeInsets.symmetric(horizontal: isMobile ? 12 : 14);
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.97 : 1.0,
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeOutCubic,
-          height: height,
-          decoration: BoxDecoration(
-            color: bg,
+    return AnimatedScale(
+      scale: _pressed ? 0.955 : 1.0,
+      duration: Duration(milliseconds: _pressed ? 80 : 160),
+      curve: _pressed ? Curves.easeInCubic : Curves.easeOutCubic,
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: radius,
+          border: Border.all(color: border, width: 1.0),
+          boxShadow: shadow,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: radius,
+          child: InkWell(
             borderRadius: radius,
-            border: Border.all(color: border, width: 1.0),
-            boxShadow: shadow,
-          ),
-          child: Material(
-            color: Colors.transparent,
-            borderRadius: radius,
-            child: InkWell(
-              borderRadius: radius,
-              onTap: widget.onPressed,
-              onHighlightChanged: (v) => setState(() => _pressed = v),
-              splashColor: fg.withValues(alpha: 0.08),
-              highlightColor: fg.withValues(alpha: 0.04),
-              child: Padding(
-                padding: pad,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+            onTap: widget.onPressed,
+            onTapDown: (_) => setState(() => _pressed = true),
+            onTapUp: (_) => setState(() => _pressed = false),
+            onTapCancel: () => setState(() => _pressed = false),
+            onHighlightChanged: (v) {
+              if (_pressed != v) setState(() => _pressed = v);
+            },
+            splashColor: fg.withValues(alpha: 0.08),
+            highlightColor: Colors.transparent,
+            child: Padding(
+              padding: pad,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                   children: [
                     if (widget.icon != null) ...[
                       Icon(
@@ -645,8 +696,7 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -788,79 +838,118 @@ class ModernPillFilterBar extends StatelessWidget {
             final isSelected = item == selectedItem;
             final count = counts?[item];
 
-            return GestureDetector(
+            return _ModernFilterPillItem(
+              item: item,
+              isSelected: isSelected,
+              count: count,
               onTap: () => onSelected(item),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 160),
-                curve: Curves.easeOutCubic,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 13,
-                  vertical: 7.5,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? Colors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(9),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColors.glassWhiteBorder
-                        : Colors.transparent,
-                    width: 0.85,
-                  ),
-                  boxShadow: isSelected
-                      ? const [
-                          BoxShadow(
-                            color: Color(0x0D0F172A),
-                            blurRadius: 6,
-                            offset: Offset(0, 2),
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      item,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w600,
-                        color: isSelected
-                            ? AppColors.textPrimary
-                            : AppColors.textMuted,
-                      ),
-                    ),
-                    if (count != null) ...[
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primaryLight
-                              : Colors.white.withValues(alpha: 0.7),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          '$count',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.textMuted,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
             );
           }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class _ModernFilterPillItem extends StatefulWidget {
+  final String item;
+  final bool isSelected;
+  final int? count;
+  final VoidCallback onTap;
+
+  const _ModernFilterPillItem({
+    required this.item,
+    required this.isSelected,
+    required this.count,
+    required this.onTap,
+  });
+
+  @override
+  State<_ModernFilterPillItem> createState() => _ModernFilterPillItemState();
+}
+
+class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.94 : 1.0,
+        duration: Duration(milliseconds: _pressed ? 80 : 160),
+        curve: _pressed ? Curves.easeInCubic : Curves.easeOutCubic,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 13,
+            vertical: 7.5,
+          ),
+          decoration: BoxDecoration(
+            color: widget.isSelected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(9),
+            border: Border.all(
+              color: widget.isSelected
+                  ? AppColors.glassWhiteBorder
+                  : Colors.transparent,
+              width: 0.85,
+            ),
+            boxShadow: widget.isSelected
+                ? const [
+                    BoxShadow(
+                      color: Color(0x0D0F172A),
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.item,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight:
+                      widget.isSelected ? FontWeight.w700 : FontWeight.w600,
+                  color: widget.isSelected
+                      ? AppColors.textPrimary
+                      : AppColors.textMuted,
+                ),
+              ),
+              if (widget.count != null) ...[
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 1.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: widget.isSelected
+                        ? AppColors.primaryLight
+                        : Colors.white.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    '${widget.count}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                      color: widget.isSelected
+                          ? AppColors.primary
+                          : AppColors.textMuted,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
