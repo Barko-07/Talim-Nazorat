@@ -4,6 +4,7 @@ import 'access_control_service.dart';
 import 'app_exceptions.dart';
 import 'dynamics_service.dart';
 import 'local_db_service.dart';
+import 'sound_tracker_service.dart';
 
 /// Bolaning monitoring holati (talab #6)
 enum StatusColor {
@@ -69,6 +70,7 @@ class ChildStatusService {
   final _db = LocalDbService();
   final _dynamics = DynamicsService();
   final _access = AccessControlService();
+  final _sounds = SoundTrackerService();
 
   static const int staleDays = 30;
 
@@ -134,6 +136,15 @@ class ChildStatusService {
           .toList();
       final r = _dynamics.evaluate(points, absoluteThreshold: 0.5, unit: 'sinf darajasi');
       _classify(r, '$subject (bilim darajasi)', today, yellow, positives);
+    }
+
+    // ---------- Logopedik tovushlar ----------
+    final soundProfile = _sounds.buildProfile(
+      student.id,
+      _db.getSoundEntries(forUser: _systemViewer, studentId: student.id),
+    );
+    for (final p in soundProfile.sounds) {
+      _classify(p.dynamics, '"${p.sound.display}" tovushi', today, yellow, positives);
     }
 
     // ---------- ITR maqsadlari ----------

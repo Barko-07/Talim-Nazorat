@@ -172,6 +172,13 @@ class AccessControlService {
         canViewStudent(user, student);
   }
 
+  /// Logopedik tovushlar kartasini yuritish: bolaga biriktirilgan logoped
+  bool canTrackSounds(UserModel user, StudentModel student) {
+    if (!user.isActive) return false;
+    if (user.role == UserRole.superAdmin) return true;
+    return user.role == UserRole.speechTherapist && canViewStudent(user, student);
+  }
+
   // ==================== BAHOLASH VA SAVOLLAR ====================
   /// Baholash o'tkazish va natija/o'lchov kiritish
   bool canCreateAssessment(UserModel user, StudentModel student) {

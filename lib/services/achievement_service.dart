@@ -1,5 +1,7 @@
 import '../models/achievement_model.dart';
 import '../models/curriculum_model.dart';
+import '../models/speech_sound_model.dart';
+import '../core/constants/uzbek_speech_sounds.dart';
 import '../models/user_model.dart';
 import 'access_control_service.dart';
 import 'app_exceptions.dart';
@@ -33,6 +35,7 @@ class AchievementService {
       ..._masteredTasks(studentId),
       ..._completedGoals(studentId),
       ..._personalBests(studentId),
+      ..._soundMilestones(studentId),
     ]..sort((a, b) => b.achievedAt.compareTo(a.achievedAt));
 
     return AchievementPassport(
@@ -135,6 +138,45 @@ class AchievementService {
     }
     return result;
   }
+
+  /// Tovush yutuqlari: tovush qo'yildi (birinchi marta) va erkin nutqqa o'tdi (birinchi marta)
+  List<Achievement> _soundMilestones(String studentId) {
+    final result = <Achievement>[];
+    final entries = _db.getSoundEntries(forUser: _system, studentId: studentId);
+    for (final soundId in entries.map((e) => e.soundId).toSet()) {
+      final history = entries.where((e) => e.soundId == soundId).toList();
+      final display = UzbekSpeechSounds.byId(soundId)?.display ?? soundId;
+      // Faqat boshida qo'yilmagan tovush uchun "qo'yildi" yutug'i
+      if (!history.first.stage.isSet) {
+        final set = history.where((e) => e.stage.isSet);
+        if (set.isNotEmpty) {
+          result.add(_soundAchievement(set.first, 'set',
+              '"$display" tovushi qo‘yildi', 'Tovush alohida to‘g‘ri talaffuz qilinmoqda.'));
+        }
+      }
+      if (!history.first.stage.isMastered) {
+        final mastered = history.where((e) => e.stage.isMastered);
+        if (mastered.isNotEmpty) {
+          result.add(_soundAchievement(mastered.first, 'mastered',
+              '"$display" tovushi erkin nutqda to‘g‘ri', 'Tovush kundalik nutqda to‘g‘ri talaffuz qilinmoqda.'));
+        }
+      }
+    }
+    return result;
+  }
+
+  Achievement _soundAchievement(SoundEntry e, String kind, String title, String description) =>
+      Achievement(
+        id: 'auto_sound_${kind}_${e.id}',
+        studentId: e.studentId,
+        category: AchievementCategory.skill,
+        title: title,
+        description: description,
+        achievedAt: e.recordedAt,
+        isAutomatic: true,
+        recordedById: e.recordedById,
+        recordedByName: e.recordedByName,
+      );
 
   String _gradeText(int g) => g == 0 ? '1-sinfgacha' : '$g-sinf darajasi';
 

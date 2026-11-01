@@ -8,6 +8,7 @@ Screens ──► AppProvider (current user, notifyListeners)
                ├─► Logic services (pure Dart, testable)
                │     QuestionSelectionService · SubjectLevelService · DynamicsService
                │     WorkspaceService · ChildStatusService · AchievementService · ReportService
+               │     SoundTrackerService
                │
                └─► LocalDbService (storage + permission checks + audit log)
                       └─► AccessControlService (permission matrix, single source of truth)
@@ -45,6 +46,7 @@ Screens ──► AppProvider (current user, notifyListeners)
 | Access profile, working grade | Psychologist, speech therapist, defectologist (assigned) |
 | Subject level, subject tasks | Special-education teacher, teacher, defectologist (assigned), coordinator |
 | Individual plan | Coordinator, leadership, special-education teacher; the responsible person updates the goals |
+| Sound tracker | The speech therapist assigned to the child (anyone who can see the child can view it) |
 | Case conference | Coordinator or leadership convenes; participants add findings; the organiser concludes |
 | Standard questions | System admin only (specialists' own questions: the author) |
 | Users | System admin; school leadership (own school only). A user can't change their own role, school or status |
@@ -59,6 +61,7 @@ Screens ──► AppProvider (current user, notifyListeners)
 | `db_curriculum`, `db_subject_levels`, `db_subject_tasks` | DTS standards, subject levels, subject tasks |
 | `db_measurements`, `db_custom_metrics` | Measurements with units, custom metrics |
 | `db_achievements`, `db_conferences` | Manual achievements, case conferences |
+| `db_sound_entries` | The speech therapist's sound tracker (stage history) |
 | `db_referrals`, `db_alerts`, `db_notifications`, `db_audit` | Referrals, monitoring alerts, notifications, audit log |
 
 ## Services
@@ -71,9 +74,10 @@ Screens ──► AppProvider (current user, notifyListeners)
 | `ChildStatusService` | #6 | Red / yellow / green status with written criteria |
 | `AchievementService` | #11 | Achievements passport (manual + automatic) |
 | `ReportService` | #12 | School and per-specialist reports, CSV |
+| `SoundTrackerService` | #3, #8 | Speech therapist's sound tracker: stages, dynamics, next step |
 
 ## Tests
-`flutter test` runs 174 tests. Test files are in `test/`. Security rules have their own file: `test/authorization_test.dart`.
+`flutter test` runs 184 tests. Test files are in `test/`. Security rules have their own file: `test/authorization_test.dart`.
 
 ## Known limitation
 Data lives only on the device. Sharing data between specialists and leadership for real needs a server (see the server discussion). The service layer is written so the same rules can later move to a server.

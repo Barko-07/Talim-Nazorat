@@ -10,6 +10,7 @@ enum WorkspaceModule {
   psychAssessment('Psixologik testlar va metodikalar'),
   observationJournal('Emotsional holat va xulq-atvor kuzatuvlari'),
   speechAssessment('Nutq tekshiruvi'),
+  soundTracker('Logopedik tovushlar kartasi'),
   developmentAssessment('Sensor-motor va amaliy rivojlanish tekshiruvi'),
   subjectLevel('Fanlar bo‘yicha bilim darajasi (DTS)'),
   subjectTasks('Fan topshiriqlari'),

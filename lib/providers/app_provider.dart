@@ -22,6 +22,9 @@ import '../services/achievement_service.dart';
 import '../services/report_service.dart';
 import '../models/achievement_model.dart';
 import '../models/case_conference_model.dart';
+import '../models/speech_sound_model.dart';
+import '../core/constants/uzbek_speech_sounds.dart';
+import '../services/sound_tracker_service.dart';
 import '../models/workspace_model.dart';
 import '../models/subject_task_model.dart';
 import '../models/curriculum_model.dart';
@@ -39,6 +42,7 @@ class AppProvider extends ChangeNotifier {
   final ChildStatusService _childStatus = ChildStatusService();
   final AchievementService _achievementService = AchievementService();
   final ReportService _reports = ReportService();
+  final SoundTrackerService _soundTracker = SoundTrackerService();
 
   UserModel? _currentUser;
   bool _isLoading = false;
@@ -953,6 +957,29 @@ class AppProvider extends ChangeNotifier {
       decisionId,
       byUser: _requireUser(),
     );
+    notifyListeners();
+    return saved;
+  }
+
+  // ==================== LOGOPEDIK TOVUSHLAR KARTASI ====================
+  /// O'zbek tili tovushlari (logopedik guruhlar bilan)
+  List<SpeechSound> get speechSounds => UzbekSpeechSounds.all;
+
+  /// Bolaning tovushlar kartasi: har bir maqsadli tovushning bosqichi, tarixi va dinamikasi
+  SpeechProfile speechProfile(String studentId) {
+    final user = _currentUser;
+    if (user == null) return SpeechProfile(studentId, const []);
+    return _soundTracker.buildProfile(
+      studentId,
+      _db.getSoundEntries(forUser: user, studentId: studentId),
+    );
+  }
+
+  /// Tovush bo'yicha keyingi qadam tavsiyasi
+  String soundNextStep(SoundProgress progress) => _soundTracker.nextStep(progress);
+
+  Future<SoundEntry> recordSoundEntry(SoundEntry entry) async {
+    final saved = await _db.recordSoundEntry(entry, byUser: _requireUser());
     notifyListeners();
     return saved;
   }

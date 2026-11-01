@@ -80,6 +80,7 @@ class SpecialistWorkspaces {
       modules: const {
         WorkspaceModule.caseload: _e,
         WorkspaceModule.speechAssessment: _e,
+        WorkspaceModule.soundTracker: _e,
         WorkspaceModule.accessProfile: _e,
         WorkspaceModule.measurements: _e,
         WorkspaceModule.sessions: _e,
@@ -163,6 +164,7 @@ class SpecialistWorkspaces {
         WorkspaceModule.sessions: _e,
         WorkspaceModule.caseConference: _e,
         WorkspaceModule.referrals: _e,
+        WorkspaceModule.soundTracker: _v,
         WorkspaceModule.reports: _v,
       },
       assessmentDomains: const [AssessmentDomains.learningSkills],
@@ -221,6 +223,7 @@ class SpecialistWorkspaces {
         WorkspaceModule.subjectLevel: _e,
         WorkspaceModule.measurements: _v,
         WorkspaceModule.sessions: _v,
+        WorkspaceModule.soundTracker: _v,
         WorkspaceModule.reports: _e,
       },
       referralTargets: [

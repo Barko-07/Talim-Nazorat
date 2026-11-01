@@ -4,6 +4,47 @@ The backend team doesn't edit `lib/screens/`. This file lists what the UI should
 
 ---
 
+## Speech therapist's sound tracker (new module: `WorkspaceModule.soundTracker`)
+
+The rules are in [speech-sound-tracker.md](speech-sound-tracker.md). The speech therapist edits; the special-education teacher and coordinator can only view.
+
+### 1. Sound tracker screen (on the child's profile)
+```dart
+final profile = app.speechProfile(student.id);
+for (final p in profile.sounds) {                 // grouped by sound
+  p.sound.display; p.sound.group.label;           // "r", "Sonor (r, l)"
+  p.stage.label; p.completion;                    // current stage, 0..1 (progress bar)
+  p.current.disorder.label; p.first.substitutedWith;   // starting problem, e.g. r → l
+  p.daysAtCurrentStage(DateTime.now());
+  p.dynamics.status.label; p.dynamics.reason;     // O‘sish / Pasayish / Samarasiz natija...
+  app.soundNextStep(p);                           // next-step suggestion
+  p.history;                                      // stage history (for a chart)
+}
+profile.mastered; profile.inProgress; profile.stuck;   // summary cards
+```
+Suggested display: show the sounds in their groups. Each sound gets a stage strip (stages 0–7) with the current stage highlighted. Show the sounds in `profile.stuck` in yellow at the top.
+
+### 2. Recording a stage
+```dart
+await app.recordSoundEntry(SoundEntry(
+  id: const Uuid().v4(), studentId: student.id, soundId: 'r',
+  stage: SoundStage.staging,
+  disorder: SoundDisorder.substitution, substitutedWith: 'l',   // only for a substitution
+  differentiatedFrom: null,                                      // 'l' at the differentiation stage
+  note: '...', recordedById: '', recordedByName: '',             // filled by backend
+  recordedAt: DateTime.now(),
+));
+```
+- Sound picker: `app.speechSounds`, grouped by `sound.group`.
+- Stage picker: `SoundStage.values`. Problem type picker: `SoundDisorder.values`. All have `.label`.
+- At the differentiation stage, offer `sound.confusedWith` as quick choices.
+- Errors (`ValidationException`, `PermissionDeniedException`) come as readable text. Show `e.toString()`.
+
+### 3. Already connected automatically
+- The achievements passport, the speech therapist's dashboard ("sound isn't developing"), the red/yellow/green status and reports pick these records up automatically. No extra UI work is needed for that.
+
+---
+
 ## Security, monitoring, achievements, reports, case conferences
 
 The overall structure is in [ARCHITECTURE.md](ARCHITECTURE.md).

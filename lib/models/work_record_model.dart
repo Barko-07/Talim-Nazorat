@@ -6,7 +6,8 @@ enum WorkKind {
   measurement('O‘lchov'),
   subjectLevel('Bilim darajasi'),
   subjectTask('Fan topshirig‘i'),
-  conference('Konsilium xulosasi');
+  conference('Konsilium xulosasi'),
+  soundTracking('Tovush qaydi');
 
   final String label;
   const WorkKind(this.label);

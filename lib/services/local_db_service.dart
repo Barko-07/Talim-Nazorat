@@ -23,9 +23,11 @@ import '../models/subject_task_model.dart';
 import '../models/work_record_model.dart';
 import '../models/achievement_model.dart';
 import '../models/case_conference_model.dart';
+import '../models/speech_sound_model.dart';
 import '../core/constants/curriculum_standards_seed.dart';
 import '../core/constants/progress_metrics.dart';
 import 'subject_level_service.dart';
+import 'sound_tracker_service.dart';
 import '../core/constants/psychological_questions_seed.dart';
 import 'access_control_service.dart';
 import 'app_exceptions.dart';
@@ -43,6 +45,7 @@ class LocalDbService {
   final _accessControl = AccessControlService();
   final _ruleEngine = MonitoringRuleEngine();
   final _subjectLevels = SubjectLevelService();
+  final _soundTracker = SoundTrackerService();
 
   // Xotiradagi kesh jadvallari (Doimiy SharedPreferences bilan sinxron)
   List<UserModel> _users = [];
@@ -64,6 +67,7 @@ class LocalDbService {
   List<SubjectTask> _subjectTasks = [];
   List<Achievement> _achievements = [];
   List<CaseConference> _conferences = [];
+  List<SoundEntry> _soundEntries = [];
 
   bool _isInitialized = false;
 
@@ -92,6 +96,7 @@ class LocalDbService {
     _subjectTasks = [];
     _achievements = [];
     _conferences = [];
+    _soundEntries = [];
     _corruptedKeys.clear();
   }
 
@@ -222,6 +227,11 @@ class LocalDbService {
       'db_conferences',
       CaseConference.fromJson,
     );
+    _soundEntries = _decodeTable(
+      prefs,
+      'db_sound_entries',
+      SoundEntry.fromJson,
+    );
   }
 
   List<T> _decodeTable<T>(
@@ -318,6 +328,11 @@ class LocalDbService {
       'db_conferences',
       _conferences.map((e) => e.toJson()),
     );
+    await _writeTable(
+      prefs,
+      'db_sound_entries',
+      _soundEntries.map((e) => e.toJson()),
+    );
   }
 
   Future<void> _writeTable(
@@ -338,6 +353,68 @@ class LocalDbService {
       iepPlans: _iepPlans,
       existingAlerts: _alerts,
     );
+  }
+
+  // ==================== LOGOPEDIK TOVUSHLAR KARTASI ====================
+  /// Tovush bosqichini qayd etish (bolaga biriktirilgan logoped yoki tizim administratori).
+  /// Qaydlar o'chirilmaydi — har bir o'zgarish tarixda qoladi.
+  Future<SoundEntry> recordSoundEntry(
+    SoundEntry entry, {
+    required UserModel byUser,
+  }) async {
+    final student = _studentOrThrow(entry.studentId);
+    _require(
+      _accessControl.canTrackSounds(byUser, student),
+      'tovushlar kartasini bolaga biriktirilgan logoped yuritadi.',
+    );
+    final error = _soundTracker.validate(entry, DateTime.now());
+    if (error != null) throw ValidationException(error);
+
+    final saved = SoundEntry(
+      id: entry.id,
+      studentId: entry.studentId,
+      soundId: entry.soundId,
+      stage: entry.stage,
+      disorder: entry.disorder,
+      substitutedWith:
+          entry.disorder == SoundDisorder.substitution ? entry.substitutedWith : null,
+      differentiatedFrom: entry.differentiatedFrom,
+      note: entry.note,
+      recordedById: byUser.id,
+      recordedByName: byUser.fullName,
+      recordedAt: entry.recordedAt,
+    );
+    if (_soundEntries.any((e) => e.id == saved.id)) {
+      throw const ValidationException('Bu qayd allaqachon saqlangan.');
+    }
+    _soundEntries.add(saved);
+    await _persistAll();
+    await addAuditLog(
+      userFullName: byUser.fullName,
+      userRole: byUser.role.label,
+      action: 'CREATE',
+      entity: 'SoundEntry',
+      details:
+          '${student.fullName}: "${saved.soundId}" tovushi — ${saved.stage.label}',
+    );
+    return saved;
+  }
+
+  /// Bolaning tovush qaydlari (eskidan yangiga)
+  List<SoundEntry> getSoundEntries({
+    required UserModel forUser,
+    required String studentId,
+    String? soundId,
+  }) {
+    final student = getStudentById(studentId);
+    if (student == null || !_accessControl.canViewStudent(forUser, student)) {
+      return [];
+    }
+    return _soundEntries
+        .where((e) => e.studentId == studentId)
+        .where((e) => soundId == null || e.soundId == soundId)
+        .toList()
+      ..sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
   }
 
   // ==================== KONSILIUM ====================
@@ -674,6 +751,9 @@ class LocalDbService {
         if (c.studentId == studentId)
           for (final contribution in c.contributions)
             WorkRecord(contribution.userId, contribution.at, WorkKind.conference),
+      for (final e in _soundEntries)
+        if (e.studentId == studentId)
+          WorkRecord(e.recordedById, e.recordedAt, WorkKind.soundTracking),
     ]..sort((a, b) => a.at.compareTo(b.at));
   }
 

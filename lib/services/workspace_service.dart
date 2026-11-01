@@ -8,6 +8,7 @@ import '../models/workspace_model.dart';
 import '../models/work_record_model.dart';
 import 'dynamics_service.dart';
 import 'local_db_service.dart';
+import 'sound_tracker_service.dart';
 
 /// E'tibor talab qiladigan holat turi
 enum AttentionKind {
@@ -19,7 +20,8 @@ enum AttentionKind {
   missingProfile('Imkoniyatlar profili to‘ldirilmagan'),
   subjectLevelMissing('Bilim darajasi tekshirilmagan'),
   largeGap('Sinf va bilim darajasi orasida katta farq'),
-  overdueTasks('Topshiriq natijasi kiritilmagan');
+  overdueTasks('Topshiriq natijasi kiritilmagan'),
+  soundStuck('Tovush rivojlanmayapti');
 
   final String label;
   const AttentionKind(this.label);
@@ -62,6 +64,7 @@ class WorkspaceService {
 
   final _db = LocalDbService();
   final _dynamics = DynamicsService();
+  final _sounds = SoundTrackerService();
 
   /// O'z baholashi shuncha kundan eski bo'lsa — qayta baholash tavsiya qilinadi
   static const int reassessmentDays = 90;
@@ -172,6 +175,20 @@ class WorkspaceService {
           AttentionKind.missingProfile,
           'Savollarni bolaga moslab tanlash uchun imkoniyatlar profilini to‘ldiring.',
         ));
+      }
+
+      if (ws.canEdit(WorkspaceModule.soundTracker)) {
+        final profile = _sounds.buildProfile(
+          s.id,
+          _db.getSoundEntries(forUser: user, studentId: s.id),
+        );
+        for (final p in profile.stuck) {
+          attention.add(AttentionItem(
+            s,
+            AttentionKind.soundStuck,
+            '"${p.sound.display}" tovushi (${p.stage.label}): ${p.dynamics.reason}',
+          ));
+        }
       }
 
       if (ws.canEdit(WorkspaceModule.subjectTasks)) {
