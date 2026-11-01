@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../models/user_model.dart';
 import '../services/local_db_service.dart';
+import '../services/app_exceptions.dart';
 
 class AuthProvider extends ChangeNotifier {
   final LocalDbService _db = LocalDbService();
@@ -198,10 +199,17 @@ class AuthProvider extends ChangeNotifier {
       isActive: true,
     );
 
-    await _db.registerUser(newUser);
+    try {
+      await _db.registerUser(newUser);
+    } on AppException catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'message': e.toString()};
+    }
 
-    // Yangi yaratilgan foydalanuvchi sifatida avtomatik kirish
-    _currentUser = newUser;
+    // Yangi yaratilgan foydalanuvchi sifatida avtomatik kirish.
+    // Bazadagi nusxa olinadi — xotirada ochiq parol saqlanmasin.
+    _currentUser = _db.getUserById(newUser.id);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_user_id', newUser.id);
 
@@ -233,8 +241,13 @@ class AuthProvider extends ChangeNotifier {
     }
 
     final updated = _currentUser!.copyWith(password: newPassword.trim());
-    await _db.updateUser(updated, byUser: _currentUser!);
-    _currentUser = updated;
+    try {
+      await _db.updateUser(updated, byUser: _currentUser!);
+    } on AppException catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+    // Bazadagi (xeshlangan) nusxa — xotirada ochiq parol saqlanmasin
+    _currentUser = _db.getUserById(updated.id);
     notifyListeners();
 
     await _db.addAuditLog(

@@ -1,3 +1,4 @@
+import '../models/monitoring_alert_model.dart';
 import '../models/student_model.dart';
 import '../models/user_model.dart';
 import 'access_control_service.dart';
@@ -77,7 +78,14 @@ class ChildStatusService {
   /// Ijobiy natija sifatida hisobga olinadigan davr
   static const int positiveWindowDays = 90;
 
-  ChildStatus statusFor(StudentModel student, UserModel viewer, {DateTime? now}) {
+  /// [unresolvedAlerts] — oldindan olingan ochiq signallar (ko'p bola uchun hisoblaganda
+  /// har safar barcha qoidalarni qayta hisoblamaslik uchun). Berilmasa — o'zi oladi.
+  ChildStatus statusFor(
+    StudentModel student,
+    UserModel viewer, {
+    DateTime? now,
+    List<MonitoringAlertModel>? unresolvedAlerts,
+  }) {
     if (!_access.canViewStudent(viewer, student)) {
       throw const PermissionDeniedException('bu o‘quvchi ma’lumotlarini ko‘rish huquqi yo‘q.');
     }
@@ -155,11 +163,11 @@ class ChildStatusService {
     }
 
     // ---------- Monitoring signallari ----------
-    final alerts = _db
-        .getAlerts(forUser: _systemViewer, onlyUnresolved: true)
+    final alerts = (unresolvedAlerts ??
+            _db.getAlerts(forUser: _systemViewer, onlyUnresolved: true))
         .where((a) => a.studentId == student.id);
-    for (final a in alerts) {
-      yellow.add('Hal qilinmagan signal: ${a.ruleTitle}.');
+    for (final title in alerts.map((a) => a.ruleTitle).toSet()) {
+      yellow.add('Hal qilinmagan signal: $title.');
     }
 
     if (notStarted.isNotEmpty && assigned.length > notStarted.length) {
@@ -196,9 +204,10 @@ class ChildStatusService {
 
   /// Foydalanuvchi ko'ra oladigan barcha bolalar holati (qizil -> sariq -> yashil)
   MonitoringSummary summaryFor(UserModel viewer, {DateTime? now}) {
+    final alerts = _db.getAlerts(forUser: _systemViewer, onlyUnresolved: true);
     final statuses = _db
         .getStudents(forUser: viewer)
-        .map((s) => statusFor(s, viewer, now: now))
+        .map((s) => statusFor(s, viewer, now: now, unresolvedAlerts: alerts))
         .toList()
       ..sort((a, b) {
         final c = a.color.index.compareTo(b.color.index);

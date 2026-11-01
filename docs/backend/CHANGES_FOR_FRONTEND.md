@@ -4,6 +4,36 @@ The backend team doesn't edit `lib/screens/`. This file lists what the UI should
 
 ---
 
+## Defectologist methods library, licensed tests, data warnings
+
+### 1. Each workspace shows its own methods library
+`psychologist_methods_tab.dart` currently uses `PsychologicalMethodsData.methods` directly. Switch it to:
+```dart
+final methods = app.myMethods;   // psychologist → psychological, defectologist → defectology, leadership → all
+m.profession.label;              // 'Psixologiya' / 'Defektologiya'
+```
+That way the same screen also works for the defectologist, who gets 6 methods: Seguin board, Kohs blocks, cut pictures, motor coordination (based on Ozeretsky), object classification, and a self-care scale.
+
+### 2. Licensed tests: please show a warning
+```dart
+if (m.requiresLicensedMaterials) {
+  // e.g. "⚠ Litsenziyalangan test" badge + m.licenseNote
+}
+```
+Raven, WISC, Cattell CPQ and Yasyukova are copyrighted. Their score tables and labels like "Yuqori intellekt" have been **removed** from the app. Interpretation must use the official licensed manual.
+
+### 3. Warn when saved records couldn't be read (optional, recommended)
+```dart
+final bad = LocalDbService().rejectedRowCounts;   // e.g. {'db_students': 1}
+if (bad.isNotEmpty) { /* "N ta yozuv o‘qilmadi va zaxiraga olindi" banner for admin */ }
+```
+A single damaged record no longer hides the whole table. It's set aside in a backup, and the other records load normally.
+
+### 4. Registration and password change
+`auth.register(...)` and `auth.changePassword(...)` now return `{'success': false, 'message': ...}` on an error, and the loader no longer gets stuck. The existing screen code can show `message` as it does now.
+
+---
+
 ## Speech therapist's sound tracker (new module: `WorkspaceModule.soundTracker`)
 
 The rules are in [speech-sound-tracker.md](speech-sound-tracker.md). The speech therapist edits; the special-education teacher and coordinator can only view.

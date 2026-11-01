@@ -23,7 +23,7 @@ Each specialist's own content:
 |---|---|---|---|
 | Psychologist | Cognitive, Attention and memory, Emotional, Social, Behaviour | Attention span, Words recalled, Meltdowns per week, Conversations with peers | Psycho-correction, Social-skills training, Managing emotions, Parent consultation |
 | Speech therapist | Speech and communication (sound pronunciation, phonemic hearing, active vocabulary, connected speech) | Correctly pronounced sounds, Active vocabulary, Reading speed | Articulation, Sound automation, Vocabulary and connected speech, Phonemic hearing |
-| Defectologist | Sensor-motor development (fine motor, sensory standards, spatial orientation, self-care), Cognitive | Fine motor (beads), Self-care, Independent tasks | Sensory integration, Fine motor, Self-care, Cognitive development |
+| Defectologist | Sensor-motor development (fine motor, sensory standards, spatial orientation, self-care), Cognitive + **6-method library** (Seguin, Kohs, cut pictures, motor coordination, classification, self-care scale) | Fine motor (beads), Self-care, Independent tasks | Sensory integration, Fine motor, Self-care, Cognitive development |
 | Special-education teacher | Learning skills (doing tasks independently, reading, writing) + DTS standards by subject | Reading speed, Independent tasks | Individual lesson at the child's level, Reading and writing, Arithmetic |
 
 ## Personal dashboard (`WorkspaceDashboard`)

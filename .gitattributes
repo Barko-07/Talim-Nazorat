@@ -1,0 +1,16 @@
+# Bir xil qator oxirlari (LF) — Windows va boshqa tizimlarda farqsiz diff
+* text=auto
+*.dart text eol=lf
+*.md text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.kts text eol=lf
+*.gradle text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.png binary
+*.jpg binary
+*.ico binary
+*.ttf binary

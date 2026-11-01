@@ -74,6 +74,13 @@ class LocalDbService {
   // O'qishda buzilgan deb topilgan jadvallar (ustidan yozilmaydi)
   final Set<String> _corruptedKeys = {};
 
+  // Jadval -> o'qib bo'lmagan (alohida zaxiralangan) qatorlar soni
+  final Map<String, int> _rejectedRowCounts = {};
+
+  /// Ishga tushishda o'qib bo'lmagan qatorlar (jadval -> soni). Ular `<jadval>_rejected_rows`
+  /// kalitida saqlanadi; foydalanuvchiga "N ta yozuv o'qilmadi" deb ko'rsatish mumkin.
+  Map<String, int> get rejectedRowCounts => Map.unmodifiable(_rejectedRowCounts);
+
   /// Xotiradagi barcha jadvallarni tozalash — init() har doim toza holatdan boshlanadi
   /// (oldingi holatdan qolgan yozuvlar yangi bazaga aralashmasin).
   void _clearMemory() {
@@ -98,6 +105,7 @@ class LocalDbService {
     _conferences = [];
     _soundEntries = [];
     _corruptedKeys.clear();
+    _rejectedRowCounts.clear();
   }
 
   /// Testlar uchun: keyingi init() ma'lumotlarni qaytadan o'qishi uchun.
@@ -242,17 +250,42 @@ class LocalDbService {
   }) {
     final raw = prefs.getString(key);
     if (raw == null) return fallback?.call() ?? <T>[];
+
+    // 1. Jadvalning o'zi o'qilmasa — butunlay zaxiralanadi va ustidan yozilmaydi
+    final List<dynamic> rows;
     try {
-      return (jsonDecode(raw) as List)
-          .map((e) => fromJson(e as Map<String, dynamic>))
-          .toList();
+      rows = jsonDecode(raw) as List;
     } catch (e) {
-      // Asl ma'lumotni zaxiralash va jadvalni ustidan yozishdan himoyalash
       _corruptedKeys.add(key);
       prefs.setString('${key}_corrupt_backup', raw);
       debugPrint('LocalDbService: "$key" jadvalini o‘qib bo‘lmadi: $e');
       return <T>[];
     }
+
+    // 2. Alohida buzilgan qatorlar boshqalarini yashirmasligi kerak: ular alohida
+    // zaxiraga olinadi, qolgan qatorlar odatdagidek yuklanadi.
+    final result = <T>[];
+    final rejected = <dynamic>[];
+    for (final row in rows) {
+      try {
+        result.add(fromJson(row as Map<String, dynamic>));
+      } catch (_) {
+        rejected.add(row);
+      }
+    }
+    if (rejected.isNotEmpty) {
+      final backupKey = '${key}_rejected_rows';
+      var previous = <dynamic>[];
+      try {
+        previous = jsonDecode(prefs.getString(backupKey) ?? '[]') as List;
+      } catch (_) {}
+      prefs.setString(backupKey, jsonEncode([...previous, ...rejected]));
+      _rejectedRowCounts[key] = rejected.length;
+      debugPrint(
+        'LocalDbService: "$key" jadvalida ${rejected.length} ta qator o‘qilmadi — "$backupKey" ga zaxiralandi',
+      );
+    }
+    return result;
   }
 
   Future<void> _persistAll() async {
@@ -782,6 +815,7 @@ class LocalDbService {
 
   // ==================== FOYDALANUVCHILAR VA XAVFSIZLIK ====================
   List<UserModel> getUsers({UserModel? forUser}) {
+    if (forUser != null && !forUser.isActive) return const [];
     if (forUser == null || forUser.role == UserRole.superAdmin) {
       return List.unmodifiable(_users);
     }
@@ -2692,7 +2726,9 @@ class LocalDbService {
       timestamp: DateTime.now(),
     );
     _auditLogs.insert(0, log);
-    await _persistAll();
+    // Faqat audit jadvali yoziladi — har bir amalda butun bazani qayta yozmaslik uchun
+    final prefs = await SharedPreferences.getInstance();
+    await _writeTable(prefs, 'db_audit', _auditLogs.map((e) => e.toJson()));
   }
 
   // ==================== PSIXOLOGIK KUZATUV JURNALI ====================

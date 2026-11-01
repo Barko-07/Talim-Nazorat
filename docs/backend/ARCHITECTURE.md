@@ -30,7 +30,10 @@ Screens ──► AppProvider (current user, notifyListeners)
    `toString()` returns a readable Uzbek message, so the UI can show `e.toString()` as it is.
 5. **Every important change goes into the audit log** (who, role, action, entity, details), with no passwords.
 6. **Saved data is protected:**
-   - A table that fails to load is backed up and never overwritten.
+   - A table that can't be read at all is backed up and never overwritten.
+   - A single damaged row doesn't hide the others: it's moved to the `<table>_rejected_rows` backup, and `rejectedRowCounts` reports it.
+   - The audit log writes only its own table, so a save doesn't rewrite the whole database twice.
+   - When nobody is logged in, `AppProvider` reads as an inactive anonymous user and gets no data.
    - New fields have defaults in `fromJson`, so data saved by older versions still loads.
    - `init()` always starts from a clean in-memory state.
 7. **The app suggests; specialists decide.** Statuses, levels and question choices are suggestions, and each comes with a reason.
@@ -74,10 +77,11 @@ Screens ──► AppProvider (current user, notifyListeners)
 | `ChildStatusService` | #6 | Red / yellow / green status with written criteria |
 | `AchievementService` | #11 | Achievements passport (manual + automatic) |
 | `ReportService` | #12 | School and per-specialist reports, CSV |
+| `MethodLibrary` | #4 | Methods by specialty (psychology, defectology); licensed tests are flagged |
 | `SoundTrackerService` | #3, #8 | Speech therapist's sound tracker: stages, dynamics, next step |
 
 ## Tests
-`flutter test` runs 184 tests. Test files are in `test/`. Security rules have their own file: `test/authorization_test.dart`.
+`flutter test` runs 200 tests (including `data_integrity_test.dart`, which checks that every reference in the demo data points to an existing record). Test files are in `test/`. Security rules have their own file: `test/authorization_test.dart`.
 
 ## Known limitation
 Data lives only on the device. Sharing data between specialists and leadership for real needs a server (see the server discussion). The service layer is written so the same rules can later move to a server.

@@ -24,6 +24,8 @@ import '../models/achievement_model.dart';
 import '../models/case_conference_model.dart';
 import '../models/speech_sound_model.dart';
 import '../core/constants/uzbek_speech_sounds.dart';
+import '../core/constants/method_library.dart';
+import '../core/constants/psychological_methods_data.dart';
 import '../services/sound_tracker_service.dart';
 import '../models/workspace_model.dart';
 import '../models/subject_task_model.dart';
@@ -58,6 +60,19 @@ class AppProvider extends ChangeNotifier {
   String? get selectedGrade => _selectedGrade;
   String? get selectedStatus => _selectedStatus;
 
+  /// O'qish uchun ko'ruvchi. Hech kim kirmagan bo'lsa — faolsiz anonim foydalanuvchi:
+  /// ruxsat qoidalari unga hech narsa ko'rsatmaydi ("forUser: null" esa filtrsiz
+  /// barcha ma'lumotni qaytarardi).
+  UserModel get _viewer => _currentUser ?? _anonymous;
+
+  static final _anonymous = UserModel(
+    id: '__anonymous__',
+    email: 'anonymous@system',
+    fullName: 'Anonim',
+    role: UserRole.reviewer,
+    isActive: false,
+  );
+
   void setCurrentUser(UserModel? user) {
     _currentUser = user;
     notifyListeners();
@@ -87,33 +102,33 @@ class AppProvider extends ChangeNotifier {
 
   // ==================== GETTERS ====================
   List<StudentModel> get students => _db.getStudents(
-    forUser: _currentUser,
+    forUser: _viewer,
     query: _searchQuery,
     grade: _selectedGrade,
     status: _selectedStatus,
   );
 
   List<StudentModel> get allStudentsIncludingArchived =>
-      _db.getStudents(forUser: _currentUser, includeArchived: true);
+      _db.getStudents(forUser: _viewer, includeArchived: true);
 
   List<AssessmentModel> get assessments =>
-      _db.getAssessments(forUser: _currentUser);
-  List<SessionModel> get sessions => _db.getSessions(forUser: _currentUser);
+      _db.getAssessments(forUser: _viewer);
+  List<SessionModel> get sessions => _db.getSessions(forUser: _viewer);
   List<IndividualEducationPlanModel> get iepPlans =>
-      _db.getIepPlans(forUser: _currentUser);
-  List<MonitoringAlertModel> get alerts => _db.getAlerts(forUser: _currentUser);
+      _db.getIepPlans(forUser: _viewer);
+  List<MonitoringAlertModel> get alerts => _db.getAlerts(forUser: _viewer);
   List<MonitoringAlertModel> get unresolvedAlerts =>
-      _db.getAlerts(forUser: _currentUser, onlyUnresolved: true);
+      _db.getAlerts(forUser: _viewer, onlyUnresolved: true);
   List<MonitoringAlertModel> getAlerts({bool onlyUnresolved = false}) =>
       onlyUnresolved ? unresolvedAlerts : alerts;
-  List<ReferralModel> get referrals => _db.getReferrals(forUser: _currentUser);
-  List<AuditLogModel> get auditLogs => _db.getAuditLogs(forUser: _currentUser);
+  List<ReferralModel> get referrals => _db.getReferrals(forUser: _viewer);
+  List<AuditLogModel> get auditLogs => _db.getAuditLogs(forUser: _viewer);
   List<PsychologicalObservationModel> get observations =>
-      _db.getObservations(forUser: _currentUser);
+      _db.getObservations(forUser: _viewer);
   List<AssessmentQuestionModel> get questions =>
-      _db.getQuestions(forUser: _currentUser);
+      _db.getQuestions(forUser: _viewer);
   List<AssessmentQuestionModel> get myQuestions =>
-      _db.getQuestions(forUser: _currentUser, myQuestionsOnly: true);
+      _db.getQuestions(forUser: _viewer, myQuestionsOnly: true);
 
   List<AssessmentQuestionModel> getQuestionsFiltered({
     String? domain,
@@ -123,7 +138,7 @@ class AppProvider extends ChangeNotifier {
     String? questionType,
   }) {
     return _db.getQuestions(
-      forUser: _currentUser,
+      forUser: _viewer,
       domain: domain,
       query: query,
       myQuestionsOnly: myQuestionsOnly,
@@ -136,10 +151,10 @@ class AppProvider extends ChangeNotifier {
       _db.getQuestionById(id);
 
   List<UserModel> get specialists => _db
-      .getUsers(forUser: _currentUser)
+      .getUsers(forUser: _viewer)
       .where((u) => u.role != UserRole.superAdmin)
       .toList();
-  List<UserModel> get allUsers => _db.getUsers(forUser: _currentUser);
+  List<UserModel> get allUsers => _db.getUsers(forUser: _viewer);
 
   List<NotificationModel> get myNotifications {
     if (_currentUser == null) return [];
@@ -522,7 +537,7 @@ class AppProvider extends ChangeNotifier {
 
   // ==================== PSIXOLOGIK KUZATUVLAR ====================
   List<PsychologicalObservationModel> getObservationsForStudent(String studentId) {
-    return _db.getObservations(forUser: _currentUser, studentId: studentId);
+    return _db.getObservations(forUser: _viewer, studentId: studentId);
   }
 
   Future<void> addObservation(
@@ -983,6 +998,16 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
     return saved;
   }
+
+  // ==================== METODIKALAR KUTUBXONASI ====================
+  /// Joriy foydalanuvchi kabinetiga mos metodikalar (psixolog — psixologik,
+  /// defektolog — defektologik; rahbariyat — barchasi)
+  List<PsychologicalMethodItem> get myMethods {
+    final user = _currentUser;
+    return user == null ? const [] : MethodLibrary.forRole(user.role);
+  }
+
+  PsychologicalMethodItem? methodById(String id) => MethodLibrary.byId(id);
 
   UserModel _requireUser() {
     final user = _currentUser;

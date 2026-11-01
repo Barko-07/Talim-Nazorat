@@ -1,3 +1,13 @@
+/// Metodika qaysi mutaxassislik uchun
+enum MethodProfession {
+  psychology('Psixologiya'),
+  defectology('Defektologiya'),
+  speechTherapy('Logopediya');
+
+  final String label;
+  const MethodProfession(this.label);
+}
+
 class PsychologicalMethodItem {
   final String id;
   final String code;
@@ -12,6 +22,12 @@ class PsychologicalMethodItem {
   final String scoringGuide;
   final double maxScore;
   final String normCriteria;
+  final MethodProfession profession;
+
+  /// Metodika mualliflik huquqi bilan himoyalangan: test materiallari va me'yor jadvallari
+  /// faqat litsenziyalangan nashrdan olinadi, ilovada saqlanmaydi.
+  final bool requiresLicensedMaterials;
+  final String? licenseNote;
 
   const PsychologicalMethodItem({
     required this.id,
@@ -27,6 +43,9 @@ class PsychologicalMethodItem {
     required this.scoringGuide,
     required this.maxScore,
     required this.normCriteria,
+    this.profession = MethodProfession.psychology,
+    this.requiresLicensedMaterials = false,
+    this.licenseNote,
   });
 }
 
@@ -53,7 +72,9 @@ class PsychologicalMethodsData {
           'Har bir to‘g‘ri javob 1 ball. Jami maksimal ball — 36 ball. Foiz darajasi bo‘yicha intellektual salohiyat aniqlanadi.',
       maxScore: 36.0,
       normCriteria:
-          '28-36 ball: Yuqori intellekt (I-daraja)\n22-27 ball: O‘rtacha me’yor (II-daraja)\n16-21 ball: O‘rtadan past (III-daraja)\n15 balldan kam: Maxsus yordam talab etiladi (IV-daraja)',
+          'Natijalarni faqat litsenziyalangan qo‘llanmadagi me’yorlar bo‘yicha talqin qiling. Ilova me’yor jadvallarini saqlamaydi va bolaga daraja yorlig‘i qo‘ymaydi.',
+      requiresLicensedMaterials: true,
+      licenseNote: 'Test materiallari va me’yorlari nashriyot litsenziyasi bilan himoyalangan.',
     ),
     PsychologicalMethodItem(
       id: 'method_landolt',
@@ -153,7 +174,9 @@ class PsychologicalMethodsData {
           'Har bir subtest ballari standart shkalaga o‘tkaziladi (Jami 100 ballik standart indeks).',
       maxScore: 100.0,
       normCriteria:
-          '90-109 ball: O‘rtacha yosh me’yori\n110-119 ball: Yuqori me’yor\n80-89 ball: Past me’yor\n70-79 ball: Chegaraviy holat\n69 balldan kam: Murakkab ta’limiy ehtiyoj',
+          'Natijalarni faqat litsenziyalangan qo‘llanmadagi me’yorlar bo‘yicha talqin qiling. Ilova me’yor jadvallarini saqlamaydi va bolaga daraja yorlig‘i qo‘ymaydi.',
+      requiresLicensedMaterials: true,
+      licenseNote: 'Veksler shkalasi tijoriy litsenziyalangan test (Pearson).',
     ),
     PsychologicalMethodItem(
       id: 'method_yasyukova',
@@ -177,7 +200,9 @@ class PsychologicalMethodsData {
           'Topshiriqlar to‘g‘riligi bo‘yicha ballar jamlanadi (Maksimal 50 ball).',
       maxScore: 50.0,
       normCriteria:
-          '40-50 ball: Oliy o‘quv tayyorgarligi\n30-39 ball: Yaxshi me’yoriy o‘zlashtirish\n20-29 ball: Mo‘tadil qiyinchiliklar\n20 balldan kam: Individual korreksiya zarur',
+          'Natijalarni faqat litsenziyalangan qo‘llanmadagi me’yorlar bo‘yicha talqin qiling. Ilova me’yor jadvallarini saqlamaydi va bolaga daraja yorlig‘i qo‘ymaydi.',
+      requiresLicensedMaterials: true,
+      licenseNote: 'L.A. Yasyukova metodikasi mualliflik huquqi bilan himoyalangan nashr.',
     ),
     PsychologicalMethodItem(
       id: 'method_cattell',
@@ -203,7 +228,9 @@ class PsychologicalMethodsData {
           'Omillar bo‘yicha xom ballar stengacha o‘tkaziladi (1 dan 10 gacha sten shkalasi).',
       maxScore: 10.0,
       normCriteria:
-          '5.5 sten: Ideal balans me’yori\n7-10 sten: Kuchli ifodalangan qutb\n1-4 sten: Kam ifodalangan qutb',
+          'Natijalarni faqat litsenziyalangan qo‘llanmadagi me’yorlar bo‘yicha talqin qiling. Ilova me’yor jadvallarini saqlamaydi va bolaga daraja yorlig‘i qo‘ymaydi.',
+      requiresLicensedMaterials: true,
+      licenseNote: 'CPQ so‘rovnomasi va me’yorlari mualliflik huquqi bilan himoyalangan.',
     ),
     PsychologicalMethodItem(
       id: 'method_htp',
