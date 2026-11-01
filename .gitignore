@@ -65,3 +65,7 @@ coverage/
 .agents/
 skills-lock.json
 
+# Tooling and extension previews
+.widget_preview/
+devtools_options.yaml
+

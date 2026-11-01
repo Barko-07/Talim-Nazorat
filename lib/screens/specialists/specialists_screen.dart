@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -27,71 +29,74 @@ class SpecialistsScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDlgState) => AlertDialog(
-          title: const Text(
-            'Yangi Xodim / Mutaxassis Qo‘shish',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'F.I.SH (To‘liq) *',
+          title: const Text('Yangi xodim / mutaxassis qo‘shish'),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'F.I.Sh. (To‘liq) *',
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<UserRole>(
-                  value: selectedRole,
-                  decoration: const InputDecoration(
-                    labelText: 'Lavozimi va Roli *',
-                  ),
-                  items:
-                      [
-                            UserRole.psychologist,
-                            UserRole.speechTherapist,
-                            UserRole.specialEducation,
-                            UserRole.teacher,
-                            UserRole.coordinator,
-                            UserRole.institutionAdmin,
-                          ]
-                          .map(
-                            (r) => DropdownMenuItem(
-                              value: r,
-                              child: Text(r.label),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<UserRole>(
+                    initialValue: selectedRole,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Lavozimi va roli *',
+                    ),
+                    items: [
+                      UserRole.psychologist,
+                      UserRole.speechTherapist,
+                      UserRole.specialEducation,
+                      UserRole.teacher,
+                      UserRole.coordinator,
+                      UserRole.institutionAdmin,
+                    ]
+                        .map(
+                          (r) => DropdownMenuItem(
+                            value: r,
+                            child: Text(
+                              r.label,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          )
-                          .toList(),
-                  onChanged: (v) {
-                    setDlgState(() {
-                      selectedRole = v!;
-                      specCtrl.text = selectedRole.professionTitle;
-                    });
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: specCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Mutaxassislik yo‘nalishi',
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) {
+                      setDlgState(() {
+                        selectedRole = v!;
+                        specCtrl.text = selectedRole.professionTitle;
+                      });
+                    },
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: phoneCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Telefon raqami *',
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: specCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Mutaxassislik yo‘nalishi',
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: emailCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Elektron pochta (Email)',
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: phoneCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Telefon raqami *',
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: emailCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Elektron pochta (Email)',
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -165,205 +170,245 @@ class SpecialistsScreen extends StatelessWidget {
 
     final staffList = canManage ? app.allUsers : app.specialists;
     final allStudents = app.students;
+    final canPop = Navigator.canPop(context);
+    final width = MediaQuery.sizeOf(context).width;
+    final mediaPadding = MediaQuery.paddingOf(context);
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Kadrlar va Mutaxassislar Boshqaruvi',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Muassasa xodimlari, lavozimlar va yuklama hisobi (${staffList.length} nafar)',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-                if (canManage)
-                  FilledButton.icon(
-                    icon: const Icon(Icons.person_add_rounded, size: 18),
-                    label: const Text('Yangi xodim'),
+    final pageBody = ResponsivePageContainer(
+      bottomPadding: 0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdaptivePageHeader(
+            title: 'Mutaxassislar shtati',
+            subtitle:
+                'Muassasa kadrlari va yuklamasi • ${staffList.length} nafar',
+            action: canManage
+                ? HeaderActionButton(
+                    icon: LucideIcons.userPlus,
+                    label: 'Yangi xodim',
                     onPressed: () => _showAddStaffDialog(context),
+                  )
+                : null,
+          ),
+          const SizedBox(height: 9),
+
+          Expanded(
+            child: ListView.separated(
+              padding: EdgeInsets.fromLTRB(
+                0,
+                0,
+                0,
+                width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
+              ),
+              itemCount: staffList.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final staff = staffList[index];
+                final assignedCount = allStudents
+                    .where((s) => s.assignedSpecialistIds.contains(staff.id))
+                    .length;
+                final isActive = staff.isActive;
+                final showToggle = canManage &&
+                    staff.id != user.id &&
+                    staff.role != UserRole.superAdmin;
+
+                return SurfaceCard(
+                  borderRadius: 26,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 22,
+                    vertical: 20,
                   ),
-              ],
-            ),
-            const SizedBox(height: 16),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isCompact = constraints.maxWidth < 480;
 
-            Expanded(
-              child: ListView.separated(
-                itemCount: staffList.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final staff = staffList[index];
-                  final assignedCount = allStudents
-                      .where((s) => s.assignedSpecialistIds.contains(staff.id))
-                      .length;
-                  final isActive = staff.isActive;
-
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
+                      final mainInfo = Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundColor: staff.role.color.withValues(
-                              alpha: 0.15,
-                            ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
                             child: Icon(
-                              staff.role.icon,
+                              premiumRoleIcon(staff.role),
                               color: staff.role.color,
-                              size: 22,
+                              size: 24,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 6,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
                                     Text(
                                       staff.fullName,
                                       style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 15.5,
                                         color: isActive
                                             ? AppColors.textPrimary
                                             : AppColors.textMuted,
+                                        letterSpacing: -0.2,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
                                     if (!isActive)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.errorBg,
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'Bloklangan',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: AppColors.error,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                      const StatusPill(
+                                        label: 'Bloklangan',
+                                        color: AppColors.error,
+                                        backgroundColor: AppColors.errorBg,
                                       ),
                                   ],
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 5),
                                 Text(
                                   '${staff.role.label} • ${staff.specialization ?? staff.role.professionTitle}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 13,
                                     color: staff.role.color,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.35,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 4),
                                 Text(
-                                  'Muassasa: ${staff.institutionName ?? 'Belgilanmagan'} • Tel: ${staff.phone ?? ''}',
+                                  '${staff.institutionName ?? 'Belgilanmagan'}${staff.phone != null && staff.phone!.isNotEmpty ? ' • ${staff.phone}' : ''}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: AppColors.textMuted,
+                                    height: 1.35,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Container(
+                        ],
+                      );
+
+                      final toggleButton = showToggle
+                          ? TextButton(
+                              style: TextButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 10,
                                   vertical: 6,
                                 ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.background,
-                                  border: Border.all(color: AppColors.border),
-                                  borderRadius: BorderRadius.circular(8),
+                                minimumSize: const Size(0, 30),
+                                foregroundColor: isActive
+                                    ? AppColors.error
+                                    : AppColors.success,
+                              ),
+                              onPressed: () {
+                                app.toggleUserActive(
+                                  staff.id,
+                                  !isActive,
+                                  byUser: user,
+                                );
+                              },
+                              child: Text(
+                                isActive ? 'Bloklash' : 'Faollashtirish',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            )
+                          : null;
+
+                      if (isCompact) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            mainInfo,
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Wrap(
+                                spacing: 10,
+                                runSpacing: 8,
+                                alignment: WrapAlignment.spaceBetween,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  StatusPill(
+                                    label: '$assignedCount ta o‘quvchi',
+                                    color: AppColors.primary,
+                                    backgroundColor: AppColors.primaryLight,
+                                    icon: LucideIcons.users,
+                                  ),
+                                  ?toggleButton,
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(child: mainInfo),
+                          const SizedBox(width: 14),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              GlassWell(
+                                borderRadius: 12,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 9,
                                 ),
                                 child: Column(
                                   children: [
                                     Text(
                                       '$assignedCount',
                                       style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 17,
                                         color: AppColors.primary,
+                                        fontFeatures: [
+                                          FontFeature.tabularFigures(),
+                                        ],
                                       ),
                                     ),
                                     const Text(
                                       'o‘quvchi',
                                       style: TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 11,
                                         color: AppColors.textMuted,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              if (canManage &&
-                                  staff.id != user.id &&
-                                  staff.role != UserRole.superAdmin) ...[
+                              if (toggleButton != null) ...[
                                 const SizedBox(height: 6),
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: const Size(60, 24),
-                                    foregroundColor: isActive
-                                        ? AppColors.error
-                                        : AppColors.success,
-                                  ),
-                                  onPressed: () {
-                                    app.toggleUserActive(
-                                      staff.id,
-                                      !isActive,
-                                      byUser: user,
-                                    );
-                                  },
-                                  child: Text(
-                                    isActive ? 'Bloklash' : 'Faollashtirish',
-                                    style: const TextStyle(fontSize: 11),
-                                  ),
-                                ),
+                                toggleButton,
                               ],
                             ],
                           ),
                         ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+
+    return Scaffold(
+      backgroundColor: canPop ? AppColors.background : Colors.transparent,
+      appBar: canPop ? AppBar(title: const Text('Mutaxassislar')) : null,
+      body: canPop ? AmbientMeshBackground(child: pageBody) : pageBody,
     );
   }
 }

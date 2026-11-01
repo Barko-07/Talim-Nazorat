@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/widgets/glass_widgets.dart';
 import '../../models/referral_model.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../students/student_detail_screen.dart';
 
 class ReferralsScreen extends StatefulWidget {
   const ReferralsScreen({super.key});
@@ -18,6 +21,14 @@ class ReferralsScreen extends StatefulWidget {
 
 class _ReferralsScreenState extends State<ReferralsScreen> {
   String _statusFilter = 'Barchasi';
+
+  static const List<String> _statuses = [
+    'Barchasi',
+    'Yuborildi',
+    'Qabul qilindi',
+    'Jarayonda',
+    'Yakunlandi',
+  ];
 
   void _showAddReferralDialog(BuildContext context) {
     final app = context.read<AppProvider>();
@@ -45,104 +56,112 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDlgState) => AlertDialog(
-          title: const Text(
-            'Yangi Yo‘naltirish Yaratish',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DropdownButtonFormField<String>(
-                  value: selectedStdId,
-                  decoration: const InputDecoration(
-                    labelText: 'O‘quvchini tanlang *',
+          title: const Text('Yangi yo‘naltirish yaratish'),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 460),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedStdId,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'O‘quvchini tanlang *',
+                    ),
+                    items: students
+                        .map(
+                          (s) => DropdownMenuItem(
+                            value: s.id,
+                            child: Text(
+                              '${s.fullName} (${s.grade})',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) => setDlgState(() => selectedStdId = v!),
                   ),
-                  items: students
-                      .map(
-                        (s) => DropdownMenuItem(
-                          value: s.id,
-                          child: Text('${s.fullName} (${s.grade})'),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (v) => setDlgState(() => selectedStdId = v!),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: toService,
-                  decoration: const InputDecoration(
-                    labelText: 'Qaysi mutaxassis / xizmatga *',
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Amaliyotchi psixolog',
-                      child: Text('Amaliyotchi psixolog'),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    initialValue: toService,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Qaysi mutaxassis / xizmatga *',
                     ),
-                    DropdownMenuItem(
-                      value: 'Logoped-defektolog',
-                      child: Text('Logoped-defektolog'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Maxsus pedagog (Defektolog)',
-                      child: Text('Maxsus pedagog (Defektolog)'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Tibbiy PMPK komissiyasi',
-                      child: Text(
-                        'Tibbiy-psixologik-pedagogik komissiya (PMPK)',
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Amaliyotchi psixolog',
+                        child: Text('Amaliyotchi psixolog'),
                       ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Shifokor-pediatr',
-                      child: Text('Shifokor-pediatr / Poliklinika'),
-                    ),
-                  ],
-                  onChanged: (v) => setDlgState(() => toService = v!),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: priority,
-                  decoration: const InputDecoration(
-                    labelText: 'Muhimlik darajasi',
+                      DropdownMenuItem(
+                        value: 'Logoped-defektolog',
+                        child: Text('Logoped-defektolog'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Maxsus pedagog (Defektolog)',
+                        child: Text('Maxsus pedagog (Defektolog)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Tibbiy PMPK komissiyasi',
+                        child: Text(
+                          'Tibbiy-psixologik-pedagogik komissiya (PMPK)',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Shifokor-pediatr',
+                        child: Text('Shifokor-pediatr / Poliklinika'),
+                      ),
+                    ],
+                    onChanged: (v) => setDlgState(() => toService = v!),
                   ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Rejali',
-                      child: Text('Rejali (Reja asosida ko‘rik)'),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    initialValue: priority,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Muhimlik darajasi',
                     ),
-                    DropdownMenuItem(
-                      value: 'Shoshilinch',
-                      child: Text('Shoshilinch (Zudlik bilan)'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Konsultatsiya',
-                      child: Text('Konsultatsiya (Qisqa tavsiya)'),
-                    ),
-                  ],
-                  onChanged: (v) => setDlgState(() => priority = v!),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: reasonCtrl,
-                  maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: 'Yo‘naltirish sababi va zarurati *',
-                    hintText: 'Nima uchun ushbu mutaxassis ko‘rigi talab qilinmoqda...',
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Rejali',
+                        child: Text('Rejali (Reja asosida ko‘rik)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Shoshilinch',
+                        child: Text('Shoshilinch (Zudlik bilan)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Konsultatsiya',
+                        child: Text('Konsultatsiya (Qisqa tavsiya)'),
+                      ),
+                    ],
+                    onChanged: (v) => setDlgState(() => priority = v!),
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: obsCtrl,
-                  maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: 'Sinfdagi kuzatuvlar va dalillar',
-                    hintText:
-                        'Qanday belgilar yoki qiyinchiliklar qayd etildi...',
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: reasonCtrl,
+                    maxLines: 2,
+                    decoration: const InputDecoration(
+                      labelText: 'Yo‘naltirish sababi va zarurati *',
+                      hintText:
+                          'Nima uchun ushbu mutaxassis ko‘rigi talab qilinmoqda...',
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: obsCtrl,
+                    maxLines: 2,
+                    decoration: const InputDecoration(
+                      labelText: 'Sinfdagi kuzatuvlar va dalillar',
+                      hintText:
+                          'Qanday belgilar yoki qiyinchiliklar qayd etildi...',
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -215,44 +234,49 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(
-          '${referral.studentName} — Xulosa va Natija',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Yo‘naltirish: ${referral.toSpecialistType}',
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        title: Text('${referral.studentName} — Xulosa va natija'),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 460),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Yo‘naltirish: ${referral.toSpecialistType}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Sabab: ${referral.reason}',
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: outcomeCtrl,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'O‘tkazilgan ko‘rik va mutaxassis xulosasi *',
+                    hintText: 'Tekshiruv natijasida nimalar aniqlandi...',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: followUpCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Tavsiya etilgan keyingi chora-tadbirlar',
+                    hintText: 'Masalan: ITR ga 2 ta nutqiy maqsad qo‘shish...',
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Sabab: ${referral.reason}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: outcomeCtrl,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'O‘tkazilgan ko‘rik va mutaxassis xulosasi *',
-                hintText: 'Tekshiruv natijasida nimalar aniqlandi...',
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: followUpCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Tavsiya etilgan keyingi chora-tadbirlar',
-                hintText: 'Masalan: ITR ga 2 ta nutqiy maqsad qo‘shish...',
-              ),
-            ),
-          ],
+          ),
         ),
         actions: [
           TextButton(
@@ -304,327 +328,350 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
     final app = context.watch<AppProvider>();
     final allReferrals = app.referrals;
     final df = DateFormat('dd.MM.yyyy');
+    final canPop = Navigator.canPop(context);
 
     final referrals = _statusFilter == 'Barchasi'
         ? allReferrals
         : allReferrals.where((r) => r.status == _statusFilter).toList();
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Yo‘naltirishlar va Konsilium',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Mutaxassislararo hamkorlik, shifokor va PMPK komissiyasiga yo‘naltirishlar (${referrals.length} ta)',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-                FilledButton.icon(
-                  icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Yangi yo‘naltirish'),
-                  onPressed: () => _showAddReferralDialog(context),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
+    final counts = <String, int>{
+      'Barchasi': allReferrals.length,
+      for (final st in _statuses.skip(1))
+        st: allReferrals.where((r) => r.status == st).length,
+    };
+    final width = MediaQuery.sizeOf(context).width;
+    final mediaPadding = MediaQuery.paddingOf(context);
 
-            // Holat filtri
-            Row(
-              children:
-                  [
-                    'Barchasi',
-                    'Yuborildi',
-                    'Qabul qilindi',
-                    'Jarayonda',
-                    'Yakunlandi',
-                  ].map((st) {
-                    final isSel = _statusFilter == st;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: FilterChip(
-                        label: Text(
-                          st,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isSel
-                                ? Colors.white
-                                : AppColors.textSecondary,
-                          ),
-                        ),
-                        selected: isSel,
-                        selectedColor: AppColors.primary,
-                        onSelected: (val) => setState(() => _statusFilter = st),
-                      ),
-                    );
-                  }).toList(),
+    final pageBody = ResponsivePageContainer(
+      bottomPadding: 0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdaptivePageHeader(
+            title: 'Yo‘naltirishlar',
+            subtitle:
+                'Konsilium va PMPK yo‘llanmalari • ${referrals.length} ta',
+            action: HeaderActionButton(
+              icon: LucideIcons.plus,
+              label: 'Yangi yo‘naltirish',
+              onPressed: () => _showAddReferralDialog(context),
             ),
-            const SizedBox(height: 16),
+          ),
+          const SizedBox(height: 9),
 
-            Expanded(
-              child: referrals.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+          ModernPillFilterBar(
+            items: _statuses,
+            selectedItem: _statusFilter,
+            counts: counts,
+            onSelected: (val) => setState(() => _statusFilter = val),
+          ),
+          const SizedBox(height: 9),
+
+          Expanded(
+            child: referrals.isEmpty
+                ? Center(
+                    child: SurfaceCard(
+                      borderRadius: 26,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 36,
+                      ),
+                      child: const Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           Icon(
-                            Icons.alt_route_rounded,
-                            size: 48,
-                            color: AppColors.textMuted,
+                            LucideIcons.arrowLeftRight,
+                            size: 34,
+                            color: AppColors.primary,
                           ),
-                          SizedBox(height: 12),
+                          SizedBox(height: 14),
                           Text(
                             'Ushbu holatda yo‘naltirishlar mavjud emas',
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15.5,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            'Boshqa holat filtrini tanlang yoki yangi yo‘naltirish yarating.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textMuted,
+                              height: 1.4,
+                            ),
                           ),
                         ],
                       ),
-                    )
-                  : ListView.separated(
-                      itemCount: referrals.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final ref = referrals[index];
-                        final isUrgent = ref.priority == 'Shoshilinch';
-                        final isCompleted = ref.status == 'Yakunlandi';
+                    ),
+                  )
+                : ListView.separated(
+                    padding: EdgeInsets.fromLTRB(
+                      0,
+                      0,
+                      0,
+                      width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
+                    ),
+                    itemCount: referrals.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final ref = referrals[index];
+                      final isUrgent = ref.priority == 'Shoshilinch';
+                      final isCompleted = ref.status == 'Yakunlandi';
 
-                        return Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 3,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: isUrgent
-                                                ? AppColors.errorBg
-                                                : AppColors.infoBg,
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            ref.priority,
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                              color: isUrgent
-                                                  ? AppColors.error
-                                                  : AppColors.info,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          ref.toSpecialistType,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      df.format(ref.createdAt),
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.textMuted,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'O‘quvchi: ${ref.studentName}',
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
+                      return SurfaceCard(
+                        borderRadius: 26,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 22,
+                          vertical: 20,
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => StudentDetailScreen(
+                                studentId: ref.studentId,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: Wrap(
+                                spacing: 10,
+                                runSpacing: 6,
+                                alignment: WrapAlignment.spaceBetween,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  StatusPill(
+                                    label: ref.priority,
+                                    color: isUrgent
+                                        ? AppColors.error
+                                        : AppColors.info,
+                                    backgroundColor: isUrgent
+                                        ? AppColors.errorBg
+                                        : AppColors.infoBg,
                                   ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Sababi: ${ref.reason}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                                if (ref.supportingObservations != null) ...[
-                                  const SizedBox(height: 4),
                                   Text(
-                                    'Kuzatuvlar: ${ref.supportingObservations}',
+                                    df.format(ref.createdAt),
                                     style: const TextStyle(
-                                      fontSize: 11,
-                                      fontStyle: FontStyle.italic,
+                                      fontSize: 12,
                                       color: AppColors.textMuted,
-                                    ),
-                                  ),
-                                ],
-                                const SizedBox(height: 6),
-                                Text(
-                                  'Yuborgan: ${ref.fromSpecialistName} (${ref.fromSpecialistRole ?? 'Mutaxassis'})',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textMuted,
-                                  ),
-                                ),
-                                if (ref.outcomeNotes != null &&
-                                    ref.outcomeNotes!.isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.successBg,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      'Yakuniy xulosa: ${ref.outcomeNotes}',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: AppColors.success,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                                const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 3,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isCompleted
-                                            ? AppColors.successBg
-                                            : AppColors.primaryLight,
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        'Holat: ${ref.status}',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: isCompleted
-                                              ? AppColors.success
-                                              : AppColors.primaryDark,
-                                        ),
-                                      ),
-                                    ),
-                                    Wrap(
-                                      spacing: 8,
-                                      children: [
-                                        if (ref.status == 'Yuborildi' ||
-                                            ref.status ==
-                                                'Ko‘rib chiqilmoqda') ...[
-                                          OutlinedButton(
-                                            style: OutlinedButton.styleFrom(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 10,
-                                                    vertical: 4,
-                                                  ),
-                                            ),
-                                            onPressed: () {
-                                              app.updateReferralStatus(
-                                                ref.id,
-                                                'Qabul qilindi',
-                                              );
-                                            },
-                                            child: const Text(
-                                              'Qabul qilish',
-                                              style: TextStyle(fontSize: 11),
-                                            ),
-                                          ),
-                                        ],
-                                        if (ref.status == 'Qabul qilindi') ...[
-                                          FilledButton.tonal(
-                                            style: FilledButton.styleFrom(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 10,
-                                                    vertical: 4,
-                                                  ),
-                                            ),
-                                            onPressed: () {
-                                              app.updateReferralStatus(
-                                                ref.id,
-                                                'Jarayonda',
-                                              );
-                                            },
-                                            child: const Text(
-                                              'Jarayonga o‘tkazish',
-                                              style: TextStyle(fontSize: 11),
-                                            ),
-                                          ),
-                                        ],
-                                        if (ref.status == 'Jarayonda') ...[
-                                          FilledButton(
-                                            style: FilledButton.styleFrom(
-                                              backgroundColor:
-                                                  AppColors.success,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 10,
-                                                    vertical: 4,
-                                                  ),
-                                            ),
-                                            onPressed: () =>
-                                                _showCompleteReferralDialog(
-                                                  context,
-                                                  ref,
-                                                ),
-                                            child: const Text(
-                                              'Yakunlash',
-                                              style: TextStyle(fontSize: 11),
-                                            ),
-                                          ),
-                                        ],
+                                      fontWeight: FontWeight.w500,
+                                      fontFeatures: [
+                                        FontFeature.tabularFigures(),
                                       ],
                                     ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              ref.toSpecialistType,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15.5,
+                                color: AppColors.textPrimary,
+                                letterSpacing: -0.25,
+                                height: 1.3,
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            GlassWell(
+                              borderRadius: 12,
+                              padding: const EdgeInsets.all(15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'O‘quvchi: ${ref.studentName}',
+                                    style: const TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'Sababi: ${ref.reason}',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: AppColors.textSecondary,
+                                      height: 1.45,
+                                    ),
+                                  ),
+                                  if (ref.supportingObservations != null &&
+                                      ref.supportingObservations!
+                                          .isNotEmpty) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'Kuzatuvlar: ${ref.supportingObservations}',
+                                      style: const TextStyle(
+                                        fontSize: 12.5,
+                                        color: AppColors.textMuted,
+                                        height: 1.4,
+                                      ),
+                                    ),
                                   ],
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                const Icon(
+                                  LucideIcons.userCheck,
+                                  size: 14.5,
+                                  color: AppColors.textMuted,
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    'Yuborgan: ${ref.fromSpecialistName} (${ref.fromSpecialistRole ?? 'Mutaxassis'})',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textMuted,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
+                            if (ref.outcomeNotes != null &&
+                                ref.outcomeNotes!.isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                              GlassWell(
+                                borderRadius: 12,
+                                padding: const EdgeInsets.all(13),
+                                tintColor: AppColors.successBg,
+                                borderColor: AppColors.successBorder,
+                                child: Text(
+                                  'Yakuniy xulosa: ${ref.outcomeNotes}',
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: AppColors.success,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Wrap(
+                                spacing: 10,
+                                runSpacing: 8,
+                                alignment: WrapAlignment.spaceBetween,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  StatusPill(
+                                    label: 'Holat: ${ref.status}',
+                                    color: isCompleted
+                                        ? AppColors.success
+                                        : AppColors.primary,
+                                    backgroundColor: isCompleted
+                                        ? AppColors.successBg
+                                        : AppColors.primaryLight,
+                                    showDot: true,
+                                  ),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 6,
+                                    children: [
+                                      if (ref.status == 'Yuborildi' ||
+                                          ref.status ==
+                                              'Ko‘rib chiqilmoqda') ...[
+                                        OutlinedButton(
+                                          style: OutlinedButton.styleFrom(
+                                            minimumSize: const Size(0, 38),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 14,
+                                              vertical: 8,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            app.updateReferralStatus(
+                                              ref.id,
+                                              'Qabul qilindi',
+                                            );
+                                          },
+                                          child: const Text(
+                                            'Qabul qilish',
+                                            style: TextStyle(fontSize: 12.5),
+                                          ),
+                                        ),
+                                      ],
+                                      if (ref.status == 'Qabul qilindi') ...[
+                                        FilledButton.tonal(
+                                          style: FilledButton.styleFrom(
+                                            minimumSize: const Size(0, 38),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 14,
+                                              vertical: 8,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            app.updateReferralStatus(
+                                              ref.id,
+                                              'Jarayonda',
+                                            );
+                                          },
+                                          child: const Text(
+                                            'Jarayonga o‘tkazish',
+                                            style: TextStyle(fontSize: 12.5),
+                                          ),
+                                        ),
+                                      ],
+                                      if (ref.status == 'Jarayonda') ...[
+                                        FilledButton(
+                                          style: FilledButton.styleFrom(
+                                            backgroundColor: AppColors.success,
+                                            minimumSize: const Size(0, 38),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 14,
+                                              vertical: 8,
+                                            ),
+                                          ),
+                                          onPressed: () =>
+                                              _showCompleteReferralDialog(
+                                            context,
+                                            ref,
+                                          ),
+                                          child: const Text(
+                                            'Yakunlash',
+                                            style: TextStyle(fontSize: 12.5),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
+    );
+
+    return Scaffold(
+      backgroundColor: canPop ? AppColors.background : Colors.transparent,
+      appBar: canPop ? AppBar(title: const Text('Yo‘naltirishlar')) : null,
+      body: canPop ? AmbientMeshBackground(child: pageBody) : pageBody,
     );
   }
 }
