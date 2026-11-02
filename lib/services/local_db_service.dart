@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -32,6 +33,7 @@ import '../core/constants/psychological_questions_seed.dart';
 import 'access_control_service.dart';
 import 'app_exceptions.dart';
 import 'password_hasher.dart';
+import '../core/config/app_config.dart';
 import 'monitoring_rule_engine.dart';
 import 'seed_data.dart';
 import '../core/constants/namangan_data.dart';
@@ -79,7 +81,8 @@ class LocalDbService {
 
   /// Ishga tushishda o'qib bo'lmagan qatorlar (jadval -> soni). Ular `<jadval>_rejected_rows`
   /// kalitida saqlanadi; foydalanuvchiga "N ta yozuv o'qilmadi" deb ko'rsatish mumkin.
-  Map<String, int> get rejectedRowCounts => Map.unmodifiable(_rejectedRowCounts);
+  Map<String, int> get rejectedRowCounts =>
+      Map.unmodifiable(_rejectedRowCounts);
 
   /// Xotiradagi barcha jadvallarni tozalash — init() har doim toza holatdan boshlanadi
   /// (oldingi holatdan qolgan yozuvlar yangi bazaga aralashmasin).
@@ -122,13 +125,13 @@ class LocalDbService {
     final isSeeded = prefs.getBool('app_db_seeded_v2') ?? false;
     _clearMemory();
 
-    if (!isSeeded && !kDebugMode) {
-      // Release build: real foydalanuvchilarga namunaviy bolalar ma'lumoti ko'rsatilmaydi
+    if (!isSeeded && !kDebugMode && !AppConfig.demoMode) {
+      // Release build (DEMO_MODE=false): real foydalanuvchilarga namunaviy bolalar ma'lumoti ko'rsatilmaydi
       _questions = List.from(PsychologicalQuestionsSeed.initialQuestions);
       await _persistAll();
       await prefs.setBool('app_db_seeded_v2', true);
     } else if (!isSeeded) {
-      // Faqat debug rejimida: namunaviy ma'lumotlar bilan boshlang'ich to'ldirish
+      // Debug yoki DEMO_MODE rejimida: namunaviy ma'lumotlar bilan boshlang'ich to'ldirish
       _users = List.from(SeedData.users);
       _students = List.from(SeedData.students);
       _assessments = List.from(SeedData.assessments);
@@ -145,9 +148,35 @@ class LocalDbService {
       await prefs.setBool('app_db_seeded_v2', true);
     } else {
       _loadFromPrefs(prefs);
+      if (AppConfig.demoMode &&
+          _users.isEmpty &&
+          _students.isEmpty &&
+          _corruptedKeys.isEmpty) {
+        _users = List.from(SeedData.users);
+        _students = List.from(SeedData.students);
+        _assessments = List.from(SeedData.assessments);
+        _sessions = List.from(SeedData.sessions);
+        _iepPlans = List.from(SeedData.iepPlans);
+        _alerts = List.from(SeedData.monitoringAlerts);
+        _referrals = List.from(SeedData.referrals);
+        _auditLogs = List.from(SeedData.auditLogs);
+        _notifications = List.from(SeedData.notifications);
+        _observations = List.from(SeedData.observations);
+        await _persistAll();
+      }
     }
 
     await _migratePlainTextPasswords();
+    for (final problem in AppConfig.problems()) {
+      debugPrint('AppConfig: $problem');
+    }
+    if (AppConfig.hasAdminBootstrap) {
+      await bootstrapAdmin(
+        email: AppConfig.adminEmail,
+        passwordHash: AppConfig.adminPasswordHash,
+        fullName: AppConfig.adminFullName,
+      );
+    }
     await _syncStandardQuestions();
     await _syncCurriculumSeed();
 
@@ -300,11 +329,7 @@ class LocalDbService {
     await _writeTable(prefs, 'db_sessions', _sessions.map((e) => e.toJson()));
     await _writeTable(prefs, 'db_iep', _iepPlans.map((e) => e.toJson()));
     await _writeTable(prefs, 'db_alerts', _alerts.map((e) => e.toJson()));
-    await _writeTable(
-      prefs,
-      'db_referrals',
-      _referrals.map((e) => e.toJson()),
-    );
+    await _writeTable(prefs, 'db_referrals', _referrals.map((e) => e.toJson()));
     await _writeTable(prefs, 'db_audit', _auditLogs.map((e) => e.toJson()));
     await _writeTable(
       prefs,
@@ -316,11 +341,7 @@ class LocalDbService {
       'db_observations',
       _observations.map((e) => e.toJson()),
     );
-    await _writeTable(
-      prefs,
-      'db_questions',
-      _questions.map((e) => e.toJson()),
-    );
+    await _writeTable(prefs, 'db_questions', _questions.map((e) => e.toJson()));
     await _writeTable(
       prefs,
       'db_assessment_plans',
@@ -399,6 +420,7 @@ class LocalDbService {
     _require(
       _accessControl.canTrackSounds(byUser, student),
       'tovushlar kartasini bolaga biriktirilgan logoped yuritadi.',
+      actor: byUser,
     );
     final error = _soundTracker.validate(entry, DateTime.now());
     if (error != null) throw ValidationException(error);
@@ -409,8 +431,9 @@ class LocalDbService {
       soundId: entry.soundId,
       stage: entry.stage,
       disorder: entry.disorder,
-      substitutedWith:
-          entry.disorder == SoundDisorder.substitution ? entry.substitutedWith : null,
+      substitutedWith: entry.disorder == SoundDisorder.substitution
+          ? entry.substitutedWith
+          : null,
       differentiatedFrom: entry.differentiatedFrom,
       note: entry.note,
       recordedById: byUser.id,
@@ -461,13 +484,16 @@ class LocalDbService {
     _require(
       _accessControl.canAssignSpecialists(byUser, student),
       'konsiliumni koordinator yoki muassasa rahbari chaqiradi.',
+      actor: byUser,
     );
     if (conference.agenda.trim().isEmpty) {
       throw const ValidationException('Konsilium kun tartibini kiriting.');
     }
     final participants = conference.participantIds.toSet().toList();
     if (participants.length < 2) {
-      throw const ValidationException('Konsiliumda kamida 2 nafar mutaxassis ishtirok etishi kerak.');
+      throw const ValidationException(
+        'Konsiliumda kamida 2 nafar mutaxassis ishtirok etishi kerak.',
+      );
     }
     for (final id in participants) {
       final u = getUserById(id);
@@ -511,7 +537,8 @@ class LocalDbService {
       userRole: byUser.role.label,
       action: 'CREATE',
       entity: 'CaseConference',
-      details: '${student.fullName} bo‘yicha konsilium rejalashtirildi (${participants.length} ishtirokchi)',
+      details:
+          '${student.fullName} bo‘yicha konsilium rejalashtirildi (${participants.length} ishtirokchi)',
     );
     return saved;
   }
@@ -538,9 +565,12 @@ class LocalDbService {
     _require(
       conf.participantIds.contains(byUser.id),
       'xulosani faqat konsilium ishtirokchisi kiritadi.',
+      actor: byUser,
     );
     if (conf.status != ConferenceStatus.planned) {
-      throw const ValidationException('Konsilium yakunlangan — xulosa qo‘shib bo‘lmaydi.');
+      throw const ValidationException(
+        'Konsilium yakunlangan — xulosa qo‘shib bo‘lmaydi.',
+      );
     }
     if (summary.trim().isEmpty) {
       throw const ValidationException('Xulosa matnini kiriting.');
@@ -581,19 +611,26 @@ class LocalDbService {
     _require(
       conf.convenedById == byUser.id || byUser.role == UserRole.superAdmin,
       'konsiliumni uni chaqirgan mas’ul yakunlaydi.',
+      actor: byUser,
     );
     if (conf.status != ConferenceStatus.planned) {
-      throw const ValidationException('Konsilium allaqachon yakunlangan yoki bekor qilingan.');
+      throw const ValidationException(
+        'Konsilium allaqachon yakunlangan yoki bekor qilingan.',
+      );
     }
     if (conclusion.trim().isEmpty) {
-      throw const ValidationException('Konsiliumning umumiy xulosasini kiriting.');
+      throw const ValidationException(
+        'Konsiliumning umumiy xulosasini kiriting.',
+      );
     }
     for (final d in decisions) {
       if (d.text.trim().isEmpty) {
         throw const ValidationException('Har bir qaror matnini kiriting.');
       }
       if (!conf.isParticipant(d.responsibleId)) {
-        throw const ValidationException('Qaror mas’uli konsilium ishtirokchilaridan bo‘lishi kerak.');
+        throw const ValidationException(
+          'Qaror mas’uli konsilium ishtirokchilaridan bo‘lishi kerak.',
+        );
       }
     }
     final now = DateTime.now();
@@ -606,7 +643,8 @@ class LocalDbService {
             id: d.id,
             text: d.text.trim(),
             responsibleId: d.responsibleId,
-            responsibleName: getUserById(d.responsibleId)?.fullName ?? d.responsibleName,
+            responsibleName:
+                getUserById(d.responsibleId)?.fullName ?? d.responsibleName,
             dueDate: d.dueDate,
           ),
       ],
@@ -636,7 +674,8 @@ class LocalDbService {
       userRole: byUser.role.label,
       action: 'UPDATE',
       entity: 'CaseConference',
-      details: '${conf.studentName} konsiliumi yakunlandi (${decisions.length} ta qaror)',
+      details:
+          '${conf.studentName} konsiliumi yakunlandi (${decisions.length} ta qaror)',
     );
     return updated;
   }
@@ -655,6 +694,7 @@ class LocalDbService {
           conf.convenedById == byUser.id ||
           byUser.role == UserRole.superAdmin,
       'qarorni faqat uning mas’uli yoki konsilium chaqiruvchisi yopadi.',
+      actor: byUser,
     );
     final updated = conf.copyWith(
       decisions: [
@@ -669,7 +709,8 @@ class LocalDbService {
       userRole: byUser.role.label,
       action: 'UPDATE',
       entity: 'CaseConference',
-      details: '${conf.studentName}: konsilium qarori bajarildi — ${decision.first.text}',
+      details:
+          '${conf.studentName}: konsilium qarori bajarildi — ${decision.first.text}',
     );
     return updated;
   }
@@ -683,12 +724,12 @@ class LocalDbService {
       if (studentId != null && c.studentId != studentId) return false;
       final student = getStudentById(c.studentId);
       if (student == null) return false;
-      final schoolWide = forUser.role == UserRole.superAdmin ||
+      final schoolWide =
+          forUser.role == UserRole.superAdmin ||
           AccessControlService.schoolWideRoles.contains(forUser.role);
       if (schoolWide) return _accessControl.canViewStudent(forUser, student);
       return forUser.isActive && c.isParticipant(forUser.id);
-    }).toList()
-      ..sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
+    }).toList()..sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
   }
 
   // ==================== YUTUQLAR PASPORTI ====================
@@ -704,12 +745,17 @@ class LocalDbService {
     _require(
       _accessControl.canCreateAssessment(byUser, student),
       'yutuqni faqat bola bilan ishlaydigan mutaxassis kiritadi.',
+      actor: byUser,
     );
     if (achievement.title.trim().isEmpty) {
       throw const ValidationException('Yutuq nomini kiriting.');
     }
-    if (achievement.achievedAt.isAfter(DateTime.now().add(const Duration(days: 1)))) {
-      throw const ValidationException('Yutuq sanasi kelajakda bo‘lishi mumkin emas.');
+    if (achievement.achievedAt.isAfter(
+      DateTime.now().add(const Duration(days: 1)),
+    )) {
+      throw const ValidationException(
+        'Yutuq sanasi kelajakda bo‘lishi mumkin emas.',
+      );
     }
     final saved = Achievement(
       id: achievement.id,
@@ -741,6 +787,7 @@ class LocalDbService {
     _require(
       target.recordedById == byUser.id || byUser.role == UserRole.superAdmin,
       'yutuqni faqat uni kiritgan mutaxassis o‘chiradi.',
+      actor: byUser,
     );
     _achievements.removeAt(index);
     await _persistAll();
@@ -751,6 +798,80 @@ class LocalDbService {
       entity: 'Achievement',
       details: 'Yutuq o‘chirildi: ${target.title}',
     );
+  }
+
+  // ==================== ADMINISTRATORNI SOZLASH ====================
+  /// Birinchi tizim administratorini yig'ish vaqtidagi sozlamadan yaratish
+  /// (AppConfig: ADMIN_EMAIL, ADMIN_PASSWORD_HASH). Faqat faol administrator yo'q
+  /// bo'lganda ishlaydi; mavjud hisob ustidan yozilmaydi va oddiy foydalanuvchi
+  /// jimgina administratorga aylantirilmaydi. true — administrator yaratildi.
+  @visibleForTesting
+  Future<bool> bootstrapAdmin({
+    required String email,
+    required String passwordHash,
+    String fullName = 'Tizim administratori',
+  }) async {
+    if (!PasswordHasher.isHashed(passwordHash)) {
+      debugPrint('AppConfig: ADMIN_PASSWORD_HASH xesh emas — administrator yaratilmadi.');
+      return false;
+    }
+    final hasActiveAdmin = _users.any(
+      (u) => u.role == UserRole.superAdmin && u.isActive,
+    );
+    if (hasActiveAdmin) return false;
+    if (findUserByEmailOrPhone(email) != null) {
+      await logSecurityEvent(
+        action: 'SECURITY_ADMIN_BOOTSTRAP_REFUSED',
+        details: 'Administrator pochtasi boshqa hisobga tegishli — avtomatik yaratilmadi.',
+      );
+      return false;
+    }
+    final admin = UserModel(
+      id: 'admin_${_uuid.v4().substring(0, 8)}',
+      email: email.trim().toLowerCase(),
+      fullName: fullName,
+      role: UserRole.superAdmin,
+      password: passwordHash,
+      isActive: true,
+    );
+    _users.insert(0, admin);
+    await _persistAll();
+    await logSecurityEvent(
+      action: 'SECURITY_ADMIN_BOOTSTRAP',
+      details: 'Tizim administratori yig‘ish sozlamasidan yaratildi.',
+      actor: admin,
+    );
+    return true;
+  }
+
+  // ==================== XAVFSIZLIK HODISALARI ====================
+  /// Shubhali faollikni jurnalga yozish: noto'g'ri kirish, bloklash, ruxsatsiz urinish.
+  /// Parol yoki maxfiy ma'lumot yozilmaydi; login yashirilgan holda beriladi.
+  Future<void> logSecurityEvent({
+    required String action,
+    required String details,
+    UserModel? actor,
+  }) {
+    return addAuditLog(
+      userFullName: actor?.fullName ?? 'Noma’lum foydalanuvchi',
+      userRole: actor?.role.label ?? '—',
+      action: action,
+      entity: 'Security',
+      details: details,
+    );
+  }
+
+  /// Xavfsizlik hodisalari — tizim bo'ylab, shuning uchun faqat tizim administratoriga
+  /// (maktab rahbari boshqa maktablar xodimlarining hodisalarini ko'rmasligi kerak)
+  List<AuditLogModel> getSecurityEvents({
+    required UserModel forUser,
+    Duration within = const Duration(days: 7),
+  }) {
+    if (!forUser.isActive || forUser.role != UserRole.superAdmin) return const [];
+    final since = DateTime.now().subtract(within);
+    return _auditLogs
+        .where((l) => l.entity == 'Security' && l.timestamp.isAfter(since))
+        .toList();
   }
 
   // ==================== ISH YOZUVLARI (MONITORING UCHUN) ====================
@@ -783,7 +904,11 @@ class LocalDbService {
       for (final c in _conferences)
         if (c.studentId == studentId)
           for (final contribution in c.contributions)
-            WorkRecord(contribution.userId, contribution.at, WorkKind.conference),
+            WorkRecord(
+              contribution.userId,
+              contribution.at,
+              WorkKind.conference,
+            ),
       for (final e in _soundEntries)
         if (e.studentId == studentId)
           WorkRecord(e.recordedById, e.recordedAt, WorkKind.soundTracking),
@@ -791,8 +916,20 @@ class LocalDbService {
   }
 
   // ==================== RUXSAT YORDAMCHILARI ====================
-  void _require(bool allowed, String reason) {
-    if (!allowed) throw PermissionDeniedException(reason);
+  /// Ruxsatni tekshiradi. Rad etilsa — urinish xavfsizlik jurnaliga yoziladi
+  /// (kim, qanday amal) va PermissionDeniedException tashlanadi.
+  void _require(bool allowed, String reason, {UserModel? actor}) {
+    if (allowed) return;
+    if (actor != null) {
+      unawaited(
+        logSecurityEvent(
+          action: 'SECURITY_ACCESS_DENIED',
+          details: 'Ruxsatsiz urinish: $reason',
+          actor: actor,
+        ),
+      );
+    }
+    throw PermissionDeniedException(reason);
   }
 
   StudentModel _studentOrThrow(String id) {
@@ -837,7 +974,9 @@ class LocalDbService {
     for (final u in _users) {
       if (u.email.toLowerCase() == cleanId) return u;
       // Telefon faqat to'liq mos kelganda (oxirgi 9 raqam: operator kodi + raqam)
-      if (phoneKey != null && u.phone != null && _phoneKey(u.phone!) == phoneKey) {
+      if (phoneKey != null &&
+          u.phone != null &&
+          _phoneKey(u.phone!) == phoneKey) {
         return u;
       }
     }
@@ -856,8 +995,8 @@ class LocalDbService {
   /// Kiritilgan parolni saqlangan xesh bilan tekshirish.
   bool verifyPassword(UserModel user, String password) {
     if (PasswordHasher.verify(password, user.password)) return true;
-    // Namunaviy (seed) hisoblarda parol yo'q — ular faqat debug rejimida ishlaydi
-    return kDebugMode &&
+    // Namunaviy (seed) hisoblarda parol yo'q — ular debug yoki DEMO_MODE rejimida ishlaydi
+    return (kDebugMode || AppConfig.demoMode) &&
         user.password == null &&
         password == SeedData.demoPassword;
   }
@@ -937,6 +1076,7 @@ class LocalDbService {
     _require(
       selfRegistrationRoles.contains(user.role),
       'bu rol bilan o‘zingiz ro‘yxatdan o‘ta olmaysiz — hisobni administrator yaratadi.',
+      actor: user,
     );
     if (findUserByEmailOrPhone(user.email) != null ||
         (user.phone != null &&
@@ -967,6 +1107,7 @@ class LocalDbService {
     _require(
       _canManageUser(byUser, user),
       'foydalanuvchini faqat tizim administratori yoki o‘z maktabi rahbari qo‘sha oladi.',
+      actor: byUser,
     );
     if (findUserByEmailOrPhone(user.email) != null) {
       throw const ValidationException(
@@ -995,7 +1136,10 @@ class LocalDbService {
 
   /// Foydalanuvchi ma'lumotlarini yangilash. Oddiy foydalanuvchi faqat o'z profilini
   /// (ism, telefon, parol...) o'zgartiradi — rol, muassasa, holat va biriktirishlarni emas.
-  Future<void> updateUser(UserModel updated, {required UserModel byUser}) async {
+  Future<void> updateUser(
+    UserModel updated, {
+    required UserModel byUser,
+  }) async {
     final index = _users.indexWhere((u) => u.id == updated.id);
     if (index == -1) throw const NotFoundException('Foydalanuvchi topilmadi.');
     final current = _users[index];
@@ -1006,6 +1150,7 @@ class LocalDbService {
       _require(
         byUser.id == updated.id,
         'boshqa foydalanuvchi ma’lumotlarini o‘zgartirish huquqi yo‘q.',
+        actor: byUser,
       );
       final privilegedChange =
           current.role != updated.role ||
@@ -1016,6 +1161,20 @@ class LocalDbService {
       _require(
         !privilegedChange,
         'o‘z rolingiz, muassasangiz, holatingiz yoki biriktirilgan o‘quvchilaringizni o‘zgartira olmaysiz.',
+        actor: byUser,
+      );
+    }
+
+    // Oxirgi faol tizim administratori rolini yo'qotmasligi kerak
+    final activeAdmins = _users
+        .where((u) => u.role == UserRole.superAdmin && u.isActive)
+        .length;
+    if (current.role == UserRole.superAdmin &&
+        current.isActive &&
+        (updated.role != UserRole.superAdmin || !updated.isActive) &&
+        activeAdmins <= 1) {
+      throw const ValidationException(
+        'Oxirgi faol tizim administratorining rolini yoki holatini o‘zgartirib bo‘lmaydi.',
       );
     }
 
@@ -1042,6 +1201,7 @@ class LocalDbService {
     _require(
       _canManageUser(byUser, target),
       'foydalanuvchi holatini o‘zgartirish uchun administrator huquqi talab qilinadi.',
+      actor: byUser,
     );
     if (target.role == UserRole.superAdmin && !isActive) {
       throw const ValidationException(
@@ -1071,6 +1231,7 @@ class LocalDbService {
     _require(
       _canManageUser(byUser, target),
       'foydalanuvchini o‘chirish huquqi mavjud emas.',
+      actor: byUser,
     );
     if (target.role == UserRole.superAdmin) {
       throw const ValidationException(
@@ -1108,8 +1269,8 @@ class LocalDbService {
           'type': name.contains('internat')
               ? 'Ixtisoslashtirilgan maktab-internati'
               : name.contains('inklyuziv')
-                  ? 'Inklyuziv tayanch maktab'
-                  : 'Umumiy o‘rta ta’lim maktabi',
+              ? 'Inklyuziv tayanch maktab'
+              : 'Umumiy o‘rta ta’lim maktabi',
           'studentsCount': 0,
           'specialistsCount': 0,
           'activeIepCount': 0,
@@ -1133,7 +1294,8 @@ class LocalDbService {
           'activeIepCount': 0,
         };
       }
-      map[name]!['specialistsCount'] = (map[name]!['specialistsCount'] as int) + 1;
+      map[name]!['specialistsCount'] =
+          (map[name]!['specialistsCount'] as int) + 1;
       if (u.district != null && u.district!.isNotEmpty) {
         map[name]!['district'] = u.district!;
       }
@@ -1142,7 +1304,8 @@ class LocalDbService {
     for (final iep in _iepPlans) {
       final name = iep.institutionName.trim();
       if (map.containsKey(name) && iep.status == 'Faol') {
-        map[name]!['activeIepCount'] = (map[name]!['activeIepCount'] as int) + 1;
+        map[name]!['activeIepCount'] =
+            (map[name]!['activeIepCount'] as int) + 1;
       }
     }
 
@@ -1157,8 +1320,8 @@ class LocalDbService {
             'type': sch.contains('internat')
                 ? 'Ixtisoslashtirilgan maktab-internati'
                 : sch.contains('inklyuziv')
-                    ? 'Inklyuziv tayanch maktab'
-                    : 'Umumiy o‘rta ta’lim maktabi',
+                ? 'Inklyuziv tayanch maktab'
+                : 'Umumiy o‘rta ta’lim maktabi',
             'studentsCount': 0,
             'specialistsCount': 0,
             'activeIepCount': 0,
@@ -1169,7 +1332,9 @@ class LocalDbService {
 
     final list = map.values.toList();
     list.sort((a, b) {
-      final sComp = (b['studentsCount'] as int).compareTo(a['studentsCount'] as int);
+      final sComp = (b['studentsCount'] as int).compareTo(
+        a['studentsCount'] as int,
+      );
       if (sComp != 0) return sComp;
       return (a['name'] as String).compareTo(b['name'] as String);
     });
@@ -1270,12 +1435,15 @@ class LocalDbService {
     _require(
       _accessControl.canEditStudent(byUser, student),
       'o‘quvchini faqat muassasa rahbari yoki koordinator ro‘yxatga oladi (o‘z maktabiga).',
+      actor: byUser,
     );
     if (_students.any((s) => s.id == student.id)) {
       throw const ValidationException('Bunday o‘quvchi allaqachon mavjud.');
     }
     if (student.firstName.trim().isEmpty || student.lastName.trim().isEmpty) {
-      throw const ValidationException('O‘quvchining ismi va familiyasini kiriting.');
+      throw const ValidationException(
+        'O‘quvchining ismi va familiyasini kiriting.',
+      );
     }
     _students.insert(0, student);
     _reEvaluateRules();
@@ -1303,6 +1471,7 @@ class LocalDbService {
       _accessControl.canEditStudent(byUser, current) &&
           _accessControl.canEditStudent(byUser, updated),
       'o‘quvchi anketasini faqat muassasa rahbari yoki koordinator tahrirlaydi.',
+      actor: byUser,
     );
     _students[index] = updated.copyWith(
       assignedSpecialistIds: current.assignedSpecialistIds,
@@ -1331,6 +1500,7 @@ class LocalDbService {
     _require(
       _accessControl.canArchiveStudent(byUser, cur),
       'o‘quvchini faqat muassasa rahbari arxivlay oladi.',
+      actor: byUser,
     );
     if (reason.trim().isEmpty) {
       throw const ValidationException('Arxivlash sababini kiriting.');
@@ -1365,6 +1535,7 @@ class LocalDbService {
     _require(
       _accessControl.canAssignSpecialists(byUser, student),
       'mutaxassisni faqat koordinator yoki muassasa rahbari biriktiradi.',
+      actor: byUser,
     );
     if (!_accessControl.canBeAssigned(specialist, student)) {
       throw const ValidationException(
@@ -1385,6 +1556,7 @@ class LocalDbService {
     _require(
       _accessControl.canAssignSpecialists(byUser, student),
       'biriktirishni faqat koordinator yoki muassasa rahbari bekor qiladi.',
+      actor: byUser,
     );
     final sIndex = _students.indexWhere((s) => s.id == studentId);
     _students[sIndex] = student.copyWith(
@@ -1628,7 +1800,10 @@ class LocalDbService {
   }
 
   // ==================== DTS TALABLARI VA FAN BO'YICHA DARAJA ====================
-  List<CurriculumStandard> getCurriculumStandards({String? subject, int? grade}) {
+  List<CurriculumStandard> getCurriculumStandards({
+    String? subject,
+    int? grade,
+  }) {
     return _curriculum.where((s) {
       if (subject != null && s.subject != subject) return false;
       if (grade != null && s.grade != grade) return false;
@@ -1836,8 +2011,7 @@ class LocalDbService {
     final student = getStudentById(task.studentId);
     if (student == null ||
         !_accessControl.canAssessSubjectLevel(byUser, student)) {
-      throw PermissionDeniedException(
-        'natijani kiritish huquqi yo‘q.');
+      throw PermissionDeniedException('natijani kiritish huquqi yo‘q.');
     }
     final done = task.complete(result, note: note);
     _subjectTasks[index] = done;
@@ -1889,11 +2063,12 @@ class LocalDbService {
     required UserModel byUser,
   }) async {
     if (!byUser.isActive || !byUser.role.canCreateAssessments) {
-      throw PermissionDeniedException(
-        'ko‘rsatkich qo‘shish huquqi yo‘q.');
+      throw PermissionDeniedException('ko‘rsatkich qo‘shish huquqi yo‘q.');
     }
     if (metric.name.trim().isEmpty || metric.unit.trim().isEmpty) {
-      throw ValidationException('Ko‘rsatkich nomi va o‘lchov birligini kiriting.');
+      throw ValidationException(
+        'Ko‘rsatkich nomi va o‘lchov birligini kiriting.',
+      );
     }
     if (getProgressMetric(metric.id) != null) {
       throw ValidationException('Bunday ko‘rsatkich allaqachon mavjud.');
@@ -2005,11 +2180,13 @@ class LocalDbService {
     _require(
       _accessControl.canCreateAssessment(byUser, student),
       'bu o‘quvchi sizga biriktirilmagan yoki baholash huquqingiz yo‘q.',
+      actor: byUser,
     );
     _require(
       assessment.specialistId == byUser.id ||
           byUser.role == UserRole.superAdmin,
       'baholashni faqat o‘z nomingizdan kiritishingiz mumkin.',
+      actor: byUser,
     );
     _assessments.insert(0, assessment);
     _reEvaluateRules();
@@ -2034,6 +2211,7 @@ class LocalDbService {
     _require(
       _accessControl.canModifyAssessment(byUser, current),
       'baholashni faqat uni o‘tkazgan mutaxassis yoki rahbariyat o‘zgartiradi.',
+      actor: byUser,
     );
     if (updated.studentId != current.studentId) {
       throw const ValidationException(
@@ -2053,16 +2231,14 @@ class LocalDbService {
     );
   }
 
-  Future<void> deleteAssessment(
-    String id, {
-    required UserModel byUser,
-  }) async {
+  Future<void> deleteAssessment(String id, {required UserModel byUser}) async {
     final index = _assessments.indexWhere((a) => a.id == id);
     if (index == -1) throw const NotFoundException('Baholash topilmadi.');
     final target = _assessments[index];
     _require(
       _accessControl.canModifyAssessment(byUser, target),
       'baholashni faqat uni o‘tkazgan mutaxassis yoki rahbariyat o‘chiradi.',
+      actor: byUser,
     );
     _assessments.removeAt(index);
     _reEvaluateRules();
@@ -2072,7 +2248,8 @@ class LocalDbService {
       userRole: byUser.role.label,
       action: 'DELETE',
       entity: 'Assessment',
-      details: '${target.studentName} uchun ${target.title} baholash o‘chirildi',
+      details:
+          '${target.studentName} uchun ${target.title} baholash o‘chirildi',
     );
   }
 
@@ -2126,6 +2303,7 @@ class LocalDbService {
     _require(
       _accessControl.canCreateQuestion(byUser),
       'savol qo‘shish huquqi yo‘q.',
+      actor: byUser,
     );
     if (question.text.trim().isEmpty) {
       throw const ValidationException('Savol matnini kiriting.');
@@ -2159,6 +2337,7 @@ class LocalDbService {
     _require(
       _accessControl.canModifyQuestion(byUser, current),
       'standart savollarni faqat tizim administratori, boshqalarini — muallif o‘zgartiradi.',
+      actor: byUser,
     );
     _questions[index] = question.copyWith(
       updatedAt: DateTime.now(),
@@ -2185,6 +2364,7 @@ class LocalDbService {
     _require(
       _accessControl.canModifyQuestion(byUser, target),
       'standart savollarni faqat tizim administratori, boshqalarini — muallif o‘chiradi.',
+      actor: byUser,
     );
     _questions.removeAt(index);
     await _persistAll();
@@ -2227,6 +2407,7 @@ class LocalDbService {
     _require(
       _accessControl.canScheduleSession(byUser, student),
       'bu o‘quvchi sizga biriktirilmagan.',
+      actor: byUser,
     );
     final schedulesForOthers =
         byUser.role == UserRole.superAdmin ||
@@ -2234,6 +2415,7 @@ class LocalDbService {
     _require(
       session.specialistId == byUser.id || schedulesForOthers,
       'mashg‘ulotni faqat o‘zingiz uchun rejalashtira olasiz.',
+      actor: byUser,
     );
 
     // Takroriy seans: bir xil o'quvchi va mutaxassis uchun bir xil vaqt
@@ -2250,8 +2432,7 @@ class LocalDbService {
     if (duplicate) {
       return {
         'success': false,
-        'message':
-            'Ushbu vaqtda bu mutaxassis va o‘quvchi uchun allaqachon mashg‘ulot rejalashtirilgan.',
+        'message': 'Ushbu vaqtda bu mutaxassis va o‘quvchi uchun allaqachon mashg‘ulot rejalashtirilgan.',
       };
     }
 
@@ -2276,6 +2457,7 @@ class LocalDbService {
     _require(
       _accessControl.canCompleteSession(byUser, cur),
       'mashg‘ulotni faqat mas’ul mutaxassis yoki rahbariyat o‘zgartiradi.',
+      actor: byUser,
     );
     return cur;
   }
@@ -2341,7 +2523,7 @@ class LocalDbService {
       userRole: byUser.role.label,
       action: 'UPDATE',
       entity: 'Session',
-      details: '${cur.studentName} bilan mashg‘ulot holati: $status ga o‘zgardi',
+      details: '${cur.studentName} bilan mashg‘ulot holati o‘zgardi: $status',
     );
   }
 
@@ -2398,6 +2580,7 @@ class LocalDbService {
       _accessControl.canManageIep(byUser, null) &&
           _accessControl.canViewStudent(byUser, student),
       'individual rejani koordinator, rahbariyat yoki bolaga biriktirilgan maxsus ta’lim o‘qituvchisi tuzadi.',
+      actor: byUser,
     );
     if (_iepPlans.any((p) => p.id == plan.id)) {
       throw const ValidationException('Bunday reja allaqachon mavjud.');
@@ -2425,9 +2608,12 @@ class LocalDbService {
     _require(
       _accessControl.canManageIep(byUser, current),
       'rejani tahrirlash huquqi yo‘q.',
+      actor: byUser,
     );
     if (plan.studentId != current.studentId) {
-      throw const ValidationException('Rejani boshqa o‘quvchiga ko‘chirib bo‘lmaydi.');
+      throw const ValidationException(
+        'Rejani boshqa o‘quvchiga ko‘chirib bo‘lmaydi.',
+      );
     }
     _iepPlans[index] = plan;
     _reEvaluateRules();
@@ -2437,7 +2623,7 @@ class LocalDbService {
       userRole: byUser.role.label,
       action: 'UPDATE',
       entity: 'IEP',
-      details: '${plan.studentName} ning ITR rejasi yangilandi',
+      details: 'ITR rejasi yangilandi: ${plan.studentName}',
     );
   }
 
@@ -2456,6 +2642,7 @@ class LocalDbService {
     _require(
       _accessControl.canUpdateObjectiveProgress(byUser, plan, objective.first),
       'bu maqsad bo‘yicha natija kiritish huquqi yo‘q.',
+      actor: byUser,
     );
     final value = progress.clamp(0, 100);
     final newObjectives = plan.objectives.map((obj) {
@@ -2511,12 +2698,15 @@ class LocalDbService {
     required UserModel byUser,
   }) async {
     final index = _alerts.indexWhere((a) => a.id == alertId);
-    if (index == -1) throw const NotFoundException('Monitoring signali topilmadi.');
+    if (index == -1) {
+      throw const NotFoundException('Monitoring signali topilmadi.');
+    }
     final cur = _alerts[index];
     final student = _studentOrThrow(cur.studentId);
     _require(
       _accessControl.canResolveAlert(byUser, student),
       'bu signalni hal qilish huquqi yo‘q.',
+      actor: byUser,
     );
     if (notes.trim().isEmpty) {
       throw const ValidationException('Qanday chora ko‘rilganini yozing.');
@@ -2567,6 +2757,7 @@ class LocalDbService {
       _accessControl.canCreateReferral(byUser) &&
           _accessControl.canViewStudent(byUser, student),
       'bu o‘quvchini yo‘naltirish huquqi yo‘q.',
+      actor: byUser,
     );
     if (referral.reason.trim().isEmpty) {
       throw const ValidationException('Yo‘naltirish sababini kiriting.');
@@ -2624,6 +2815,7 @@ class LocalDbService {
     _require(
       _accessControl.canProcessReferral(byUser, cur),
       'bu yo‘naltirish bilan ishlash huquqi yo‘q.',
+      actor: byUser,
     );
     if (!referralStatuses.contains(newStatus)) {
       throw ValidationException('Noma’lum yo‘naltirish holati: $newStatus');
@@ -2686,6 +2878,7 @@ class LocalDbService {
     _require(
       _notifications[index].recipientUserId == byUser.id,
       'boshqa foydalanuvchining bildirishnomasi.',
+      actor: byUser,
     );
     _notifications[index] = _notifications[index].copyWith(isRead: true);
     await _persistAll();
@@ -2709,6 +2902,10 @@ class LocalDbService {
     return List.unmodifiable(_auditLogs);
   }
 
+  /// Qurilmadagi audit jurnalining eng ko'p yozuvlari (eng eskilari o'chiriladi;
+  /// server ulanganda to'liq jurnal serverda saqlanadi)
+  static const int maxAuditEntries = 20000;
+
   Future<void> addAuditLog({
     required String userFullName,
     required String userRole,
@@ -2726,6 +2923,9 @@ class LocalDbService {
       timestamp: DateTime.now(),
     );
     _auditLogs.insert(0, log);
+    if (_auditLogs.length > maxAuditEntries) {
+      _auditLogs.removeRange(maxAuditEntries, _auditLogs.length);
+    }
     // Faqat audit jadvali yoziladi — har bir amalda butun bazani qayta yozmaslik uchun
     final prefs = await SharedPreferences.getInstance();
     await _writeTable(prefs, 'db_audit', _auditLogs.map((e) => e.toJson()));
@@ -2766,11 +2966,13 @@ class LocalDbService {
     _require(
       _accessControl.canWriteObservation(byUser, student),
       'psixologik kuzatuvni faqat bolaga biriktirilgan psixolog yozadi.',
+      actor: byUser,
     );
     _require(
       observation.psychologistId == byUser.id ||
           byUser.role == UserRole.superAdmin,
       'kuzatuvni faqat o‘z nomingizdan yozishingiz mumkin.',
+      actor: byUser,
     );
     if (observation.observationText.trim().isEmpty) {
       throw const ValidationException('Kuzatuv matnini kiriting.');
@@ -2787,16 +2989,14 @@ class LocalDbService {
     );
   }
 
-  Future<void> deleteObservation(
-    String id, {
-    required UserModel byUser,
-  }) async {
+  Future<void> deleteObservation(String id, {required UserModel byUser}) async {
     final index = _observations.indexWhere((o) => o.id == id);
     if (index == -1) throw const NotFoundException('Kuzatuv topilmadi.');
     final obs = _observations[index];
     _require(
       obs.psychologistId == byUser.id || byUser.role == UserRole.superAdmin,
       'kuzatuvni faqat muallif o‘chiradi.',
+      actor: byUser,
     );
     _observations.removeAt(index);
     await _persistAll();
@@ -2805,8 +3005,7 @@ class LocalDbService {
       userRole: byUser.role.label,
       action: 'DELETE',
       entity: 'Observation',
-      details:
-          '${obs.studentName} ning ${obs.category} bo‘yicha kuzatuvi o‘chirildi',
+      details: 'Kuzatuv o‘chirildi: ${obs.studentName} (${obs.category})',
     );
   }
 }

@@ -138,7 +138,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         titleSpacing: 16,
         backgroundColor: Colors.white,

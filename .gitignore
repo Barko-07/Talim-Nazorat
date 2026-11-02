@@ -69,3 +69,14 @@ skills-lock.json
 .widget_preview/
 devtools_options.yaml
 
+
+# --- Sirlar va imzo kalitlari (hech qachon GitHub'ga yuklanmaydi) ---
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+**/android/key.properties
+*.pem
+*.p12
+secrets/

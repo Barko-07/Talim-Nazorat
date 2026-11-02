@@ -8,6 +8,8 @@ import '../core/constants/app_colors.dart';
 import '../core/widgets/glass_widgets.dart';
 import '../models/student_model.dart';
 import '../models/user_model.dart';
+import '../models/workspace_model.dart';
+import '../core/constants/specialist_workspaces.dart';
 import '../providers/app_provider.dart';
 import '../providers/auth_provider.dart';
 import 'assessments/assessments_list_screen.dart';
@@ -170,15 +172,86 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   bool get _isPsychologist =>
       context.read<AuthProvider>().currentUser?.role == UserRole.psychologist;
 
-  /// Menyu bandlari (ro'yxatdagi o'rni == band raqami)
-  List<_NavItemData> get _navItems => _isPsychologist
-      ? [..._baseNavItems, ..._psychologistNavItems]
-      : _baseNavItems;
+  /// Menyuda bandlarning ko'rinish tartibi (yon panel guruhlari shu tartibda)
+  static const List<int> _menuOrder = [0, 1, 2, 3, 4, 5, 8, 6, 7, 9, 10, 11, 12];
 
-  /// Joriy band (hisob almashganda raqam ro'yxatdan tashqarida qolsa — bosh sahifa)
-  _NavItemData get _currentNavItem => _selectedIndex < _navItems.length
-      ? _navItems[_selectedIndex]
-      : _navItems.first;
+  UserRole? get _role => context.read<AuthProvider>().currentUser?.role;
+
+  /// Band shu rol kabinetiga tegishlimi. Qoida backend'dagi kabinet ta'rifidan olinadi
+  /// (SpecialistWorkspaces) — menyu va ruxsatlar doim bir xil bo'ladi.
+  bool _canSee(int index) {
+    final role = _role;
+    if (role == null) return index == 0 || index == 9;
+    final ws = SpecialistWorkspaces.forRole(role);
+    bool any(List<WorkspaceModule> modules) => modules.any(ws.has);
+    switch (index) {
+      case 0: // Boshqaruv markazi
+      case 9: // Sozlamalar (profil, parol)
+        return true;
+      case 1: // Bolalar
+        return any(const [
+          WorkspaceModule.caseload,
+          WorkspaceModule.schoolMonitoring,
+        ]);
+      case 2: // Baholashlar
+        return any(const [
+          WorkspaceModule.psychAssessment,
+          WorkspaceModule.speechAssessment,
+          WorkspaceModule.developmentAssessment,
+          WorkspaceModule.subjectLevel,
+          WorkspaceModule.learningResults,
+          WorkspaceModule.schoolMonitoring,
+        ]);
+      case 3:
+        return ws.has(WorkspaceModule.sessions);
+      case 4:
+        return ws.has(WorkspaceModule.iep);
+      case 5: // Monitoring: rahbariyat — maktab, mutaxassis — o'z bolalari
+        return ws.has(WorkspaceModule.schoolMonitoring) || ws.worksWithChildren;
+      case 6:
+        return ws.has(WorkspaceModule.reports);
+      case 7: // Mutaxassislar shtati — faqat rahbariyat va koordinator
+        return any(const [
+          WorkspaceModule.specialistAssignment,
+          WorkspaceModule.userManagement,
+        ]);
+      case 8:
+        return ws.has(WorkspaceModule.referrals);
+      case 10:
+      case 11:
+      case 12:
+        return role == UserRole.psychologist;
+      default:
+        return false;
+    }
+  }
+
+  /// Joriy foydalanuvchi ko'radigan menyu bandlari (menyu tartibida)
+  List<_NavItemData> get _navItems {
+    final all = {
+      for (final i in [..._baseNavItems, ..._psychologistNavItems]) i.index: i,
+    };
+    return [
+      for (final index in _menuOrder)
+        if (all.containsKey(index) && _canSee(index)) all[index]!,
+    ];
+  }
+
+  /// Joriy band (rol almashganda ko'rinmay qolsa — bosh sahifa)
+  _NavItemData get _currentNavItem {
+    final items = _navItems;
+    return items.firstWhere(
+      (i) => i.index == _selectedIndex,
+      orElse: () => items.first,
+    );
+  }
+
+  /// Yon panel guruhi nomi: "Boshqaruv va tizim" faqat rahbariyat uchun ma'noli
+  String _groupLabel(String group) {
+    final leadership = _canSee(7);
+    if (group == 'BOSHQARUV VA TIZIM' && !leadership) return 'HISOBOT VA SOZLAMALAR';
+    return group;
+  }
 
   /// Psixolog modullari bir-biriga o'tganda (ixtiyoriy ravishda tanlangan bola bilan)
   void _openPsychTab(int psychIndex, {StudentModel? student}) {
@@ -200,7 +273,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   void _selectTab(int index) {
-    if (index >= 0 && index < _navItems.length && _selectedIndex != index) {
+    // Faollik qayd etiladi; sessiya muddati tugagan bo'lsa — qayta kirish so'raladi
+    context.read<AuthProvider>().touchSession();
+    if (_selectedIndex != index && _navItems.any((i) => i.index == index)) {
       setState(() {
         _isMovingForward = index > _selectedIndex;
         _selectedIndex = index;
@@ -242,6 +317,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildActiveScreen() {
+    if (!_canSee(_selectedIndex)) {
+      return DashboardScreen(
+        key: const ValueKey('tab_default'),
+        onNavigateTab: _selectTab,
+      );
+    }
     if (_isPsychologist) {
       final psychScreen = _buildPsychologistScreen();
       if (psychScreen != null) return psychScreen;
@@ -1330,25 +1411,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     AppProvider app,
     UserModel? user,
   ) {
-    final groups = <String, List<_NavItemData>>{
-      'ASOSIY ISH MAYDONI': [
-        _navItems[0],
-        _navItems[1],
-        _navItems[2],
-        _navItems[3],
-      ],
-      'REJA VA NAZORAT': [
-        _navItems[4],
-        _navItems[5],
-        _navItems[8],
-      ],
-      'BOSHQARUV VA TIZIM': [
-        _navItems[6],
-        _navItems[7],
-        _navItems[9],
-      ],
-      if (_isPsychologist) 'PSIXOLOGIK XIZMAT': _psychologistNavItems,
-    };
+    final groups = <String, List<_NavItemData>>{};
+    for (final item in _navItems) {
+      groups.putIfAbsent(_groupLabel(item.group), () => []).add(item);
+    }
 
     return SafeArea(
       right: false,
@@ -1594,7 +1660,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildMobileFrostedBottomBar(BuildContext context, AppProvider app) {
-    final quickTabs = [_navItems[0], _navItems[1], _navItems[2], _navItems[3]];
+    final quickTabs = _navItems.take(4).toList();
     final isMoreActive = _selectedIndex >= 4;
     final mediaPadding = MediaQuery.paddingOf(context);
 

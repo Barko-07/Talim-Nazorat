@@ -8,16 +8,16 @@ class AppColors {
   static const Color primaryTint = Color(0xFFDBEAFE);
 
   // Fon va Yuzalar — Fresh Porcelain & Airy Mist (Nafas oladigan, toza va yorug')
-  static const Color background = Color(0xFFF1F5F9); // Yorug', sof chinni-kulrang
-  static const Color backgroundDeep = Color(0xFFE2E9F2); // Sokin engil havorang-kulrang
+  static const Color background = Color(0xFFEDF3FE); // Yorug' havorang (asosiy ko'k bilan uyg'un)
+  static const Color backgroundDeep = Color(0xFFDCE7FB); // Chuqurroq mayin havorang
   static const Color surface = Color(0xFFFFFFFF);
   static const Color card = Color(0xFFFFFFFF);
 
   // Minimalist Soft-Glass Qatlam Tokenlari
   static const Color glassFill = Color(0xEBFFFFFF); // 92% toza oq
   static const Color glassFillStrong = Color(0xF5FFFFFF); // 96% toza oq
-  static const Color glassWellFill = Color(0xFFF5F8FC); // Sokin ichki blok foni
-  static const Color glassRecessedFill = Color(0xFFEEF3F8);
+  static const Color glassWellFill = Color(0xFFF3F7FE); // Sokin ichki blok foni (havorang tus)
+  static const Color glassRecessedFill = Color(0xFFEBF1FC);
   static const Color glassSpecular = Color(0xFFFFFFFF);
   static const Color glassWhiteBorder = Color(0xFFFFFFFF); // 100% toza oq chegara
   static const Color glassInnerBorder = Color(0xF5FFFFFF);

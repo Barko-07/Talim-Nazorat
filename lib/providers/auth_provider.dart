@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -5,9 +7,13 @@ import 'package:uuid/uuid.dart';
 import '../models/user_model.dart';
 import '../services/local_db_service.dart';
 import '../services/app_exceptions.dart';
+import '../services/auth_session.dart';
+import '../services/login_guard.dart';
+import '../services/password_hasher.dart';
 
-class AuthProvider extends ChangeNotifier {
+class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   final LocalDbService _db = LocalDbService();
+  final LoginGuard _guard = LoginGuard();
   UserModel? _currentUser;
   bool _isLoading = true;
 
@@ -17,8 +23,45 @@ class AuthProvider extends ChangeNotifier {
 
   UserRole get currentRole => _currentUser?.role ?? UserRole.reviewer;
 
+  Timer? _sessionTimer;
+
   AuthProvider() {
+    WidgetsBinding.instance.addObserver(this);
     _checkSavedSession();
+    // Ilova bitta ekranda ochiq qolib ketsa ham sessiya muddati nazorat qilinadi
+    _sessionTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => validateSession(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _sessionTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) validateSession();
+  }
+
+  /// Sessiyani tekshiradi: muddati tugagan, hisob bloklangan yoki roli o'zgargan bo'lsa —
+  /// tizimdan chiqaradi (yangi huquqlar bilan qayta kirish talab qilinadi).
+  Future<void> validateSession() async {
+    final cached = _currentUser;
+    if (cached == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final session = AuthSession.decode(prefs.getString(AuthSession.prefsKey));
+    final fresh = _db.getUserById(cached.id);
+    final valid = session != null &&
+        session.isValid() &&
+        session.userId == cached.id &&
+        fresh != null &&
+        fresh.isActive &&
+        fresh.role == cached.role;
+    if (!valid) await logout();
   }
 
   Future<void> _checkSavedSession() async {
@@ -26,25 +69,54 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     await _db.init();
+    _dummyHash.length; // soxta xeshni oldindan tayyorlash
 
     final prefs = await SharedPreferences.getInstance();
-    final savedUserId = prefs.getString('auth_user_id');
+    // Eski versiyadagi muddatsiz sessiya kaliti bekor qilinadi — qayta kirish talab qilinadi
+    await prefs.remove('auth_user_id');
 
-    if (savedUserId != null) {
-      final user = _db.getUserById(savedUserId);
-      // Bloklangan hisobning saqlangan sessiyasi bekor qilinadi
-      if (user != null && user.isActive) {
-        _currentUser = user;
-      } else {
-        await prefs.remove('auth_user_id');
-      }
+    final session = AuthSession.decode(prefs.getString(AuthSession.prefsKey));
+    final user = session == null ? null : _db.getUserById(session.userId);
+    if (session != null && session.isValid() && user != null && user.isActive) {
+      _currentUser = user;
+      await prefs.setString(AuthSession.prefsKey, session.touched().encode());
+    } else {
+      await prefs.remove(AuthSession.prefsKey);
     }
 
     _isLoading = false;
     notifyListeners();
   }
 
-  // Telefon raqami yoki Email orqali kirish (soha mosligini tekshirish bilan)
+  /// Foydalanuvchi faolligini qayd etadi (faolliksiz vaqt shu paytdan hisoblanadi).
+  /// Sessiya muddati tugagan bo'lsa — tizimdan chiqariladi.
+  Future<void> touchSession() async {
+    if (_currentUser == null) return;
+    await validateSession();
+    if (_currentUser == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final session = AuthSession.decode(prefs.getString(AuthSession.prefsKey))!;
+    final now = DateTime.now();
+    if (now.difference(session.lastActive) > const Duration(minutes: 1)) {
+      await prefs.setString(AuthSession.prefsKey, session.touched(now: now).encode());
+    }
+  }
+
+  /// Hisob mavjud emasligini ham noto'g'ri parol kabi tekshirish uchun soxta xesh
+  /// (javob vaqti bo'yicha hisob borligini aniqlab bo'lmasin)
+  static final String _dummyHash = PasswordHasher.hash('__no_such_account__');
+
+  static const _invalidCredentials = 'Login yoki parol noto‘g‘ri.';
+
+  Map<String, dynamic> _fail(String message) {
+    _isLoading = false;
+    notifyListeners();
+    return {'success': false, 'message': message};
+  }
+
+  /// Telefon raqami yoki pochta orqali kirish.
+  /// Xavfsizlik: hisob borligi oshkor qilinmaydi (bir xil xabar), ketma-ket noto'g'ri
+  /// urinishlar loginni vaqtincha bloklaydi, shubhali urinishlar jurnalga yoziladi.
   Future<Map<String, dynamic>> login(
     String identifier,
     String password, {
@@ -53,76 +125,75 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 300)); // Smooth UX
-
-    if (identifier.trim().isEmpty) {
-      _isLoading = false;
-      notifyListeners();
-      return {
-        'success': false,
-        'message': 'Telefon raqamingiz yoki elektron pochtangizni kiriting.',
-      };
+    final id = identifier.trim();
+    if (id.isEmpty) {
+      return _fail('Telefon raqamingiz yoki elektron pochtangizni kiriting.');
+    }
+    if (password.isEmpty) {
+      return _fail('Iltimos, parolingizni kiriting.');
     }
 
-    if (password.trim().isEmpty) {
-      _isLoading = false;
-      notifyListeners();
-      return {'success': false, 'message': 'Iltimos, parolingizni kiriting.'};
+    final user = _db.findUserByEmailOrPhone(id);
+    final accountKey = user == null ? null : LoginGuard.accountKey(user.id);
+    final locked = await _guard.lockRemaining(id) ??
+        (accountKey == null ? null : await _guard.lockRemaining(accountKey));
+    if (locked != null) {
+      await _db.logSecurityEvent(
+        action: 'SECURITY_LOCKED_ATTEMPT',
+        details: 'Bloklangan loginga kirish urinishi: ${LoginGuard.mask(id)}',
+      );
+      final minutes = (locked.inSeconds / 60).ceil();
+      return _fail(
+        'Juda ko‘p noto‘g‘ri urinish. $minutes daqiqadan keyin qayta urinib ko‘ring.',
+      );
     }
 
-    final user = _db.findUserByEmailOrPhone(identifier.trim());
+    final passwordOk = user != null
+        ? _db.verifyPassword(user, password.trim())
+        : (PasswordHasher.verify(password, _dummyHash) && false);
 
-    if (user == null) {
-      _isLoading = false;
-      notifyListeners();
-      return {
-        'success': false,
-        'message': 'Ushbu telefon raqam yoki pochta bo‘yicha hisob topilmadi. Iltimos, ro‘yxatdan o‘ting.',
-      };
-    }
-
-    // Soha muvofiqligi tekshiruvi (bitta sohani tanlagandan keyin boshqasiga kirishni taqiqlash)
-    if (requiredRole != null) {
-      final isRoleMatch =
-          user.role == requiredRole ||
-          ((requiredRole == UserRole.superAdmin ||
-                  requiredRole == UserRole.institutionAdmin) &&
-              (user.role == UserRole.superAdmin ||
-                  user.role == UserRole.institutionAdmin));
-
-      if (!isRoleMatch) {
-        _isLoading = false;
-        notifyListeners();
-        return {
-          'success': false,
-          'message':
-              'Ushbu hisob "${user.role.label}" sohasiga tegishli. Siz "${requiredRole.label}" portalini tanlagansiz. Boshqa soha bilan kirish taqiqlangan.',
-        };
+    if (user == null || !passwordOk) {
+      var nowLocked = await _guard.registerFailure(id);
+      if (accountKey != null) {
+        nowLocked = await _guard.registerFailure(accountKey) || nowLocked;
       }
-    }
-
-    if (!_db.verifyPassword(user, password.trim())) {
-      _isLoading = false;
-      notifyListeners();
-      return {
-        'success': false,
-        'message': 'Kiritilgan parol noto‘g‘ri. Iltimos, qayta urinib ko‘ring.',
-      };
+      await _db.logSecurityEvent(
+        action: nowLocked ? 'SECURITY_LOCKOUT' : 'SECURITY_LOGIN_FAILED',
+        details: nowLocked
+            ? '${LoginGuard.maxFailures} ta noto‘g‘ri urinish — login vaqtincha bloklandi: ${LoginGuard.mask(id)}'
+            : 'Noto‘g‘ri login yoki parol: ${LoginGuard.mask(id)}',
+        actor: user,
+      );
+      if (nowLocked) {
+        final wait = await _guard.lockRemaining(id) ??
+            (accountKey == null ? null : await _guard.lockRemaining(accountKey)) ??
+            LoginGuard.lockDuration;
+        return _fail(
+          'Juda ko‘p noto‘g‘ri urinish. ${(wait.inSeconds / 60).ceil()} daqiqadan keyin qayta urinib ko‘ring.',
+        );
+      }
+      return _fail(_invalidCredentials);
     }
 
     if (!user.isActive) {
-      _isLoading = false;
-      notifyListeners();
-      return {
-        'success': false,
-        'message':
-            'Ushbu hisob bloklangan. Iltimos, administrator bilan bog‘laning.',
-      };
+      await _db.logSecurityEvent(
+        action: 'SECURITY_BLOCKED_LOGIN',
+        details: 'Bloklangan hisob bilan kirish urinishi',
+        actor: user,
+      );
+      return _fail('Ushbu hisob bloklangan. Iltimos, administrator bilan bog‘laning.');
     }
 
+    // Soha mosligi faqat parol tasdiqlangandan keyin tekshiriladi (rol oshkor qilinmaydi)
+    if (requiredRole != null && user.role != requiredRole) {
+      return _fail('Bu hisob tanlangan bo‘lim uchun mo‘ljallanmagan.');
+    }
+
+    await _guard.registerSuccess(id);
+    if (accountKey != null) await _guard.registerSuccess(accountKey);
     _currentUser = user;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('auth_user_id', user.id);
+    await prefs.setString(AuthSession.prefsKey, AuthSession.start(user.id).encode());
 
     await _db.addAuditLog(
       userFullName: user.fullName,
@@ -211,7 +282,7 @@ class AuthProvider extends ChangeNotifier {
     // Bazadagi nusxa olinadi — xotirada ochiq parol saqlanmasin.
     _currentUser = _db.getUserById(newUser.id);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('auth_user_id', newUser.id);
+    await prefs.setString(AuthSession.prefsKey, AuthSession.start(newUser.id).encode());
 
     _isLoading = false;
     notifyListeners();
@@ -265,9 +336,19 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    final user = _currentUser;
     _currentUser = null;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_user_id');
+    await prefs.remove(AuthSession.prefsKey);
+    if (user != null) {
+      await _db.addAuditLog(
+        userFullName: user.fullName,
+        userRole: user.role.label,
+        action: 'LOGOUT',
+        entity: 'Auth',
+        details: '${user.fullName} tizimdan chiqdi',
+      );
+    }
     notifyListeners();
   }
 }

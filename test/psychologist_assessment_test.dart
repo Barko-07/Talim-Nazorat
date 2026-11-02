@@ -100,17 +100,20 @@ void main() {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       db = LocalDbService();
+      db.resetForTest();
       await db.init();
       provider = AppProvider();
 
-      provider.setCurrentUser(
-        UserModel(
-          id: 'user_psy_test',
-          email: 'psy@talim.uz',
-          fullName: 'Usmonova Dilnoza',
-          role: UserRole.superAdmin,
-        ),
+      // Sinov foydalanuvchisi bazada ro'yxatdan o'tkaziladi (provider har amalda
+      // foydalanuvchining joriy holatini bazadan tekshiradi)
+      final testUser = UserModel(
+        id: 'user_psy_test',
+        email: 'psy.test@talim.uz',
+        fullName: 'Sinov Psixologi',
+        role: UserRole.superAdmin,
       );
+      await db.addUser(testUser, byUser: db.getUserById('user_admin')!);
+      provider.setCurrentUser(testUser);
     });
 
     test('Initializes with seed questions in the database', () {

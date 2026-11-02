@@ -160,6 +160,11 @@ void main() {
     expect(open.length, open.toSet().length);
   });
 
+  test('an open alert keeps its identity but its text follows the current facts', () {
+    final open = db.getAlerts(onlyUnresolved: true);
+    expect(open.any((a) => a.message.contains('ITR dagi')), false);
+  });
+
   test('confidential notes count as work without exposing their content', () async {
     await child('c_conf', assigned: ['user_psychologist']);
     final records = db.getWorkRecords('c_conf');

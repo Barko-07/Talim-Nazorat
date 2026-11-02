@@ -1,12 +1,12 @@
 {
-    "name": "talim_nazorat",
-    "short_name": "talim_nazorat",
+    "name": "TA’LIM NAZORAT — Yagona monitoring platformasi",
+    "short_name": "TA’LIM NAZORAT",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#F8FAFC",
+    "theme_color": "#1E40AF",
+    "description": "Alohida ta’lim ehtiyojlariga ega bolalar ta’limi va rivojlanishi monitoringi platformasi.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

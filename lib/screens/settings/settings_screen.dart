@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -8,8 +9,55 @@ import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/login_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _hideSensitiveInfo = false;
+
+  TextStyle _myGovFont({
+    double fontSize = 15,
+    FontWeight fontWeight = FontWeight.w500,
+    Color color = const Color(0xFF0F172A),
+    double letterSpacing = -0.1,
+    double? height,
+  }) {
+    return GoogleFonts.golosText(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      height: height,
+    );
+  }
+
+  String _formatShortName(String fullName) {
+    final parts = fullName
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
+    if (parts.length >= 2) {
+      final firstInitial = parts[0].substring(0, 1).toUpperCase();
+      return '$firstInitial. ${parts[1]}';
+    }
+    return fullName.isNotEmpty ? fullName : 'Mutaxassis';
+  }
+
+  String _maskPhone(String phone) {
+    if (phone.isEmpty) return 'Ko‘rsatilmagan';
+    if (!_hideSensitiveInfo) return phone;
+    final digits = phone.replaceAll(RegExp(r'\D'), '');
+    if (digits.length >= 9) {
+      final last2 = digits.substring(digits.length - 2);
+      return '+998 (••) •••-••-$last2';
+    }
+    return '••• •• ••';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,405 +66,219 @@ class SettingsScreen extends StatelessWidget {
     final canPop = Navigator.canPop(context);
     final region = user?.region ?? 'Namangan viloyati';
     final district = user?.district ?? 'Chortoq tumani';
-    final roleColor = user?.role.color ?? AppColors.primary;
-    final roleIcon = user != null
-        ? premiumRoleIcon(user.role)
-        : LucideIcons.shieldCheck;
+    final fullName = user?.fullName ?? 'Mutaxassis';
+    final phone = user?.phone ?? '+998 90 123-45-67';
+    final schoolName =
+        user?.institutionName ?? '';
 
     final scrollBody = SingleChildScrollView(
       child: ResponsivePageContainer(
-        maxWidth: 960,
+        maxWidth: 720,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AdaptivePageHeader(
-              title: 'Tizim sozlamalari',
-              subtitle:
-                  'Foydalanuvchi profili va xavfsizlik konfiguratsiyasi',
-              action: HeaderActionButton(
-                variant: HeaderActionVariant.danger,
-                icon: LucideIcons.logOut,
-                label: 'Tizimdan chiqish',
-                onPressed: () async {
-                  await auth.logout();
-                  if (context.mounted) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
-                      ),
-                    );
-                  }
-                },
+            // 1. MY.GOV.UZ USLUBIDAGI YUQORI PROFIL KARTasi
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x080F172A),
+                    blurRadius: 14,
+                    offset: Offset(0, 4),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 18),
-
-            // 1. Joriy Foydalanuvchi Profili (Minimalist Soft-Glass Hero Card)
-            GlassSurface(
-              borderRadius: 26,
-              blur: 16,
-              opacity: 0.96,
-              padding: const EdgeInsets.all(20),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    width: 48,
-                    height: 48,
+                    width: 52,
+                    height: 52,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
-                      borderRadius: BorderRadius.circular(13),
+                      shape: BoxShape.circle,
+                      color: const Color(0xFFF1F5F9),
                       border: Border.all(
-                        color: AppColors.primaryTint,
-                        width: 1.0,
+                        color: const Color(0xFFCBD5E1),
+                        width: 1.4,
                       ),
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      (user?.fullName ?? 'U').substring(0, 1).toUpperCase(),
-                      style: const TextStyle(
+                      fullName.substring(0, 1).toUpperCase(),
+                      style: _myGovFont(
+                        fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                        color: AppColors.primary,
+                        color: const Color(0xFF1E293B),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          user?.fullName ?? 'Mutaxassis',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 17.5,
-                            color: AppColors.textPrimary,
-                            letterSpacing: -0.1,
-                            wordSpacing: 0.4,
+                          _formatShortName(fullName),
+                          style: _myGovFont(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF0F172A),
                           ),
                         ),
-                        const SizedBox(height: 7),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 6,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            StatusPill(
-                              label: user?.role.label ?? 'Mutaxassis',
-                              color: AppColors.primary,
-                              backgroundColor: AppColors.primaryLight,
-                              showDot: true,
-                            ),
-                            const StatusPill(
-                              label: 'Faol hisob',
-                              color: AppColors.success,
-                              backgroundColor: AppColors.successBg,
-                              icon: LucideIcons.shieldCheck,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 9),
-                        Wrap(
-                          spacing: 14,
-                          runSpacing: 5,
-                          children: [
-                            if (user?.email != null && user!.email.isNotEmpty)
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    LucideIcons.mail,
-                                    size: 13.5,
-                                    color: AppColors.textMuted,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Flexible(
-                                    child: Text(
-                                      user.email,
-                                      style: const TextStyle(
-                                        fontSize: 12.5,
-                                        color: AppColors.textMuted,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  LucideIcons.phone,
-                                  size: 13.5,
-                                  color: AppColors.textMuted,
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  user?.phone ?? '+998 90 000-00-00',
-                                  style: const TextStyle(
-                                    fontSize: 12.5,
-                                    color: AppColors.textMuted,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 18),
-
-            // 2. Biriktirilgan kasbiy profil va shaxsiy javobgarlik
-            SurfaceCard(
-              borderRadius: 26,
-              padding: const EdgeInsets.all(22),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Icon(
-                          roleIcon,
-                          color: roleColor,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 6,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(
-                                  user?.role.label ?? 'Mutaxassis',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                const StatusPill(
-                                  label: 'Soha qulflangan',
-                                  color: AppColors.success,
-                                  backgroundColor: AppColors.successBg,
-                                  icon: LucideIcons.lock,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              user?.role.professionTitle ?? '',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: roleColor,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  GlassWell(
-                    borderRadius: 12,
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(
-                              LucideIcons.info,
-                              size: 16,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Mutaxassislik huquqi va doirasi',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 13,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 7),
+                        const SizedBox(height: 3),
                         Text(
-                          user?.role.domainDescription ?? '',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
-                            height: 1.45,
+                          _maskPhone(phone),
+                          style: _myGovFont(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF475569),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  const Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 1),
-                        child: Icon(
-                          LucideIcons.shield,
-                          size: 15,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Shaxsiy javobgarlik talabiga binoan, profil ichidan mutaxassislik sohasini o‘zgartirib bo‘lmaydi. Boshqa kasbiy profil bilan kirish uchun joriy tizimdan chiqish lozim.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textMuted,
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
-                    ],
+                  IconButton(
+                    tooltip: _hideSensitiveInfo
+                        ? 'Ma’lumotlarni ko‘rsatish'
+                        : 'Ma’lumotlarni yashirish',
+                    onPressed: () {
+                      setState(() => _hideSensitiveInfo = !_hideSensitiveInfo);
+                    },
+                    icon: Icon(
+                      _hideSensitiveInfo ? LucideIcons.eyeOff : LucideIcons.eye,
+                      size: 21,
+                      color: const Color(0xFF334155),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Xavfsizlik sozlamalari',
+                    onPressed: () => _showChangePasswordSheet(context),
+                    icon: const Icon(
+                      LucideIcons.settings,
+                      size: 21,
+                      color: Color(0xFF334155),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
 
-            // 3. Ta'lim muassasasi (Dinamik haqiqiy hudud ma'lumotlari bilan)
-            SurfaceCard(
-              borderRadius: 26,
-              padding: const EdgeInsets.all(22),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                    children: [
-                      Icon(
-                        LucideIcons.school,
-                        color: AppColors.primary,
-                        size: 22,
-                      ),
-                      SizedBox(width: 11),
-                      Expanded(
-                        child: Text(
-                          'Ta’lim muassasasi',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 16,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ],
+            // 2. MY.GOV.UZ USLUBIDAGI PROFIL VA SOZLAMALAR RO'YXATI
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x060F172A),
+                    blurRadius: 12,
+                    offset: Offset(0, 3),
                   ),
-                  const SizedBox(height: 16),
-                  GlassWell(
-                    borderRadius: 12,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 6,
-                    ),
-                    child: Column(
-                      children: [
-                        _buildSettingRow(
-                          'Muassasa nomi',
-                          user?.institutionName ??
-                              '9-sonli inklyuziv ta’lim tayanch maktabi',
-                        ),
-                        _buildSettingRow('Hudud', '$region, $district'),
-                        _buildSettingRow(
-                          'Bo‘lim',
-                          'Alohida ta’lim ehtiyojlari bo‘lgan bolalar korreksion sektori',
-                          isLast: true,
-                        ),
-                      ],
-                    ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  _buildMyGovMenuItem(
+                    icon: LucideIcons.idCard,
+                    title: 'Shaxsiy ma’lumotlar',
+                    subtitle: 'F.I.Sh, aloqa va identifikatsiya ma’lumotlari',
+                    onTap: () => _showPersonalDetailsSheet(context, user),
+                  ),
+                  _buildMyGovMenuItem(
+                    icon: LucideIcons.briefcase,
+                    title: 'Mehnat faoliyati',
+                    subtitle: user?.role.label ?? 'Mutaxassis',
+                    badgeText: 'Faol',
+                    onTap: () => _showProfessionSheet(context, user),
+                  ),
+                  _buildMyGovMenuItem(
+                    icon: LucideIcons.house,
+                    title: 'Ta’lim muassasasi',
+                    subtitle: schoolName,
+                    onTap: () =>
+                        _showInstitutionSheet(context, schoolName, region, district),
+                  ),
+                  _buildMyGovMenuItem(
+                    icon: LucideIcons.shield,
+                    title: 'Xavfsizlik',
+                    subtitle: 'Parolni yangilash va kirish himoyasi',
+                    onTap: () => _showChangePasswordSheet(context),
+                  ),
+                  _buildMyGovMenuItem(
+                    icon: LucideIcons.paintbrush,
+                    title: 'Ilova mavzusi',
+                    trailingValue: 'Tizimli',
+                    showChevron: false,
+                  ),
+                  _buildMyGovMenuItem(
+                    icon: LucideIcons.languages,
+                    title: 'Ilova tili',
+                    trailingValue: 'O‘zbekcha',
+                    showChevron: false,
+                  ),
+                  _buildMyGovMenuItem(
+                    icon: LucideIcons.circleAlert,
+                    title: 'Ilova haqida',
+                    subtitle: 'Tizim ma’lumotlari va huquqiy me’yorlar',
+                    onTap: () => _showAboutAppSheet(context),
+                  ),
+                  _buildMyGovMenuItem(
+                    icon: LucideIcons.contact,
+                    title: 'Bog‘lanish',
+                    subtitle: 'Texnik yordam va hududiy koordinator',
+                    onTap: () => _showContactSheet(context, region, district),
+                  ),
+                  _buildMyGovMenuItem(
+                    icon: LucideIcons.logOut,
+                    title: 'Profildan chiqish',
+                    isLast: true,
+                    showChevron: false,
+                    onTap: () async {
+                      await auth.logout();
+                      if (context.mounted) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 24),
 
-            // 4. Ma'lumotlar bazasi va xavfsizlik
-            SurfaceCard(
-              borderRadius: 26,
-              padding: const EdgeInsets.all(22),
+            // 3. PAстки RASMIY FOOTER
+            Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
-                    children: [
-                      Icon(
-                        LucideIcons.database,
-                        color: AppColors.info,
-                        size: 22,
-                      ),
-                      SizedBox(width: 11),
-                      Expanded(
-                        child: Text(
-                          'Ma’lumotlar bazasi va xavfsizlik',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 16,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  GlassWell(
-                    borderRadius: 12,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 6,
+                  Text(
+                    'Raqamli ta’lim monitoringi tizimi',
+                    style: _myGovFont(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF64748B),
                     ),
-                    child: Column(
-                      children: [
-                        _buildSettingRow(
-                          'Baza arxitekturasi',
-                          'Mahalliy mustaqil ma’lumotlar bazasi (Offline-first Local DB)',
-                        ),
-                        _buildSettingRow(
-                          'Tashqi bog‘liqlik',
-                          'O‘chirilgan (Zero External Cloud Dependency)',
-                        ),
-                        _buildSettingRow(
-                          'Xotirada saqlash',
-                          'SharedPreferences doimiy xotirasi + tezkor indeksatsiya',
-                        ),
-                        _buildSettingRow(
-                          'Xavfsizlik standarti',
-                          'O‘zR O‘RQ-547 «Shaxsga doir ma’lumotlar to‘g‘risida»gi qonuniga muvofiq',
-                        ),
-                        _buildSettingRow(
-                          'Audit jurnali',
-                          'Barcha amallar vaqt tamg‘asi bilan o‘zgarmas tarzda qayd etiladi',
-                          isLast: true,
-                        ),
-                      ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'TA’LIM NAZORAT • v1.0.0',
+                    style: _myGovFont(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF94A3B8),
                     ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -424,84 +286,402 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
-      appBar: canPop ? AppBar(title: const Text('Sozlamalar')) : null,
+      appBar: canPop
+          ? AppBar(
+              title: Text(
+                'Sozlamalar',
+                style: _myGovFont(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF0F172A),
+                ),
+              ),
+            )
+          : null,
       body: canPop ? AmbientMeshBackground(child: scrollBody) : scrollBody,
     );
   }
 
-  Widget _buildSettingRow(
-    String label,
-    String value, {
+  Widget _buildMyGovMenuItem({
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    String? trailingValue,
+    String? badgeText,
+    bool showChevron = true,
     bool isLast = false,
+    VoidCallback? onTap,
   }) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isCompact = constraints.maxWidth < 460;
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            border: isLast
-                ? null
-                : const Border(
-                    bottom: BorderSide(
-                      color: AppColors.hairlineBorder,
-                      width: 1.0,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.vertical(
+        top: Radius.zero,
+        bottom: isLast ? const Radius.circular(20) : Radius.zero,
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+        decoration: BoxDecoration(
+          border: isLast
+              ? null
+              : const Border(
+                  bottom: BorderSide(
+                    color: Color(0xFFF1F5F9),
+                    width: 1.0,
+                  ),
+                ),
+        ),
+        child: Row(
+          children: [
+            // my.gov.uz uslubidagi chiziqli ikona (stiker)
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                icon,
+                size: 20,
+                color: const Color(0xFF1E293B),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: _myGovFont(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF0F172A),
+                      letterSpacing: -0.1,
                     ),
                   ),
-          ),
-          child: isCompact
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  if (subtitle != null && subtitle.isNotEmpty) ...[
+                    const SizedBox(height: 3),
                     Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      value,
-                      style: const TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                        height: 1.35,
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _myGovFont(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF64748B),
                       ),
                     ),
                   ],
-                )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                ],
+              ),
+            ),
+            if (badgeText != null) ...[
+              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 11,
+                  vertical: 4.5,
+                ),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF22C55E), Color(0xFF2563EB)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  badgeText,
+                  style: _myGovFont(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+            if (trailingValue != null) ...[
+              const SizedBox(width: 10),
+              Text(
+                trailingValue,
+                style: _myGovFont(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF64748B),
+                ),
+              ),
+            ],
+            if (showChevron) ...[
+              const SizedBox(width: 8),
+              const Icon(
+                LucideIcons.chevronRight,
+                size: 18,
+                color: Color(0xFF64748B),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPersonalDetailsSheet(BuildContext context, UserModel? user) {
+    _showMyGovModal(
+      context: context,
+      title: 'Shaxsiy ma’lumotlar',
+      rows: [
+        ('F.I.Sh', user?.fullName ?? 'Ko‘rsatilmagan'),
+        ('Telefon raqam', user?.phone ?? 'Ko‘rsatilmagan'),
+        ('Elektron pochta', user?.email ?? 'Ko‘rsatilmagan'),
+        ('Foydalanuvchi ID', user?.id ?? '—'),
+      ],
+    );
+  }
+
+  void _showProfessionSheet(BuildContext context, UserModel? user) {
+    _showMyGovModal(
+      context: context,
+      title: 'Mehnat faoliyati',
+      rows: [
+        ('Mutaxassislik', user?.role.label ?? 'Mutaxassis'),
+        ('Lavozim', user?.role.professionTitle ?? '—'),
+        ('Malaka toifasi', user?.qualificationCategory ?? 'Mutaxassis'),
+        ('Vakolat doirasi', user?.role.domainDescription ?? '—'),
+      ],
+    );
+  }
+
+  void _showInstitutionSheet(
+    BuildContext context,
+    String school,
+    String region,
+    String district,
+  ) {
+    _showMyGovModal(
+      context: context,
+      title: 'Ta’lim muassasasi',
+      rows: [
+        ('Muassasa nomi', school),
+        ('Viloyat', region),
+        ('Tuman / shahar', district),
+        ('Yo‘nalish', 'Inklyuziv va korreksion ta’lim sektori'),
+      ],
+    );
+  }
+
+  void _showAboutAppSheet(BuildContext context) {
+    _showMyGovModal(
+      context: context,
+      title: 'Ilova haqida',
+      rows: const [
+        ('Platforma nomi', 'TA’LIM NAZORAT'),
+        ('Talqin', '1.0.0'),
+        ('Ma’lumotlar bazasi', 'Mahalliy himoyalangan xotira'),
+        ('Huquqiy me’yor', 'O‘RQ-547 ("Shaxsga doir ma’lumotlar to‘g‘risida")'),
+      ],
+    );
+  }
+
+  void _showContactSheet(
+    BuildContext context,
+    String region,
+    String district,
+  ) {
+    _showMyGovModal(
+      context: context,
+      title: 'Bog‘lanish',
+      rows: [
+        ('Hududiy boshqarma', '$region MMTB'),
+        ('Mas’ul tuman', district),
+        ('Ishonch telefoni', '+998 (69) 227-00-00'),
+        ('Elektron manzil', 'info@talim-nazorat.uz'),
+      ],
+    );
+  }
+
+  void _showMyGovModal({
+    required BuildContext context,
+    required String title,
+    required List<(String, String)> rows,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(22, 14, 22, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFCBD5E1),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(
-                      width: 175,
-                      child: Text(
-                        label,
-                        style: const TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textMuted,
-                        ),
+                    Text(
+                      title,
+                      style: _myGovFont(
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF0F172A),
                       ),
                     ),
-                    Expanded(
-                      child: Text(
-                        value,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                          height: 1.35,
-                        ),
-                      ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      icon: const Icon(LucideIcons.x, size: 19),
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
+                ...rows.map(
+                  (item) => Container(
+                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Color(0xFFF1F5F9)),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 145,
+                          child: Text(
+                            item.$1,
+                            style: _myGovFont(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF64748B),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            item.$2,
+                            style: _myGovFont(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF0F172A),
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
+    );
+  }
+
+  void _showChangePasswordSheet(BuildContext context) {
+    final auth = context.read<AuthProvider>();
+    final oldPassCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    final confirmPassCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          'Parolni yangilash',
+          style: _myGovFont(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: SizedBox(
+          width: 380,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: oldPassCtrl,
+                obscureText: true,
+                style: _myGovFont(fontSize: 14),
+                decoration: const InputDecoration(labelText: 'Joriy parol *'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: newPassCtrl,
+                obscureText: true,
+                style: _myGovFont(fontSize: 14),
+                decoration: const InputDecoration(labelText: 'Yangi parol *'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: confirmPassCtrl,
+                obscureText: true,
+                style: _myGovFont(fontSize: 14),
+                decoration: const InputDecoration(
+                  labelText: 'Yangi parolni tasdiqlang *',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Bekor qilish',
+              style: _myGovFont(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF64748B),
+              ),
+            ),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final res = await auth.changePassword(
+                oldPassCtrl.text.trim(),
+                newPassCtrl.text.trim(),
+              );
+              if (context.mounted) {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(res['message'] as String),
+                    backgroundColor: res['success'] == true
+                        ? AppColors.success
+                        : AppColors.error,
+                  ),
+                );
+              }
+            },
+            child: Text(
+              'Saqlash',
+              style: _myGovFont(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

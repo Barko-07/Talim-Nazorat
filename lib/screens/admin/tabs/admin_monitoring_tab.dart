@@ -276,14 +276,6 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                           color: AppColors.textPrimary,
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        '(${a.ruleCode})',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          color: AppColors.textMuted,
-                                        ),
-                                      ),
                                     ],
                                   ),
                                   const SizedBox(height: 6),

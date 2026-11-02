@@ -265,7 +265,7 @@ class SpecialistsScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
-                                  '${staff.role.label} • ${staff.specialization ?? staff.role.professionTitle}',
+                                  staff.roleTitle,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(

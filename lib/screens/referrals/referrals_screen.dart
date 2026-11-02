@@ -271,7 +271,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                   controller: followUpCtrl,
                   decoration: const InputDecoration(
                     labelText: 'Tavsiya etilgan keyingi chora-tadbirlar',
-                    hintText: 'Masalan: ITR ga 2 ta nutqiy maqsad qo‘shish...',
+                    hintText: 'Masalan: ITRga 2 ta nutqiy maqsad qo‘shish...',
                   ),
                 ),
               ],

@@ -360,6 +360,25 @@ extension UserRoleExtension on UserRole {
   }
 }
 
+/// Lavozim va mutaxassislikni takrorlamasdan ko'rsatish
+extension UserRoleTitle on UserModel {
+  /// "Logoped-defektolog • Logoped-defektolog" o'rniga "Logoped-defektolog".
+  /// Biri ikkinchisini o'z ichiga olsa — aniqrog'i (uzunrog'i) ko'rsatiladi.
+  String get roleTitle {
+    final role = this.role.label;
+    final spec = specialization?.trim() ?? '';
+    if (spec.isEmpty) return role;
+    String norm(String v) =>
+        v.toLowerCase().replaceAll(RegExp(r'[^a-z\u0400-\u04ff]'), '');
+    final r = norm(role);
+    final sp = norm(spec);
+    if (r == sp) return role;
+    if (sp.contains(r)) return spec;
+    if (r.contains(sp)) return role;
+    return '$role • $spec';
+  }
+}
+
 class UserModel {
   final String id;
   final String email;

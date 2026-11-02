@@ -253,7 +253,7 @@ class _PsychologistObservationsTabState
                     studentGrade: selectedStudent.grade,
                     psychologistId: currentUser?.id ?? 'user_psychologist',
                     psychologistName:
-                        currentUser?.fullName ?? 'Usmonova Dilnoza (Psixolog)',
+                        currentUser?.fullName ?? '',
                     date: obsDate,
                     category: selectedCategory,
                     emotionalState: selectedState,

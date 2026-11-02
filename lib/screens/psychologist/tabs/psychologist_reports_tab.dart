@@ -259,8 +259,8 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Maxfiylik kafolati: O‘zR O‘RQ-547 "Psixologik yordam ko‘rsatish to‘g‘risida"gi Qonuni talablariga asosan, '
-                      'bolalarning psixologik baholash va kuzatuv ma’lumotlari faqat mas’ul mutaxassis vakolati doirasida shakllantiriladi.',
+                      'Maxfiylik: bolalarning psixologik baholash va kuzatuv ma’lumotlari faqat bolaga biriktirilgan '
+                      'mutaxassislarga ochiq. Maxfiy kuzatuvlarni faqat psixologlar ko‘radi.',
                       style: const TextStyle(fontSize: 12, color: Color(0xFF1E3A8A), height: 1.4),
                     ),
                   ),

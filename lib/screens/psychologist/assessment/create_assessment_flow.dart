@@ -730,7 +730,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    '•  ${q.safeAgeRange}',
+                                    '• ${q.safeAgeRange}',
                                     style: const TextStyle(
                                       fontSize: 11,
                                       color: Color(0xFF64748B),

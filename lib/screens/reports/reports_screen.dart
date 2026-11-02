@@ -108,7 +108,7 @@ class ReportsScreen extends StatelessWidget {
                   title: 'Yo‘naltirishlar jurnali (${app.referrals.length} ta)',
                   onTap: () => _displayCsvPreview(
                     context,
-                    'Yonalishlar_jurnali.csv',
+                    'Yonaltirishlar_jurnali.csv',
                     app.exportReferralsCsv(),
                   ),
                 ),

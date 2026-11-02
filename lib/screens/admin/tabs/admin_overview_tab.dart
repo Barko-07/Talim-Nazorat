@@ -187,7 +187,7 @@ class AdminOverviewTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'O‘zR O‘RQ-547 xavfsizlik standarti',
+                      'Rollar bo‘yicha himoyalangan tizim',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.75),
                         fontSize: 10,

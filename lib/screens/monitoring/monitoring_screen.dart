@@ -49,7 +49,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '[${alert.ruleCode}] ${alert.ruleTitle}',
+                      alert.ruleTitle,
                       style: const TextStyle(
                         fontSize: 12.5,
                         color: AppColors.primary,
@@ -382,7 +382,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
           ),
           const SizedBox(height: 10),
           Text(
-            '[${alt.ruleCode}] ${alt.ruleTitle}',
+            alt.ruleTitle,
             style: const TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: 15.5,

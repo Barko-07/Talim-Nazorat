@@ -175,7 +175,7 @@ class MonitoringRuleEngine {
               studentGrade: student.grade,
               severity: 'DIQQAT',
               message:
-                  'ITR dagi "${firstObj.title}" vazifasi muddati o‘tgan bo‘lsa-da, hali yakunlanmagan (${firstObj.progressPercent}%).',
+                  'ITRdagi "${firstObj.title}" vazifasi muddati o‘tgan bo‘lsa-da, hali yakunlanmagan (${firstObj.progressPercent}%).',
               suggestedAction: 'Koordinator boshchiligida maqsadni kichikroq bosqichlarga ajratish yoki muddatni rasmiylashtirish.',
               responsiblePersonName: plan.responsibleTeacherName,
               responsiblePersonId: plan.responsibleTeacherId,
@@ -227,6 +227,24 @@ class MonitoringRuleEngine {
     for (final generated in generatedAlerts) {
       final key = '${generated.studentId}_${generated.ruleCode}';
       if (merged.containsKey(generated.id) || openRuleKeys.contains(key)) {
+        // Ochiq signal saqlanadi (ID, holat, yaratilgan sana), lekin matni joriy
+        // holatga yangilanadi — masalan, ITR maqsadi foizi o'zgarganda.
+        final existingId = merged.containsKey(generated.id)
+            ? generated.id
+            : merged.values
+                  .firstWhere(
+                    (a) => !a.isResolved && '${a.studentId}_${a.ruleCode}' == key,
+                  )
+                  .id;
+        final existing = merged[existingId]!;
+        if (!existing.isResolved) {
+          merged[existingId] = existing.copyWith(
+            ruleTitle: generated.ruleTitle,
+            severity: generated.severity,
+            message: generated.message,
+            suggestedAction: generated.suggestedAction,
+          );
+        }
         continue;
       }
       merged[generated.id] = generated;

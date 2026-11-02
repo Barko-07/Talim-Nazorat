@@ -6,12 +6,24 @@ import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/student_model.dart';
 import '../../providers/app_provider.dart';
+import '../../services/access_control_service.dart';
+import '../../providers/auth_provider.dart';
 import 'add_student_screen.dart';
 import 'student_detail_screen.dart';
 
 // Sinf filtri variantlari. Tanlangan qiymat ro'yxatda bo'lmasa, DropdownButton xato beradi —
 // shuning uchun qiymat shu ro'yxat bo'yicha tekshiriladi.
-const _gradeOptions = ['1-A', '1-B', '2-A', '2-B', '3-A', '3-B', '4-A', '4-B', '5-A'];
+const _gradeOptions = [
+  '1-A',
+  '1-B',
+  '2-A',
+  '2-B',
+  '3-A',
+  '3-B',
+  '4-A',
+  '4-B',
+  '5-A',
+];
 
 class StudentsListScreen extends StatelessWidget {
   const StudentsListScreen({super.key});
@@ -23,6 +35,10 @@ class StudentsListScreen extends StatelessWidget {
     final canPop = Navigator.canPop(context);
     final width = MediaQuery.sizeOf(context).width;
     final mediaPadding = MediaQuery.paddingOf(context);
+    final currentUser = context.watch<AuthProvider>().currentUser;
+    final canAddStudent =
+        currentUser != null &&
+        AccessControlService().canEditStudent(currentUser, null);
 
     final bodyContent = ResponsivePageContainer(
       bottomPadding: 0,
@@ -33,18 +49,21 @@ class StudentsListScreen extends StatelessWidget {
             title: 'Bolalar reyestri',
             subtitle:
                 'Ro‘yxatda ${students.length} nafar inklyuziv ta’lim o‘quvchisi',
-            action: HeaderActionButton(
-              icon: LucideIcons.userPlus,
-              label: 'Yangi o‘quvchi',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AddStudentScreen(),
+            // Yangi o'quvchini faqat koordinator va rahbariyat ro'yxatga oladi
+            action: !canAddStudent
+                ? null
+                : HeaderActionButton(
+                    icon: LucideIcons.userPlus,
+                    label: 'Yangi o‘quvchi',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AddStudentScreen(),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
           const SizedBox(height: 9),
 
@@ -226,9 +245,7 @@ class StudentsListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
       appBar: canPop
-          ? AppBar(
-              title: const Text('Bolalar elektron reyestri'),
-            )
+          ? AppBar(title: const Text('Bolalar elektron reyestri'))
           : null,
       body: canPop ? AmbientMeshBackground(child: bodyContent) : bodyContent,
     );

@@ -12,6 +12,7 @@ import '../models/notification_model.dart';
 import '../models/psychologist_observation_model.dart';
 import '../models/assessment_question_model.dart';
 import '../services/local_db_service.dart';
+import '../services/app_exceptions.dart';
 import '../services/report_export_service.dart';
 import '../services/question_selection_service.dart';
 import '../services/subject_level_service.dart';
@@ -63,7 +64,20 @@ class AppProvider extends ChangeNotifier {
   /// O'qish uchun ko'ruvchi. Hech kim kirmagan bo'lsa — faolsiz anonim foydalanuvchi:
   /// ruxsat qoidalari unga hech narsa ko'rsatmaydi ("forUser: null" esa filtrsiz
   /// barcha ma'lumotni qaytarardi).
-  UserModel get _viewer => _currentUser ?? _anonymous;
+  /// Bazadagi joriy, faol foydalanuvchi; kirilmagan yoki bloklangan bo'lsa — null
+  UserModel? get _currentViewer {
+    final cached = _currentUser;
+    if (cached == null) return null;
+    final fresh = _db.getUserById(cached.id);
+    return (fresh != null && fresh.isActive) ? fresh : null;
+  }
+
+  UserModel get _viewer {
+    final cached = _currentUser;
+    if (cached == null) return _anonymous;
+    // Bazadagi joriy holat (bloklangan hisob hech narsa ko'rmaydi)
+    return _db.getUserById(cached.id) ?? _anonymous;
+  }
 
   static final _anonymous = UserModel(
     id: '__anonymous__',
@@ -157,13 +171,15 @@ class AppProvider extends ChangeNotifier {
   List<UserModel> get allUsers => _db.getUsers(forUser: _viewer);
 
   List<NotificationModel> get myNotifications {
-    if (_currentUser == null) return [];
-    return _db.getNotifications(_currentUser!.id);
+    final user = _currentViewer;
+    if (user == null) return [];
+    return _db.getNotifications(user.id);
   }
 
   int get myUnreadNotificationCount {
-    if (_currentUser == null) return 0;
-    return _db.getUnreadNotificationCount(_currentUser!.id);
+    final user = _currentViewer;
+    if (user == null) return 0;
+    return _db.getUnreadNotificationCount(user.id);
   }
 
   // ==================== DASHBOARD METRICS ====================
@@ -192,7 +208,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.addStudent(student, byUser: byUser ?? _requireUser());
+      await _db.addStudent(student, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -203,7 +219,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.updateStudent(student, byUser: byUser ?? _requireUser());
+      await _db.updateStudent(student, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -221,7 +237,7 @@ class AppProvider extends ChangeNotifier {
       await _db.deactivateStudent(
         studentId,
         reason,
-        byUser: byUser ?? _requireUser(),
+        byUser: _requireUser(),
       );
     } finally {
       _isLoading = false;
@@ -255,7 +271,7 @@ class AppProvider extends ChangeNotifier {
       await _db.assignSpecialistToStudent(
         studentId,
         specialistId,
-        byUser: byUser ?? _requireUser(),
+        byUser: _requireUser(),
       );
     } finally {
       _isLoading = false;
@@ -270,7 +286,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.addAssessment(assessment, byUser: byUser ?? _requireUser());
+      await _db.addAssessment(assessment, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -284,7 +300,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.updateAssessment(assessment, byUser: byUser ?? _requireUser());
+      await _db.updateAssessment(assessment, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -298,7 +314,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.deleteAssessment(id, byUser: byUser ?? _requireUser());
+      await _db.deleteAssessment(id, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -312,7 +328,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.addQuestion(question, byUser: byUser ?? _requireUser());
+      await _db.addQuestion(question, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -326,7 +342,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.updateQuestion(question, byUser: byUser ?? _requireUser());
+      await _db.updateQuestion(question, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -340,7 +356,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.deleteQuestion(id, byUser: byUser ?? _requireUser());
+      await _db.deleteQuestion(id, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -354,7 +370,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      return await _db.addSession(session, byUser: byUser ?? _requireUser());
+      return await _db.addSession(session, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -371,7 +387,7 @@ class AppProvider extends ChangeNotifier {
       id,
       observations: observations,
       nextSteps: nextSteps,
-      byUser: byUser ?? _requireUser(),
+      byUser: _requireUser(),
     );
     notifyListeners();
   }
@@ -386,13 +402,13 @@ class AppProvider extends ChangeNotifier {
       id,
       status,
       notes: notes,
-      byUser: byUser ?? _requireUser(),
+      byUser: _requireUser(),
     );
     notifyListeners();
   }
 
   Future<void> deleteSession(String id, {UserModel? byUser}) async {
-    await _db.deleteSession(id, byUser: byUser ?? _requireUser());
+    await _db.deleteSession(id, byUser: _requireUser());
     notifyListeners();
   }
 
@@ -403,7 +419,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.addIepPlan(plan, byUser: byUser ?? _requireUser());
+      await _db.addIepPlan(plan, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -417,7 +433,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.updateIepPlan(plan, byUser: byUser ?? _requireUser());
+      await _db.updateIepPlan(plan, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -436,7 +452,7 @@ class AppProvider extends ChangeNotifier {
       objId,
       progress,
       evidenceNotes: evidenceNotes,
-      byUser: byUser ?? _requireUser(),
+      byUser: _requireUser(),
     );
     notifyListeners();
   }
@@ -446,12 +462,12 @@ class AppProvider extends ChangeNotifier {
     String notes, {
     UserModel? byUser,
   }) async {
-    await _db.resolveAlert(alertId, notes, byUser: byUser ?? _requireUser());
+    await _db.resolveAlert(alertId, notes, byUser: _requireUser());
     notifyListeners();
   }
 
   Future<void> addReferral(ReferralModel referral, {UserModel? byUser}) async {
-    await _db.addReferral(referral, byUser: byUser ?? _requireUser());
+    await _db.addReferral(referral, byUser: _requireUser());
     notifyListeners();
   }
 
@@ -469,7 +485,7 @@ class AppProvider extends ChangeNotifier {
       outcomeNotes: outcomeNotes,
       followUpAction: followUpAction,
       followUpDate: followUpDate,
-      byUser: byUser ?? _requireUser(),
+      byUser: _requireUser(),
     );
     notifyListeners();
   }
@@ -488,7 +504,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.addUser(user, byUser: byUser ?? _requireUser());
+      await _db.addUser(user, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -496,7 +512,7 @@ class AppProvider extends ChangeNotifier {
   }
 
   Future<void> updateUser(UserModel updated, {UserModel? byUser}) async {
-    await _db.updateUser(updated, byUser: byUser ?? _requireUser());
+    await _db.updateUser(updated, byUser: _requireUser());
     notifyListeners();
   }
 
@@ -508,13 +524,13 @@ class AppProvider extends ChangeNotifier {
     await _db.toggleUserActive(
       userId,
       isActive,
-      byUser: byUser ?? _requireUser(),
+      byUser: _requireUser(),
     );
     notifyListeners();
   }
 
   Future<void> deleteUser(String userId, {UserModel? byUser}) async {
-    await _db.deleteUser(userId, byUser: byUser ?? _requireUser());
+    await _db.deleteUser(userId, byUser: _requireUser());
     notifyListeners();
   }
 
@@ -544,12 +560,12 @@ class AppProvider extends ChangeNotifier {
     PsychologicalObservationModel observation, {
     UserModel? byUser,
   }) async {
-    await _db.addObservation(observation, byUser: byUser ?? _requireUser());
+    await _db.addObservation(observation, byUser: _requireUser());
     notifyListeners();
   }
 
   Future<void> deleteObservation(String id, {UserModel? byUser}) async {
-    await _db.deleteObservation(id, byUser: byUser ?? _requireUser());
+    await _db.deleteObservation(id, byUser: _requireUser());
     notifyListeners();
   }
 
@@ -638,7 +654,7 @@ class AppProvider extends ChangeNotifier {
     String? domain,
     bool onlyActive = false,
   }) {
-    final user = _currentUser;
+    final user = _currentViewer;
     if (user == null) return [];
     return _db.getAssessmentPlans(
       forUser: user,
@@ -650,7 +666,7 @@ class AppProvider extends ChangeNotifier {
 
   /// Qayta baholash uchun joriy to'plam
   AssessmentPlanModel? activeAssessmentPlan(String studentId, String domain) {
-    final user = _currentUser;
+    final user = _currentViewer;
     if (user == null) return null;
     return _db.getActivePlan(
       forUser: user,
@@ -705,13 +721,13 @@ class AppProvider extends ChangeNotifier {
       );
 
   List<SubjectLevelAssessment> subjectLevelHistory(String studentId, {String? subject}) {
-    final user = _currentUser;
+    final user = _currentViewer;
     if (user == null) return [];
     return _db.getSubjectLevels(forUser: user, studentId: studentId, subject: subject);
   }
 
   SubjectLevelAssessment? currentSubjectLevel(String studentId, String subject) {
-    final user = _currentUser;
+    final user = _currentViewer;
     if (user == null) return null;
     return _db.latestSubjectLevel(forUser: user, studentId: studentId, subject: subject);
   }
@@ -763,7 +779,7 @@ class AppProvider extends ChangeNotifier {
   }
 
   List<ProgressMeasurement> measurementsFor(String studentId, {String? metricId}) {
-    final user = _currentUser;
+    final user = _currentViewer;
     if (user == null) return [];
     return _db.getMeasurements(forUser: user, studentId: studentId, metricId: metricId);
   }
@@ -808,24 +824,24 @@ class AppProvider extends ChangeNotifier {
   /// Joriy foydalanuvchi kabineti: bo'limlar (tartibi bilan), ruxsatlar, yo'nalishlar,
   /// ko'rsatkichlar, mashg'ulot shablonlari va yo'naltirish manzillari.
   SpecialistWorkspace? get workspace {
-    final user = _currentUser;
+    final user = _currentViewer;
     return user == null ? null : _workspaces.workspaceFor(user);
   }
 
   bool canUseModule(WorkspaceModule module, {bool edit = false}) {
-    final user = _currentUser;
+    final user = _currentViewer;
     return user != null && _workspaces.canUse(user, module, edit: edit);
   }
 
   /// Kabinet bosh sahifasi: o'quvchilarim, hali ishlanmaganlar, e'tibor talab qiladiganlar,
   /// kelgan yo'naltirishlar, yaqin 7 kunlik mashg'ulotlar.
   WorkspaceDashboard? get workspaceDashboard {
-    final user = _currentUser;
+    final user = _currentViewer;
     return user == null ? null : _workspaces.dashboardFor(user);
   }
 
   List<StudentModel> get myCaseload {
-    final user = _currentUser;
+    final user = _currentViewer;
     return user == null ? [] : _workspaces.caseloadFor(user);
   }
 
@@ -847,7 +863,7 @@ class AppProvider extends ChangeNotifier {
   /// Bolaning haqiqiy darajasiga mos topshiriq qoralamalari (keyingi DTS talablaridan).
   /// O'qituvchi tanlaydi, tahrirlaydi va assignSubjectTask bilan beradi.
   List<SubjectTask> suggestSubjectTasks(String studentId, String subject) {
-    final user = _currentUser;
+    final user = _currentViewer;
     final current = currentSubjectLevel(studentId, subject);
     if (user == null || current == null) return [];
     return nextStandardsFor(studentId, subject)
@@ -878,7 +894,7 @@ class AppProvider extends ChangeNotifier {
   }
 
   List<SubjectTask> subjectTasksFor(String studentId, {String? subject, bool onlyOpen = false}) {
-    final user = _currentUser;
+    final user = _currentViewer;
     if (user == null) return [];
     return _db.getSubjectTasks(
       forUser: user, studentId: studentId, subject: subject, onlyOpen: onlyOpen,
@@ -888,7 +904,7 @@ class AppProvider extends ChangeNotifier {
   // ==================== MONITORING: QIZIL / SARIQ / YASHIL ====================
   /// Ko'rinadigan barcha bolalar holati (qizil -> sariq -> yashil), sanoqlar bilan
   MonitoringSummary? get monitoringSummary {
-    final user = _currentUser;
+    final user = _currentViewer;
     return user == null ? null : _childStatus.summaryFor(user);
   }
 
@@ -925,7 +941,7 @@ class AppProvider extends ChangeNotifier {
 
   // ==================== KONSILIUM ====================
   List<CaseConference> conferencesFor({String? studentId}) {
-    final user = _currentUser;
+    final user = _currentViewer;
     if (user == null) return [];
     return _db.getConferences(forUser: user, studentId: studentId);
   }
@@ -982,7 +998,7 @@ class AppProvider extends ChangeNotifier {
 
   /// Bolaning tovushlar kartasi: har bir maqsadli tovushning bosqichi, tarixi va dinamikasi
   SpeechProfile speechProfile(String studentId) {
-    final user = _currentUser;
+    final user = _currentViewer;
     if (user == null) return SpeechProfile(studentId, const []);
     return _soundTracker.buildProfile(
       studentId,
@@ -1003,17 +1019,23 @@ class AppProvider extends ChangeNotifier {
   /// Joriy foydalanuvchi kabinetiga mos metodikalar (psixolog — psixologik,
   /// defektolog — defektologik; rahbariyat — barchasi)
   List<PsychologicalMethodItem> get myMethods {
-    final user = _currentUser;
+    final user = _currentViewer;
     return user == null ? const [] : MethodLibrary.forRole(user.role);
   }
 
   PsychologicalMethodItem? methodById(String id) => MethodLibrary.byId(id);
 
+  /// Amal bajaruvchi foydalanuvchi — har safar bazadagi joriy holati olinadi:
+  /// sessiya davomida bloklangan yoki roli o'zgargan hisob eski huquqlar bilan ishlamaydi.
   UserModel _requireUser() {
-    final user = _currentUser;
-    if (user == null) {
-      throw Exception('Foydalanuvchi tizimga kirmagan.');
+    final cached = _currentUser;
+    if (cached == null) {
+      throw const PermissionDeniedException('tizimga kirilmagan.');
     }
-    return user;
+    final fresh = _db.getUserById(cached.id);
+    if (fresh == null || !fresh.isActive) {
+      throw const PermissionDeniedException('hisob bloklangan yoki o‘chirilgan.');
+    }
+    return fresh;
   }
 }

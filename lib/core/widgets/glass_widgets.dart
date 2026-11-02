@@ -45,7 +45,7 @@ class AmbientMeshBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subtleAlpha = intense ? 0.045 : 0.032;
+    final subtleAlpha = intense ? 0.09 : 0.07;
 
     return Stack(
       fit: StackFit.expand,
@@ -58,10 +58,10 @@ class AmbientMeshBackground extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFFF8FAFC), // Tepa chap: juda toza, yorug' kunduzgi oq-kulrang
-                Color(0xFFF1F5F9), // Markaz-tepa: nafis chinni-kulrang
-                Color(0xFFEAF0F6), // Markaz-quyi: mayin havo rangli sokin slate
-                Color(0xFFE2E9F2), // Pastki o'ng: engil tayanch fon (bo'g'iq emas)
+                Color(0xFFF6F9FF), // Tepa chap: deyarli oq, mayin havorang
+                Color(0xFFEDF3FE), // Markaz-tepa: yorug' havorang
+                Color(0xFFE4EDFD), // Markaz-quyi: sokin ko'kish
+                Color(0xFFDCE7FB), // Pastki o'ng: chuqurroq havorang (asosiy ko'k bilan uyg'un)
               ],
               stops: [0.0, 0.35, 0.70, 1.0],
             ),

@@ -1,7 +1,7 @@
 import 'package:animations/animations.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -10,7 +10,6 @@ import '../../core/constants/namangan_data.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
-import '../../services/seed_data.dart';
 import '../main_navigation_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -27,13 +26,8 @@ class _LoginScreenState extends State<LoginScreen>
   late TabController _tabController;
 
   // --- LOGIN CONTROLLERS ---
-  // Namunaviy hisob ma'lumotlari faqat debug rejimida oldindan to'ldiriladi
-  final _loginIdentifierCtrl = TextEditingController(
-    text: kDebugMode ? 'psixolog@talim.uz' : '',
-  );
-  final _loginPasswordCtrl = TextEditingController(
-    text: kDebugMode ? SeedData.demoPassword : '',
-  );
+  final _loginIdentifierCtrl = TextEditingController();
+  final _loginPasswordCtrl = TextEditingController();
   bool _loginObscure = true;
 
   // --- SIGN UP STEP MANAGEMENT ---
@@ -344,6 +338,35 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
+  TextStyle _myGovFont({
+    double fontSize = 14,
+    FontWeight fontWeight = FontWeight.w500,
+    Color color = AppColors.textPrimary,
+    double letterSpacing = -0.1,
+    double? height,
+  }) {
+    return GoogleFonts.golosText(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      height: height,
+    );
+  }
+
+  bool get _hasMinLength => _signUpPasswordCtrl.text.trim().length >= 8;
+  bool get _hasUppercase =>
+      RegExp(r'[A-Z]').hasMatch(_signUpPasswordCtrl.text);
+  bool get _hasLowercase =>
+      RegExp(r'[a-z]').hasMatch(_signUpPasswordCtrl.text);
+  bool get _hasDigit => RegExp(r'[0-9]').hasMatch(_signUpPasswordCtrl.text);
+
+  int get _passwordStrengthScore =>
+      (_hasMinLength ? 1 : 0) +
+      (_hasUppercase ? 1 : 0) +
+      (_hasLowercase ? 1 : 0) +
+      (_hasDigit ? 1 : 0);
+
   void _previousStep() {
     setState(() {
       _errorMessage = null;
@@ -354,10 +377,10 @@ class _LoginScreenState extends State<LoginScreen>
   void _handleSignUp() async {
     setState(() => _errorMessage = null);
 
-    if (_signUpPasswordCtrl.text.trim().length < 6) {
+    if (!_hasMinLength || !_hasUppercase || !_hasLowercase || !_hasDigit) {
       setState(
         () => _errorMessage =
-            'Parol kamida 6 ta belgidan iborat bo‘lishi lozim.',
+            'Parolda kamida 8 ta belgi, 1 ta katta harf (A-Z), 1 ta kichik harf (a-z) va 1 ta raqam (0-9) bo‘lishi shart.',
       );
       return;
     }
@@ -409,12 +432,6 @@ class _LoginScreenState extends State<LoginScreen>
         });
       }
     }
-  }
-
-  void _selectDemoAccount(UserModel user) {
-    _loginIdentifierCtrl.text = user.email;
-    _loginPasswordCtrl.text = SeedData.demoPassword;
-    _handleLogin();
   }
 
   @override
@@ -689,60 +706,27 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildLoginView(AuthProvider auth) {
-    final demoProfiles = [
-      (
-        SeedData.users.firstWhere((u) => u.role == UserRole.psychologist),
-        'Psixolog',
-        LucideIcons.brain,
-      ),
-      (
-        SeedData.users.firstWhere((u) => u.role == UserRole.speechTherapist),
-        'Logoped',
-        LucideIcons.mic,
-      ),
-      (
-        SeedData.users.firstWhere((u) => u.role == UserRole.specialEducation),
-        'Defektolog',
-        LucideIcons.puzzle,
-      ),
-      (
-        SeedData.users.firstWhere((u) => u.role == UserRole.specialEdTeacher),
-        'Maxsus o‘qituvchi',
-        LucideIcons.bookOpen,
-      ),
-      (
-        SeedData.users.firstWhere((u) => u.role == UserRole.teacher),
-        'O‘qituvchi',
-        LucideIcons.bookOpen,
-      ),
-      (
-        SeedData.users.firstWhere((u) => u.role == UserRole.coordinator),
-        'Koordinator',
-        LucideIcons.sparkles,
-      ),
-      (
-        SeedData.users.firstWhere((u) => u.role == UserRole.superAdmin),
-        'Admin',
-        LucideIcons.shieldCheck,
-      ),
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
+        Text(
           'Shaxsiy kabinetga kirish',
-          style: TextStyle(
+          style: _myGovFont(
             fontSize: 18,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
-            letterSpacing: -0.35,
+            letterSpacing: -0.25,
           ),
         ),
         const SizedBox(height: 5),
-        const Text(
-          'Telefon raqamingiz yoki elektron pochtangiz orqali tizimga kiring',
-          style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+        Text(
+          'Telefon raqamingiz yoki elektron pochtangiz orqali kiring.',
+          style: _myGovFont(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF475569),
+            height: 1.35,
+          ),
         ),
         const SizedBox(height: 20),
 
@@ -819,74 +803,16 @@ class _LoginScreenState extends State<LoginScreen>
         Center(
           child: TextButton(
             onPressed: () => _tabController.animateTo(1),
-            child: const Text(
+            child: Text(
               'Yangi hisob ochish (Ro‘yxatdan o‘tish)',
-              style: TextStyle(
+              style: _myGovFont(
                 color: AppColors.primary,
-                fontWeight: FontWeight.w700,
-                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
               ),
             ),
           ),
         ),
-
-        // Tezkor sinash uchun namunaviy hisoblar (faqat debug rejimida)
-        if (kDebugMode) ...[
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 12),
-          child: Divider(),
-        ),
-
-        const Row(
-          children: [
-            Icon(LucideIcons.zap, size: 14, color: AppColors.primary),
-            SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                'Namunaviy hisoblar (1-klikda tezkor kirish):',
-                style: TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: demoProfiles.map((item) {
-            final user = item.$1;
-            final label = item.$2;
-            final icon = item.$3;
-            return SurfaceCard(
-              elevated: false,
-              borderRadius: 10,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              backgroundColor: AppColors.glassWellFill,
-              borderColor: AppColors.border,
-              onTap: () => _selectDemoAccount(user),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, size: 14, color: AppColors.primary),
-                  const SizedBox(width: 6),
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-        ],
       ],
     );
   }
@@ -915,9 +841,13 @@ class _LoginScreenState extends State<LoginScreen>
         Center(
           child: TextButton(
             onPressed: () => _tabController.animateTo(0),
-            child: const Text(
+            child: Text(
               'Allaqachon hisobingiz bormi? Kirish',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 12.5),
+              style: _myGovFont(
+                color: const Color(0xFF475569),
+                fontWeight: FontWeight.w500,
+                fontSize: 13,
+              ),
             ),
           ),
         ),
@@ -926,7 +856,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildStepProgressBar() {
-    final stepTitles = ['Ism-familiya', 'Kasb va Maktab', 'Aloqa', 'Parol'];
+    final stepTitles = ['Shaxsiy', 'Soha', 'Aloqa', 'Parol'];
 
     return GlassWell(
       borderRadius: 12,
@@ -962,11 +892,11 @@ class _LoginScreenState extends State<LoginScreen>
             children: [
               Text(
                 'QADAM ${_signUpStep + 1} / 4',
-                style: const TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
-                  color: AppColors.textMuted,
+                style: _myGovFont(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.4,
+                  color: const Color(0xFF64748B),
                 ),
               ),
               Flexible(
@@ -974,9 +904,9 @@ class _LoginScreenState extends State<LoginScreen>
                   stepTitles[_signUpStep],
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
+                  style: _myGovFont(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.primary,
                   ),
                 ),
@@ -1009,23 +939,30 @@ class _LoginScreenState extends State<LoginScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            '1-Qadam: Ism va Familiyangiz',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
+          Text(
+            '1-Qadam: Ism va Familiya',
+            style: _myGovFont(
+              fontSize: 16.5,
+              fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
+              letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 4),
-          const Text(
+          const SizedBox(height: 5),
+          Text(
             'Tizimda rasmiy hujjatlar sizning nomingizdan yuritiladi.',
-            style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+            style: _myGovFont(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF475569),
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _firstNameCtrl,
             textCapitalization: TextCapitalization.words,
+            style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: const InputDecoration(
               labelText: 'Ismingiz *',
               hintText: 'Masalan: Dilnoza',
@@ -1040,6 +977,7 @@ class _LoginScreenState extends State<LoginScreen>
           TextField(
             controller: _lastNameCtrl,
             textCapitalization: TextCapitalization.words,
+            style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: const InputDecoration(
               labelText: 'Familiyangiz *',
               hintText: 'Masalan: Qodirova',
@@ -1057,21 +995,15 @@ class _LoginScreenState extends State<LoginScreen>
 
   Widget _buildStep2ProfessionalInfo() {
     final availableRoles = [
-      (UserRole.psychologist, 'Amaliyotchi psixolog', LucideIcons.brain),
+      (UserRole.psychologist, 'Amaliyotchi psixolog', LucideIcons.idCard),
       (UserRole.speechTherapist, 'Logoped-defektolog', LucideIcons.mic),
-      (
-        UserRole.specialEducation,
-        'Maxsus pedagog (Defektolog)',
-        LucideIcons.puzzle,
-      ),
+      (UserRole.specialEducation, 'Defektolog', LucideIcons.shield),
       (
         UserRole.specialEdTeacher,
-        'Maxsus ta’lim o‘qituvchisi',
-        LucideIcons.bookOpen,
+        'Maxsus o‘qituvchi',
+        LucideIcons.graduationCap,
       ),
       (UserRole.teacher, 'Fan o‘qituvchisi', LucideIcons.bookOpen),
-      // Rahbariyat, koordinator va inspektor hisoblarini administrator yaratadi
-      // (backend: LocalDbService.selfRegistrationRoles)
     ];
 
     final selectedSchool = _institutionCtrl.text.isNotEmpty
@@ -1083,25 +1015,31 @@ class _LoginScreenState extends State<LoginScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            '2-Qadam: Mutaxassislik va Muassasa',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
+          Text(
+            '2-Qadam: Soha va maktab',
+            style: _myGovFont(
+              fontSize: 16.5,
+              fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
+              letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 4),
-          const Text(
-            'O‘z kasbingizni va Chortoq tumanidagi maktabingizni tanlang.',
-            style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+          const SizedBox(height: 5),
+          Text(
+            'Sohangiz va maktabingizni tanlang.',
+            style: _myGovFont(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF475569),
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 14),
-          const Text(
+          Text(
             'Mutaxassislik sohasi *',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
+            style: _myGovFont(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -1117,16 +1055,16 @@ class _LoginScreenState extends State<LoginScreen>
 
               return SurfaceCard(
                 elevated: false,
-                borderRadius: 10,
+                borderRadius: 12,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 9,
+                  horizontal: 13,
+                  vertical: 10,
                 ),
                 backgroundColor: isSelected
                     ? AppColors.primaryLight
-                    : AppColors.glassWellFill,
+                    : const Color(0xFFF8FAFC),
                 borderColor: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.45)
+                    ? AppColors.primary.withValues(alpha: 0.55)
                     : AppColors.border,
                 onTap: () {
                   setState(() {
@@ -1137,34 +1075,53 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      icon,
-                      size: 15,
-                      color:
-                          isSelected ? AppColors.primary : AppColors.textMuted,
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.primary.withValues(alpha: 0.12)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.primary.withValues(alpha: 0.35)
+                              : const Color(0xFFE2E8F0),
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        icon,
+                        size: 16,
+                        color: isSelected
+                            ? AppColors.primary
+                            : const Color(0xFF334155),
+                      ),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 9),
                     Flexible(
                       child: Text(
                         title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight:
-                              isSelected ? FontWeight.w800 : FontWeight.w600,
+                        style: _myGovFont(
+                          fontSize: 13.5,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                           color: isSelected
                               ? AppColors.primary
-                              : AppColors.textPrimary,
+                              : const Color(0xFF1E293B),
+                          letterSpacing: -0.05,
                         ),
                       ),
                     ),
                     if (isSelected) ...[
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 6),
                       const Icon(
                         LucideIcons.circleCheck,
                         color: AppColors.primary,
-                        size: 14,
+                        size: 15,
                       ),
                     ],
                   ],
@@ -1173,11 +1130,11 @@ class _LoginScreenState extends State<LoginScreen>
             }).toList(),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Ta’lim muassasasi (Chortoq tumani) *',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
+          Text(
+            'Maktab *',
+            style: _myGovFont(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -1186,7 +1143,7 @@ class _LoginScreenState extends State<LoginScreen>
             elevated: false,
             borderRadius: 12,
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
-            backgroundColor: AppColors.glassWellFill,
+            backgroundColor: const Color(0xFFF8FAFC),
             borderColor: AppColors.border,
             onTap: () => _showIosSchoolPickerModal(context),
             child: Row(
@@ -1202,8 +1159,8 @@ class _LoginScreenState extends State<LoginScreen>
                     selectedSchool,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: _myGovFont(
+                      fontSize: 13.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -1229,23 +1186,30 @@ class _LoginScreenState extends State<LoginScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            '3-Qadam: Aloqa Ma’lumotlari',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
+          Text(
+            '3-Qadam: Aloqa',
+            style: _myGovFont(
+              fontSize: 16.5,
+              fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
+              letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 4),
-          const Text(
-            'Telefon raqamingiz tizimga kirish identifikatori bo‘lib xizmat qiladi.',
-            style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+          const SizedBox(height: 5),
+          Text(
+            'Kirish uchun telefon raqamingizni kiriting.',
+            style: _myGovFont(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF475569),
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _phoneCtrl,
             keyboardType: TextInputType.phone,
+            style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: const InputDecoration(
               labelText: 'Telefon raqam *',
               hintText: '+998 90 123 45 67',
@@ -1260,6 +1224,7 @@ class _LoginScreenState extends State<LoginScreen>
           TextField(
             controller: _emailCtrl,
             keyboardType: TextInputType.emailAddress,
+            style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: const InputDecoration(
               labelText: 'Elektron pochta (Ixtiyoriy)',
               hintText: 'mutaxassis@talim.uz',
@@ -1281,63 +1246,34 @@ class _LoginScreenState extends State<LoginScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            '4-Qadam: Parol va Tasdiqlash',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
+          Text(
+            '4-Qadam: Parol',
+            style: _myGovFont(
+              fontSize: 16.5,
+              fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
+              letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 4),
-          const Text(
-            'Kamida 6 ta belgidan iborat xavfsiz parol o‘rnating.',
-            style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
-          ),
-          const SizedBox(height: 14),
-          GlassWell(
-            borderRadius: 12,
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'F.I.Sh: ${_firstNameCtrl.text.trim()} ${_lastNameCtrl.text.trim()}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  'Soha: ${_selectedRole.label}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Maktab: ${_institutionCtrl.text.trim()}',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 11.5,
-                    color: AppColors.textMuted,
-                  ),
-                ),
-              ],
+          const SizedBox(height: 5),
+          Text(
+            'Hisobingiz uchun kuchli parol o‘rnating.',
+            style: _myGovFont(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF475569),
+              height: 1.4,
             ),
           ),
           const SizedBox(height: 14),
           TextField(
             controller: _signUpPasswordCtrl,
             obscureText: _signUpObscure,
+            onChanged: (_) => setState(() => _errorMessage = null),
+            style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: InputDecoration(
               labelText: 'Parol *',
-              hintText: 'Kamida 6 ta belgi',
+              hintText: 'Masalan: Talim2026',
               prefixIcon: const Icon(
                 LucideIcons.lock,
                 size: 18,
@@ -1354,10 +1290,14 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             ),
           ),
+          const SizedBox(height: 12),
+          _buildPasswordRequirementsBox(),
           const SizedBox(height: 14),
           TextField(
             controller: _signUpConfirmPasswordCtrl,
             obscureText: _signUpConfirmObscure,
+            onChanged: (_) => setState(() => _errorMessage = null),
+            style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: InputDecoration(
               labelText: 'Parolni tasdiqlang *',
               prefixIcon: const Icon(
@@ -1379,6 +1319,124 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPasswordRequirementsBox() {
+    final score = _passwordStrengthScore;
+    final Color activeColor = score <= 1
+        ? AppColors.error
+        : score == 2
+            ? const Color(0xFFD97706)
+            : score == 3
+                ? AppColors.primary
+                : AppColors.success;
+    final String strengthLabel = score == 0
+        ? 'Parol talablari'
+        : score == 1
+            ? 'Kuchsiz parol'
+            : score == 2
+                ? 'O‘rtacha parol'
+                : score == 3
+                    ? 'Yaxshi parol'
+                    : 'Kuchli parol';
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                strengthLabel,
+                style: _myGovFont(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: score == 0
+                      ? const Color(0xFF334155)
+                      : activeColor,
+                ),
+              ),
+              Text(
+                '$score / 4',
+                style: _myGovFont(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF64748B),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: List.generate(4, (index) {
+              final passed = index < score;
+              return Expanded(
+                child: Container(
+                  height: 4.5,
+                  margin: EdgeInsets.only(right: index == 3 ? 0 : 5),
+                  decoration: BoxDecoration(
+                    color: passed ? activeColor : const Color(0xFFE2E8F0),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 11),
+          _buildPasswordRuleRow(
+            'Kamida 8 ta belgi',
+            _hasMinLength,
+          ),
+          const SizedBox(height: 6),
+          _buildPasswordRuleRow(
+            'Kamida 1 ta katta harf (A–Z)',
+            _hasUppercase,
+          ),
+          const SizedBox(height: 6),
+          _buildPasswordRuleRow(
+            'Kamida 1 ta kichik harf (a–z)',
+            _hasLowercase,
+          ),
+          const SizedBox(height: 6),
+          _buildPasswordRuleRow(
+            'Kamida 1 ta raqam (0–9)',
+            _hasDigit,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPasswordRuleRow(String text, bool met) {
+    return Row(
+      children: [
+        Icon(
+          met ? LucideIcons.circleCheck : LucideIcons.circle,
+          size: 15,
+          color: met ? AppColors.success : const Color(0xFF94A3B8),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: _myGovFont(
+              fontSize: 12.5,
+              fontWeight: met ? FontWeight.w600 : FontWeight.w500,
+              color: met
+                  ? const Color(0xFF0F172A)
+                  : const Color(0xFF64748B),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

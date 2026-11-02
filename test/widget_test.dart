@@ -146,6 +146,10 @@ void main() {
       expect(find.text('Yangi o‘quvchini ro‘yxatga olish'), findsOneWidget);
       expect(find.text('Familiyasi *'), findsOneWidget);
       expect(find.text('Qo‘llab-quvvatlash darajasi'), findsOneWidget);
+
+      // Sessiya taymeri to'xtatiladi (ilovada provayderni ChangeNotifierProvider yopadi)
+      await tester.pumpWidget(const SizedBox());
+      authProvider.dispose();
     });
   });
 }
