@@ -15,7 +15,7 @@ class AppTheme {
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.background,
       fontFamily: baseFont,
-      splashFactory: InkSparkle.splashFactory,
+      splashFactory: InkRipple.splashFactory,
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.android: FadeThroughPageTransitionsBuilder(),

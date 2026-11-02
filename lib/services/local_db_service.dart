@@ -2677,7 +2677,9 @@ class LocalDbService {
     UserModel? forUser,
     bool? onlyUnresolved,
   }) {
-    _reEvaluateRules();
+    if (_alerts.isEmpty && _students.isNotEmpty) {
+      _reEvaluateRules();
+    }
     return _alerts.where((a) {
       if (onlyUnresolved == true && a.isResolved) return false;
       if (forUser != null) {
