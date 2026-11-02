@@ -6,6 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../models/user_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/child_status_service.dart';
 
 class AdminOverviewTab extends StatelessWidget {
   final Function(int) onNavigateTab;
@@ -310,6 +311,82 @@ class AdminOverviewTab extends StatelessWidget {
                     onTap: () => onNavigateTab(10), // Audit jurnali
                   ),
                 ],
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+
+          // 2.5. SVETOFOR VA ISHLANMAGAN BOLALAR NAZORATI
+          Builder(
+            builder: (context) {
+              final summary = app.monitoringSummary;
+              final redCount = summary.count(StatusColor.red);
+              final yellowCount = summary.count(StatusColor.yellow);
+              final greenCount = summary.count(StatusColor.green);
+              final unassignedCount = app.students
+                  .where((s) => s.assignedSpecialistIds.isEmpty)
+                  .length;
+              return Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: AppColors.border),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Bolalar bilan ishlash holati (Svetofor monitoringi)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.5,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => onNavigateTab(3),
+                            child: const Text(
+                              'O‘quvchilar reyestriga o‘tish →',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 8,
+                        children: [
+                          _buildBadge(
+                            label: '🔴 Qizil (Ishlanmagan / kechikkan): $redCount nafar',
+                            color: const Color(0xFFDC2626),
+                            bgColor: const Color(0xFFFEE2E2),
+                          ),
+                          _buildBadge(
+                            label: '🟡 Sariq (E’tibor talab): $yellowCount nafar',
+                            color: const Color(0xFFD97706),
+                            bgColor: const Color(0xFFFEF3C7),
+                          ),
+                          _buildBadge(
+                            label: '🟢 Yashil (Ijobiy natija): $greenCount nafar',
+                            color: const Color(0xFF16A34A),
+                            bgColor: const Color(0xFFDCFCE7),
+                          ),
+                          _buildBadge(
+                            label: '⚠ Mutaxassis biriktirilmagan: $unassignedCount nafar',
+                            color: const Color(0xFF7C3AED),
+                            bgColor: const Color(0xFFF5F3FF),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           ),

@@ -3115,4 +3115,46 @@ class LocalDbService {
     };
     return const JsonEncoder.withIndent('  ').convert(payload);
   }
+
+  /// Parolni tiklash so'rovi (hisob borligini oshkor qilmasdan administratorga bildirishnoma yuboradi)
+  Future<void> requestPasswordRecovery(String identifier) async {
+    final cleaned = identifier.trim();
+    if (cleaned.isEmpty) {
+      throw const ValidationException('Telefon raqami yoki elektron pochtani kiriting.');
+    }
+    final user = findUserByEmailOrPhone(cleaned);
+    if (user != null) {
+      final admins = _users.where(
+        (u) =>
+            u.isActive &&
+            (u.role == UserRole.superAdmin ||
+                (u.role == UserRole.institutionAdmin &&
+                    u.institutionName == user.institutionName)),
+      );
+      for (final admin in admins) {
+        _notifications.insert(
+          0,
+          NotificationModel(
+            id: 'notif_${_uuid.v4().substring(0, 8)}',
+            recipientUserId: admin.id,
+            title: 'Parolni tiklash so‘rovi',
+            body:
+                '${user.fullName} (${user.role.label}, ${user.institutionName ?? "maktab"}) parolini tiklashni so‘radi.',
+            type: 'SECURITY',
+            relatedRecordId: user.id,
+            isRead: false,
+            createdAt: DateTime.now(),
+          ),
+        );
+      }
+      await _persistAll();
+      await addAuditLog(
+        userFullName: user.fullName,
+        userRole: user.role.label,
+        action: 'PASSWORD_RECOVERY_REQUEST',
+        entity: 'Auth',
+        details: '${user.fullName} parolni tiklash bo‘yicha administratorga so‘rov yubordi',
+      );
+    }
+  }
 }

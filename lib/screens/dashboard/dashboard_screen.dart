@@ -10,9 +10,11 @@ import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/access_control_service.dart';
+import '../../services/child_status_service.dart';
 import '../assessments/new_assessment_screen.dart';
 import '../iep/iep_list_screen.dart';
 import '../monitoring/monitoring_screen.dart';
+import '../referrals/referrals_screen.dart';
 import '../reports/reports_screen.dart';
 import '../sessions/sessions_screen.dart';
 import '../specialists/specialists_screen.dart';
@@ -220,12 +222,16 @@ class DashboardScreen extends StatelessWidget {
 
               const SizedBox(height: 10),
 
+              // 3.5. SVETOFOR VA ISHLANMAGAN BOLALAR NAZORAT PANELI
+              _buildSvetoforOverviewStrip(context, app),
+              const SizedBox(height: 10),
+
               // 4. KASBIY ISH MAYDONI
               _buildRoleSpecificWorkspace(context, user),
               const SizedBox(height: 10),
 
               // 5. GRAFIK: OYLIK RIVOJLANISH DINAMIKASI
-              _buildAnalyticsChartCard(),
+              _buildAnalyticsChartCard(app),
               const SizedBox(height: 10),
 
               // 6. SO'NGGI BAHOLASHLAR VA KUTILAYOTGAN MASHG'ULOTLAR
@@ -404,8 +410,111 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAnalyticsChartCard() {
-    const months = ['Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
+  Widget _buildSvetoforOverviewStrip(BuildContext context, AppProvider app) {
+    final summary = app.monitoringSummary;
+    final redCount = summary.count(StatusColor.red);
+    final yellowCount = summary.count(StatusColor.yellow);
+    final greenCount = summary.count(StatusColor.green);
+    final pendingReferrals = app.referrals
+        .where((r) => r.status == 'Ko‘rib chiqilmoqda' || r.status == 'Qabul qilindi')
+        .length;
+
+    return SurfaceCard(
+      borderRadius: 22,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.activity, size: 19, color: AppColors.primary),
+              const SizedBox(width: 9),
+              const Expanded(
+                child: Text(
+                  'Bolalar bilan ishlash holati (Svetofor nazorati)',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () => _openModule(context, 1, const StudentsListScreen()),
+                child: const Text(
+                  'Ro‘yxatni ochish →',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            children: [
+              StatusPill(
+                label: '🔴 Ishlanmagan / kechikkan: $redCount nafar',
+                color: const Color(0xFFDC2626),
+                backgroundColor: const Color(0xFFFEE2E2),
+              ),
+              StatusPill(
+                label: '🟡 E’tibor talab: $yellowCount nafar',
+                color: const Color(0xFFD97706),
+                backgroundColor: const Color(0xFFFEF3C7),
+              ),
+              StatusPill(
+                label: '🟢 Ijobiy dinamika: $greenCount nafar',
+                color: const Color(0xFF16A34A),
+                backgroundColor: const Color(0xFFDCFCE7),
+              ),
+              StatusPill(
+                label: '↗ Faol yo‘naltirishlar: $pendingReferrals ta',
+                color: AppColors.info,
+                backgroundColor: AppColors.primaryLight,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnalyticsChartCard(AppProvider app) {
+    const months = ['Boshlang‘ich', 'Oraliq 1', 'Oraliq 2', 'Joriy davr'];
+    final assessments = app.assessments;
+    double prevAvg = 58;
+    double currAvg = 72;
+    if (assessments.isNotEmpty) {
+      final currScores = assessments
+          .where((a) => a.maxScore > 0)
+          .map((a) => (a.totalScore / a.maxScore * 100).clamp(0.0, 100.0))
+          .toList();
+      final prevScores = assessments
+          .where((a) => a.previousScore != null && a.maxScore > 0)
+          .map((a) => (a.previousScore! / a.maxScore * 100).clamp(0.0, 100.0))
+          .toList();
+      if (currScores.isNotEmpty) {
+        currAvg = currScores.reduce((a, b) => a + b) / currScores.length;
+      }
+      if (prevScores.isNotEmpty) {
+        prevAvg = prevScores.reduce((a, b) => a + b) / prevScores.length;
+      } else {
+        prevAvg = (currAvg - 10).clamp(0.0, 100.0);
+      }
+    }
+    final step1 = prevAvg + (currAvg - prevAvg) * 0.35;
+    final step2 = prevAvg + (currAvg - prevAvg) * 0.70;
+    final dynamicSpots = [
+      FlSpot(0, prevAvg.roundToDouble()),
+      FlSpot(1, step1.roundToDouble()),
+      FlSpot(2, step2.roundToDouble()),
+      FlSpot(3, currAvg.roundToDouble()),
+    ];
 
     return SurfaceCard(
       borderRadius: 26,
@@ -566,12 +675,7 @@ class DashboardScreen extends StatelessWidget {
                   maxY: 100,
                   lineBarsData: [
                     LineChartBarData(
-                      spots: const [
-                        FlSpot(0, 55),
-                        FlSpot(1, 62),
-                        FlSpot(2, 70),
-                        FlSpot(3, 78),
-                      ],
+                      spots: dynamicSpots,
                       isCurved: true,
                       curveSmoothness: 0.34,
                       color: AppColors.primary,
@@ -930,6 +1034,68 @@ class DashboardScreen extends StatelessWidget {
           {
             'title': 'Moslashtirilgan ITR',
             'desc': 'Bolaga moslashtirilgan o‘quv rejasi va mezonlari',
+            'icon': LucideIcons.bookOpenCheck,
+            'color': AppColors.purple,
+            'tabIndex': 4,
+            'screen': const IepListScreen(),
+          },
+        ];
+        break;
+
+      case UserRole.specialEdTeacher:
+        sectionTitle = 'Maxsus ta’lim o‘qituvchisi ish maydoni';
+        sectionSubtitle =
+            'O‘quvchining haqiqiy DTS bilim darajasini aniqlash (masalan: 7-sinf → 3-sinf darajasi) va moslashtirilgan fan topshiriqlari';
+        actions = [
+          {
+            'title': 'DTS darajasi va fan topshiriqlari',
+            'desc': 'O‘quvchi profilida matematika, o‘qish va ona tili bo‘yicha haqiqiy darajani belgilash',
+            'icon': LucideIcons.graduationCap,
+            'color': AppColors.primary,
+            'tabIndex': 1,
+            'screen': const StudentsListScreen(),
+          },
+          {
+            'title': 'Haftalik pedagogik baholash',
+            'desc': 'O‘quv ko‘nikmalari va o‘zlashtirish dinamikasini qayd etish',
+            'icon': LucideIcons.clipboardCheck,
+            'color': AppColors.info,
+            'screen': const NewAssessmentScreen(),
+          },
+          {
+            'title': 'Individual ta’lim rejalari (ITR)',
+            'desc': 'Haqiqiy darajaga moslashtirilgan o‘quv maqsadlari ijrosi',
+            'icon': LucideIcons.bookOpenCheck,
+            'color': AppColors.purple,
+            'tabIndex': 4,
+            'screen': const IepListScreen(),
+          },
+        ];
+        break;
+
+      case UserRole.coordinator:
+        sectionTitle = 'Ta’lim koordinatori va ITR eksperti ish maydoni';
+        sectionSubtitle =
+            'Bolalarga mutaxassis biriktirish, konsilium chaqirish, ITR rejalari va Svetofor nazorati';
+        actions = [
+          {
+            'title': 'O‘quvchilar va Svetofor holati',
+            'desc': 'Ishlanmagan (Qizil) bolalarni aniqlash va mutaxassis biriktirish',
+            'icon': LucideIcons.users,
+            'color': AppColors.primary,
+            'tabIndex': 1,
+            'screen': const StudentsListScreen(),
+          },
+          {
+            'title': 'Yo‘naltirishlar va Konsilium',
+            'desc': 'Psixolog, logoped, maxsus o‘qituvchi va ota-onaga yo‘naltirishlar',
+            'icon': LucideIcons.arrowLeftRight,
+            'color': AppColors.info,
+            'screen': const ReferralsScreen(),
+          },
+          {
+            'title': 'ITR va Monitoring hisoboti',
+            'desc': 'Individual ta’lim rejalari ijrosi va maktab qamrov hisobotlari',
             'icon': LucideIcons.bookOpenCheck,
             'color': AppColors.purple,
             'tabIndex': 4,

@@ -37,8 +37,9 @@ class _LoginScreenState extends State<LoginScreen>
   final _firstNameCtrl = TextEditingController();
   final _lastNameCtrl = TextEditingController();
 
-  // Qadam 2: Kasbiy mutaxassislik va Chortoq tumani maktabi
+  // Qadam 2: Kasbiy mutaxassislik va tuman/maktab
   UserRole _selectedRole = UserRole.psychologist;
+  String _selectedDistrict = 'Chortoq tumani';
   final _institutionCtrl = TextEditingController(
     text: '9-sonli inklyuziv ta’lim tayanch maktabi',
   );
@@ -93,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _showIosSchoolPickerModal(BuildContext context) {
-    final allSchools = NamanganData.getSchoolsForDistrict('Chortoq tumani');
+    final allSchools = NamanganData.getSchoolsForDistrict(_selectedDistrict);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -403,7 +404,7 @@ class _LoginScreenState extends State<LoginScreen>
       email: _emailCtrl.text.trim(),
       role: roleToRegister,
       region: NamanganData.defaultRegion,
-      district: 'Chortoq tumani',
+      district: _selectedDistrict,
       institutionName: _institutionCtrl.text.trim().isNotEmpty
           ? _institutionCtrl.text.trim()
           : '9-sonli inklyuziv ta’lim tayanch maktabi',
@@ -801,19 +802,90 @@ class _LoginScreenState extends State<LoginScreen>
         const SizedBox(height: 10),
 
         Center(
-          child: TextButton(
-            onPressed: () => _tabController.animateTo(1),
-            child: Text(
-              'Yangi hisob ochish (Ro‘yxatdan o‘tish)',
-              style: _myGovFont(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            children: [
+              TextButton(
+                onPressed: () => _tabController.animateTo(1),
+                child: Text(
+                  'Yangi hisob ochish (Ro‘yxatdan o‘tish)',
+                  style: _myGovFont(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
               ),
-            ),
+              TextButton(
+                onPressed: () => _showPasswordRecoveryDialog(context),
+                child: Text(
+                  'Parolni unutdingizmi?',
+                  style: _myGovFont(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12.5,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
+    );
+  }
+
+  void _showPasswordRecoveryDialog(BuildContext context) {
+    final ctrl = TextEditingController(text: _loginIdentifierCtrl.text.trim());
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Parolni tiklash so‘rovi'),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Telefon raqamingiz yoki elektron pochtangizni kiriting. Muassasa yoki tizim administratoriga parolni tiklash so‘rovi yuboriladi va sizga vaqtinchalik parol taqdim etiladi.',
+                style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary, height: 1.4),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: ctrl,
+                decoration: const InputDecoration(
+                  labelText: 'Telefon raqam yoki Email *',
+                  hintText: '+998 90 123 45 67 yoki login@talim.uz',
+                  prefixIcon: Icon(LucideIcons.keyRound, size: 18, color: AppColors.primary),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Bekor qilish'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final res = await context.read<AuthProvider>().requestPasswordRecovery(ctrl.text);
+              if (ctx.mounted) {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(res['message'] as String),
+                    backgroundColor:
+                        res['success'] == true ? AppColors.success : AppColors.error,
+                  ),
+                );
+              }
+            },
+            child: const Text('So‘rov yuborish'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1130,6 +1202,34 @@ class _LoginScreenState extends State<LoginScreen>
             }).toList(),
           ),
           const SizedBox(height: 16),
+          Text(
+            'Tuman / shahar *',
+            style: _myGovFont(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            initialValue: _selectedDistrict,
+            isExpanded: true,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(LucideIcons.mapPin, size: 18, color: AppColors.primary),
+            ),
+            items: NamanganData.districts
+                .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                .toList(),
+            onChanged: (val) {
+              if (val == null) return;
+              setState(() {
+                _selectedDistrict = val;
+                final schools = NamanganData.getSchoolsForDistrict(val);
+                _institutionCtrl.text = schools.isNotEmpty ? schools.first : '';
+              });
+            },
+          ),
+          const SizedBox(height: 14),
           Text(
             'Maktab *',
             style: _myGovFont(

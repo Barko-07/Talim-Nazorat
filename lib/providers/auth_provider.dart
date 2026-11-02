@@ -335,6 +335,26 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     };
   }
 
+  Future<Map<String, dynamic>> requestPasswordRecovery(String identifier) async {
+    final cleaned = identifier.trim();
+    if (cleaned.isEmpty) {
+      return {
+        'success': false,
+        'message': 'Telefon raqamingiz yoki elektron pochtangizni kiriting.',
+      };
+    }
+    try {
+      await _db.requestPasswordRecovery(cleaned);
+      return {
+        'success': true,
+        'message':
+            'So‘rov qabul qilindi! Agar hisob mavjud bo‘lsa, muassasa yoki tizim administratoriga parolni tiklash xabarnomasi yuborildi.',
+      };
+    } on AppException catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
   Future<void> logout() async {
     final user = _currentUser;
     _currentUser = null;
