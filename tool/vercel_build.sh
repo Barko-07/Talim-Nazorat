@@ -16,5 +16,5 @@ fi
 
 flutter config --enable-web
 flutter pub get
-flutter build web --release --dart-define=DEMO_MODE=true
+flutter build web --release --pwa-strategy=none --dart-define=DEMO_MODE=true
 
