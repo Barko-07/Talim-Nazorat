@@ -7,6 +7,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/monitoring_alert_model.dart';
 import '../../providers/app_provider.dart';
+import '../../services/child_status_service.dart';
 import '../students/student_detail_screen.dart';
 
 class MonitoringScreen extends StatefulWidget {
@@ -18,6 +19,29 @@ class MonitoringScreen extends StatefulWidget {
 
 class _MonitoringScreenState extends State<MonitoringScreen> {
   bool _showOnlyUnresolved = true;
+  StatusColor? _selectedSvetoforFilter;
+
+  static Color _colorFor(StatusColor c) {
+    switch (c) {
+      case StatusColor.red:
+        return const Color(0xFFDC2626);
+      case StatusColor.yellow:
+        return const Color(0xFFD97706);
+      case StatusColor.green:
+        return const Color(0xFF059669);
+    }
+  }
+
+  static Color _bgFor(StatusColor c) {
+    switch (c) {
+      case StatusColor.red:
+        return const Color(0xFFFEF2F2);
+      case StatusColor.yellow:
+        return const Color(0xFFFFFBEB);
+      case StatusColor.green:
+        return const Color(0xFFECFDF5);
+    }
+  }
 
   void _showResolveDialog(BuildContext context, MonitoringAlertModel alert) {
     final notesCtrl = TextEditingController(
@@ -172,6 +196,13 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
       ),
     ];
 
+    final summary = app.monitoringSummary;
+    final filteredStatuses = summary == null
+        ? const <ChildStatus>[]
+        : (_selectedSvetoforFilter == null
+              ? summary.statuses
+              : summary.byColor(_selectedSvetoforFilter!));
+
     final scrollBody = SingleChildScrollView(
       child: ResponsivePageContainer(
         child: Column(
@@ -196,6 +227,99 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               ),
             ),
             const SizedBox(height: 18),
+
+            // SVETOFOR: QIZIL / SARIQ / YASHIL MONITORING PANELI
+            if (summary != null) ...[
+              SurfaceCard(
+                borderRadius: 26,
+                padding: const EdgeInsets.all(22),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Bolalar bilan ishlash holati (Svetofor monitoringi)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15.5,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Qizil: bola bilan ishlanmagan yoki 30+ kun yozuv kiritilmagan • Sariq: pasayish/samarasiz yoki to‘liq ishlanmagan • Yashil: ijobiy dinamika',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        _buildSvetoforCounter(
+                          label: 'Barchasi',
+                          count: summary.total,
+                          color: AppColors.primary,
+                          bg: AppColors.primaryLight,
+                          selected: _selectedSvetoforFilter == null,
+                          onTap: () => setState(
+                            () => _selectedSvetoforFilter = null,
+                          ),
+                        ),
+                        _buildSvetoforCounter(
+                          label: '🔴 Qizil (Ishlanmagan)',
+                          count: summary.count(StatusColor.red),
+                          color: const Color(0xFFDC2626),
+                          bg: const Color(0xFFFEF2F2),
+                          selected:
+                              _selectedSvetoforFilter == StatusColor.red,
+                          onTap: () => setState(
+                            () => _selectedSvetoforFilter =
+                                _selectedSvetoforFilter == StatusColor.red
+                                ? null
+                                : StatusColor.red,
+                          ),
+                        ),
+                        _buildSvetoforCounter(
+                          label: '🟡 Sariq (E’tibor talab)',
+                          count: summary.count(StatusColor.yellow),
+                          color: const Color(0xFFD97706),
+                          bg: const Color(0xFFFFFBEB),
+                          selected:
+                              _selectedSvetoforFilter == StatusColor.yellow,
+                          onTap: () => setState(
+                            () => _selectedSvetoforFilter =
+                                _selectedSvetoforFilter == StatusColor.yellow
+                                ? null
+                                : StatusColor.yellow,
+                          ),
+                        ),
+                        _buildSvetoforCounter(
+                          label: '🟢 Yashil (Ijobiy)',
+                          count: summary.count(StatusColor.green),
+                          color: const Color(0xFF059669),
+                          bg: const Color(0xFFECFDF5),
+                          selected:
+                              _selectedSvetoforFilter == StatusColor.green,
+                          onTap: () => setState(
+                            () => _selectedSvetoforFilter =
+                                _selectedSvetoforFilter == StatusColor.green
+                                ? null
+                                : StatusColor.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    ...filteredStatuses.map(
+                      (st) => _buildChildStatusTile(context, st),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+            ],
 
             // 6 ta nazorat qoidalari bloki (Responsive 2-col desktop/tablet, 1-col mobile)
             SurfaceCard(
@@ -287,6 +411,187 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
       appBar: canPop ? AppBar(title: const Text('Monitoring')) : null,
       body: canPop ? AmbientMeshBackground(child: scrollBody) : scrollBody,
+    );
+  }
+
+  Widget _buildSvetoforCounter({
+    required String label,
+    required int count,
+    required Color color,
+    required Color bg,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? color : bg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? color : color.withValues(alpha: 0.35),
+            width: 1.2,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: selected ? Colors.white : color,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              decoration: BoxDecoration(
+                color: selected
+                    ? Colors.white.withValues(alpha: 0.22)
+                    : color.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '$count',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: selected ? Colors.white : color,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChildStatusTile(BuildContext context, ChildStatus st) {
+    final c = _colorFor(st.color);
+    final bg = _bgFor(st.color);
+    final df = DateFormat('dd.MM.yyyy');
+    final isRed = st.color == StatusColor.red;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => StudentDetailScreen(studentId: st.student.id),
+            ),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: isRed ? const Color(0xFFFFF5F5) : const Color(0xFFF9FAFC),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: c.withValues(alpha: isRed ? 0.55 : 0.3),
+              width: isRed ? 1.4 : 1.0,
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: bg,
+                child: Text(
+                  st.student.firstName.isNotEmpty
+                      ? st.student.firstName[0]
+                      : '?',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: c,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          st.student.fullName,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        StatusPill(
+                          label: '${st.student.grade}-sinf',
+                          color: AppColors.primary,
+                          backgroundColor: AppColors.primaryLight,
+                        ),
+                        StatusPill(
+                          label: '${st.color.label} — ${st.color.meaning}',
+                          color: c,
+                          backgroundColor: bg,
+                          showDot: true,
+                        ),
+                      ],
+                    ),
+                    if (st.reasons.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      ...st.reasons.map(
+                        (r) => Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text(
+                            '• $r',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: c,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    if (st.specialistsNotStarted.isNotEmpty ||
+                        st.lastWorkAt != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        [
+                          if (st.lastWorkAt != null)
+                            'Oxirgi ish: ${df.format(st.lastWorkAt!)}'
+                          else
+                            'Oxirgi ish: kiritilmagan',
+                          if (st.specialistsNotStarted.isNotEmpty)
+                            'Ish boshlamagan: ${st.specialistsNotStarted.join(", ")}',
+                        ].join(' • '),
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const Icon(
+                LucideIcons.chevronRight,
+                size: 16,
+                color: AppColors.textSubtle,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

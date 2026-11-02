@@ -7,6 +7,7 @@ import '../../../models/user_model.dart';
 import '../../../models/student_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/child_status_service.dart';
 import '../../students/student_detail_screen.dart';
 import '../../students/add_student_screen.dart';
 
@@ -22,6 +23,29 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
   String? _filterGrade;
   String? _filterStatus;
   String? _filterLevel;
+  StatusColor? _filterColor;
+
+  static Color _colorFor(StatusColor c) {
+    switch (c) {
+      case StatusColor.red:
+        return const Color(0xFFDC2626);
+      case StatusColor.yellow:
+        return const Color(0xFFD97706);
+      case StatusColor.green:
+        return const Color(0xFF059669);
+    }
+  }
+
+  static Color _bgFor(StatusColor c) {
+    switch (c) {
+      case StatusColor.red:
+        return const Color(0xFFFEF2F2);
+      case StatusColor.yellow:
+        return const Color(0xFFFFFBEB);
+      case StatusColor.green:
+        return const Color(0xFFECFDF5);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +53,18 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
     final auth = context.watch<AuthProvider>();
     final currentUser = auth.currentUser;
     final allStudents = app.allStudentsIncludingArchived;
+    final summary = app.monitoringSummary;
+    final statusByStudentId = <String, ChildStatus>{
+      if (summary != null)
+        for (final st in summary.statuses) st.student.id: st,
+    };
     final df = DateFormat('dd.MM.yyyy');
 
     final filtered = allStudents.where((s) {
+      if (_filterColor != null &&
+          statusByStudentId[s.id]?.color != _filterColor) {
+        return false;
+      }
       if (_search.isNotEmpty) {
         final q = _search.toLowerCase();
         final matchName = s.fullName.toLowerCase().contains(q);
@@ -227,6 +260,74 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
               ),
             ),
           ),
+          if (summary != null) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                FilterChip(
+                  selected: _filterColor == null,
+                  label: Text('Barchasi (${allStudents.length})'),
+                  onSelected: (_) => setState(() => _filterColor = null),
+                ),
+                FilterChip(
+                  selected: _filterColor == StatusColor.red,
+                  label: Text(
+                    '🔴 Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
+                  ),
+                  selectedColor: const Color(0xFFDC2626),
+                  backgroundColor: const Color(0xFFFEF2F2),
+                  labelStyle: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: _filterColor == StatusColor.red
+                        ? Colors.white
+                        : const Color(0xFFDC2626),
+                  ),
+                  onSelected: (v) => setState(
+                    () => _filterColor = v ? StatusColor.red : null,
+                  ),
+                ),
+                FilterChip(
+                  selected: _filterColor == StatusColor.yellow,
+                  label: Text(
+                    '🟡 Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
+                  ),
+                  selectedColor: const Color(0xFFD97706),
+                  backgroundColor: const Color(0xFFFFFBEB),
+                  labelStyle: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: _filterColor == StatusColor.yellow
+                        ? Colors.white
+                        : const Color(0xFFD97706),
+                  ),
+                  onSelected: (v) => setState(
+                    () => _filterColor = v ? StatusColor.yellow : null,
+                  ),
+                ),
+                FilterChip(
+                  selected: _filterColor == StatusColor.green,
+                  label: Text(
+                    '🟢 Yashil — Ijobiy (${summary.count(StatusColor.green)})',
+                  ),
+                  selectedColor: const Color(0xFF059669),
+                  backgroundColor: const Color(0xFFECFDF5),
+                  labelStyle: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: _filterColor == StatusColor.green
+                        ? Colors.white
+                        : const Color(0xFF059669),
+                  ),
+                  onSelected: (v) => setState(
+                    () => _filterColor = v ? StatusColor.green : null,
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 16),
 
           // 3. BOLALAR RO'YXATI
@@ -238,12 +339,22 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
             itemBuilder: (context, i) {
               final s = filtered[i];
               final isArchived = s.status == 'Arxivlangan';
+              final st = statusByStudentId[s.id];
+              final isRed = !isArchived && st?.color == StatusColor.red;
+              final stColor = st != null ? _colorFor(st.color) : null;
+              final stBg = st != null ? _bgFor(st.color) : null;
 
               return Card(
                 elevation: 0,
+                color: isRed ? const Color(0xFFFFF5F5) : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: AppColors.border),
+                  side: BorderSide(
+                    color: !isArchived && stColor != null
+                        ? stColor.withValues(alpha: isRed ? 0.55 : 0.35)
+                        : AppColors.border,
+                    width: isRed ? 1.5 : 1.0,
+                  ),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -253,13 +364,13 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                         radius: 24,
                         backgroundColor: isArchived
                             ? Colors.grey.shade200
-                            : AppColors.primaryLight,
+                            : (stBg ?? AppColors.primaryLight),
                         child: Text(
                           s.firstName.isNotEmpty ? s.firstName[0] : 'B',
                           style: TextStyle(
                             color: isArchived
                                 ? AppColors.textMuted
-                                : AppColors.primary,
+                                : (stColor ?? AppColors.primary),
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                           ),
@@ -270,7 +381,10 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
                                   s.fullName,
@@ -282,7 +396,6 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                         : AppColors.textPrimary,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 6,
@@ -301,8 +414,29 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 6),
                                 _buildStatusPill(s.status),
+                                if (!isArchived && st != null)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: stBg,
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: stColor!.withValues(alpha: 0.35),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${st.color.label}: ${st.color == StatusColor.red ? "Ishlanmagan" : st.color == StatusColor.yellow ? "E’tibor talab" : "Ijobiy"}',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: stColor,
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                             const SizedBox(height: 4),
@@ -313,6 +447,19 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                 color: AppColors.textSecondary,
                               ),
                             ),
+                            if (!isArchived &&
+                                st != null &&
+                                st.reasons.isNotEmpty) ...[
+                              const SizedBox(height: 3),
+                              Text(
+                                'Svetofor sababi: ${st.reasons.first}',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: stColor,
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 3),
                             Text(
                               '🏛️ ${s.institutionName} • Tug‘ilgan: ${df.format(s.dateOfBirth)} (${s.age} yosh)',

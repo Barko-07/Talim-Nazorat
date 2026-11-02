@@ -1,0 +1,3314 @@
+{
+  "meta": {
+    "application": "TA’LIM NAZORAT — Inklyuziv va maxsus ta’lim monitoring tizimi",
+    "schemaVersion": "2.0",
+    "exportedAt": "2026-11-02T13:50:00.000Z",
+    "description": "To‘liq ma’lumotlar bazasi zaxira nusxasi (Users, Students, Assessments, Sessions, IEP, Alerts, Referrals, Observations, Questions, DTS Standards, SubjectLevels, SubjectTasks, ProgressMetrics, Measurements, SoundEntries, Achievements, CaseConferences)"
+  },
+  "tables": {
+    "users": [
+      {
+        "id": "user_admin",
+        "email": "admin@talim.uz",
+        "fullName": "Rahimov Sarvar Komilovich",
+        "role": "SUPER_ADMIN",
+        "region": "Namangan viloyati",
+        "district": "Namangan shahri",
+        "institutionId": "inst_namangan_admin",
+        "institutionName": "Namangan viloyat Maktabgacha va maktab ta’limi boshqarmasi",
+        "phone": "+998 90 123-45-67",
+        "specialization": "Viloyat ta’lim koordinatori",
+        "qualificationCategory": "Mutaxassis",
+        "experienceYears": 3,
+        "password": "",
+        "isActive": true,
+        "assignedStudentIds": []
+      },
+      {
+        "id": "user_director",
+        "email": "maktab14.admin@talim.uz",
+        "fullName": "Karimova Nargiza Shuhratovna",
+        "role": "INSTITUTION_ADMIN",
+        "region": "Namangan viloyati",
+        "district": "Chortoq tumani",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "phone": "+998 91 234-56-78",
+        "specialization": "Maktab direktori",
+        "qualificationCategory": "Mutaxassis",
+        "experienceYears": 3,
+        "password": "",
+        "isActive": true,
+        "assignedStudentIds": []
+      },
+      {
+        "id": "user_coordinator",
+        "email": "koordinator@talim.uz",
+        "fullName": "Hakimova Zebo Erkinovna",
+        "role": "COORDINATOR",
+        "region": "Namangan viloyati",
+        "district": "Chortoq tumani",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "phone": "+998 90 765-43-21",
+        "specialization": "Ta’lim koordinatori va ITR eksperti",
+        "qualificationCategory": "Mutaxassis",
+        "experienceYears": 3,
+        "password": "",
+        "isActive": true,
+        "assignedStudentIds": []
+      },
+      {
+        "id": "user_psychologist",
+        "email": "psixolog@talim.uz",
+        "fullName": "Usmonova Dilnoza Anvarovna",
+        "role": "PSYCHOLOGIST",
+        "region": "Namangan viloyati",
+        "district": "Chortoq tumani",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "phone": "+998 93 345-67-89",
+        "specialization": "Bolalar amaliyotchi psixologi",
+        "qualificationCategory": "Mutaxassis",
+        "experienceYears": 3,
+        "password": "",
+        "isActive": true,
+        "assignedStudentIds": []
+      },
+      {
+        "id": "user_speech",
+        "email": "logoped@talim.uz",
+        "fullName": "Sodiqov Bobur Mirzayevich",
+        "role": "SPEECH_THERAPIST",
+        "region": "Namangan viloyati",
+        "district": "Chortoq tumani",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "phone": "+998 94 456-78-90",
+        "specialization": "Logoped-defektolog",
+        "qualificationCategory": "Mutaxassis",
+        "experienceYears": 3,
+        "password": "",
+        "isActive": true,
+        "assignedStudentIds": []
+      },
+      {
+        "id": "user_special_ed",
+        "email": "defektolog@talim.uz",
+        "fullName": "Axmedova Madina Rustamovna",
+        "role": "SPECIAL_EDUCATION",
+        "region": "Namangan viloyati",
+        "district": "Chortoq tumani",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "phone": "+998 95 567-89-01",
+        "specialization": "Maxsus pedagog / Defektolog",
+        "qualificationCategory": "Mutaxassis",
+        "experienceYears": 3,
+        "password": "",
+        "isActive": true,
+        "assignedStudentIds": []
+      },
+      {
+        "id": "user_special_ed_teacher",
+        "email": "maxsus.oqituvchi@talim.uz",
+        "fullName": "Rahmonova Dildora Akmalovna",
+        "role": "SPECIAL_ED_TEACHER",
+        "region": "Namangan viloyati",
+        "district": "Chortoq tumani",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "phone": "+998 99 234-12-34",
+        "specialization": "Maxsus ta’lim o‘qituvchisi (boshlang‘ich sinflar)",
+        "qualificationCategory": "Mutaxassis",
+        "experienceYears": 3,
+        "password": "",
+        "isActive": true,
+        "assignedStudentIds": []
+      },
+      {
+        "id": "user_teacher",
+        "email": "oqituvchi@talim.uz",
+        "fullName": "Nazarov Farrux Odilovich",
+        "role": "TEACHER",
+        "region": "Namangan viloyati",
+        "district": "Chortoq tumani",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "phone": "+998 97 678-90-12",
+        "specialization": "Inklyuziv sinf rahbari",
+        "qualificationCategory": "Mutaxassis",
+        "experienceYears": 3,
+        "password": "",
+        "isActive": true,
+        "assignedStudentIds": []
+      },
+      {
+        "id": "user_reviewer",
+        "email": "kuzatuvchi@talim.uz",
+        "fullName": "Po‘latova Gulchehra Ziyodovna",
+        "role": "REVIEWER",
+        "region": "Namangan viloyati",
+        "district": "Namangan shahri",
+        "institutionId": "inst_namangan_metodist",
+        "institutionName": "Namangan viloyat ta’lim sifatini monitoring qilish markazi",
+        "phone": "+998 98 789-01-23",
+        "specialization": "Viloyat bosh metodisti",
+        "qualificationCategory": "Mutaxassis",
+        "experienceYears": 3,
+        "password": "",
+        "isActive": true,
+        "assignedStudentIds": []
+      }
+    ],
+    "students": [
+      {
+        "id": "student_01",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "firstName": "Jasur",
+        "lastName": "Aliyev",
+        "middleName": "Sherzodovich",
+        "dateOfBirth": "2016-05-14T00:00:00.000",
+        "gender": "Erkak",
+        "grade": "3-A",
+        "status": "Faol",
+        "primaryNeed": "Nutqiy rivojlanishdan orqada qolish (Fonetik-fonematik)",
+        "supportLevel": "2-daraja (O‘rta yordam)",
+        "medicalNotes": "Tug‘ruq asoratlari, eshitish a’zolari me’yorda",
+        "psychologicalNotes": "Diqqat barqaror, muloqotga moyil, yangi vazifalarga qiziqadi",
+        "guardians": [
+          {
+            "id": "g_01",
+            "fullName": "Aliyev Sherzod Mahmudovich",
+            "relationship": "Otasi",
+            "phone": "+998 90 999-88-77",
+            "email": "sherzod.aliyev@mail.uz",
+            "address": "Chortoq tumani, Mustaqillik MFY, 12-uy"
+          }
+        ],
+        "assignedSpecialistIds": [
+          "user_speech",
+          "user_psychologist"
+        ],
+        "coordinatorId": "user_coordinator",
+        "coordinatorName": "Hakimova Zebo Erkinovna",
+        "deactivationReason": null,
+        "deactivatedAt": null,
+        "createdAt": "2026-07-05T18:56:16.209904",
+        "accessProfile": null,
+        "domainLevels": []
+      },
+      {
+        "id": "student_02",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "firstName": "Malika",
+        "lastName": "Rustamova",
+        "middleName": "Botirovna",
+        "dateOfBirth": "2017-09-21T00:00:00.000",
+        "gender": "Ayol",
+        "grade": "2-B",
+        "status": "Faol",
+        "primaryNeed": "Diqqat yetishmasligi va giperaktivlik (ADHD)",
+        "supportLevel": "2-daraja (O‘rta yordam)",
+        "medicalNotes": "Nerv tizimi qo‘zg‘aluvchanligi yuqori",
+        "psychologicalNotes": "Vizual signallarga yaxshi javob beradi, tez charchaydi",
+        "guardians": [
+          {
+            "id": "g_02",
+            "fullName": "Rustamova Zuhra Azimovna",
+            "relationship": "Onasi",
+            "phone": "+998 93 111-22-33",
+            "email": null,
+            "address": "Chortoq tumani, Guliston MFY, 45-uy"
+          }
+        ],
+        "assignedSpecialistIds": [
+          "user_psychologist",
+          "user_teacher"
+        ],
+        "coordinatorId": "user_coordinator",
+        "coordinatorName": "Hakimova Zebo Erkinovna",
+        "deactivationReason": null,
+        "deactivatedAt": null,
+        "createdAt": "2026-08-04T18:56:16.209904",
+        "accessProfile": null,
+        "domainLevels": []
+      },
+      {
+        "id": "student_03",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "firstName": "Bekzod",
+        "lastName": "Qodirov",
+        "middleName": "Mansurovich",
+        "dateOfBirth": "2015-03-10T00:00:00.000",
+        "gender": "Erkak",
+        "grade": "4-A",
+        "status": "Faol",
+        "primaryNeed": "Bolalar serebral falaji (Yengil gemiparez)",
+        "supportLevel": "3-daraja (Intensiv yordam)",
+        "medicalNotes": "O‘ng qo‘l nozik motorikasi chegaralangan",
+        "psychologicalNotes": "Irodali, bilim olishga ishtiyoqi baland",
+        "guardians": [
+          {
+            "id": "g_03",
+            "fullName": "Qodirov Mansur Hakimovich",
+            "relationship": "Otasi",
+            "phone": "+998 94 222-33-44",
+            "email": null,
+            "address": null
+          }
+        ],
+        "assignedSpecialistIds": [
+          "user_special_ed",
+          "user_psychologist"
+        ],
+        "coordinatorId": "user_coordinator",
+        "coordinatorName": "Hakimova Zebo Erkinovna",
+        "deactivationReason": null,
+        "deactivatedAt": null,
+        "createdAt": "2026-06-05T18:56:16.209904",
+        "accessProfile": null,
+        "domainLevels": []
+      },
+      {
+        "id": "student_04",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "firstName": "Zarnigor",
+        "lastName": "Sobirova",
+        "middleName": "Alisherovna",
+        "dateOfBirth": "2018-01-15T00:00:00.000",
+        "gender": "Ayol",
+        "grade": "1-A",
+        "status": "Faol",
+        "primaryNeed": "Umumiy nutq rivojlanmaganligi (3-daraja)",
+        "supportLevel": "2-daraja (O‘rta yordam)",
+        "medicalNotes": "Somatik holati qoniqarli",
+        "psychologicalNotes": "Tengdoshlari bilan o‘yinda faol, so‘z boyligi chegaralangan",
+        "guardians": [
+          {
+            "id": "g_04",
+            "fullName": "Sobirova Nodira Jamshidovna",
+            "relationship": "Onasi",
+            "phone": "+998 97 333-44-55",
+            "email": null,
+            "address": null
+          }
+        ],
+        "assignedSpecialistIds": [
+          "user_speech",
+          "user_special_ed"
+        ],
+        "coordinatorId": "user_coordinator",
+        "coordinatorName": "Hakimova Zebo Erkinovna",
+        "deactivationReason": null,
+        "deactivatedAt": null,
+        "createdAt": "2026-09-18T18:56:16.209904",
+        "accessProfile": null,
+        "domainLevels": []
+      },
+      {
+        "id": "student_05",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "firstName": "Temur",
+        "lastName": "Xolmatov",
+        "middleName": "Olimovich",
+        "dateOfBirth": "2016-11-05T00:00:00.000",
+        "gender": "Erkak",
+        "grade": "3-B",
+        "status": "Faol",
+        "primaryNeed": "Autizm spektri buzilishi (Yengil shakli)",
+        "supportLevel": "3-daraja (Intensiv yordam)",
+        "medicalNotes": "Sensor disfunksiya mavjud (shovqinga sezgir)",
+        "psychologicalNotes": "Karta va piktogrammalar bilan muvaffaqiyatli ishlaydi",
+        "guardians": [
+          {
+            "id": "g_05",
+            "fullName": "Xolmatov Olim Baxtiyorovich",
+            "relationship": "Otasi",
+            "phone": "+998 99 444-55-66",
+            "email": null,
+            "address": null
+          }
+        ],
+        "assignedSpecialistIds": [
+          "user_psychologist",
+          "user_special_ed",
+          "user_teacher"
+        ],
+        "coordinatorId": "user_coordinator",
+        "coordinatorName": "Hakimova Zebo Erkinovna",
+        "deactivationReason": null,
+        "deactivatedAt": null,
+        "createdAt": "2026-07-25T18:56:16.209904",
+        "accessProfile": null,
+        "domainLevels": []
+      },
+      {
+        "id": "student_06",
+        "institutionId": "inst_chortoq_5",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "firstName": "Rayhona",
+        "lastName": "Ibrohimova",
+        "middleName": "Umarovna",
+        "dateOfBirth": "2017-04-18T00:00:00.000",
+        "gender": "Ayol",
+        "grade": "2-A",
+        "status": "Faol",
+        "primaryNeed": "Eshitish zaifligi (1-daraja, eshitish apparati bilan)",
+        "supportLevel": "2-daraja (O‘rta yordam)",
+        "medicalNotes": "Surdolog nazoratida, koxlear apparat taqqan",
+        "psychologicalNotes": "Lab harakatidan o‘qishni yaxshi o‘zlashtirgan",
+        "guardians": [
+          {
+            "id": "g_06",
+            "fullName": "Ibrohimova Fotima Komilovna",
+            "relationship": "Onasi",
+            "phone": "+998 90 555-66-77",
+            "email": null,
+            "address": null
+          }
+        ],
+        "assignedSpecialistIds": [
+          "user_speech",
+          "user_teacher"
+        ],
+        "coordinatorId": "user_coordinator",
+        "coordinatorName": "Hakimova Zebo Erkinovna",
+        "deactivationReason": null,
+        "deactivatedAt": null,
+        "createdAt": "2026-08-14T18:56:16.209904",
+        "accessProfile": null,
+        "domainLevels": []
+      }
+    ],
+    "assessments": [
+      {
+        "id": "ass_01",
+        "studentId": "student_01",
+        "studentName": "Aliyev Jasur",
+        "specialistId": "user_speech",
+        "specialistName": "Sodiqov Bobur Mirzayevich",
+        "specialistRole": "Logoped-defektolog",
+        "assessmentDate": "2026-10-19T18:56:16.210885",
+        "type": "Standart balli (Rubrika)",
+        "category": "Nutq va muloqot",
+        "title": "Fonematik idrok va tovush talaffuzi diagnostikasi",
+        "notes": "R va L tovushlari talaffuzida sezilarli ijobiy siljish bor.",
+        "recommendations": "Haftasiga 2 marta differensiyalash mashg‘ulotlarini davom ettirish.",
+        "totalScore": 78.0,
+        "maxScore": 100.0,
+        "previousScore": 68.0,
+        "criteria": [
+          {
+            "criterionName": "Tovushlarni to‘g‘ri artikulyatsiya qilish",
+            "score": 24.0,
+            "maxScore": 30.0,
+            "notes": null
+          },
+          {
+            "criterionName": "Fonematik tahlil va sintez ko‘nikmasi",
+            "score": 22.0,
+            "maxScore": 30.0,
+            "notes": null
+          },
+          {
+            "criterionName": "Lug‘at boyligi va bog‘lanishli nutq",
+            "score": 32.0,
+            "maxScore": 40.0,
+            "notes": null
+          }
+        ],
+        "responses": [],
+        "questionIds": [],
+        "status": "completed",
+        "generalConclusion": null,
+        "domainScores": null,
+        "followUpAction": null,
+        "reviewDate": "2026-12-02T18:56:16.210885",
+        "isDraft": false,
+        "updatedAt": null,
+        "createdAt": null
+      },
+      {
+        "id": "ass_02",
+        "studentId": "student_02",
+        "studentName": "Rustamova Malika",
+        "specialistId": "user_psychologist",
+        "specialistName": "Usmonova Dilnoza Anvarovna",
+        "specialistRole": "Amaliyotchi psixolog",
+        "assessmentDate": "2026-10-25T18:56:16.210885",
+        "type": "Sifatli pedagogik kuzatuv",
+        "category": "Kognitiv va psixologik",
+        "title": "Ixtiyoriy diqqat va o‘z-o‘zini boshqarish testi",
+        "notes": "Diqqat konsentratsiyasi 12 daqiqagacha cho‘zildi (ilgari 6-7 daqiqa edi).",
+        "recommendations": "Mashg‘ulotlar orasida qisqa tanaffus va vizual jadvaldan foydalanish.",
+        "totalScore": 65.0,
+        "maxScore": 100.0,
+        "previousScore": 65.0,
+        "criteria": [
+          {
+            "criterionName": "Diqqat barqarorligi",
+            "score": 18.0,
+            "maxScore": 30.0,
+            "notes": null
+          },
+          {
+            "criterionName": "Ko‘rsatmalarga rioya qilish",
+            "score": 22.0,
+            "maxScore": 35.0,
+            "notes": null
+          },
+          {
+            "criterionName": "Ixtiyoriy eslab qolish",
+            "score": 25.0,
+            "maxScore": 35.0,
+            "notes": null
+          }
+        ],
+        "responses": [],
+        "questionIds": [],
+        "status": "completed",
+        "generalConclusion": null,
+        "domainScores": null,
+        "followUpAction": null,
+        "reviewDate": "2026-11-17T18:56:16.210885",
+        "isDraft": false,
+        "updatedAt": null,
+        "createdAt": null
+      }
+    ],
+    "sessions": [
+      {
+        "id": "ses_01",
+        "studentId": "student_01",
+        "studentName": "Aliyev Jasur",
+        "specialistId": "user_speech",
+        "specialistName": "Sodiqov Bobur Mirzayevich",
+        "specialistRole": "Logoped-defektolog",
+        "scheduledAt": "2026-10-31T15:56:16.211399",
+        "durationMinutes": 45,
+        "status": "Bajarildi",
+        "topic": "R tovushini bo‘g‘inlarda avtomatlashtirish",
+        "sessionType": "Individual",
+        "goalDescription": "R tovushini to‘g‘ri talaffuz qilish",
+        "activities": "Artikulyatsion gimnastika, piktogrammali kartalar bilan talaffuz mashqi.",
+        "observations": "Bolada rag‘bat yuqori, topshiriqlarni mustaqil bajardi.",
+        "nextSteps": "So‘zlar tarkibida qo‘llashga o‘tish.",
+        "attendanceConfirmed": true
+      },
+      {
+        "id": "ses_02",
+        "studentId": "student_05",
+        "studentName": "Xolmatov Temur",
+        "specialistId": "user_speech",
+        "specialistName": "Sodiqov Bobur Mirzayevich",
+        "specialistRole": "Logoped-defektolog",
+        "scheduledAt": "2026-10-30T18:56:16.211399",
+        "durationMinutes": 45,
+        "status": "Qatnashmadi",
+        "topic": "Sensor integratsiya va nutq nafasi",
+        "sessionType": "Individual",
+        "goalDescription": null,
+        "activities": null,
+        "observations": "O‘quvchi mashg‘ulotga kelmadi. Sababi: oilaviy holat.",
+        "nextSteps": null,
+        "attendanceConfirmed": false
+      },
+      {
+        "id": "ses_03",
+        "studentId": "student_05",
+        "studentName": "Xolmatov Temur",
+        "specialistId": "user_speech",
+        "specialistName": "Sodiqov Bobur Mirzayevich",
+        "specialistRole": "Logoped-defektolog",
+        "scheduledAt": "2026-11-01T18:56:16.211399",
+        "durationMinutes": 45,
+        "status": "Qatnashmadi",
+        "topic": "Tovushlar talaffuzini mustahkamlash",
+        "sessionType": "Individual",
+        "goalDescription": null,
+        "activities": null,
+        "observations": "O‘quvchi kelmadi (ketma-ket 2-marta).",
+        "nextSteps": null,
+        "attendanceConfirmed": false
+      },
+      {
+        "id": "ses_04",
+        "studentId": "student_02",
+        "studentName": "Rustamova Malika",
+        "specialistId": "user_psychologist",
+        "specialistName": "Usmonova Dilnoza Anvarovna",
+        "specialistRole": "Amaliyotchi psixolog",
+        "scheduledAt": "2026-11-03T20:56:16.211399",
+        "durationMinutes": 40,
+        "status": "Rejalashtirilgan",
+        "topic": "Diqqatni jamlash bo‘yicha korreksion o‘yinlar",
+        "sessionType": "Individual",
+        "goalDescription": null,
+        "activities": null,
+        "observations": null,
+        "nextSteps": null,
+        "attendanceConfirmed": false
+      }
+    ],
+    "iepPlans": [
+      {
+        "id": "iep_01",
+        "studentId": "student_01",
+        "studentName": "Aliyev Jasur",
+        "studentGrade": "3-A",
+        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
+        "title": "Aliyev Jasur uchun 2026/2027 o‘quv yili ITR",
+        "academicYear": "2026-2027",
+        "startDate": "2026-09-02T00:00:00.000",
+        "reviewDate": "2026-12-25T00:00:00.000",
+        "responsibleTeacherId": "user_teacher",
+        "responsibleTeacherName": "Nazarov Farrux Odilovich",
+        "coordinatorId": "user_coordinator",
+        "coordinatorName": "Hakimova Zebo Erkinovna",
+        "status": "Faol",
+        "baselineSummary": "Nutq tovushlari talaffuzida fonetik nuqsonlar bor, lug‘at boyligi yoshiga nisbatan chegaralangan.",
+        "longTermGoals": "Yil oxiriga qadar barcha tovushlarni to‘g‘ri artikulyatsiya qilish va o‘quv matnlarini tushunib o‘qish.",
+        "supportStrategies": "Haftasiga 2 marta individual logopedik mashg‘ulot, sinfda vizual jadvaldan foydalanish.",
+        "objectives": [
+          {
+            "id": "obj_01",
+            "title": "R va L tovushlarini so‘z boshida to‘g‘ri talaffuz qilish",
+            "domain": "Nutq va muloqot",
+            "startingLevel": null,
+            "targetLevel": null,
+            "measurementCriteria": null,
+            "responsibleSpecialistId": null,
+            "responsibleSpecialistName": null,
+            "startDate": null,
+            "targetDate": "2026-10-30T00:00:00.000",
+            "status": "Jarayonda",
+            "progressPercent": 75,
+            "successCriteria": "10 ta so‘zdan 8 tasida to‘g‘ri talaffuz",
+            "evidenceNotes": null
+          },
+          {
+            "id": "obj_02",
+            "title": "Qisqa ertak mazmunini 4-5 ta to‘liq gap bilan qayta so‘zlab berish",
+            "domain": "Nutq va muloqot",
+            "startingLevel": null,
+            "targetLevel": null,
+            "measurementCriteria": null,
+            "responsibleSpecialistId": null,
+            "responsibleSpecialistName": null,
+            "startDate": null,
+            "targetDate": "2026-11-20T00:00:00.000",
+            "status": "Jarayonda",
+            "progressPercent": 60,
+            "successCriteria": "Ketma-ketlikni buzmasdan voqealar zanjirini aytish",
+            "evidenceNotes": null
+          },
+          {
+            "id": "obj_03",
+            "title": "Doskadagi qisqa matnni daftarga xatosiz ko‘chirib yozish",
+            "domain": "O‘quv va dars faoliyati",
+            "startingLevel": null,
+            "targetLevel": null,
+            "measurementCriteria": null,
+            "responsibleSpecialistId": null,
+            "responsibleSpecialistName": null,
+            "startDate": null,
+            "targetDate": "2026-12-10T00:00:00.000",
+            "status": "Rejalashtirilgan",
+            "progressPercent": 40,
+            "successCriteria": "Harf tushirib qoldirmasdan 25 ta so‘zni yozish",
+            "evidenceNotes": null
+          }
+        ]
+      }
+    ],
+    "alerts": [
+      {
+        "id": "alt_01",
+        "ruleCode": "MISSED_SESSIONS",
+        "ruleTitle": "Muntazam qatnashmaslik holati",
+        "studentId": "student_05",
+        "studentName": "Xolmatov Temur",
+        "studentGrade": "3-B",
+        "severity": "DIQQAT",
+        "message": "O‘quvchi ketma-ket 2 ta rejalashtirilgan mashg‘ulotga kelmadi.",
+        "suggestedAction": "Oila bilan bog‘lanish va dars qoldirish sabablarini aniqlash.",
+        "responsiblePersonId": "user_speech",
+        "responsiblePersonName": "Sodiqov Bobur Mirzayevich",
+        "status": "Ochiq",
+        "isResolved": false,
+        "resolvedNotes": null,
+        "resolvedAt": null,
+        "createdAt": "2026-11-01T18:56:16.211399"
+      }
+    ],
+    "referrals": [
+      {
+        "id": "ref_01",
+        "studentId": "student_02",
+        "studentName": "Rustamova Malika",
+        "fromSpecialistId": "user_teacher",
+        "fromSpecialistName": "Nazarov Farrux Odilovich",
+        "fromSpecialistRole": "Sinf rahbari",
+        "toSpecialistType": "Amaliyotchi psixolog",
+        "toSpecialistId": "user_psychologist",
+        "toSpecialistName": "Usmonova Dilnoza Anvarovna",
+        "reason": "Dars paytida giperaktivlik oshishi va e’tiborning tez chalg‘ishi kuzatildi.",
+        "supportingObservations": null,
+        "priority": "Rejali",
+        "status": "Ko‘rib chiqilmoqda",
+        "outcomeNotes": null,
+        "followUpAction": null,
+        "followUpDate": null,
+        "createdAt": "2026-10-28T18:56:16.211399",
+        "updatedAt": null
+      },
+      {
+        "id": "ref_02",
+        "studentId": "student_04",
+        "studentName": "Sobirova Zarnigor",
+        "fromSpecialistId": "user_psychologist",
+        "fromSpecialistName": "Usmonova Dilnoza Anvarovna",
+        "fromSpecialistRole": "Amaliyotchi psixolog",
+        "toSpecialistType": "Logoped-defektolog",
+        "toSpecialistId": "user_speech",
+        "toSpecialistName": "Sodiqov Bobur Mirzayevich",
+        "reason": "Nutq tovushlarini talaffuz qilishda artikulyatsion apparat tekshiruvi zarur.",
+        "supportingObservations": null,
+        "priority": "Shoshilinch",
+        "status": "Qabul qilindi",
+        "outcomeNotes": null,
+        "followUpAction": null,
+        "followUpDate": null,
+        "createdAt": "2026-10-24T18:56:16.211399",
+        "updatedAt": null
+      }
+    ],
+    "observations": [
+      {
+        "id": "obs_01",
+        "studentId": "student_01",
+        "studentName": "Aliyev Jasur",
+        "studentGrade": "3-A",
+        "psychologistId": "user_psychologist",
+        "psychologistName": "Usmonova Dilnoza (Psixolog)",
+        "date": "2026-10-31T18:56:16.212427",
+        "category": "Darsdagi xulq-atvor",
+        "observationText": "Dars boshida diqqati barqaror bo‘ldi. Rangli kartochkalar bilan ishlashda qiziqish ko‘rsatdi. O‘qituvchining ko‘rsatmalariga ijobiy javob berdi.",
+        "emotionalState": "Barqaror / Ijobiy",
+        "triggerOrContext": "Yangi mavzu tushuntirilganda",
+        "recommendationOrAction": "Vizual qo‘llanmalar orqali rag‘batlantirishni davom ettirish.",
+        "isConfidential": true,
+        "createdAt": "2026-10-31T18:56:16.212427"
+      },
+      {
+        "id": "obs_02",
+        "studentId": "student_02",
+        "studentName": "Karimova Madina",
+        "studentGrade": "2-B",
+        "psychologistId": "user_psychologist",
+        "psychologistName": "Usmonova Dilnoza (Psixolog)",
+        "date": "2026-10-30T18:56:16.212427",
+        "category": "Hissiy holat (Affektiv)",
+        "observationText": "Vazifani bajarishda xato qilishdan qo‘rqish belgilari kuzatildi. Barmoqlarini asabiy qisirlatish holati bo‘ldi.",
+        "emotionalState": "Xavotirli",
+        "triggerOrContext": "Yozma mustaqil ish topshirilganda",
+        "recommendationOrAction": "Xavotirni kamaytiruvchi nafas mashqlari o‘rgatildi, o‘qituvchiga kichik hajmli topshiriqlar berish tavsiya qilindi.",
+        "isConfidential": true,
+        "createdAt": "2026-10-30T18:56:16.212427"
+      },
+      {
+        "id": "obs_03",
+        "studentId": "student_03",
+        "studentName": "Usmonov Botir",
+        "studentGrade": "1-A",
+        "psychologistId": "user_psychologist",
+        "psychologistName": "Usmonova Dilnoza (Psixolog)",
+        "date": "2026-10-28T18:56:16.212427",
+        "category": "Tengdoshlar bilan muloqot",
+        "observationText": "Tengdoshlari bilan muloqotga kirishishga harakat qildi, biroq o‘yin qoidalarini oxirigacha kutishda sabrsizlik qildi.",
+        "emotionalState": "Tirishqoq / Chalg‘uvchan",
+        "triggerOrContext": "Tanaffus paytida jamoaviy o‘yinda",
+        "recommendationOrAction": "Rolli ijtimoiy moslashuv o‘yinlarida psixolog nazoratida qatnashtirish.",
+        "isConfidential": true,
+        "createdAt": "2026-10-28T18:56:16.212427"
+      },
+      {
+        "id": "obs_04",
+        "studentId": "student_01",
+        "studentName": "Aliyev Jasur",
+        "studentGrade": "3-A",
+        "psychologistId": "user_psychologist",
+        "psychologistName": "Usmonova Dilnoza (Psixolog)",
+        "date": "2026-11-01T18:56:16.212427",
+        "category": "Kognitiv faollik va diqqat",
+        "observationText": "Landolt halqalari bo‘yicha diqqat tezligi 15% ga yaxshilandi. Chalg‘ish soni kamaydi.",
+        "emotionalState": "Barqaror / Ijobiy",
+        "triggerOrContext": "Korreksion individual mashg‘ulotda",
+        "recommendationOrAction": "Mantiqiy ketma-ketlik vazifalarini bosqichma-bosqich murakkablashtirish.",
+        "isConfidential": true,
+        "createdAt": "2026-11-01T18:56:16.212427"
+      }
+    ],
+    "questions": [
+      {
+        "id": "q_kog_01",
+        "title": "Umumlashtirish va tushunchalar",
+        "text": "O‘quvchi taqdim etilgan 4 ta jism yoki tushunchadan mantiqan ortiqchasini ajrata oladimi? (Masalan: olma, nok, shaftoli, sabzi)",
+        "domain": "Kognitiv va intellekt",
+        "targetAgeRange": "7–10 yosh (1-4 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "opt_1",
+            "text": "To‘liq mustaqil va sababini tushuntirib ajratadi",
+            "score": 3.0
+          },
+          {
+            "id": "opt_2",
+            "text": "Yo‘naltiruvchi savollar yordamida to‘g‘ri topadi",
+            "score": 2.0
+          },
+          {
+            "id": "opt_3",
+            "text": "Faqat tashqi belgilari (rangi, shakli) bo‘yicha adashadi",
+            "score": 1.0
+          },
+          {
+            "id": "opt_4",
+            "text": "Topshiriq mohiyatini tushunmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "Har bir daraja uchun 0 dan 3 gacha ball beriladi.",
+        "psychologistNotes": "Kognitiv analiz va sintez qobiliyatini aniqlash. Boladan nega aynan shu ortiqcha ekanligini so‘rang.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision",
+          "speech"
+        ],
+        "adaptationHint": "Rasmli kartochkalar bilan; bola ortiqchasini ko‘rsatib beradi, og‘zaki tushuntirish talab qilinmaydi.",
+        "minGrade": 1,
+        "maxGrade": 4
+      },
+      {
+        "id": "q_kog_02",
+        "title": "Mantiqiy ketma-ketlik",
+        "text": "Voqealar ketma-ketligi aks etgan 4 ta syujetli rasmni mantiqiy tartibda to‘g‘ri joylashtiradimi?",
+        "domain": "Kognitiv va intellekt",
+        "targetAgeRange": "7–11 yosh (1-5 sinf)",
+        "questionType": "yes_no",
+        "options": [
+          {
+            "id": "yes",
+            "text": "Ha (To‘g‘ri va ketma-ket hikoya qilib beradi)",
+            "score": 2.0
+          },
+          {
+            "id": "no",
+            "text": "Yo‘q (Tartib buzilgan yoki sabab-oqibatni tushunmaydi)",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "Ha = 2 ball, Yo‘q = 0 ball.",
+        "psychologistNotes": "Sabab-oqibat bog‘lanishlarini tushunish va vaqt tushunchasini tekshirish.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision",
+          "handMotor"
+        ],
+        "adaptationHint": "Kartochkalarni psixolog joylashtiradi, bola tartibni ko‘rsatish orqali belgilaydi.",
+        "minGrade": 1,
+        "maxGrade": 4
+      },
+      {
+        "id": "q_kog_03",
+        "title": "Fazoviy tasavvur va yo‘nalish",
+        "text": "O‘quvchining o‘ng-chap, yuqori-past va koordinata fazoviy yo‘nalishlarni anglash darajasi:",
+        "domain": "Kognitiv va intellekt",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "scale_1_5",
+        "options": [
+          {
+            "id": "sc_1",
+            "text": "1 - Fazoviy oriyentatsiya mutlaqo shakllanmagan",
+            "score": 1.0
+          },
+          {
+            "id": "sc_2",
+            "text": "2 - Doimiy adashadi, faqat o‘z tanasida qisman biladi",
+            "score": 2.0
+          },
+          {
+            "id": "sc_3",
+            "text": "3 - O‘rtacha, qog‘ozda adashadi, amalda to‘g‘ri bajaradi",
+            "score": 3.0
+          },
+          {
+            "id": "sc_4",
+            "text": "4 - Yaxshi, faqat murakkab topshiriqda o‘ylanadi",
+            "score": 4.0
+          },
+          {
+            "id": "sc_5",
+            "text": "5 - Yuqori, fazoviy tasavvuri to‘liq barqaror",
+            "score": 5.0
+          }
+        ],
+        "scoringCriteria": "1 dan 5 gacha shkala ko‘rsatkichi.",
+        "psychologistNotes": "Grafik diktant yoki qog‘oz varag‘ida yo‘nalish topshiriqlari bilan sinov o‘tkaziladi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision",
+          "hearing",
+          "handMotor"
+        ],
+        "adaptationHint": "Grafik diktant o‘rniga ko‘rsatish bilan bajariladigan topshiriq; ko‘rsatmalar vizual yoki imo-ishorada beriladi.",
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_diq_01",
+        "title": "Diqqat barqarorligi va chalg‘uvchanlik",
+        "text": "Bir xil faoliyat (masalan, matn yoki shakllarni ko‘chirish) bilan shug‘ullanganda necha daqiqa chalg‘imasdan ishlay oladi?",
+        "domain": "Diqqat va xotira",
+        "targetAgeRange": "7–12 yosh",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "opt_d1",
+            "text": "15 daqiqadan ko‘proq (Yosh me’yoridan yuqori)",
+            "score": 4.0
+          },
+          {
+            "id": "opt_d2",
+            "text": "10–15 daqiqa (Me’yoriy daraja)",
+            "score": 3.0
+          },
+          {
+            "id": "opt_d3",
+            "text": "5–10 daqiqa (Qisman beqaror, tez toliqadi)",
+            "score": 2.0
+          },
+          {
+            "id": "opt_d4",
+            "text": "3 daqiqadan kam (Yuqori chalg‘uvchanlik va beqarorlik)",
+            "score": 1.0
+          }
+        ],
+        "scoringCriteria": "0 dan 4 ballgacha unumdorlik darajasi.",
+        "psychologistNotes": "Landolt yoki Shulte jadvali orqali o‘lchanishi tavsiya etiladi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-02T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision",
+          "handMotor"
+        ],
+        "adaptationHint": "Ko‘chirish o‘rniga saralash yoki ko‘rsatish bilan bajariladigan bir xil topshiriqda vaqtni o‘lchang.",
+        "minGrade": 1,
+        "maxGrade": 4
+      },
+      {
+        "id": "q_diq_02",
+        "title": "Eshitish-nutqiy tezkor xotira hajmi",
+        "text": "Ketma-ket aytilgan 10 ta oddiy so‘zdan birinchi eshitishda nechtasini bexato takrorlay oladi?",
+        "domain": "Diqqat va xotira",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "scale_1_5",
+        "options": [
+          {
+            "id": "sc_x1",
+            "text": "1 - 2 tadan kam so‘z (Og‘ir darajadagi xotira sustligi)",
+            "score": 1.0
+          },
+          {
+            "id": "sc_x2",
+            "text": "2 - 3–4 ta so‘z (Sust birlamchi eslab qolish)",
+            "score": 2.0
+          },
+          {
+            "id": "sc_x3",
+            "text": "3 - 5–6 ta so‘z (O‘rtacha yosh me’yori)",
+            "score": 3.0
+          },
+          {
+            "id": "sc_x4",
+            "text": "4 - 7–8 ta so‘z (Yaxshi xotira hajmi)",
+            "score": 4.0
+          },
+          {
+            "id": "sc_x5",
+            "text": "5 - 9–10 ta so‘z (Yuqori ko‘rsatkich)",
+            "score": 5.0
+          }
+        ],
+        "scoringCriteria": "Luriya 10 so‘z shkalasi bo‘yicha 1 dan 5 gacha ball.",
+        "psychologistNotes": "Bir-biriga ma’nodosh bo‘lmagan 1 bo‘g‘inli so‘zlarni taqdim eting.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-02T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing",
+          "speech"
+        ],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_diq_03",
+        "title": "Vizual xotira va detallarga e’tibor",
+        "text": "O‘quvchiga 10 soniya ko‘rsatilgan rasmdagi asosiy o‘zgarish yoki yo‘qolgan detallarni topish qobiliyati:",
+        "domain": "Diqqat va xotira",
+        "targetAgeRange": "7–12 yosh",
+        "questionType": "multiple_choice",
+        "options": [
+          {
+            "id": "m1",
+            "text": "Ranglardagi o‘zgarishlarni darhol payqaydi",
+            "score": 1.0
+          },
+          {
+            "id": "m2",
+            "text": "Shakllar va ob’ektlar joylashuvini eslaydi",
+            "score": 1.0
+          },
+          {
+            "id": "m3",
+            "text": "Mayda ikkilamchi detallarni e’tibordan qochiradi",
+            "score": 0.0
+          },
+          {
+            "id": "m4",
+            "text": "Xotirada uzoq vaqt saqlay oladi va tasvirlaydi",
+            "score": 1.0
+          }
+        ],
+        "scoringCriteria": "Har bir ijobiy belgi uchun 1 ball.",
+        "psychologistNotes": "Kuzatish davomida bolaning qayerga ko‘proq nigoh qaratganini qayd eting.",
+        "authorId": "user_psychologist",
+        "authorName": "Usmonova Dilnoza Anvarovna",
+        "isStandard": false,
+        "status": "ready",
+        "createdAt": "2024-09-10T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision"
+        ],
+        "adaptationHint": null,
+        "minGrade": 1,
+        "maxGrade": 4
+      },
+      {
+        "id": "q_emo_01",
+        "title": "Baholanish va xatodan qo‘rquv",
+        "text": "Darsda doskaga chiqqanda yoki tekshiruv topshirig‘i berilganda bolada qanday xavotir alomatlari kuzatiladi?",
+        "domain": "Emotsional va xavotir",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "multiple_choice",
+        "options": [
+          {
+            "id": "opt_e1",
+            "text": "Qo‘llarda qaltirash, qizarish yoki fiziologik zo‘riqish",
+            "score": 0.0
+          },
+          {
+            "id": "opt_e2",
+            "text": "Ovoz pasayishi va gapirishdan bosh tortish",
+            "score": 0.0
+          },
+          {
+            "id": "opt_e3",
+            "text": "Javob berishdan oldin ko‘p ikkilanish va ma’qullash kutish",
+            "score": 0.0
+          },
+          {
+            "id": "opt_e4",
+            "text": "Vaziyatga xotirjam va ishonch bilan yondashadi",
+            "score": 3.0
+          }
+        ],
+        "scoringCriteria": "Belgilar yo‘qligi va xotirjamlik 3 ball. Xavotir belgilari qayd etiladi.",
+        "psychologistNotes": "Filipps maktab xavotiri metodikasi bilan muvofiqlashtirilgan.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-03T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_emo_02",
+        "title": "Frustratsiya va qiyinchilikka chidamlilik",
+        "text": "Topshiriq o‘xshamaganda yoki qiyinchilikka uchraganda bola qanday munosabat bildiradi?",
+        "domain": "Emotsional va xavotir",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "f1",
+            "text": "Irodani jamlab, qaytadan urinib ko‘radi (Konstruktiv)",
+            "score": 3.0
+          },
+          {
+            "id": "f2",
+            "text": "Kattalardan yoki do‘stlaridan yordam so‘raydi",
+            "score": 2.0
+          },
+          {
+            "id": "f3",
+            "text": "Tez taslim bo‘ladi va daftarni yopib qo‘yadi (Passiv)",
+            "score": 1.0
+          },
+          {
+            "id": "f4",
+            "text": "G‘azablanadi, yig‘laydi yoki o‘quv qurollarini uloqtiradi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "Konstruktiv reaksiyalar yuqori ball bilan baholanadi.",
+        "psychologistNotes": "Hissiy barqarorlik va o‘z-o‘zini regulyatsiya qilish ko‘rsatkichi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-03T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_emo_03",
+        "title": "Kayfiyat foni va hissiy kuzatuv",
+        "text": "Suhbat davomida bolaning yuz ifodasi, umumiy hissiy foni va kontaktga kirishish darajasini tasvirlang:",
+        "domain": "Emotsional va xavotir",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "open_text",
+        "options": [],
+        "scoringCriteria": "Sifatli psixologik xulosa sifatida tahlil qilinadi.",
+        "psychologistNotes": "Ko‘z kontakti, tabassum, mimika va qiziqish bor-yo‘qligini batafsil yozing.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-03T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_ijt_01",
+        "title": "Tengdoshlar bilan o‘yinda qoidalarga amal qilish",
+        "text": "Guruhli o‘yin yoki jamoaviy topshiriqda belgilangan qoidalarga rioya qiladimi va navbatini kuta oladimi?",
+        "domain": "Ijtimoiy moslashuv va motivatsiya",
+        "targetAgeRange": "6–11 yosh",
+        "questionType": "yes_no",
+        "options": [
+          {
+            "id": "y",
+            "text": "Ha (Qoidani tushunadi va navbat kutadi)",
+            "score": 2.0
+          },
+          {
+            "id": "n",
+            "text": "Yo‘q (Qoidani buzadi yoki navbatsiz harakat qiladi)",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "Ha = 2 ball, Yo‘q = 0 ball.",
+        "psychologistNotes": "Ijtimoiy intizom va o‘zaro hamkorlik ko‘nikmasini o‘rganish.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-04T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": 0,
+        "maxGrade": 4
+      },
+      {
+        "id": "q_ijt_02",
+        "title": "O‘quv motivatsiyasi yo‘nalishi",
+        "text": "Bolada maktabga borish va dars qilishning asosiy yetakchi sababi nima?",
+        "domain": "Ijtimoiy moslashuv va motivatsiya",
+        "targetAgeRange": "7–12 yosh",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "m_1",
+            "text": "Bilish va yangi narsalarni o‘rganishga qiziqish (Ichki motiv)",
+            "score": 4.0
+          },
+          {
+            "id": "m_2",
+            "text": "Yaxshi baho olish va maqtov eshitish (Ijtimoiy motiv)",
+            "score": 3.0
+          },
+          {
+            "id": "m_3",
+            "text": "Faqat do‘stlari bilan muloqot va tanaffus uchun (Pozitsion)",
+            "score": 2.0
+          },
+          {
+            "id": "m_4",
+            "text": "Ota-ona yoki o‘qituvchi jazolashidan qo‘rqish (Majburiy)",
+            "score": 1.0
+          }
+        ],
+        "scoringCriteria": "Ichki bilish motivi eng yuqori 4 ball bilan baholanadi.",
+        "psychologistNotes": "Luskina o‘quv motivatsiyasi metodikasi bilan korrelyatsiya qilinadi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-04T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing",
+          "speech"
+        ],
+        "adaptationHint": "Rasmli tanlov kartochkalari orqali yoki ota-ona va o‘qituvchi bilan suhbat asosida aniqlang.",
+        "minGrade": 1,
+        "maxGrade": 4
+      },
+      {
+        "id": "q_ijt_03",
+        "title": "Konfliktli vaziyatlarni hal qilish uslubi",
+        "text": "Tengdoshlari bilan bahsli yoki ziddiyatli holat vujudga kelganda bola qanday yo‘l tutadi?",
+        "domain": "Ijtimoiy moslashuv va motivatsiya",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "open_text",
+        "options": [],
+        "scoringCriteria": "Sifatli kuzatuv yozuvi.",
+        "psychologistNotes": "Kompromiss, chekinish, agressiya yoki o‘qituvchiga murojaat qilish holatini qayd qiling.",
+        "authorId": "user_psychologist",
+        "authorName": "Usmonova Dilnoza Anvarovna",
+        "isStandard": false,
+        "status": "ready",
+        "createdAt": "2024-09-15T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_xul_01",
+        "title": "Kattalarning ko‘rsatmalariga itoatkorlik",
+        "text": "O‘qituvchi yoki psixologning og‘zaki ko‘rsatma va talablarini qanchalik tez qabul qiladi va bajaradi?",
+        "domain": "Xulq-atvor va iroda",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "scale_1_5",
+        "options": [
+          {
+            "id": "x_1",
+            "text": "1 - Ko‘rsatmalarga qarshilik ko‘rsatadi (Negativizm)",
+            "score": 1.0
+          },
+          {
+            "id": "x_2",
+            "text": "2 - Bir necha bor takrorlangandan so‘ng noiloj bajaradi",
+            "score": 2.0
+          },
+          {
+            "id": "x_3",
+            "text": "3 - Vaziyatga qarab o‘zgaruvchan",
+            "score": 3.0
+          },
+          {
+            "id": "x_4",
+            "text": "4 - Ko‘p hollarda to‘g‘ri qabul qiladi",
+            "score": 4.0
+          },
+          {
+            "id": "x_5",
+            "text": "5 - Ko‘rsatmalarni birinchi martada to‘liq va ixtiyoriy bajaradi",
+            "score": 5.0
+          }
+        ],
+        "scoringCriteria": "1 dan 5 gacha irodaviy nazorat shkalasi.",
+        "psychologistNotes": "Irodaviy zo‘riqish va xatti-harakatni boshqara olish darajasi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-05T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing"
+        ],
+        "adaptationHint": "Ko‘rsatmalarni bolaning muloqot usulida (imo-ishora, rasm, surdo tili) bering va shunga ko‘ra baholang.",
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_xul_02",
+        "title": "Impulsivlik va harakat faolligi",
+        "text": "Dars va mashg‘ulot davomida o‘rinsiz joyidan turib ketish, gap qo‘shish yoki ortiqcha harakatlar kuzatiladimi?",
+        "domain": "Xulq-atvor va iroda",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "imp_1",
+            "text": "Deyarli kuzatilmaydi, o‘zini to‘liq boshqaradi",
+            "score": 3.0
+          },
+          {
+            "id": "imp_2",
+            "text": "Faqat darsning ikkinchi yarmida toliqqanda qimirlab qoladi",
+            "score": 2.0
+          },
+          {
+            "id": "imp_3",
+            "text": "Doimiy ravishda harakatda va gapirishni to‘xtatolmaydi (Giperfaollik)",
+            "score": 1.0
+          }
+        ],
+        "scoringCriteria": "Harakat intizomi bo‘yicha 1 dan 3 gacha ball.",
+        "psychologistNotes": "Diqqat yetishmasligi va giperfaollik sindromi (SDVG) belgilarini e’tiborga oling.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2024-09-05T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_kog_58_01",
+        "title": "So‘z analogiyalari",
+        "text": "O‘quvchiga 5 ta analogiya beriladi (masalan: \"Kitob — o‘qish, qalam — ?\"). Nechtasini to‘g‘ri yakunlaydi?",
+        "domain": "Kognitiv va intellekt",
+        "targetAgeRange": "11–14 yosh (5-8 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "an_1",
+            "text": "5 tadan 5 tasini mustaqil va asoslab yakunlaydi",
+            "score": 3.0
+          },
+          {
+            "id": "an_2",
+            "text": "3–4 tasini to‘g‘ri yakunlaydi",
+            "score": 2.0
+          },
+          {
+            "id": "an_3",
+            "text": "1–2 tasini, yo‘naltiruvchi savollar bilan",
+            "score": 1.0
+          },
+          {
+            "id": "an_4",
+            "text": "Bog‘lanish tamoyilini tushunmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "To‘g‘ri yakunlangan analogiyalar soniga qarab 0–3 ball.",
+        "psychologistNotes": "Tushunchalar o‘rtasidagi munosabatni (vazifa, qism–butun, sabab–oqibat) anglashni tekshiradi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision",
+          "reading"
+        ],
+        "adaptationHint": "Analogiyalarni ovoz chiqarib o‘qib bering yoki rasmli analogiyalardan foydalaning.",
+        "minGrade": 5,
+        "maxGrade": 8
+      },
+      {
+        "id": "q_diq_58_01",
+        "title": "Korrektura topshirig‘ida diqqat aniqligi",
+        "text": "Harflar jadvalida berilgan 2 ta harfni 5 daqiqa davomida belgilashda o‘quvchi qancha xato yoki o‘tkazib yuborishga yo‘l qo‘yadi?",
+        "domain": "Diqqat va xotira",
+        "targetAgeRange": "11–14 yosh (5-8 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "kr_1",
+            "text": "0–2 ta xato, sur’at barqaror",
+            "score": 3.0
+          },
+          {
+            "id": "kr_2",
+            "text": "3–6 ta xato",
+            "score": 2.0
+          },
+          {
+            "id": "kr_3",
+            "text": "7–12 ta xato, oxiriga kelib toliqadi",
+            "score": 1.0
+          },
+          {
+            "id": "kr_4",
+            "text": "12 tadan ko‘p xato yoki topshiriqni yakunlay olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "Xatolar soniga qarab 0–3 ball.",
+        "psychologistNotes": "Bir xil jadvalni qayta baholashda ham ishlating — natijalar solishtiriladi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision",
+          "handMotor",
+          "reading"
+        ],
+        "adaptationHint": "Harflar o‘rniga oddiy shakllardan foydalaning; bola belgilash o‘rniga barmoq bilan ko‘rsatadi.",
+        "minGrade": 5,
+        "maxGrade": 8
+      },
+      {
+        "id": "q_emo_58_01",
+        "title": "Nazorat ishi oldidan xavotir",
+        "text": "Nazorat ishi yoki imtihon oldidan o‘quvchi o‘z xavotirini 1 dan 5 gacha qanday baholaydi?",
+        "domain": "Emotsional va xavotir",
+        "targetAgeRange": "11–14 yosh (5-8 sinf)",
+        "questionType": "scale_1_5",
+        "options": [
+          {
+            "id": "nx_1",
+            "text": "1 - Juda kuchli xavotir, topshiriqni bajarishga xalaqit beradi",
+            "score": 1.0
+          },
+          {
+            "id": "nx_2",
+            "text": "2 - Kuchli xavotir",
+            "score": 2.0
+          },
+          {
+            "id": "nx_3",
+            "text": "3 - O‘rtacha, o‘zini boshqara oladi",
+            "score": 3.0
+          },
+          {
+            "id": "nx_4",
+            "text": "4 - Yengil hayajon",
+            "score": 4.0
+          },
+          {
+            "id": "nx_5",
+            "text": "5 - Xotirjam",
+            "score": 5.0
+          }
+        ],
+        "scoringCriteria": "1–5 shkala (yuqori ball — xotirjamroq).",
+        "psychologistNotes": "O‘quvchining o‘z bahosi; kuzatuv bilan solishtiring.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing",
+          "speech"
+        ],
+        "adaptationHint": "Shkalani rasmli shaklda (yuz ifodalari) ko‘rsating; bola mos rasmni ko‘rsatadi.",
+        "minGrade": 5,
+        "maxGrade": 8
+      },
+      {
+        "id": "q_ijt_58_01",
+        "title": "Sinfdagi o‘rni va do‘stlik munosabatlari",
+        "text": "O‘quvchining sinfdoshlari orasidagi o‘rni va do‘stlik munosabatlari qanday?",
+        "domain": "Ijtimoiy moslashuv va motivatsiya",
+        "targetAgeRange": "11–14 yosh (5-8 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "sd_1",
+            "text": "Barqaror do‘stlari bor, guruh ishida faol",
+            "score": 3.0
+          },
+          {
+            "id": "sd_2",
+            "text": "1–2 ta yaqin do‘sti bor, guruhda kam faol",
+            "score": 2.0
+          },
+          {
+            "id": "sd_3",
+            "text": "Ko‘pincha yolg‘iz, tengdoshlar bilan aloqasi kam",
+            "score": 1.0
+          },
+          {
+            "id": "sd_4",
+            "text": "Tengdoshlar bilan aloqadan qochadi yoki chetlashtiriladi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball, kuzatuv va sinf rahbari ma’lumoti asosida.",
+        "psychologistNotes": "Chetlashtirish belgilari bo‘lsa, alohida kuzatuv qaydi yozing.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": 5,
+        "maxGrade": 8
+      },
+      {
+        "id": "q_xul_58_01",
+        "title": "Vazifani rejalashtirish va mustaqil boshlash",
+        "text": "O‘quvchi uy vazifasi yoki topshiriqni o‘zi rejalashtirib, eslatmasiz boshlay oladimi?",
+        "domain": "Xulq-atvor va iroda",
+        "targetAgeRange": "11–14 yosh (5-8 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "rj_1",
+            "text": "Mustaqil rejalashtiradi va o‘z vaqtida boshlaydi",
+            "score": 3.0
+          },
+          {
+            "id": "rj_2",
+            "text": "Bitta eslatmadan keyin boshlaydi",
+            "score": 2.0
+          },
+          {
+            "id": "rj_3",
+            "text": "Doimiy nazorat va bosqichma-bosqich yo‘l-yo‘riq kerak",
+            "score": 1.0
+          },
+          {
+            "id": "rj_4",
+            "text": "Kattalar yordamisiz boshlay olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "Ota-ona va sinf rahbari bilan suhbat orqali aniqlashtiring.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": 5,
+        "maxGrade": 8
+      },
+      {
+        "id": "q_kog_911_01",
+        "title": "Mantiqiy xulosa chiqarish",
+        "text": "O‘quvchiga ikki asosdan xulosa chiqarish bo‘yicha 5 ta topshiriq beriladi (masalan: \"Barcha metallar elektr o‘tkazadi. Mis — metall. Demak...?\"). Natija:",
+        "domain": "Kognitiv va intellekt",
+        "targetAgeRange": "15–17 yosh (9-11 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "mx_1",
+            "text": "5 tasini to‘g‘ri hal qiladi va noto‘g‘ri xulosalarni ham ajratadi",
+            "score": 3.0
+          },
+          {
+            "id": "mx_2",
+            "text": "3–4 tasini to‘g‘ri hal qiladi",
+            "score": 2.0
+          },
+          {
+            "id": "mx_3",
+            "text": "1–2 tasini, faqat aniq misollarda",
+            "score": 1.0
+          },
+          {
+            "id": "mx_4",
+            "text": "Asoslar va xulosa o‘rtasidagi bog‘liqlikni tushunmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "To‘g‘ri hal qilingan topshiriqlar soniga qarab 0–3 ball.",
+        "psychologistNotes": "Mavhum mantiqiy fikrlashni tekshiradi. Topshiriqlar mazmuni o‘quvchiga tanish bo‘lishi kerak.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing",
+          "speech"
+        ],
+        "adaptationHint": "Topshiriqlarni yozma shaklda va javob variantlari bilan bering; o‘quvchi to‘g‘ri variantni ko‘rsatadi.",
+        "minGrade": 9,
+        "maxGrade": 11
+      },
+      {
+        "id": "q_kog_911_02",
+        "title": "Matndan asosiy fikrni ajratish",
+        "text": "O‘quvchi bir xatboshili ilmiy-ommabop matnni o‘qib, asosiy fikrni o‘z so‘zlari bilan ifodalay oladimi?",
+        "domain": "Kognitiv va intellekt",
+        "targetAgeRange": "15–17 yosh (9-11 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "af_1",
+            "text": "Asosiy fikrni aniq ifodalaydi va dalillarni ajratadi",
+            "score": 3.0
+          },
+          {
+            "id": "af_2",
+            "text": "Asosiy fikrni topadi, lekin dalillarni ajratmaydi",
+            "score": 2.0
+          },
+          {
+            "id": "af_3",
+            "text": "Matnni qisman qayta hikoya qiladi, umumlashtirmaydi",
+            "score": 1.0
+          },
+          {
+            "id": "af_4",
+            "text": "Matn mazmunini tushunmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "Qayta baholashda bir xil murakkablikdagi matndan foydalaning.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "reading",
+          "speech"
+        ],
+        "adaptationHint": "Matnni ovoz chiqarib o‘qib bering; asosiy fikrni 3–4 variantdan tanlash orqali aniqlang.",
+        "minGrade": 9,
+        "maxGrade": 11
+      },
+      {
+        "id": "q_diq_911_01",
+        "title": "Ishchi xotira: teskari tartibda takrorlash",
+        "text": "Ovoz chiqarib aytilgan raqamlar qatorini teskari tartibda nechtagacha bexato takrorlay oladi?",
+        "domain": "Diqqat va xotira",
+        "targetAgeRange": "15–17 yosh (9-11 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "tx_1",
+            "text": "6 va undan ortiq raqam",
+            "score": 3.0
+          },
+          {
+            "id": "tx_2",
+            "text": "4–5 ta raqam",
+            "score": 2.0
+          },
+          {
+            "id": "tx_3",
+            "text": "2–3 ta raqam",
+            "score": 1.0
+          },
+          {
+            "id": "tx_4",
+            "text": "Teskari tartibda takrorlay olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "Eng uzun to‘g‘ri qator uzunligiga qarab 0–3 ball.",
+        "psychologistNotes": "Eshitish-nutqiy ishchi xotirani o‘lchaydi; vizual shaklga o‘tkazilsa boshqa ko‘rsatkich o‘lchanadi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing",
+          "speech"
+        ],
+        "adaptationHint": null,
+        "minGrade": 9,
+        "maxGrade": 11
+      },
+      {
+        "id": "q_diq_911_02",
+        "title": "Uzoq vaqt diqqatni ushlab turish",
+        "text": "20 daqiqalik mustaqil yozma yoki amaliy ish davomida o‘quvchi necha marta chalg‘iydi?",
+        "domain": "Diqqat va xotira",
+        "targetAgeRange": "15–17 yosh (9-11 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "ud_1",
+            "text": "Chalg‘imaydi yoki 1 marta, o‘zi qaytadi",
+            "score": 3.0
+          },
+          {
+            "id": "ud_2",
+            "text": "2–3 marta, o‘zi qaytadi",
+            "score": 2.0
+          },
+          {
+            "id": "ud_3",
+            "text": "Tez-tez chalg‘iydi, eslatma kerak",
+            "score": 1.0
+          },
+          {
+            "id": "ud_4",
+            "text": "5 daqiqadan ortiq ishlay olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball, kuzatuv asosida.",
+        "psychologistNotes": "Ishni bolaning imkoniyatiga mos shaklda tanlang; o‘lchanadigan narsa — diqqat davomiyligi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": 9,
+        "maxGrade": 11
+      },
+      {
+        "id": "q_emo_911_01",
+        "title": "Imtihon stressi va o‘zini boshqarish",
+        "text": "Bitiruv yoki kirish imtihonlariga tayyorgarlik davrida o‘quvchi stressni qanday boshqaradi?",
+        "domain": "Emotsional va xavotir",
+        "targetAgeRange": "15–17 yosh (9-11 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "is_1",
+            "text": "Stressni anglaydi va o‘ziga yordam berish usullarini qo‘llaydi",
+            "score": 3.0
+          },
+          {
+            "id": "is_2",
+            "text": "Stressni anglaydi, lekin kattalar yordami bilan boshqaradi",
+            "score": 2.0
+          },
+          {
+            "id": "is_3",
+            "text": "Uyqu, ishtaha yoki o‘qishga ta’sir qiluvchi kuchli stress",
+            "score": 1.0
+          },
+          {
+            "id": "is_4",
+            "text": "Stress tufayli kundalik faoliyatdan to‘xtab qoladi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball, suhbat va kuzatuv asosida.",
+        "psychologistNotes": "Kuchli stress belgilari bo‘lsa, ota-ona bilan suhbat va qo‘llab-quvvatlash rejasini ko‘rib chiqing.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing",
+          "speech"
+        ],
+        "adaptationHint": "Suhbatni bolaning muloqot usulida o‘tkazing; holatni rasmli shkala orqali aniqlang.",
+        "minGrade": 9,
+        "maxGrade": 11
+      },
+      {
+        "id": "q_emo_911_02",
+        "title": "His-tuyg‘ularni anglash va nomlash",
+        "text": "O‘quvchi turli vaziyatlarda o‘z his-tuyg‘ularini qanchalik aniq anglaydi va nomlaydi?",
+        "domain": "Emotsional va xavotir",
+        "targetAgeRange": "15–17 yosh (9-11 sinf)",
+        "questionType": "scale_1_5",
+        "options": [
+          {
+            "id": "ht_1",
+            "text": "1 - His-tuyg‘ularini farqlamaydi",
+            "score": 1.0
+          },
+          {
+            "id": "ht_2",
+            "text": "2 - Faqat \"yaxshi / yomon\" deb ajratadi",
+            "score": 2.0
+          },
+          {
+            "id": "ht_3",
+            "text": "3 - Asosiy his-tuyg‘ularni nomlaydi",
+            "score": 3.0
+          },
+          {
+            "id": "ht_4",
+            "text": "4 - Aralash his-tuyg‘ularni ham nomlaydi",
+            "score": 4.0
+          },
+          {
+            "id": "ht_5",
+            "text": "5 - His-tuyg‘ular sababini tushuntiradi",
+            "score": 5.0
+          }
+        ],
+        "scoringCriteria": "1–5 shkala.",
+        "psychologistNotes": "Vaziyatli savollar orqali tekshiring (\"Agar do‘sting va’dasini bajarmasa, nimani his qilasan?\").",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "speech"
+        ],
+        "adaptationHint": "His-tuyg‘ular aks etgan rasmli kartochkalardan foydalaning; bola mosini ko‘rsatadi.",
+        "minGrade": 9,
+        "maxGrade": 11
+      },
+      {
+        "id": "q_ijt_911_01",
+        "title": "Kasb tanlash va kelajak rejalari",
+        "text": "O‘quvchida kelajakdagi kasbi yoki ta’limi haqida qanchalik aniq tasavvur bor?",
+        "domain": "Ijtimoiy moslashuv va motivatsiya",
+        "targetAgeRange": "15–17 yosh (9-11 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "kt_1",
+            "text": "Aniq maqsadi va unga erishish rejasi bor",
+            "score": 3.0
+          },
+          {
+            "id": "kt_2",
+            "text": "Qiziqish sohasi bor, lekin reja yo‘q",
+            "score": 2.0
+          },
+          {
+            "id": "kt_3",
+            "text": "Tasavvuri noaniq, boshqalar fikriga tayanadi",
+            "score": 1.0
+          },
+          {
+            "id": "kt_4",
+            "text": "Kelajak haqida o‘ylashdan qochadi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "Bolaning imkoniyatlariga mos kasblar haqida ota-ona bilan birga suhbatlashing.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing",
+          "speech"
+        ],
+        "adaptationHint": "Kasblar aks etgan rasmli kartochkalar bilan; ota-ona suhbati orqali to‘ldiring.",
+        "minGrade": 9,
+        "maxGrade": 11
+      },
+      {
+        "id": "q_ijt_911_02",
+        "title": "Mustaqil hayot ko‘nikmalari",
+        "text": "O‘quvchi kundalik hayotda (jamoat transporti, pul bilan hisob-kitob, xarid qilish) qanchalik mustaqil?",
+        "domain": "Ijtimoiy moslashuv va motivatsiya",
+        "targetAgeRange": "15–17 yosh (9-11 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "mh_1",
+            "text": "Barchasini mustaqil bajaradi",
+            "score": 3.0
+          },
+          {
+            "id": "mh_2",
+            "text": "Tanish vaziyatlarda mustaqil",
+            "score": 2.0
+          },
+          {
+            "id": "mh_3",
+            "text": "Kattalar hamrohligida bajaradi",
+            "score": 1.0
+          },
+          {
+            "id": "mh_4",
+            "text": "Hali mustaqil bajarmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball, ota-ona ma’lumoti va kuzatuv asosida.",
+        "psychologistNotes": "Maqsad qo‘yish uchun foydali: qaysi ko‘nikma keyingi qadam bo‘lishi mumkinligini belgilang.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": 9,
+        "maxGrade": 11
+      },
+      {
+        "id": "q_xul_911_01",
+        "title": "Qaror qabul qilish va oqibatni oldindan ko‘rish",
+        "text": "Hayotiy vaziyat taqdim etilganda (masalan, do‘sti darsdan qochishni taklif qiladi) o‘quvchi oqibatlarni hisobga olib qaror qabul qila oladimi?",
+        "domain": "Xulq-atvor va iroda",
+        "targetAgeRange": "15–17 yosh (9-11 sinf)",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "qq_1",
+            "text": "Bir nechta oqibatni ko‘radi va asoslangan qaror qabul qiladi",
+            "score": 3.0
+          },
+          {
+            "id": "qq_2",
+            "text": "Asosiy oqibatni ko‘radi",
+            "score": 2.0
+          },
+          {
+            "id": "qq_3",
+            "text": "Yo‘naltiruvchi savollardan keyin oqibatni ko‘radi",
+            "score": 1.0
+          },
+          {
+            "id": "qq_4",
+            "text": "Oqibatlarni hisobga olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "Bir nechta vaziyatdan foydalaning; qayta baholashda o‘sha vaziyatlarni qo‘llang.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing",
+          "speech"
+        ],
+        "adaptationHint": "Vaziyatni rasmli hikoya shaklida ko‘rsating; javob variantlarini rasm bilan bering.",
+        "minGrade": 9,
+        "maxGrade": 11
+      },
+      {
+        "id": "q_xul_911_02",
+        "title": "Mas’uliyat va vazifani muddatida bajarish",
+        "text": "O‘quvchi berilgan vazifalarni muddatida va mustaqil bajarish darajasi:",
+        "domain": "Xulq-atvor va iroda",
+        "targetAgeRange": "15–17 yosh (9-11 sinf)",
+        "questionType": "scale_1_5",
+        "options": [
+          {
+            "id": "ms_1",
+            "text": "1 - Vazifalarni deyarli bajarmaydi",
+            "score": 1.0
+          },
+          {
+            "id": "ms_2",
+            "text": "2 - Doimiy eslatma bilan qisman bajaradi",
+            "score": 2.0
+          },
+          {
+            "id": "ms_3",
+            "text": "3 - Ko‘pincha bajaradi, ba’zan kechiktiradi",
+            "score": 3.0
+          },
+          {
+            "id": "ms_4",
+            "text": "4 - Deyarli har doim muddatida",
+            "score": 4.0
+          },
+          {
+            "id": "ms_5",
+            "text": "5 - Mustaqil, rejali va o‘z vaqtida",
+            "score": 5.0
+          }
+        ],
+        "scoringCriteria": "1–5 shkala.",
+        "psychologistNotes": "Sinf rahbari va ota-ona ma’lumotlari bilan to‘ldiring.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": 9,
+        "maxGrade": 11
+      },
+      {
+        "id": "q_nutq_01",
+        "title": "Tovushlar talaffuzi",
+        "text": "Bola so‘z boshida, o‘rtasida va oxirida maqsadli tovushlarni (masalan, r, sh, s, l) qanday talaffuz qiladi?",
+        "domain": "Nutq va muloqot",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "tt_1",
+            "text": "Barcha pozitsiyalarda to‘g‘ri talaffuz qiladi",
+            "score": 3.0
+          },
+          {
+            "id": "tt_2",
+            "text": "Alohida talaffuz qiladi, nutqda ba’zan buzadi",
+            "score": 2.0
+          },
+          {
+            "id": "tt_3",
+            "text": "Tovushni boshqasiga almashtiradi yoki tushirib qoldiradi",
+            "score": 1.0
+          },
+          {
+            "id": "tt_4",
+            "text": "Tovush hali shakllanmagan",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "Har bir maqsadli tovush uchun alohida baholang, 0–3 ball.",
+        "psychologistNotes": "Natijani \"To‘g‘ri talaffuz qilinadigan tovushlar\" ko‘rsatkichiga ham kiriting.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "speech",
+          "hearing"
+        ],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_nutq_02",
+        "title": "Fonematik eshitish",
+        "text": "Bola talaffuzi yaqin so‘zlarni (masalan, \"qum — qo‘l\", \"tosh — tush\") eshitib farqlay oladimi? 6 juft so‘z bo‘yicha:",
+        "domain": "Nutq va muloqot",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "fe_1",
+            "text": "6 juftning barchasini farqlaydi",
+            "score": 3.0
+          },
+          {
+            "id": "fe_2",
+            "text": "4–5 juftni farqlaydi",
+            "score": 2.0
+          },
+          {
+            "id": "fe_3",
+            "text": "2–3 juftni farqlaydi",
+            "score": 1.0
+          },
+          {
+            "id": "fe_4",
+            "text": "Farqlay olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "To‘g‘ri farqlangan juftlar soni bo‘yicha 0–3 ball.",
+        "psychologistNotes": "Bola javobni rasmni ko‘rsatish orqali berishi mumkin — og‘zaki javob shart emas.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing"
+        ],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": 4
+      },
+      {
+        "id": "q_nutq_03",
+        "title": "Faol lug‘at",
+        "text": "Bolaga 20 ta tanish predmet rasmi ko‘rsatiladi. Nechtasini to‘g‘ri nomlaydi?",
+        "domain": "Nutq va muloqot",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "fl_1",
+            "text": "17–20 ta",
+            "score": 3.0
+          },
+          {
+            "id": "fl_2",
+            "text": "11–16 ta",
+            "score": 2.0
+          },
+          {
+            "id": "fl_3",
+            "text": "5–10 ta",
+            "score": 1.0
+          },
+          {
+            "id": "fl_4",
+            "text": "5 tadan kam",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "Nomlangan rasmlar soni bo‘yicha 0–3 ball.",
+        "psychologistNotes": "Aniq sonni \"Faol lug‘at\" ko‘rsatkichiga kiriting — dinamika shu orqali kuzatiladi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision",
+          "speech"
+        ],
+        "adaptationHint": "Og‘zaki nutqi cheklangan bola uchun: psixolog so‘zni aytadi, bola mos rasmni ko‘rsatadi (passiv lug‘at).",
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_nutq_04",
+        "title": "Bog‘lanishli nutq",
+        "text": "Syujetli rasm (yoki 3 ta ketma-ket rasm) bo‘yicha bola qanday hikoya tuzadi?",
+        "domain": "Nutq va muloqot",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "bn_1",
+            "text": "Mustaqil, mantiqiy va to‘liq gaplar bilan hikoya qiladi",
+            "score": 3.0
+          },
+          {
+            "id": "bn_2",
+            "text": "Yo‘naltiruvchi savollar bilan hikoya qiladi",
+            "score": 2.0
+          },
+          {
+            "id": "bn_3",
+            "text": "Alohida so‘z yoki qisqa iboralar bilan javob beradi",
+            "score": 1.0
+          },
+          {
+            "id": "bn_4",
+            "text": "Hikoya tuza olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "Grammatik xatolar va gap tuzilishini ham qayd eting.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision",
+          "speech"
+        ],
+        "adaptationHint": "Surdo tili yoki rasmli kartochkalardan foydalanadigan bola hikoyani o‘z muloqot usulida tuzadi.",
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_sm_01",
+        "title": "Mayda motorika",
+        "text": "Bola mayda predmetlar bilan ishlashda (munchoq terish, tugma qadash, qaychi bilan kesish) qanchalik mustaqil?",
+        "domain": "Sensor-motor rivojlanish",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "mm_1",
+            "text": "Barchasini mustaqil va aniq bajaradi",
+            "score": 3.0
+          },
+          {
+            "id": "mm_2",
+            "text": "Sekin, lekin mustaqil bajaradi",
+            "score": 2.0
+          },
+          {
+            "id": "mm_3",
+            "text": "Kattalar yordami bilan bajaradi",
+            "score": 1.0
+          },
+          {
+            "id": "mm_4",
+            "text": "Hali bajara olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "Aniq natijani \"Mayda motorika\" ko‘rsatkichiga kiriting.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "handMotor"
+        ],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_sm_02",
+        "title": "Sensor etalonlar: rang, shakl, kattalik",
+        "text": "Bola predmetlarni rangi, shakli va kattaligi bo‘yicha guruhlay oladimi?",
+        "domain": "Sensor-motor rivojlanish",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "se_1",
+            "text": "Uchala belgi bo‘yicha mustaqil guruhlaydi",
+            "score": 3.0
+          },
+          {
+            "id": "se_2",
+            "text": "Ikki belgi bo‘yicha guruhlaydi",
+            "score": 2.0
+          },
+          {
+            "id": "se_3",
+            "text": "Bitta belgi bo‘yicha, namuna bilan",
+            "score": 1.0
+          },
+          {
+            "id": "se_4",
+            "text": "Guruhlay olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "Ko‘rishi zaif bolada rang o‘rniga tuzilma (silliq/g‘adir-budur) bilan tekshiring.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision"
+        ],
+        "adaptationHint": "Rang o‘rniga sirt tuzilmasi va og‘irlik bo‘yicha taktil guruhlash.",
+        "minGrade": null,
+        "maxGrade": 4
+      },
+      {
+        "id": "q_sm_03",
+        "title": "Fazoviy mo‘ljal",
+        "text": "Bola o‘z tanasida va atrofdagi predmetlarda yo‘nalishlarni (o‘ng-chap, oldi-orqa, ustida-tagida) ko‘rsata oladimi?",
+        "domain": "Sensor-motor rivojlanish",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "fm_1",
+            "text": "O‘zida va predmetlarda to‘g‘ri ko‘rsatadi",
+            "score": 3.0
+          },
+          {
+            "id": "fm_2",
+            "text": "O‘z tanasida to‘g‘ri, predmetlarda adashadi",
+            "score": 2.0
+          },
+          {
+            "id": "fm_3",
+            "text": "Faqat ayrim yo‘nalishlarni biladi",
+            "score": 1.0
+          },
+          {
+            "id": "fm_4",
+            "text": "Yo‘nalishlarni farqlamaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "Ko‘rsatma bolaning muloqot usulida beriladi.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "hearing"
+        ],
+        "adaptationHint": "Ko‘rsatmani imo-ishora yoki namuna ko‘rsatish orqali bering.",
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_sm_04",
+        "title": "O‘z-o‘ziga xizmat ko‘nikmalari",
+        "text": "Bola kundalik o‘z-o‘ziga xizmat amallarini (kiyinish, qo‘l yuvish, ovqatlanish, narsalarini yig‘ish) qanchalik mustaqil bajaradi?",
+        "domain": "Sensor-motor rivojlanish",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "ox_1",
+            "text": "Barchasini mustaqil bajaradi",
+            "score": 3.0
+          },
+          {
+            "id": "ox_2",
+            "text": "Ko‘pchiligini mustaqil, ayrimlarini eslatma bilan",
+            "score": 2.0
+          },
+          {
+            "id": "ox_3",
+            "text": "Ko‘pchiligini yordam bilan",
+            "score": 1.0
+          },
+          {
+            "id": "ox_4",
+            "text": "To‘liq yordam kerak",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball, kuzatuv va ota-ona ma’lumoti asosida.",
+        "psychologistNotes": "Mustaqil bajarilgan amallar sonini \"O‘z-o‘ziga xizmat\" ko‘rsatkichiga kiriting.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_oq_01",
+        "title": "Topshiriqni mustaqil bajarish",
+        "text": "Darajasiga mos o‘quv topshirig‘ini bola qanchalik mustaqil bajaradi?",
+        "domain": "O‘quv ko‘nikmalari",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "tm_1",
+            "text": "Ko‘rsatmani tushunib, mustaqil bajaradi",
+            "score": 3.0
+          },
+          {
+            "id": "tm_2",
+            "text": "Bitta-ikkita yo‘naltiruvchi ko‘rsatma bilan bajaradi",
+            "score": 2.0
+          },
+          {
+            "id": "tm_3",
+            "text": "Bosqichma-bosqich yordam bilan bajaradi",
+            "score": 1.0
+          },
+          {
+            "id": "tm_4",
+            "text": "Yordam bilan ham bajara olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "Topshiriq bolaning fan bo‘yicha haqiqiy darajasiga mos bo‘lishi kerak, sinfiga emas.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [],
+        "adaptationHint": null,
+        "minGrade": null,
+        "maxGrade": null
+      },
+      {
+        "id": "q_oq_02",
+        "title": "O‘qish texnikasi",
+        "text": "Bola darajasiga mos matnni qanday o‘qiydi?",
+        "domain": "O‘quv ko‘nikmalari",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "ot_1",
+            "text": "Ravon, so‘zlab, tushunib o‘qiydi",
+            "score": 3.0
+          },
+          {
+            "id": "ot_2",
+            "text": "So‘zlab o‘qiydi, ba’zan bo‘g‘inlaydi",
+            "score": 2.0
+          },
+          {
+            "id": "ot_3",
+            "text": "Bo‘g‘inlab o‘qiydi",
+            "score": 1.0
+          },
+          {
+            "id": "ot_4",
+            "text": "Harflarni taniydi, lekin o‘qiy olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "O‘qish tezligini (so‘z/daqiqa) \"O‘qish tezligi\" ko‘rsatkichiga kiriting.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "vision",
+          "reading"
+        ],
+        "adaptationHint": "Ko‘rishi zaif bola uchun yirik shrift yoki Brayl yozuvi; nutqi cheklangan bola uchun o‘qiganini rasm bilan moslashtirish.",
+        "minGrade": 1,
+        "maxGrade": null
+      },
+      {
+        "id": "q_oq_03",
+        "title": "Yozish ko‘nikmasi",
+        "text": "Bola darajasiga mos so‘z va gaplarni qanday yozadi (ko‘chirib yoki diktant)?",
+        "domain": "O‘quv ko‘nikmalari",
+        "targetAgeRange": "Barcha yoshlar",
+        "questionType": "single_choice",
+        "options": [
+          {
+            "id": "yz_1",
+            "text": "Mustaqil, deyarli xatosiz yozadi",
+            "score": 3.0
+          },
+          {
+            "id": "yz_2",
+            "text": "Ko‘chirib to‘g‘ri yozadi, diktantda xato qiladi",
+            "score": 2.0
+          },
+          {
+            "id": "yz_3",
+            "text": "Alohida harflar va qisqa so‘zlarni yozadi",
+            "score": 1.0
+          },
+          {
+            "id": "yz_4",
+            "text": "Hali yoza olmaydi",
+            "score": 0.0
+          }
+        ],
+        "scoringCriteria": "0–3 ball.",
+        "psychologistNotes": "Harakat imkoniyati cheklangan bola uchun klaviatura yoki harfli kartochkalar.",
+        "authorId": "system_standard",
+        "authorName": "Standart diagnostika banki",
+        "isStandard": true,
+        "status": "ready",
+        "createdAt": "2026-11-01T00:00:00.000",
+        "updatedAt": null,
+        "requirements": [
+          "writing",
+          "handMotor"
+        ],
+        "adaptationHint": "Qo‘lda yozish o‘rniga klaviatura, planshet yoki harfli kartochkalardan so‘z terish.",
+        "minGrade": 1,
+        "maxGrade": null
+      }
+    ],
+    "curriculumStandards": [
+      {
+        "id": "dts_mat_1_1",
+        "subject": "Matematika",
+        "grade": 1,
+        "description": "20 ichida sanaydi va sonlarni taqqoslaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_1_2",
+        "subject": "Matematika",
+        "grade": 1,
+        "description": "10 ichida qo‘shish va ayirishni bajaradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_1_3",
+        "subject": "Matematika",
+        "grade": 1,
+        "description": "Oddiy geometrik shakllarni (doira, kvadrat, uchburchak) taniydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_2_1",
+        "subject": "Matematika",
+        "grade": 2,
+        "description": "100 ichida qo‘shish va ayirishni bajaradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_2_2",
+        "subject": "Matematika",
+        "grade": 2,
+        "description": "2–5 ga ko‘paytirish jadvalini biladi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_2_3",
+        "subject": "Matematika",
+        "grade": 2,
+        "description": "Uzunlikni santimetr va metrda o‘lchaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_3_1",
+        "subject": "Matematika",
+        "grade": 3,
+        "description": "Ko‘paytirish va bo‘lish jadvalini to‘liq biladi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_3_2",
+        "subject": "Matematika",
+        "grade": 3,
+        "description": "1000 ichidagi sonlarni o‘qiydi, yozadi va taqqoslaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_3_3",
+        "subject": "Matematika",
+        "grade": 3,
+        "description": "Soat bo‘yicha vaqtni aniqlaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_4_1",
+        "subject": "Matematika",
+        "grade": 4,
+        "description": "Ko‘p xonali sonlar ustida to‘rt amalni bajaradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_4_2",
+        "subject": "Matematika",
+        "grade": 4,
+        "description": "Oddiy kasr tushunchasini tushunadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_4_3",
+        "subject": "Matematika",
+        "grade": 4,
+        "description": "To‘g‘ri to‘rtburchakning perimetri va yuzini hisoblaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_5_1",
+        "subject": "Matematika",
+        "grade": 5,
+        "description": "Natural sonlar va oddiy kasrlar bilan amallar bajaradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_5_2",
+        "subject": "Matematika",
+        "grade": 5,
+        "description": "O‘nli kasrlarni o‘qiydi va ular bilan amallar bajaradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_5_3",
+        "subject": "Matematika",
+        "grade": 5,
+        "description": "Oddiy matnli masalalarni yechadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_6_1",
+        "subject": "Matematika",
+        "grade": 6,
+        "description": "Musbat va manfiy sonlar bilan amallar bajaradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_6_2",
+        "subject": "Matematika",
+        "grade": 6,
+        "description": "Nisbat va proporsiyani qo‘llaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_6_3",
+        "subject": "Matematika",
+        "grade": 6,
+        "description": "Sonning foizini hisoblaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_7_1",
+        "subject": "Matematika",
+        "grade": 7,
+        "description": "Algebraik ifodalarni soddalashtiradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_7_2",
+        "subject": "Matematika",
+        "grade": 7,
+        "description": "Bir noma’lumli chiziqli tenglamalarni yechadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_mat_7_3",
+        "subject": "Matematika",
+        "grade": 7,
+        "description": "Burchak va uchburchak xossalarini qo‘llaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_1_1",
+        "subject": "Ona tili",
+        "grade": 1,
+        "description": "Harf va tovushlarni farqlaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_1_2",
+        "subject": "Ona tili",
+        "grade": 1,
+        "description": "So‘zlarni bo‘g‘inlab yozadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_1_3",
+        "subject": "Ona tili",
+        "grade": 1,
+        "description": "Gapdagi so‘zlarni ajratadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_2_1",
+        "subject": "Ona tili",
+        "grade": 2,
+        "description": "Tanish so‘zlarni imlo qoidalariga muvofiq yozadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_2_2",
+        "subject": "Ona tili",
+        "grade": 2,
+        "description": "Darak va so‘roq gaplarni farqlaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_2_3",
+        "subject": "Ona tili",
+        "grade": 2,
+        "description": "Kichik matnni xatosiz ko‘chiradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_3_1",
+        "subject": "Ona tili",
+        "grade": 3,
+        "description": "Ot, sifat va fe’lni farqlaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_3_2",
+        "subject": "Ona tili",
+        "grade": 3,
+        "description": "Gapning bosh bo‘laklarini topadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_3_3",
+        "subject": "Ona tili",
+        "grade": 3,
+        "description": "5–6 gapdan iborat matn tuzadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_4_1",
+        "subject": "Ona tili",
+        "grade": 4,
+        "description": "So‘z tarkibini (o‘zak, qo‘shimcha) ajratadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_4_2",
+        "subject": "Ona tili",
+        "grade": 4,
+        "description": "Asosiy tinish belgilarini to‘g‘ri qo‘llaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_4_3",
+        "subject": "Ona tili",
+        "grade": 4,
+        "description": "Eshitgan yoki o‘qigan matni bo‘yicha bayon yozadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_5_1",
+        "subject": "Ona tili",
+        "grade": 5,
+        "description": "Asosiy imlo qoidalarini qo‘llaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_5_2",
+        "subject": "Ona tili",
+        "grade": 5,
+        "description": "So‘z yasalishini tushunadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_5_3",
+        "subject": "Ona tili",
+        "grade": 5,
+        "description": "Reja asosida matn tuzadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_6_1",
+        "subject": "Ona tili",
+        "grade": 6,
+        "description": "Ot, sifat, son va olmoshning grammatik belgilarini ajratadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_6_2",
+        "subject": "Ona tili",
+        "grade": 6,
+        "description": "So‘z birikmalarini tuzadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_6_3",
+        "subject": "Ona tili",
+        "grade": 6,
+        "description": "Berilgan mavzuda insho yozadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_7_1",
+        "subject": "Ona tili",
+        "grade": 7,
+        "description": "Fe’l shakllarini to‘g‘ri qo‘llaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_7_2",
+        "subject": "Ona tili",
+        "grade": 7,
+        "description": "Ravish va ko‘makchilarni farqlaydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_ona_7_3",
+        "subject": "Ona tili",
+        "grade": 7,
+        "description": "Qo‘shma gaplar tuzadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_1_1",
+        "subject": "O‘qish va adabiyot",
+        "grade": 1,
+        "description": "Harflarni tanib, bo‘g‘inlab o‘qiydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_1_2",
+        "subject": "O‘qish va adabiyot",
+        "grade": 1,
+        "description": "Qisqa so‘z va gaplarni o‘qiydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_1_3",
+        "subject": "O‘qish va adabiyot",
+        "grade": 1,
+        "description": "Eshitgan ertak mazmunini aytib beradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_2_1",
+        "subject": "O‘qish va adabiyot",
+        "grade": 2,
+        "description": "Qisqa matnni so‘zlab, ravon o‘qiydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_2_2",
+        "subject": "O‘qish va adabiyot",
+        "grade": 2,
+        "description": "O‘qigan matni bo‘yicha savollarga javob beradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_2_3",
+        "subject": "O‘qish va adabiyot",
+        "grade": 2,
+        "description": "Kichik she’rni yod oladi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_3_1",
+        "subject": "O‘qish va adabiyot",
+        "grade": 3,
+        "description": "Matnni ifodali o‘qiydi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_3_2",
+        "subject": "O‘qish va adabiyot",
+        "grade": 3,
+        "description": "Matn bo‘yicha oddiy reja tuzadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_3_3",
+        "subject": "O‘qish va adabiyot",
+        "grade": 3,
+        "description": "Matnning asosiy fikrini aytadi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_4_1",
+        "subject": "O‘qish va adabiyot",
+        "grade": 4,
+        "description": "Matnni mustaqil o‘qib, mazmunini qayta hikoya qiladi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_4_2",
+        "subject": "O‘qish va adabiyot",
+        "grade": 4,
+        "description": "Asar qahramonlariga baho beradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      },
+      {
+        "id": "dts_oqi_4_3",
+        "subject": "O‘qish va adabiyot",
+        "grade": 4,
+        "description": "O‘qigan kitobi haqida qisqa fikr bildiradi",
+        "source": "Namuna (rasmiy DTS bilan almashtirilishi kerak)",
+        "isOfficial": false
+      }
+    ],
+    "subjectLevels": [
+      {
+        "id": "sl_01",
+        "studentId": "student_03",
+        "subject": "Matematika",
+        "classGrade": 4,
+        "results": {
+          "dts_mat_1_1": "mastered",
+          "dts_mat_1_2": "mastered",
+          "dts_mat_1_3": "mastered",
+          "dts_mat_2_1": "mastered",
+          "dts_mat_2_2": "mastered",
+          "dts_mat_2_3": "mastered",
+          "dts_mat_3_1": "mastered",
+          "dts_mat_3_2": "mastered",
+          "dts_mat_3_3": "partial",
+          "dts_mat_4_1": "notYet",
+          "dts_mat_4_2": "notYet"
+        },
+        "suggestedGrade": 3,
+        "confirmedGrade": 3,
+        "assessedById": "user_special_ed_teacher",
+        "assessedByName": "Rahmonova Dildora Akmalovna",
+        "assessedAt": "2026-10-27T18:56:16.216983",
+        "notes": "Rasmiy 4-sinf o‘quvchisi, biroq DTS bo‘yicha 3-sinf matematika dasturini barqaror o‘zlashtirmoqda. Individual 3-sinf darajasida o‘qitiladi."
+      },
+      {
+        "id": "sl_02",
+        "studentId": "student_01",
+        "subject": "O‘qish va adabiyot",
+        "classGrade": 3,
+        "results": {
+          "dts_oqi_1_1": "mastered",
+          "dts_oqi_1_2": "mastered",
+          "dts_oqi_1_3": "mastered",
+          "dts_oqi_2_1": "mastered",
+          "dts_oqi_2_2": "mastered",
+          "dts_oqi_2_3": "partial",
+          "dts_oqi_3_1": "notYet"
+        },
+        "suggestedGrade": 2,
+        "confirmedGrade": 2,
+        "assessedById": "user_special_ed_teacher",
+        "assessedByName": "Rahmonova Dildora Akmalovna",
+        "assessedAt": "2026-10-23T18:56:16.217366",
+        "notes": "O‘qish va adabiyotdan 2-sinf me’yorlariga mos; bo‘g‘inlab va so‘zlab o‘qish tezligi ustida ishlanmoqda."
+      },
+      {
+        "id": "sl_03",
+        "studentId": "student_05",
+        "subject": "Matematika",
+        "classGrade": 3,
+        "results": {
+          "dts_mat_1_1": "mastered",
+          "dts_mat_1_2": "mastered",
+          "dts_mat_1_3": "partial",
+          "dts_mat_2_1": "notYet"
+        },
+        "suggestedGrade": 1,
+        "confirmedGrade": 1,
+        "assessedById": "user_special_ed_teacher",
+        "assessedByName": "Rahmonova Dildora Akmalovna",
+        "assessedAt": "2026-10-21T18:56:16.217366",
+        "notes": "Vizual kartochkalar yordamida 1-sinf matematika dasturi (20 ichida qo‘shish va ayirish) asosida individual ishlanmoqda."
+      }
+    ],
+    "subjectTasks": [
+      {
+        "id": "tsk_01",
+        "studentId": "student_03",
+        "subject": "Matematika",
+        "levelGrade": 3,
+        "standardId": "dts_mat_3_3",
+        "title": "Matnli masalalarni 2 amal bilan yechish (3-sinf DTS)",
+        "description": "Kattalashtirilgan shriftli kartochkada berilgan 3 ta matnli masalani chizma yordamida yechish.",
+        "assignedById": "user_special_ed_teacher",
+        "assignedByName": "Rahmonova Dildora Akmalovna",
+        "assignedAt": "2026-10-28T18:56:16.217978",
+        "dueDate": "2026-11-09T18:56:16.217978",
+        "result": "mastered",
+        "resultNote": "3 ta masaladan 3 tasini mustaqil to‘g‘ri yechdi.",
+        "completedAt": "2026-11-01T18:56:16.217978"
+      },
+      {
+        "id": "tsk_02",
+        "studentId": "student_01",
+        "subject": "O‘qish va adabiyot",
+        "levelGrade": 2,
+        "standardId": "dts_oqi_2_3",
+        "title": "Qisqa hikoyani o‘qib, asosiy qahramon harakatini aytib berish",
+        "description": "5-6 gapdan iborat hikoyani ovoz chiqarib o‘qish va savollarga javob berish.",
+        "assignedById": "user_special_ed_teacher",
+        "assignedByName": "Rahmonova Dildora Akmalovna",
+        "assignedAt": "2026-10-29T18:56:16.217978",
+        "dueDate": "2026-11-07T18:56:16.217978",
+        "result": null,
+        "resultNote": null,
+        "completedAt": null
+      }
+    ],
+    "progressMetrics": [
+      {
+        "id": "metric_attention_minutes",
+        "name": "Diqqatni bir topshiriqda jamlash davomiyligi",
+        "unit": "daqiqa",
+        "domain": "Diqqat va xotira",
+        "higherIsBetter": true
+      },
+      {
+        "id": "metric_words_recalled",
+        "name": "10 ta so‘zdan eslab qolinganlari",
+        "unit": "so‘z",
+        "domain": "Diqqat va xotira",
+        "higherIsBetter": true
+      },
+      {
+        "id": "metric_independent_tasks",
+        "name": "Mustaqil bajarilgan topshiriqlar (5 tadan)",
+        "unit": "topshiriq",
+        "domain": "Xulq-atvor va iroda",
+        "higherIsBetter": true
+      },
+      {
+        "id": "metric_reading_wpm",
+        "name": "O‘qish tezligi",
+        "unit": "so‘z/daqiqa",
+        "domain": "Nutq va muloqot",
+        "higherIsBetter": true
+      },
+      {
+        "id": "metric_meltdowns_week",
+        "name": "Haftasiga hissiy portlashlar soni",
+        "unit": "marta",
+        "domain": "Emotsional va xavotir",
+        "higherIsBetter": false
+      },
+      {
+        "id": "metric_peer_initiations",
+        "name": "Tengdoshlar bilan o‘zi boshlagan muloqotlar (tanaffusda)",
+        "unit": "marta",
+        "domain": "Ijtimoiy moslashuv va motivatsiya",
+        "higherIsBetter": true
+      },
+      {
+        "id": "metric_sounds_correct",
+        "name": "To‘g‘ri talaffuz qilinadigan maqsadli tovushlar",
+        "unit": "tovush",
+        "domain": "Nutq va muloqot",
+        "higherIsBetter": true
+      },
+      {
+        "id": "metric_active_vocabulary",
+        "name": "Faol lug‘at (20 ta rasmdan nomlanganlari)",
+        "unit": "so‘z",
+        "domain": "Nutq va muloqot",
+        "higherIsBetter": true
+      },
+      {
+        "id": "metric_fine_motor_beads",
+        "name": "Mayda motorika: 1 daqiqada ipga o‘tkazilgan munchoqlar",
+        "unit": "dona",
+        "domain": "Sensor-motor rivojlanish",
+        "higherIsBetter": true
+      },
+      {
+        "id": "metric_self_care",
+        "name": "O‘z-o‘ziga xizmat: mustaqil bajarilgan amallar (10 tadan)",
+        "unit": "amal",
+        "domain": "Sensor-motor rivojlanish",
+        "higherIsBetter": true
+      }
+    ],
+    "measurements": [
+      {
+        "id": "msr_01",
+        "studentId": "student_01",
+        "metricId": "metric_attention_minutes",
+        "value": 3.0,
+        "measuredAt": "2026-09-28T18:56:16.218987",
+        "recordedById": "user_psychologist",
+        "recordedByName": "Usmonova Dilnoza Anvarovna",
+        "note": "Boshlang‘ich holat: 3 daqiqadan so‘ng chalg‘ish kuzatildi.",
+        "iepObjectiveId": null
+      },
+      {
+        "id": "msr_02",
+        "studentId": "student_01",
+        "metricId": "metric_attention_minutes",
+        "value": 5.0,
+        "measuredAt": "2026-10-15T18:56:16.218987",
+        "recordedById": "user_psychologist",
+        "recordedByName": "Usmonova Dilnoza Anvarovna",
+        "note": "Vizual taymer qo‘llanganda 5 daqiqagacha barqaror ishladi.",
+        "iepObjectiveId": null
+      },
+      {
+        "id": "msr_03",
+        "studentId": "student_01",
+        "metricId": "metric_attention_minutes",
+        "value": 8.0,
+        "measuredAt": "2026-10-30T18:56:16.218987",
+        "recordedById": "user_psychologist",
+        "recordedByName": "Usmonova Dilnoza Anvarovna",
+        "note": "O‘sish: 8 daqiqa davomida mustaqil topshiriq bajardi.",
+        "iepObjectiveId": null
+      },
+      {
+        "id": "msr_04",
+        "studentId": "student_01",
+        "metricId": "metric_reading_wpm",
+        "value": 18.0,
+        "measuredAt": "2026-10-03T18:56:16.218987",
+        "recordedById": "user_special_ed_teacher",
+        "recordedByName": "Rahmonova Dildora Akmalovna",
+        "note": "Bo‘g‘inlab o‘qish: 18 so‘z/daqiqa.",
+        "iepObjectiveId": null
+      },
+      {
+        "id": "msr_05",
+        "studentId": "student_01",
+        "metricId": "metric_reading_wpm",
+        "value": 29.0,
+        "measuredAt": "2026-10-29T18:56:16.218987",
+        "recordedById": "user_special_ed_teacher",
+        "recordedByName": "Rahmonova Dildora Akmalovna",
+        "note": "So‘zlab o‘qishga o‘tdi: 29 so‘z/daqiqa.",
+        "iepObjectiveId": null
+      }
+    ],
+    "soundEntries": [
+      {
+        "id": "snd_01",
+        "studentId": "student_01",
+        "soundId": "r",
+        "stage": "preparation",
+        "disorder": "substitution",
+        "substitutedWith": "l",
+        "differentiatedFrom": null,
+        "note": "R tovushini L ga almashtiradi, artikulyatsion mashqlar boshlandi.",
+        "recordedById": "user_speech",
+        "recordedByName": "Sodiqov Bobur Mirzayevich",
+        "recordedAt": "2026-10-05T18:56:16.219982"
+      },
+      {
+        "id": "snd_02",
+        "studentId": "student_01",
+        "soundId": "r",
+        "stage": "staging",
+        "disorder": "none",
+        "substitutedWith": null,
+        "differentiatedFrom": null,
+        "note": "Titrash hosil qilindi, R tovushi alohida qo‘yildi.",
+        "recordedById": "user_speech",
+        "recordedByName": "Sodiqov Bobur Mirzayevich",
+        "recordedAt": "2026-10-19T18:56:16.219982"
+      },
+      {
+        "id": "snd_03",
+        "studentId": "student_01",
+        "soundId": "r",
+        "stage": "words",
+        "disorder": "none",
+        "substitutedWith": null,
+        "differentiatedFrom": null,
+        "note": "So‘z boshida va o‘rtasida R tovushini to‘g‘ri talaffuz qilmoqda.",
+        "recordedById": "user_speech",
+        "recordedByName": "Sodiqov Bobur Mirzayevich",
+        "recordedAt": "2026-10-31T18:56:16.219982"
+      },
+      {
+        "id": "snd_04",
+        "studentId": "student_01",
+        "soundId": "l",
+        "stage": "spontaneous",
+        "disorder": "none",
+        "substitutedWith": null,
+        "differentiatedFrom": null,
+        "note": "L tovushi erkin nutqda to‘liq avtomatlashtirildi!",
+        "recordedById": "user_speech",
+        "recordedByName": "Sodiqov Bobur Mirzayevich",
+        "recordedAt": "2026-10-28T18:56:16.219982"
+      }
+    ],
+    "achievements": [
+      {
+        "id": "ach_01",
+        "studentId": "student_01",
+        "category": "skill",
+        "title": "«L» tovushini erkin nutqda xatosiz talaffuz qilishga erishdi",
+        "description": "Logopedik mashg‘ulotlar natijasida L tovushi to‘liq o‘zlashtirildi.",
+        "achievedAt": "2026-10-28T18:56:16.219982",
+        "recordedById": "user_speech",
+        "recordedByName": "Sodiqov Bobur Mirzayevich"
+      },
+      {
+        "id": "ach_02",
+        "studentId": "student_03",
+        "category": "subject",
+        "title": "Matematikadan 3-sinf DTS darajasidagi 2 amalli masalalarni mustaqil yechdi",
+        "description": "Individual moslashtirilgan 3-sinf dasturi bo‘yicha yuqori natija.",
+        "achievedAt": "2026-11-01T18:56:16.221018",
+        "recordedById": "user_special_ed_teacher",
+        "recordedByName": "Rahmonova Dildora Akmalovna"
+      }
+    ],
+    "conferences": [
+      {
+        "id": "cnf_01",
+        "studentId": "student_01",
+        "studentName": "Aliyev Jasur",
+        "agenda": "1-chorak yakuni bo‘yicha logoped, psixolog va maxsus o‘qituvchi qo‘shma konsiliumi",
+        "scheduledAt": "2026-10-29T18:56:16.221982",
+        "convenedById": "user_coordinator",
+        "convenedByName": "Hakimova Zebo Erkinovna",
+        "participantIds": [
+          "user_coordinator",
+          "user_speech",
+          "user_psychologist",
+          "user_special_ed_teacher"
+        ],
+        "status": "held",
+        "contributions": [
+          {
+            "userId": "user_speech",
+            "userName": "Sodiqov Bobur Mirzayevich",
+            "role": "Logoped-defektolog",
+            "summary": "L tovushi erkin nutqqa chiqdi, R tovushi so‘zlarda avtomatlashtirilmoqda.",
+            "recommendations": "Ota-onaga uyda har kuni 10 daqiqa artikulyatsion mashq berish.",
+            "at": "2026-10-29T18:56:16.221982"
+          },
+          {
+            "userId": "user_psychologist",
+            "userName": "Usmonova Dilnoza Anvarovna",
+            "role": "Amaliyotchi psixolog",
+            "summary": "Diqqat davomiyligi 3 daqiqadan 8 daqiqagacha oshdi.",
+            "recommendations": "Darsda vizual jadval va rag‘bat stikerlarini davom ettirish.",
+            "at": "2026-10-29T18:56:16.222980"
+          }
+        ],
+        "conclusion": "Barcha yo‘nalishlarda ijobiy dinamika tasdiqlandi. O‘qish fanidan 2-sinf darajasidan 3-sinf DTS talablariga bosqichma-bosqich o‘tkazish tavsiya etildi.",
+        "decisions": [
+          {
+            "id": "dec_01",
+            "text": "R va L tovushlarini farqlash (differensiatsiya) mashqlarini boshlash",
+            "responsibleId": "user_speech",
+            "responsibleName": "Sodiqov Bobur Mirzayevich",
+            "dueDate": "2026-11-16T18:56:16.222980",
+            "isDone": false,
+            "doneAt": null
+          }
+        ],
+        "heldAt": null
+      }
+    ],
+    "auditLogs": [
+      {
+        "id": "aud_01",
+        "userFullName": "Rahimov Sarvar (Super Admin)",
+        "userRole": "Tizim administratori",
+        "action": "LOGIN",
+        "entity": "Auth",
+        "details": "Tizimga muvaffaqiyatli kirildi",
+        "timestamp": "2026-11-02T16:56:16.224023"
+      },
+      {
+        "id": "aud_02",
+        "userFullName": "Sodiqov Bobur (Logoped)",
+        "userRole": "Logoped-defektolog",
+        "action": "CREATE",
+        "entity": "Assessment",
+        "details": "Aliyev Jasur uchun fonematik diagnostika saqlandi",
+        "timestamp": "2026-10-31T18:56:16.224023"
+      }
+    ],
+    "notifications": [
+      {
+        "id": "notif_01",
+        "recipientUserId": "user_speech",
+        "title": "Yangi yo‘naltirish (Referral)",
+        "body": "Sobirova Zarnigor sizning logopedik tekshiruvingizga yo‘naltirildi.",
+        "type": "REFERRAL",
+        "relatedRecordId": "ref_02",
+        "relatedStudentId": "student_04",
+        "relatedStudentName": "Sobirova Zarnigor",
+        "isRead": false,
+        "createdAt": "2026-11-02T14:56:16.224023"
+      },
+      {
+        "id": "notif_02",
+        "recipientUserId": "user_psychologist",
+        "title": "ITR ko‘rib chiqish muddati",
+        "body": "Aliyev Jasurning ITR rejasi oraliq baholash sanasi yaqinlashmoqda.",
+        "type": "IEP",
+        "relatedRecordId": "iep_01",
+        "relatedStudentId": "student_01",
+        "relatedStudentName": "Aliyev Jasur",
+        "isRead": true,
+        "createdAt": "2026-11-01T18:56:16.225035"
+      }
+    ]
+  }
+}

@@ -939,6 +939,9 @@ class AppProvider extends ChangeNotifier {
   String exportSpecialistActivityCsv({DateTime? from, DateTime? to}) =>
       _exportService.generateSpecialistActivityCsv(buildReport(from: from, to: to));
 
+  String exportDatabaseBackupJson() =>
+      _db.exportDatabaseBackupJson(forUser: _currentViewer);
+
   // ==================== KONSILIUM ====================
   List<CaseConference> conferencesFor({String? studentId}) {
     final user = _currentViewer;

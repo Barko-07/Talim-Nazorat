@@ -156,6 +156,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                           UserRole.psychologist,
                           UserRole.speechTherapist,
                           UserRole.specialEducation,
+                          UserRole.specialEdTeacher,
                           UserRole.teacher,
                           UserRole.coordinator,
                         ].map(

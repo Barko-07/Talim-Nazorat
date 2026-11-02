@@ -73,7 +73,14 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final allMethods = PsychologicalMethodsData.methods;
+    final app = context.watch<AppProvider>();
+    final allMethods = app.myMethods.isNotEmpty
+        ? app.myMethods
+        : PsychologicalMethodsData.methods;
+    final dynamicDomains = <String>[
+      'Barchasi',
+      ...{for (final m in allMethods) m.domain},
+    ];
 
     final filteredMethods = allMethods.where((m) {
       final matchesDomain = _selectedDomain == 'Barchasi' || m.domain == _selectedDomain;
@@ -226,7 +233,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: _domains.map((domain) {
+                      children: dynamicDomains.map((domain) {
                         final isSelected = _selectedDomain == domain;
                         return Padding(
                           padding: const EdgeInsets.only(right: 8.0),
@@ -446,6 +453,41 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
               height: 1.4,
             ),
           ),
+          if (m.requiresLicensedMaterials) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFBEB),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: const Color(0xFFD97706).withValues(alpha: 0.4),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    size: 15,
+                    color: Color(0xFFD97706),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      '⚠ Litsenziyalangan test: ${m.licenseNote ?? "Rasmiy litsenziyalangan qo‘llanma asosida talqin qilinadi."}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFB45309),
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
 
           // Subshkalalar soni va max ball

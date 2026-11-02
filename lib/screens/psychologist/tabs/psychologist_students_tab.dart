@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../models/student_model.dart';
 import '../../../models/user_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/child_status_service.dart';
 import '../../students/student_detail_screen.dart';
 
 class PsychologistStudentsTab extends StatefulWidget {
@@ -31,6 +31,29 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
   String? _gradeFilter;
   String? _levelFilter;
   bool _onlyAssignedToMe = false;
+  StatusColor? _statusColorFilter;
+
+  static Color _colorFor(StatusColor c) {
+    switch (c) {
+      case StatusColor.red:
+        return const Color(0xFFDC2626);
+      case StatusColor.yellow:
+        return const Color(0xFFD97706);
+      case StatusColor.green:
+        return const Color(0xFF059669);
+    }
+  }
+
+  static Color _bgFor(StatusColor c) {
+    switch (c) {
+      case StatusColor.red:
+        return const Color(0xFFFEF2F2);
+      case StatusColor.yellow:
+        return const Color(0xFFFFFBEB);
+      case StatusColor.green:
+        return const Color(0xFFECFDF5);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +61,11 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
     final app = context.watch<AppProvider>();
     final currentUser = auth.currentUser;
     final allAllowedStudents = app.students;
-    final df = DateFormat('dd.MM.yyyy');
+    final summary = app.monitoringSummary;
+    final statusByStudentId = <String, ChildStatus>{
+      if (summary != null)
+        for (final st in summary.statuses) st.student.id: st,
+    };
 
     // Filtrlash (Psixolog vakolati doirasida)
     final filtered = allAllowedStudents.where((s) {
@@ -46,6 +73,10 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
         final isAssigned = s.assignedSpecialistIds.contains(currentUser.id) ||
             currentUser.assignedStudentIds.contains(s.id);
         if (!isAssigned) return false;
+      }
+      if (_statusColorFilter != null &&
+          statusByStudentId[s.id]?.color != _statusColorFilter) {
+        return false;
       }
       if (_search.isNotEmpty) {
         final q = _search.toLowerCase();
@@ -236,7 +267,10 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       FilterChip(
                         selected: _onlyAssignedToMe,
@@ -257,7 +291,68 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         onSelected: (val) =>
                             setState(() => _onlyAssignedToMe = val),
                       ),
-                      const Spacer(),
+                      if (summary != null) ...[
+                        FilterChip(
+                          selected: _statusColorFilter == StatusColor.red,
+                          label: Text(
+                            '🔴 Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
+                          ),
+                          selectedColor: const Color(0xFFDC2626),
+                          backgroundColor: const Color(0xFFFEF2F2),
+                          labelStyle: TextStyle(
+                            fontSize: 12,
+                            color: _statusColorFilter == StatusColor.red
+                                ? Colors.white
+                                : const Color(0xFFDC2626),
+                            fontWeight: FontWeight.w700,
+                          ),
+                          onSelected: (val) => setState(
+                            () => _statusColorFilter = val
+                                ? StatusColor.red
+                                : null,
+                          ),
+                        ),
+                        FilterChip(
+                          selected: _statusColorFilter == StatusColor.yellow,
+                          label: Text(
+                            '🟡 Sariq (${summary.count(StatusColor.yellow)})',
+                          ),
+                          selectedColor: const Color(0xFFD97706),
+                          backgroundColor: const Color(0xFFFFFBEB),
+                          labelStyle: TextStyle(
+                            fontSize: 12,
+                            color: _statusColorFilter == StatusColor.yellow
+                                ? Colors.white
+                                : const Color(0xFFD97706),
+                            fontWeight: FontWeight.w700,
+                          ),
+                          onSelected: (val) => setState(
+                            () => _statusColorFilter = val
+                                ? StatusColor.yellow
+                                : null,
+                          ),
+                        ),
+                        FilterChip(
+                          selected: _statusColorFilter == StatusColor.green,
+                          label: Text(
+                            '🟢 Yashil (${summary.count(StatusColor.green)})',
+                          ),
+                          selectedColor: const Color(0xFF059669),
+                          backgroundColor: const Color(0xFFECFDF5),
+                          labelStyle: TextStyle(
+                            fontSize: 12,
+                            color: _statusColorFilter == StatusColor.green
+                                ? Colors.white
+                                : const Color(0xFF059669),
+                            fontWeight: FontWeight.w700,
+                          ),
+                          onSelected: (val) => setState(
+                            () => _statusColorFilter = val
+                                ? StatusColor.green
+                                : null,
+                          ),
+                        ),
+                      ],
                       TextButton(
                         onPressed: () {
                           setState(() {
@@ -265,6 +360,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                             _gradeFilter = null;
                             _levelFilter = null;
                             _onlyAssignedToMe = false;
+                            _statusColorFilter = null;
                           });
                         },
                         child: const Text('Filtrlarni tozalash', style: TextStyle(fontSize: 12)),
@@ -306,15 +402,25 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
               separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (ctx, i) {
                 final s = filtered[i];
+                final st = statusByStudentId[s.id];
+                final isRed = st?.color == StatusColor.red;
+                final stColor = st != null ? _colorFor(st.color) : null;
+                final stBg = st != null ? _bgFor(st.color) : null;
                 final isAssigned = currentUser != null &&
                     (s.assignedSpecialistIds.contains(currentUser.id) ||
                         currentUser.assignedStudentIds.contains(s.id));
 
                 return Card(
                   elevation: 0,
+                  color: isRed ? const Color(0xFFFFF5F5) : Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(
+                      color: stColor != null
+                          ? stColor.withValues(alpha: isRed ? 0.55 : 0.35)
+                          : AppColors.border,
+                      width: isRed ? 1.5 : 1.0,
+                    ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -324,12 +430,12 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         Row(
                           children: [
                             CircleAvatar(
-                              backgroundColor: const Color(0xFFEEF2FF),
+                              backgroundColor: stBg ?? const Color(0xFFEEF2FF),
                               child: Text(
                                 s.firstName.isNotEmpty ? s.firstName[0] : 'O',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF4F46E5),
+                                  color: stColor ?? const Color(0xFF4F46E5),
                                 ),
                               ),
                             ),
@@ -338,7 +444,11 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 4,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
                                     children: [
                                       Text(
                                         s.fullName,
@@ -348,7 +458,6 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                           color: AppColors.textPrimary,
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 6,
@@ -366,8 +475,31 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                           ),
                                         ),
                                       ),
-                                      if (isAssigned) ...[
-                                        const SizedBox(width: 6),
+                                      if (st != null)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: stBg,
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                            border: Border.all(
+                                              color: stColor!
+                                                  .withValues(alpha: 0.35),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            '${st.color.label}: ${st.color == StatusColor.red ? "Ishlanmagan" : st.color == StatusColor.yellow ? "E’tibor talab" : "Ijobiy"}',
+                                            style: TextStyle(
+                                              fontSize: 10.5,
+                                              fontWeight: FontWeight.bold,
+                                              color: stColor,
+                                            ),
+                                          ),
+                                        ),
+                                      if (isAssigned)
                                         Container(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 6,
@@ -389,7 +521,6 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                             ),
                                           ),
                                         ),
-                                      ],
                                     ],
                                   ),
                                   const SizedBox(height: 4),
@@ -400,6 +531,17 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                       color: AppColors.textSecondary,
                                     ),
                                   ),
+                                  if (st != null && st.reasons.isNotEmpty) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Holat sababi: ${st.reasons.first}',
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: stColor,
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),

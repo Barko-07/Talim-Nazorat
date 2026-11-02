@@ -143,12 +143,21 @@ class LocalDbService {
       _notifications = List.from(SeedData.notifications);
       _observations = List.from(SeedData.observations);
       _questions = List.from(PsychologicalQuestionsSeed.initialQuestions);
+      if (!kDebugMode && AppConfig.demoMode) {
+        _subjectLevelRecords = List.from(SeedData.subjectLevels);
+        _subjectTasks = List.from(SeedData.subjectTasks);
+        _measurements = List.from(SeedData.measurements);
+        _soundEntries = List.from(SeedData.soundEntries);
+        _achievements = List.from(SeedData.achievements);
+        _conferences = List.from(SeedData.conferences);
+      }
 
       await _persistAll();
       await prefs.setBool('app_db_seeded_v2', true);
     } else {
       _loadFromPrefs(prefs);
-      if (AppConfig.demoMode &&
+      if (!kDebugMode &&
+          AppConfig.demoMode &&
           _users.isEmpty &&
           _students.isEmpty &&
           _corruptedKeys.isEmpty) {
@@ -162,6 +171,12 @@ class LocalDbService {
         _auditLogs = List.from(SeedData.auditLogs);
         _notifications = List.from(SeedData.notifications);
         _observations = List.from(SeedData.observations);
+        _subjectLevelRecords = List.from(SeedData.subjectLevels);
+        _subjectTasks = List.from(SeedData.subjectTasks);
+        _measurements = List.from(SeedData.measurements);
+        _soundEntries = List.from(SeedData.soundEntries);
+        _achievements = List.from(SeedData.achievements);
+        _conferences = List.from(SeedData.conferences);
         await _persistAll();
       }
     }
@@ -3009,5 +3024,95 @@ class LocalDbService {
       entity: 'Observation',
       details: 'Kuzatuv o‘chirildi: ${obs.studentName} (${obs.category})',
     );
+  }
+
+  /// Ma'lumotlar bazasining to'liq JSON zaxira nusxasi (parolsiz, foydalanuvchi ruxsatiga mos)
+  String exportDatabaseBackupJson({UserModel? forUser}) {
+    final visibleStudents = getStudents(forUser: forUser, includeArchived: true);
+    final visibleStudentIds = visibleStudents.map((s) => s.id).toSet();
+    final payload = <String, dynamic>{
+      'meta': {
+        'application': 'TA’LIM NAZORAT — Inklyuziv va maxsus ta’lim monitoring tizimi',
+        'schemaVersion': '2.0',
+        'exportedAt': DateTime.now().toIso8601String(),
+        'exportedBy': forUser?.fullName ?? 'System',
+        'exportedByRole': forUser?.role.label ?? 'System',
+      },
+      'tables': {
+        'users': (forUser != null ? getUsers(forUser: forUser) : _users)
+            .map((u) => u.copyWith(password: '').toJson())
+            .toList(),
+        'students': visibleStudents.map((s) => s.toJson()).toList(),
+        'assessments': getAssessments(forUser: forUser).map((a) => a.toJson()).toList(),
+        'sessions': getSessions(forUser: forUser).map((s) => s.toJson()).toList(),
+        'iepPlans': getIepPlans(forUser: forUser).map((p) => p.toJson()).toList(),
+        'alerts': getAlerts(forUser: forUser).map((a) => a.toJson()).toList(),
+        'referrals': getReferrals(forUser: forUser).map((r) => r.toJson()).toList(),
+        'observations': getObservations(forUser: forUser).map((o) => o.toJson()).toList(),
+        'questions': _questions.map((q) => q.toJson()).toList(),
+        'curriculumStandards': _curriculum.map((c) => c.toJson()).toList(),
+        'subjectLevels': _subjectLevelRecords
+            .where((l) => visibleStudentIds.contains(l.studentId))
+            .map((l) => l.toJson())
+            .toList(),
+        'subjectTasks': _subjectTasks
+            .where((t) => visibleStudentIds.contains(t.studentId))
+            .map((t) => t.toJson())
+            .toList(),
+        'progressMetrics': getProgressMetrics().map((m) => m.toJson()).toList(),
+        'measurements': _measurements
+            .where((m) => visibleStudentIds.contains(m.studentId))
+            .map((m) => m.toJson())
+            .toList(),
+        'soundEntries': _soundEntries
+            .where((e) => visibleStudentIds.contains(e.studentId))
+            .map((e) => e.toJson())
+            .toList(),
+        'achievements': _achievements
+            .where((a) => visibleStudentIds.contains(a.studentId))
+            .map((a) => a.toJson())
+            .toList(),
+        'conferences': (forUser != null ? getConferences(forUser: forUser) : _conferences)
+            .map((c) => c.toJson())
+            .toList(),
+        'auditLogs': getAuditLogs(forUser: forUser).map((l) => l.toJson()).toList(),
+      },
+    };
+    return const JsonEncoder.withIndent('  ').convert(payload);
+  }
+
+  /// Barcha boshlang'ich va namunaviy ma'lumotlar bazasi jadvallarining to'liq zaxira nusxasi
+  String exportFullSeedBackupJson({DateTime? exportedAt}) {
+    final payload = <String, dynamic>{
+      'meta': {
+        'application': 'TA’LIM NAZORAT — Inklyuziv va maxsus ta’lim monitoring tizimi',
+        'schemaVersion': '2.0',
+        'exportedAt': (exportedAt ?? DateTime.now()).toIso8601String(),
+        'description':
+            'To‘liq ma’lumotlar bazasi zaxira nusxasi (Users, Students, Assessments, Sessions, IEP, Alerts, Referrals, Observations, Questions, DTS Standards, SubjectLevels, SubjectTasks, ProgressMetrics, Measurements, SoundEntries, Achievements, CaseConferences)',
+      },
+      'tables': {
+        'users': SeedData.users.map((u) => u.copyWith(password: '').toJson()).toList(),
+        'students': SeedData.students.map((s) => s.toJson()).toList(),
+        'assessments': SeedData.assessments.map((a) => a.toJson()).toList(),
+        'sessions': SeedData.sessions.map((s) => s.toJson()).toList(),
+        'iepPlans': SeedData.iepPlans.map((p) => p.toJson()).toList(),
+        'alerts': SeedData.monitoringAlerts.map((a) => a.toJson()).toList(),
+        'referrals': SeedData.referrals.map((r) => r.toJson()).toList(),
+        'observations': SeedData.observations.map((o) => o.toJson()).toList(),
+        'questions': PsychologicalQuestionsSeed.initialQuestions.map((q) => q.toJson()).toList(),
+        'curriculumStandards': CurriculumStandardsSeed.standards.map((c) => c.toJson()).toList(),
+        'subjectLevels': SeedData.subjectLevels.map((l) => l.toJson()).toList(),
+        'subjectTasks': SeedData.subjectTasks.map((t) => t.toJson()).toList(),
+        'progressMetrics': ProgressMetrics.all.map((m) => m.toJson()).toList(),
+        'measurements': SeedData.measurements.map((m) => m.toJson()).toList(),
+        'soundEntries': SeedData.soundEntries.map((e) => e.toJson()).toList(),
+        'achievements': SeedData.achievements.map((a) => a.toJson()).toList(),
+        'conferences': SeedData.conferences.map((c) => c.toJson()).toList(),
+        'auditLogs': SeedData.auditLogs.map((l) => l.toJson()).toList(),
+        'notifications': SeedData.notifications.map((n) => n.toJson()).toList(),
+      },
+    };
+    return const JsonEncoder.withIndent('  ').convert(payload);
   }
 }

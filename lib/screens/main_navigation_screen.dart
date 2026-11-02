@@ -219,8 +219,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return ws.has(WorkspaceModule.referrals);
       case 10:
       case 11:
-      case 12:
         return role == UserRole.psychologist;
+      case 12:
+        return role == UserRole.psychologist ||
+            role == UserRole.specialEducation;
       default:
         return false;
     }

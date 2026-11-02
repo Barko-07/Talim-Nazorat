@@ -1,8 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:talim_nazorat/core/constants/psychological_questions_seed.dart';
 import 'package:talim_nazorat/services/local_db_service.dart';
+import 'package:talim_nazorat/services/seed_data.dart';
 
 /// Namunaviy ma'lumotlar yaxlitligi: har bir havola mavjud yozuvga ishora qilishi kerak.
 void main() {
@@ -85,5 +89,48 @@ void main() {
       final ids = q.options.map((o) => o.id).toList();
       expect(ids.length, ids.toSet().length, reason: '${q.id}: variant id takrorlangan');
     }
+  });
+
+  test('extended seed tables and full JSON database backup are valid', () {
+    final users = userIds();
+    final students = studentIds();
+
+    for (final sl in SeedData.subjectLevels) {
+      expect(students, contains(sl.studentId), reason: 'subjectLevel ${sl.id}');
+      expect(users, contains(sl.assessedById), reason: 'subjectLevel ${sl.id}');
+    }
+    for (final t in SeedData.subjectTasks) {
+      expect(students, contains(t.studentId), reason: 'subjectTask ${t.id}');
+      expect(users, contains(t.assignedById), reason: 'subjectTask ${t.id}');
+    }
+    for (final m in SeedData.measurements) {
+      expect(students, contains(m.studentId), reason: 'measurement ${m.id}');
+      expect(users, contains(m.recordedById), reason: 'measurement ${m.id}');
+    }
+    for (final se in SeedData.soundEntries) {
+      expect(students, contains(se.studentId), reason: 'soundEntry ${se.id}');
+      expect(users, contains(se.recordedById), reason: 'soundEntry ${se.id}');
+    }
+
+    final backupJson = db.exportFullSeedBackupJson(
+      exportedAt: DateTime.utc(2026, 11, 2, 13, 50, 0),
+    );
+    final decoded = jsonDecode(backupJson) as Map<String, dynamic>;
+    final tables = decoded['tables'] as Map<String, dynamic>;
+    expect((tables['users'] as List).length, greaterThanOrEqualTo(9));
+    expect((tables['students'] as List).length, greaterThanOrEqualTo(6));
+    expect((tables['questions'] as List).isNotEmpty, true);
+    expect((tables['curriculumStandards'] as List).isNotEmpty, true);
+    expect((tables['subjectLevels'] as List).isNotEmpty, true);
+    expect((tables['subjectTasks'] as List).isNotEmpty, true);
+    expect((tables['measurements'] as List).isNotEmpty, true);
+    expect((tables['soundEntries'] as List).isNotEmpty, true);
+
+    final backupFile = File('backups/database_backup.json');
+    if (!backupFile.existsSync()) {
+      backupFile.parent.createSync(recursive: true);
+      backupFile.writeAsStringSync(backupJson);
+    }
+    expect(backupFile.existsSync(), true);
   });
 }

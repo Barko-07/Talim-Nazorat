@@ -53,6 +53,7 @@ class SpecialistsScreen extends StatelessWidget {
                       UserRole.psychologist,
                       UserRole.speechTherapist,
                       UserRole.specialEducation,
+                      UserRole.specialEdTeacher,
                       UserRole.teacher,
                       UserRole.coordinator,
                       UserRole.institutionAdmin,

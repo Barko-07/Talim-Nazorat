@@ -104,6 +104,14 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                         child: Text('Maxsus pedagog (Defektolog)'),
                       ),
                       DropdownMenuItem(
+                        value: 'Maxsus ta’lim o‘qituvchisi',
+                        child: Text('Maxsus ta’lim o‘qituvchisi'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Ota-onaga (uy vazifasi va tavsiya)',
+                        child: Text('Ota-onaga (uy vazifasi va tavsiya)'),
+                      ),
+                      DropdownMenuItem(
                         value: 'Tibbiy PMPK komissiyasi',
                         child: Text(
                           'Tibbiy-psixologik-pedagogik komissiya (PMPK)',
@@ -112,7 +120,9 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                       ),
                       DropdownMenuItem(
                         value: 'Shifokor-pediatr',
-                        child: Text('Shifokor-pediatr / Poliklinika'),
+                        child: Text(
+                          'Tibbiyot (Shifokor-pediatr / Nevropatolog)',
+                        ),
                       ),
                     ],
                     onChanged: (v) => setDlgState(() => toService = v!),

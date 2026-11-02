@@ -8,6 +8,12 @@ import '../models/referral_model.dart';
 import '../models/audit_log_model.dart';
 import '../models/notification_model.dart';
 import '../models/psychologist_observation_model.dart';
+import '../models/curriculum_model.dart';
+import '../models/subject_task_model.dart';
+import '../models/progress_measurement_model.dart';
+import '../models/speech_sound_model.dart';
+import '../models/achievement_model.dart';
+import '../models/case_conference_model.dart';
 
 class SeedData {
   /// Namunaviy hisoblar paroli. Faqat debug rejimida qabul qilinadi
@@ -674,6 +680,282 @@ class SeedData {
           'Mantiqiy ketma-ketlik vazifalarini bosqichma-bosqich murakkablashtirish.',
       isConfidential: true,
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+  ];
+
+  static List<SubjectLevelAssessment> get subjectLevels => [
+    SubjectLevelAssessment(
+      id: 'sl_01',
+      studentId: 'student_03',
+      subject: SchoolSubjects.matematika,
+      classGrade: 4,
+      results: const {
+        'dts_mat_1_1': Mastery.mastered,
+        'dts_mat_1_2': Mastery.mastered,
+        'dts_mat_1_3': Mastery.mastered,
+        'dts_mat_2_1': Mastery.mastered,
+        'dts_mat_2_2': Mastery.mastered,
+        'dts_mat_2_3': Mastery.mastered,
+        'dts_mat_3_1': Mastery.mastered,
+        'dts_mat_3_2': Mastery.mastered,
+        'dts_mat_3_3': Mastery.partial,
+        'dts_mat_4_1': Mastery.notYet,
+        'dts_mat_4_2': Mastery.notYet,
+      },
+      suggestedGrade: 3,
+      confirmedGrade: 3,
+      assessedById: 'user_special_ed_teacher',
+      assessedByName: 'Rahmonova Dildora Akmalovna',
+      assessedAt: DateTime.now().subtract(const Duration(days: 6)),
+      notes:
+          'Rasmiy 4-sinf o‘quvchisi, biroq DTS bo‘yicha 3-sinf matematika dasturini barqaror o‘zlashtirmoqda. Individual 3-sinf darajasida o‘qitiladi.',
+    ),
+    SubjectLevelAssessment(
+      id: 'sl_02',
+      studentId: 'student_01',
+      subject: SchoolSubjects.oqish,
+      classGrade: 3,
+      results: const {
+        'dts_oqi_1_1': Mastery.mastered,
+        'dts_oqi_1_2': Mastery.mastered,
+        'dts_oqi_1_3': Mastery.mastered,
+        'dts_oqi_2_1': Mastery.mastered,
+        'dts_oqi_2_2': Mastery.mastered,
+        'dts_oqi_2_3': Mastery.partial,
+        'dts_oqi_3_1': Mastery.notYet,
+      },
+      suggestedGrade: 2,
+      confirmedGrade: 2,
+      assessedById: 'user_special_ed_teacher',
+      assessedByName: 'Rahmonova Dildora Akmalovna',
+      assessedAt: DateTime.now().subtract(const Duration(days: 10)),
+      notes:
+          'O‘qish va adabiyotdan 2-sinf me’yorlariga mos; bo‘g‘inlab va so‘zlab o‘qish tezligi ustida ishlanmoqda.',
+    ),
+    SubjectLevelAssessment(
+      id: 'sl_03',
+      studentId: 'student_05',
+      subject: SchoolSubjects.matematika,
+      classGrade: 3,
+      results: const {
+        'dts_mat_1_1': Mastery.mastered,
+        'dts_mat_1_2': Mastery.mastered,
+        'dts_mat_1_3': Mastery.partial,
+        'dts_mat_2_1': Mastery.notYet,
+      },
+      suggestedGrade: 1,
+      confirmedGrade: 1,
+      assessedById: 'user_special_ed_teacher',
+      assessedByName: 'Rahmonova Dildora Akmalovna',
+      assessedAt: DateTime.now().subtract(const Duration(days: 12)),
+      notes:
+          'Vizual kartochkalar yordamida 1-sinf matematika dasturi (20 ichida qo‘shish va ayirish) asosida individual ishlanmoqda.',
+    ),
+  ];
+
+  static List<SubjectTask> get subjectTasks => [
+    SubjectTask(
+      id: 'tsk_01',
+      studentId: 'student_03',
+      subject: SchoolSubjects.matematika,
+      levelGrade: 3,
+      standardId: 'dts_mat_3_3',
+      title: 'Matnli masalalarni 2 amal bilan yechish (3-sinf DTS)',
+      description:
+          'Kattalashtirilgan shriftli kartochkada berilgan 3 ta matnli masalani chizma yordamida yechish.',
+      assignedById: 'user_special_ed_teacher',
+      assignedByName: 'Rahmonova Dildora Akmalovna',
+      assignedAt: DateTime.now().subtract(const Duration(days: 5)),
+      dueDate: DateTime.now().add(const Duration(days: 7)),
+      result: Mastery.mastered,
+      resultNote: '3 ta masaladan 3 tasini mustaqil to‘g‘ri yechdi.',
+      completedAt: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    SubjectTask(
+      id: 'tsk_02',
+      studentId: 'student_01',
+      subject: SchoolSubjects.oqish,
+      levelGrade: 2,
+      standardId: 'dts_oqi_2_3',
+      title: 'Qisqa hikoyani o‘qib, asosiy qahramon harakatini aytib berish',
+      description: '5-6 gapdan iborat hikoyani ovoz chiqarib o‘qish va savollarga javob berish.',
+      assignedById: 'user_special_ed_teacher',
+      assignedByName: 'Rahmonova Dildora Akmalovna',
+      assignedAt: DateTime.now().subtract(const Duration(days: 4)),
+      dueDate: DateTime.now().add(const Duration(days: 5)),
+    ),
+  ];
+
+  static List<ProgressMeasurement> get measurements => [
+    ProgressMeasurement(
+      id: 'msr_01',
+      studentId: 'student_01',
+      metricId: 'metric_attention_minutes',
+      value: 3,
+      measuredAt: DateTime.now().subtract(const Duration(days: 35)),
+      recordedById: 'user_psychologist',
+      recordedByName: 'Usmonova Dilnoza Anvarovna',
+      note: 'Boshlang‘ich holat: 3 daqiqadan so‘ng chalg‘ish kuzatildi.',
+    ),
+    ProgressMeasurement(
+      id: 'msr_02',
+      studentId: 'student_01',
+      metricId: 'metric_attention_minutes',
+      value: 5,
+      measuredAt: DateTime.now().subtract(const Duration(days: 18)),
+      recordedById: 'user_psychologist',
+      recordedByName: 'Usmonova Dilnoza Anvarovna',
+      note: 'Vizual taymer qo‘llanganda 5 daqiqagacha barqaror ishladi.',
+    ),
+    ProgressMeasurement(
+      id: 'msr_03',
+      studentId: 'student_01',
+      metricId: 'metric_attention_minutes',
+      value: 8,
+      measuredAt: DateTime.now().subtract(const Duration(days: 3)),
+      recordedById: 'user_psychologist',
+      recordedByName: 'Usmonova Dilnoza Anvarovna',
+      note: 'O‘sish: 8 daqiqa davomida mustaqil topshiriq bajardi.',
+    ),
+    ProgressMeasurement(
+      id: 'msr_04',
+      studentId: 'student_01',
+      metricId: 'metric_reading_wpm',
+      value: 18,
+      measuredAt: DateTime.now().subtract(const Duration(days: 30)),
+      recordedById: 'user_special_ed_teacher',
+      recordedByName: 'Rahmonova Dildora Akmalovna',
+      note: 'Bo‘g‘inlab o‘qish: 18 so‘z/daqiqa.',
+    ),
+    ProgressMeasurement(
+      id: 'msr_05',
+      studentId: 'student_01',
+      metricId: 'metric_reading_wpm',
+      value: 29,
+      measuredAt: DateTime.now().subtract(const Duration(days: 4)),
+      recordedById: 'user_special_ed_teacher',
+      recordedByName: 'Rahmonova Dildora Akmalovna',
+      note: 'So‘zlab o‘qishga o‘tdi: 29 so‘z/daqiqa.',
+    ),
+  ];
+
+  static List<SoundEntry> get soundEntries => [
+    SoundEntry(
+      id: 'snd_01',
+      studentId: 'student_01',
+      soundId: 'r',
+      stage: SoundStage.preparation,
+      disorder: SoundDisorder.substitution,
+      substitutedWith: 'l',
+      note: 'R tovushini L ga almashtiradi, artikulyatsion mashqlar boshlandi.',
+      recordedById: 'user_speech',
+      recordedByName: 'Sodiqov Bobur Mirzayevich',
+      recordedAt: DateTime.now().subtract(const Duration(days: 28)),
+    ),
+    SoundEntry(
+      id: 'snd_02',
+      studentId: 'student_01',
+      soundId: 'r',
+      stage: SoundStage.staging,
+      disorder: SoundDisorder.none,
+      note: 'Titrash hosil qilindi, R tovushi alohida qo‘yildi.',
+      recordedById: 'user_speech',
+      recordedByName: 'Sodiqov Bobur Mirzayevich',
+      recordedAt: DateTime.now().subtract(const Duration(days: 14)),
+    ),
+    SoundEntry(
+      id: 'snd_03',
+      studentId: 'student_01',
+      soundId: 'r',
+      stage: SoundStage.words,
+      disorder: SoundDisorder.none,
+      note: 'So‘z boshida va o‘rtasida R tovushini to‘g‘ri talaffuz qilmoqda.',
+      recordedById: 'user_speech',
+      recordedByName: 'Sodiqov Bobur Mirzayevich',
+      recordedAt: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    SoundEntry(
+      id: 'snd_04',
+      studentId: 'student_01',
+      soundId: 'l',
+      stage: SoundStage.spontaneous,
+      disorder: SoundDisorder.none,
+      note: 'L tovushi erkin nutqda to‘liq avtomatlashtirildi!',
+      recordedById: 'user_speech',
+      recordedByName: 'Sodiqov Bobur Mirzayevich',
+      recordedAt: DateTime.now().subtract(const Duration(days: 5)),
+    ),
+  ];
+
+  static List<Achievement> get achievements => [
+    Achievement(
+      id: 'ach_01',
+      studentId: 'student_01',
+      category: AchievementCategory.skill,
+      title: '«L» tovushini erkin nutqda xatosiz talaffuz qilishga erishdi',
+      description: 'Logopedik mashg‘ulotlar natijasida L tovushi to‘liq o‘zlashtirildi.',
+      achievedAt: DateTime.now().subtract(const Duration(days: 5)),
+      recordedById: 'user_speech',
+      recordedByName: 'Sodiqov Bobur Mirzayevich',
+    ),
+    Achievement(
+      id: 'ach_02',
+      studentId: 'student_03',
+      category: AchievementCategory.subject,
+      title: 'Matematikadan 3-sinf DTS darajasidagi 2 amalli masalalarni mustaqil yechdi',
+      description: 'Individual moslashtirilgan 3-sinf dasturi bo‘yicha yuqori natija.',
+      achievedAt: DateTime.now().subtract(const Duration(days: 1)),
+      recordedById: 'user_special_ed_teacher',
+      recordedByName: 'Rahmonova Dildora Akmalovna',
+    ),
+  ];
+
+  static List<CaseConference> get conferences => [
+    CaseConference(
+      id: 'cnf_01',
+      studentId: 'student_01',
+      studentName: 'Aliyev Jasur',
+      agenda: '1-chorak yakuni bo‘yicha logoped, psixolog va maxsus o‘qituvchi qo‘shma konsiliumi',
+      scheduledAt: DateTime.now().subtract(const Duration(days: 4)),
+      convenedById: 'user_coordinator',
+      convenedByName: 'Hakimova Zebo Erkinovna',
+      participantIds: const [
+        'user_coordinator',
+        'user_speech',
+        'user_psychologist',
+        'user_special_ed_teacher',
+      ],
+      status: ConferenceStatus.held,
+      contributions: [
+        ConferenceContribution(
+          userId: 'user_speech',
+          userName: 'Sodiqov Bobur Mirzayevich',
+          role: 'Logoped-defektolog',
+          summary: 'L tovushi erkin nutqqa chiqdi, R tovushi so‘zlarda avtomatlashtirilmoqda.',
+          recommendations: 'Ota-onaga uyda har kuni 10 daqiqa artikulyatsion mashq berish.',
+          at: DateTime.now().subtract(const Duration(days: 4)),
+        ),
+        ConferenceContribution(
+          userId: 'user_psychologist',
+          userName: 'Usmonova Dilnoza Anvarovna',
+          role: 'Amaliyotchi psixolog',
+          summary: 'Diqqat davomiyligi 3 daqiqadan 8 daqiqagacha oshdi.',
+          recommendations: 'Darsda vizual jadval va rag‘bat stikerlarini davom ettirish.',
+          at: DateTime.now().subtract(const Duration(days: 4)),
+        ),
+      ],
+      conclusion:
+          'Barcha yo‘nalishlarda ijobiy dinamika tasdiqlandi. O‘qish fanidan 2-sinf darajasidan 3-sinf DTS talablariga bosqichma-bosqich o‘tkazish tavsiya etildi.',
+      decisions: [
+        ConferenceDecision(
+          id: 'dec_01',
+          text: 'R va L tovushlarini farqlash (differensiatsiya) mashqlarini boshlash',
+          responsibleId: 'user_speech',
+          responsibleName: 'Sodiqov Bobur Mirzayevich',
+          dueDate: DateTime.now().add(const Duration(days: 14)),
+          isDone: false,
+        ),
+      ],
     ),
   ];
 }

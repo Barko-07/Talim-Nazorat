@@ -7,6 +7,7 @@ import '../../core/widgets/glass_widgets.dart';
 import '../../models/student_model.dart';
 import '../../providers/app_provider.dart';
 import '../../services/access_control_service.dart';
+import '../../services/child_status_service.dart';
 import '../../providers/auth_provider.dart';
 import 'add_student_screen.dart';
 import 'student_detail_screen.dart';
@@ -23,15 +24,62 @@ const _gradeOptions = [
   '4-A',
   '4-B',
   '5-A',
+  '6-A',
+  '7-A',
+  '8-A',
+  '9-A',
 ];
 
-class StudentsListScreen extends StatelessWidget {
+class StudentsListScreen extends StatefulWidget {
   const StudentsListScreen({super.key});
+
+  @override
+  State<StudentsListScreen> createState() => _StudentsListScreenState();
+}
+
+class _StudentsListScreenState extends State<StudentsListScreen> {
+  StatusColor? _selectedStatusColor;
+
+  static Color _colorFor(StatusColor c) {
+    switch (c) {
+      case StatusColor.red:
+        return const Color(0xFFDC2626);
+      case StatusColor.yellow:
+        return const Color(0xFFD97706);
+      case StatusColor.green:
+        return const Color(0xFF059669);
+    }
+  }
+
+  static Color _bgFor(StatusColor c) {
+    switch (c) {
+      case StatusColor.red:
+        return const Color(0xFFFEF2F2);
+      case StatusColor.yellow:
+        return const Color(0xFFFFFBEB);
+      case StatusColor.green:
+        return const Color(0xFFECFDF5);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
-    final students = app.students;
+    final rawStudents = app.students;
+    final summary = app.monitoringSummary;
+    final statusByStudentId = <String, ChildStatus>{
+      if (summary != null)
+        for (final st in summary.statuses) st.student.id: st,
+    };
+
+    final students = _selectedStatusColor == null
+        ? rawStudents
+        : rawStudents
+              .where(
+                (s) => statusByStudentId[s.id]?.color == _selectedStatusColor,
+              )
+              .toList();
+
     final canPop = Navigator.canPop(context);
     final width = MediaQuery.sizeOf(context).width;
     final mediaPadding = MediaQuery.paddingOf(context);
@@ -160,22 +208,84 @@ class StudentsListScreen extends StatelessWidget {
                   ),
                 );
 
-                if (isCompact) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (isCompact) ...[
                       searchField,
                       const SizedBox(height: 10),
                       gradeFilter,
+                    ] else
+                      Row(
+                        children: [
+                          Expanded(child: searchField),
+                          const SizedBox(width: 12),
+                          gradeFilter,
+                        ],
+                      ),
+                    if (summary != null) ...[
+                      const SizedBox(height: 10),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildStatusFilterChip(
+                              label: 'Barchasi (${rawStudents.length})',
+                              color: AppColors.primary,
+                              bg: AppColors.primaryLight,
+                              selected: _selectedStatusColor == null,
+                              onTap: () =>
+                                  setState(() => _selectedStatusColor = null),
+                            ),
+                            const SizedBox(width: 8),
+                            _buildStatusFilterChip(
+                              label:
+                                  '🔴 Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
+                              color: const Color(0xFFDC2626),
+                              bg: const Color(0xFFFEF2F2),
+                              selected:
+                                  _selectedStatusColor == StatusColor.red,
+                              onTap: () => setState(
+                                () => _selectedStatusColor =
+                                    _selectedStatusColor == StatusColor.red
+                                    ? null
+                                    : StatusColor.red,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            _buildStatusFilterChip(
+                              label:
+                                  '🟡 Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
+                              color: const Color(0xFFD97706),
+                              bg: const Color(0xFFFFFBEB),
+                              selected:
+                                  _selectedStatusColor == StatusColor.yellow,
+                              onTap: () => setState(
+                                () => _selectedStatusColor =
+                                    _selectedStatusColor == StatusColor.yellow
+                                    ? null
+                                    : StatusColor.yellow,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            _buildStatusFilterChip(
+                              label:
+                                  '🟢 Yashil — Ijobiy (${summary.count(StatusColor.green)})',
+                              color: const Color(0xFF059669),
+                              bg: const Color(0xFFECFDF5),
+                              selected:
+                                  _selectedStatusColor == StatusColor.green,
+                              onTap: () => setState(
+                                () => _selectedStatusColor =
+                                    _selectedStatusColor == StatusColor.green
+                                    ? null
+                                    : StatusColor.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                  );
-                }
-
-                return Row(
-                  children: [
-                    Expanded(child: searchField),
-                    const SizedBox(width: 12),
-                    gradeFilter,
                   ],
                 );
               },
@@ -234,7 +344,11 @@ class StudentsListScreen extends StatelessWidget {
                     separatorBuilder: (_, _) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final student = students[index];
-                      return _buildStudentCard(context, student);
+                      return _buildStudentCard(
+                        context,
+                        student,
+                        statusByStudentId[student.id],
+                      );
                     },
                   ),
           ),
@@ -251,14 +365,57 @@ class StudentsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStudentCard(BuildContext context, StudentModel s) {
+  Widget _buildStatusFilterChip({
+    required String label,
+    required Color color,
+    required Color bg,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: selected ? color : bg,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: selected ? color : color.withValues(alpha: 0.35),
+            width: 1.2,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: selected ? Colors.white : color,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStudentCard(
+    BuildContext context,
+    StudentModel s,
+    ChildStatus? status,
+  ) {
     final guardianText = s.guardians.isNotEmpty
         ? '${s.guardians.first.relationship}: ${s.guardians.first.fullName}'
         : 'Vasiy kiritilmagan';
+    final statusColor = status != null ? _colorFor(status.color) : null;
+    final statusBg = status != null ? _bgFor(status.color) : null;
+    final isRed = status?.color == StatusColor.red;
 
     return SurfaceCard(
       borderRadius: 26,
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+      backgroundColor: isRed ? const Color(0xFFFFF5F5) : null,
+      borderColor: statusColor != null
+          ? statusColor.withValues(alpha: isRed ? 0.55 : 0.32)
+          : null,
       onTap: () {
         Navigator.push(
           context,
@@ -272,11 +429,11 @@ class StudentsListScreen extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 22,
-            backgroundColor: AppColors.primaryLight,
+            backgroundColor: statusBg ?? AppColors.primaryLight,
             child: Text(
               s.firstName.isNotEmpty ? s.firstName.substring(0, 1) : '?',
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: statusColor ?? AppColors.primary,
                 fontWeight: FontWeight.w800,
                 fontSize: 17,
               ),
@@ -303,7 +460,16 @@ class StudentsListScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
+                    if (status != null) ...[
+                      StatusPill(
+                        label: '${status.color.label}: ${status.color == StatusColor.red ? "Ishlanmagan" : status.color == StatusColor.yellow ? "E’tibor talab" : "Ijobiy"}',
+                        color: statusColor!,
+                        backgroundColor: statusBg!,
+                        showDot: true,
+                      ),
+                      const SizedBox(width: 6),
+                    ],
                     StatusPill(
                       label: '${s.grade}-sinf',
                       color: AppColors.primary,
@@ -323,6 +489,48 @@ class StudentsListScreen extends StatelessWidget {
                     height: 1.35,
                   ),
                 ),
+                if (status != null && status.reasons.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: statusBg,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: statusColor!.withValues(alpha: 0.25),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          isRed
+                              ? LucideIcons.circleAlert
+                              : status.color == StatusColor.yellow
+                              ? LucideIcons.triangleAlert
+                              : LucideIcons.circleCheck,
+                          size: 14,
+                          color: statusColor,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            status.reasons.first,
+                            style: TextStyle(
+                              fontSize: 11.8,
+                              fontWeight: FontWeight.w600,
+                              color: statusColor,
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 10,
