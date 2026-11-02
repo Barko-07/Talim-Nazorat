@@ -17,7 +17,7 @@ import '../../models/progress_measurement_model.dart';
 import '../../models/referral_model.dart';
 import '../../models/session_model.dart';
 import '../../models/speech_sound_model.dart';
-import '../../models/student_access_profile.dart';
+import '../../models/development_profile_model.dart';
 import '../../models/student_model.dart';
 import '../../models/subject_task_model.dart';
 import '../../models/user_model.dart';
@@ -1287,7 +1287,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     try {
       passport = app.achievementPassport(s.id);
     } catch (_) {}
-    final canEdit = app.canUseModule(WorkspaceModule.achievements, edit: true);
+    final canEdit = app.canUseModule(WorkspaceModule.measurements, edit: true);
 
     return SurfaceCard(
       borderRadius: 26,
@@ -3337,7 +3337,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     StudentModel s,
     AppProvider app,
   ) {
-    final existing = s.accessProfile ?? const StudentAccessProfile();
+    final existing =
+        s.accessProfile ?? StudentAccessProfile(updatedAt: DateTime.now());
     var comm = existing.communicationMode;
     var hearing = existing.hearing;
     var vision = existing.vision;

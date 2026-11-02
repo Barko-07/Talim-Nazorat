@@ -320,9 +320,9 @@ class AdminOverviewTab extends StatelessWidget {
           Builder(
             builder: (context) {
               final summary = app.monitoringSummary;
-              final redCount = summary.count(StatusColor.red);
-              final yellowCount = summary.count(StatusColor.yellow);
-              final greenCount = summary.count(StatusColor.green);
+              final redCount = summary?.count(StatusColor.red) ?? 0;
+              final yellowCount = summary?.count(StatusColor.yellow) ?? 0;
+              final greenCount = summary?.count(StatusColor.green) ?? 0;
               final unassignedCount = app.students
                   .where((s) => s.assignedSpecialistIds.isEmpty)
                   .length;

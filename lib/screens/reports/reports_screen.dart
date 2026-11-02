@@ -527,7 +527,7 @@ class ReportsScreen extends StatelessWidget {
     final yellowCount = report.statusCounts[StatusColor.yellow] ?? 0;
     final greenCount = report.statusCounts[StatusColor.green] ?? 0;
     final growthCount = report.dynamicsCounts[DynamicsStatus.growth] ?? 0;
-    final stagnantCount = report.dynamicsCounts[DynamicsStatus.stagnant] ?? 0;
+    final stagnantCount = report.dynamicsCounts[DynamicsStatus.stable] ?? 0;
     final declineCount = report.dynamicsCounts[DynamicsStatus.decline] ?? 0;
     final ineffectiveCount =
         report.dynamicsCounts[DynamicsStatus.ineffective] ?? 0;

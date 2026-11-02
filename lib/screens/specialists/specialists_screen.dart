@@ -342,7 +342,7 @@ class SpecialistsScreen extends StatelessWidget {
                                     backgroundColor: AppColors.primaryLight,
                                     icon: LucideIcons.users,
                                   ),
-                                  ?toggleButton,
+                                  if (toggleButton != null) toggleButton,
                                 ],
                               ),
                             ),

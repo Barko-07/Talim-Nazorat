@@ -412,9 +412,9 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildSvetoforOverviewStrip(BuildContext context, AppProvider app) {
     final summary = app.monitoringSummary;
-    final redCount = summary.count(StatusColor.red);
-    final yellowCount = summary.count(StatusColor.yellow);
-    final greenCount = summary.count(StatusColor.green);
+    final redCount = summary?.count(StatusColor.red) ?? 0;
+    final yellowCount = summary?.count(StatusColor.yellow) ?? 0;
+    final greenCount = summary?.count(StatusColor.green) ?? 0;
     final pendingReferrals = app.referrals
         .where((r) => r.status == 'Ko‘rib chiqilmoqda' || r.status == 'Qabul qilindi')
         .length;
