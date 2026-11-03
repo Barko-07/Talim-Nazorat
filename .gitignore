@@ -80,3 +80,5 @@ devtools_options.yaml
 *.pem
 *.p12
 secrets/
+
+.codex/

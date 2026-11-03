@@ -16,7 +16,10 @@ class CreateAssessmentFlow extends StatefulWidget {
 
   const CreateAssessmentFlow({super.key, this.initialStudent});
 
-  static Future<void> start(BuildContext context, {StudentModel? initialStudent}) {
+  static Future<void> start(
+    BuildContext context, {
+    StudentModel? initialStudent,
+  }) {
     return Navigator.push(
       context,
       MaterialPageRoute(
@@ -54,9 +57,10 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
     super.initState();
     _selectedStudent = widget.initialStudent;
     _titleCtrl = TextEditingController(
-      text: _selectedStudent != null
-          ? '${_selectedStudent!.fullName} — Psixologik diagnostika'
-          : 'Psixologik diagnostika va monitoring',
+      text:
+          _selectedStudent != null
+              ? '${_selectedStudent!.fullName} — Psixologik diagnostika'
+              : 'Psixologik diagnostika va monitoring',
     );
   }
 
@@ -71,8 +75,12 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
     final ageText = q.safeAgeRange.toLowerCase();
     final grade = student.grade.toLowerCase();
     if (ageText.contains(grade)) return true;
-    if (grade.contains('1') || grade.contains('2') || grade.contains('3') || grade.contains('4')) {
-      if (ageText.contains('1-4') || ageText.contains('boshlang‘ich')) return true;
+    if (grade.contains('1') ||
+        grade.contains('2') ||
+        grade.contains('3') ||
+        grade.contains('4')) {
+      if (ageText.contains('1-4') || ageText.contains('boshlang‘ich'))
+        return true;
     }
     return false;
   }
@@ -100,7 +108,9 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
     if (_selectedStudent == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Iltimos, avval baholash o‘tkaziladigan bolani tanlang.'),
+          content: Text(
+            'Iltimos, avval baholash o‘tkaziladigan bolani tanlang.',
+          ),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -111,17 +121,19 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
     final app = context.read<AppProvider>();
     final user = auth.currentUser;
 
-    final responses = _selectedQuestions.map((q) {
-      return AssessmentResponseModel(
-        questionId: q.id,
-        questionTitle: q.title,
-        questionText: q.questionText,
-        domain: q.domain,
-        questionType: q.questionType,
-        maxScore: q.maxScore,
-        isEvaluated: false,
-      );
-    }).toList();
+    final responses =
+        _selectedQuestions.map((q) {
+          return AssessmentResponseModel(
+            questionId: q.id,
+            questionTitle: q.title,
+            questionText: q.questionText,
+            domain: q.domain,
+            questionType: q.questionType,
+            maxScore: q.maxScore,
+            scoringSchema: q.scoringSchema,
+            isEvaluated: false,
+          );
+        }).toList();
 
     final draft = AssessmentModel(
       id: 'ass_psy_${const Uuid().v4().substring(0, 8)}',
@@ -133,9 +145,10 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
       assessmentDate: DateTime.now(),
       type: 'Psixologik diagnostika (Kutubxona asosida)',
       category: _selectedCategory,
-      title: _titleCtrl.text.trim().isNotEmpty
-          ? _titleCtrl.text.trim()
-          : 'Psixologik baholash',
+      title:
+          _titleCtrl.text.trim().isNotEmpty
+              ? _titleCtrl.text.trim()
+              : 'Psixologik baholash',
       notes: '',
       recommendations: '',
       totalScore: 0.0,
@@ -166,7 +179,9 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
     if (_selectedStudent == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Iltimos, avval baholash o‘tkaziladigan bolani tanlang.'),
+          content: Text(
+            'Iltimos, avval baholash o‘tkaziladigan bolani tanlang.',
+          ),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -186,17 +201,19 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
     final auth = context.read<AuthProvider>();
     final user = auth.currentUser;
 
-    final responses = _selectedQuestions.map((q) {
-      return AssessmentResponseModel(
-        questionId: q.id,
-        questionTitle: q.title,
-        questionText: q.questionText,
-        domain: q.domain,
-        questionType: q.questionType,
-        maxScore: q.maxScore,
-        isEvaluated: false,
-      );
-    }).toList();
+    final responses =
+        _selectedQuestions.map((q) {
+          return AssessmentResponseModel(
+            questionId: q.id,
+            questionTitle: q.title,
+            questionText: q.questionText,
+            domain: q.domain,
+            questionType: q.questionType,
+            maxScore: q.maxScore,
+            scoringSchema: q.scoringSchema,
+            isEvaluated: false,
+          );
+        }).toList();
 
     final assessment = AssessmentModel(
       id: 'ass_psy_${const Uuid().v4().substring(0, 8)}',
@@ -208,9 +225,10 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
       assessmentDate: DateTime.now(),
       type: 'Psixologik diagnostika (Kutubxona asosida)',
       category: _selectedCategory,
-      title: _titleCtrl.text.trim().isNotEmpty
-          ? _titleCtrl.text.trim()
-          : 'Psixologik baholash',
+      title:
+          _titleCtrl.text.trim().isNotEmpty
+              ? _titleCtrl.text.trim()
+              : 'Psixologik baholash',
       notes: '',
       recommendations: '',
       totalScore: 0.0,
@@ -226,11 +244,12 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => ConductAssessmentScreen(
-          assessment: assessment,
-          selectedQuestions: _selectedQuestions,
-          isNew: true,
-        ),
+        builder:
+            (_) => ConductAssessmentScreen(
+              assessment: assessment,
+              selectedQuestions: _selectedQuestions,
+              isNew: true,
+            ),
       ),
     );
   }
@@ -261,7 +280,8 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
         currentStep: _currentStep,
         onStepTapped: (step) {
           if (step == 1 && _selectedStudent == null) return;
-          if (step == 2 && _selectedQuestions.isEmpty && _currentStep < 2) return;
+          if (step == 2 && _selectedQuestions.isEmpty && _currentStep < 2)
+            return;
           setState(() => _currentStep = step);
         },
         onStepContinue: () {
@@ -269,7 +289,9 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
             if (_selectedStudent == null) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Iltimos, baholash o‘tkaziladigan bolani tanlang.'),
+                  content: Text(
+                    'Iltimos, baholash o‘tkaziladigan bolani tanlang.',
+                  ),
                   backgroundColor: AppColors.warning,
                 ),
               );
@@ -284,7 +306,9 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
             if (_selectedQuestions.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Iltimos, kutubxonadan kamida 1 ta savol tanlang.'),
+                  content: Text(
+                    'Iltimos, kutubxonadan kamida 1 ta savol tanlang.',
+                  ),
                   backgroundColor: AppColors.warning,
                 ),
               );
@@ -337,9 +361,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                     size: 18,
                   ),
                   label: Text(
-                    _currentStep == 2
-                        ? 'Baholashni boshlash'
-                        : 'Keyingisi',
+                    _currentStep == 2 ? 'Baholashni boshlash' : 'Keyingisi',
                   ),
                   onPressed: details.onStepContinue,
                 ),
@@ -391,24 +413,26 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
 
         // Bola tanlash
         DropdownButtonFormField<StudentModel>(
-          value: _selectedStudent != null &&
-                  students.any((s) => s.id == _selectedStudent!.id)
-              ? _selectedStudent
-              : null,
+          value:
+              _selectedStudent != null &&
+                      students.any((s) => s.id == _selectedStudent!.id)
+                  ? _selectedStudent
+                  : null,
           isExpanded: true,
           decoration: const InputDecoration(
             labelText: 'O‘quvchini tanlang *',
             prefixIcon: Icon(Icons.person_search_rounded),
           ),
-          items: students.map((s) {
-            return DropdownMenuItem(
-              value: s,
-              child: Text(
-                '${s.fullName} (${s.grade} • ${s.primaryNeed})',
-                overflow: TextOverflow.ellipsis,
-              ),
-            );
-          }).toList(),
+          items:
+              students.map((s) {
+                return DropdownMenuItem(
+                  value: s,
+                  child: Text(
+                    '${s.fullName} (${s.grade} • ${s.primaryNeed})',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              }).toList(),
           onChanged: (v) {
             setState(() {
               _selectedStudent = v;
@@ -485,9 +509,10 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
             labelText: 'Diagnostika yo‘nalishi *',
             prefixIcon: Icon(Icons.category_outlined),
           ),
-          items: _categories.map((c) {
-            return DropdownMenuItem(value: c, child: Text(c));
-          }).toList(),
+          items:
+              _categories.map((c) {
+                return DropdownMenuItem(value: c, child: Text(c));
+              }).toList(),
           onChanged: (v) {
             if (v != null) setState(() => _selectedCategory = v);
           },
@@ -507,19 +532,23 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
     );
   }
 
-  Widget _buildStep2QuestionSelection(List<AssessmentQuestionModel> allQuestions) {
-    final filtered = allQuestions.where((q) {
-      if (_questionSearch.isNotEmpty) {
-        final qry = _questionSearch.toLowerCase();
-        final matchTitle = (q.title ?? '').toLowerCase().contains(qry);
-        final matchText = q.questionText.toLowerCase().contains(qry);
-        if (!matchTitle && !matchText) return false;
-      }
-      if (_questionDomainFilter != null && q.domain != _questionDomainFilter) {
-        return false;
-      }
-      return true;
-    }).toList();
+  Widget _buildStep2QuestionSelection(
+    List<AssessmentQuestionModel> allQuestions,
+  ) {
+    final filtered =
+        allQuestions.where((q) {
+          if (_questionSearch.isNotEmpty) {
+            final qry = _questionSearch.toLowerCase();
+            final matchTitle = (q.title ?? '').toLowerCase().contains(qry);
+            final matchText = q.questionText.toLowerCase().contains(qry);
+            if (!matchTitle && !matchText) return false;
+          }
+          if (_questionDomainFilter != null &&
+              q.domain != _questionDomainFilter) {
+            return false;
+          }
+          return true;
+        }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -546,7 +575,10 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
             ),
             if (_selectedStudent != null)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFECFDF5),
                   borderRadius: BorderRadius.circular(8),
@@ -615,9 +647,15 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                 items: [
                   const DropdownMenuItem(
                     value: null,
-                    child: Text('Barcha yo‘nalishlar', style: TextStyle(fontSize: 12)),
+                    child: Text(
+                      'Barcha yo‘nalishlar',
+                      style: TextStyle(fontSize: 12),
+                    ),
                   ),
-                  ...allQuestions.map((q) => q.domain).toSet().map(
+                  ...allQuestions
+                      .map((q) => q.domain)
+                      .toSet()
+                      .map(
                         (d) => DropdownMenuItem(
                           value: d,
                           child: Text(d, style: const TextStyle(fontSize: 12)),
@@ -649,9 +687,8 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                   side: BorderSide(
-                    color: isSelected
-                        ? const Color(0xFF4F46E5)
-                        : AppColors.border,
+                    color:
+                        isSelected ? const Color(0xFF4F46E5) : AppColors.border,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -681,9 +718,10 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13.5,
-                                        color: isSelected
-                                            ? const Color(0xFF4F46E5)
-                                            : AppColors.textPrimary,
+                                        color:
+                                            isSelected
+                                                ? const Color(0xFF4F46E5)
+                                                : AppColors.textPrimary,
                                       ),
                                     ),
                                   ),

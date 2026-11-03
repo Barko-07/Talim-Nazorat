@@ -1,17 +1,20 @@
 class ReferralModel {
   final String id;
+  final String? sourceAssessmentId;
   final String studentId;
   final String studentName;
   final String fromSpecialistId;
   final String fromSpecialistName;
   final String? fromSpecialistRole;
-  final String toSpecialistType; // 'Amaliyotchi psixolog', 'Logoped-defektolog', 'Maxsus pedagog (Defektolog)', 'Tibbiy PMPK'
+  final String
+  toSpecialistType; // 'Amaliyotchi psixolog', 'Logoped-defektolog', 'Maxsus pedagog (Defektolog)', 'Tibbiy PMPK'
   final String? toSpecialistId;
   final String? toSpecialistName;
   final String reason;
   final String? supportingObservations;
   final String priority; // 'Shoshilinch', 'Rejali', 'Konsultatsiya'
-  final String status; // 'Qoralamada', 'Yuborildi', 'Qabul qilindi', 'Jarayonda', 'Yakunlandi', 'Rad etildi'
+  final String
+  status; // 'Qoralamada', 'Yuborildi', 'Qabul qilindi', 'Jarayonda', 'Yakunlandi', 'Rad etildi'
   final String? outcomeNotes;
   final String? followUpAction;
   final DateTime? followUpDate;
@@ -20,6 +23,7 @@ class ReferralModel {
 
   ReferralModel({
     required this.id,
+    this.sourceAssessmentId,
     required this.studentId,
     required this.studentName,
     this.fromSpecialistId = '',
@@ -41,6 +45,7 @@ class ReferralModel {
 
   ReferralModel copyWith({
     String? id,
+    String? sourceAssessmentId,
     String? studentId,
     String? studentName,
     String? fromSpecialistId,
@@ -61,6 +66,7 @@ class ReferralModel {
   }) {
     return ReferralModel(
       id: id ?? this.id,
+      sourceAssessmentId: sourceAssessmentId ?? this.sourceAssessmentId,
       studentId: studentId ?? this.studentId,
       studentName: studentName ?? this.studentName,
       fromSpecialistId: fromSpecialistId ?? this.fromSpecialistId,
@@ -84,6 +90,7 @@ class ReferralModel {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'sourceAssessmentId': sourceAssessmentId,
     'studentId': studentId,
     'studentName': studentName,
     'fromSpecialistId': fromSpecialistId,
@@ -105,6 +112,7 @@ class ReferralModel {
 
   factory ReferralModel.fromJson(Map<String, dynamic> json) => ReferralModel(
     id: json['id'] as String,
+    sourceAssessmentId: json['sourceAssessmentId'] as String?,
     studentId: json['studentId'] as String,
     studentName: json['studentName'] as String? ?? '',
     fromSpecialistId: json['fromSpecialistId'] as String? ?? '',
@@ -119,12 +127,14 @@ class ReferralModel {
     status: json['status'] as String,
     outcomeNotes: json['outcomeNotes'] as String?,
     followUpAction: json['followUpAction'] as String?,
-    followUpDate: json['followUpDate'] != null
-        ? DateTime.parse(json['followUpDate'] as String)
-        : null,
+    followUpDate:
+        json['followUpDate'] != null
+            ? DateTime.parse(json['followUpDate'] as String)
+            : null,
     createdAt: DateTime.parse(json['createdAt'] as String),
-    updatedAt: json['updatedAt'] != null
-        ? DateTime.parse(json['updatedAt'] as String)
-        : null,
+    updatedAt:
+        json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'] as String)
+            : null,
   );
 }

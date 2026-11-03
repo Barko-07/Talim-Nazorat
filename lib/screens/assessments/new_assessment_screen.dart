@@ -9,6 +9,7 @@ import '../../models/assessment_model.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../psychologist/assessment/assessment_result_screen.dart';
 import '../psychologist/assessment/create_assessment_flow.dart';
 
 class NewAssessmentScreen extends StatefulWidget {
@@ -59,49 +60,32 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
       switch (role) {
         case UserRole.speechTherapist:
           _titleCtrl.text = 'Nutqiy rivojlanish va artikulyatsiya tekshiruvi';
-          _notesCtrl.text =
-              'Nutq apparati harakatchanligi va tovushlar talaffuzida ijobiy dinamika kuzatildi.';
-          _recommendationsCtrl.text =
-              'Artikulyatsion gimnastika mashg‘ulotlarini haftasiga 3 marta davom ettirish.';
           break;
         case UserRole.psychologist:
           _titleCtrl.text = 'Kognitiv jarayonlar va hissiy barqarorlik tahlili';
-          _notesCtrl.text =
-              'Diqqatni jamlash ko‘rsatkichi va topshiriqqa bo‘lgan qiziqish barqarorlashmoqda.';
-          _recommendationsCtrl.text =
-              'Sensor xonada relaksatsion va rivojlantiruvchi o‘yinlarni tavsiya etish.';
           break;
         case UserRole.specialEducation:
           _titleCtrl.text = 'Sensor integratsiya va motorika diagnostikasi';
-          _notesCtrl.text =
-              'Mayda motorika va barmoqlar harakat koordinatsiyasida sezilarli ilgarilash bor.';
-          _recommendationsCtrl.text =
-              'Grafomotor mashqlar va montessori vositalari bilan ishlashni kuchaytirish.';
           break;
         case UserRole.teacher:
           _titleCtrl.text =
               'Dars mashg‘ulotlari va o‘quv motivatsiyasi kuzatuvi';
-          _notesCtrl.text =
-              'Sinf faoliyatida o‘qituvchi ko‘rsatmalarini to‘g‘ri qabul qilib, vazifani mustaqil bajarmoqda.';
-          _recommendationsCtrl.text =
-              'Sinfdoshlar bilan jamoaviy topshiriqlarda ko‘proq jalb qilish.';
           break;
         default:
           _titleCtrl.text = 'Oraliq pedagogik-psixologik monitoring';
-          _notesCtrl.text = 'Rejali pedagogik-psixologik mezonlar tekshirildi.';
-          _recommendationsCtrl.text =
-              'Mashg‘ulotlarni belgilangan tartibda davom ettirish.';
           break;
       }
 
       // Mezonlarni klonlash (har biri uchun 'score' o'zgarishi mumkin)
-      _criteriaList = role.defaultCriteria.map((c) {
-        return {
-          'name': c['name'] as String,
-          'max': (c['max'] as num).toDouble(),
-          'score': (c['default'] as num).toDouble(),
-        };
-      }).toList();
+      _criteriaList =
+          role.assessmentCriteria.map((c) {
+            return {
+              'name': c['name'] as String,
+              'max': (c['max'] as num).toDouble(),
+              'score': 0.0,
+              'rated': false,
+            };
+          }).toList();
 
       _isInitialized = true;
     }
@@ -125,6 +109,16 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
   void _saveAssessment() async {
     if (_formKey.currentState!.validate()) {
+      if (_criteriaList.any((criterion) => criterion['rated'] != true)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Saqlashdan oldin har bir mezonni baholang.'),
+            backgroundColor: AppColors.warning,
+          ),
+        );
+        return;
+      }
+
       final app = context.read<AppProvider>();
       final auth = context.read<AuthProvider>();
       final user = auth.currentUser;
@@ -147,29 +141,48 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
       final total = _totalScore;
       final maxTotal = _maxTotalScore > 0 ? _maxTotalScore : 100.0;
 
-      final results = _criteriaList.map((c) {
-        return AssessmentCriterionResult(
-          criterionName: c['name'] as String,
-          score: c['score'] as double,
-          maxScore: c['max'] as double,
-        );
-      }).toList();
+      final results =
+          _criteriaList.map((c) {
+            return AssessmentCriterionResult(
+              criterionName: c['name'] as String,
+              score: c['score'] as double,
+              maxScore: c['max'] as double,
+            );
+          }).toList();
 
       // Haqiqiy oldingi baholashni bazadan qidirish (soxta ball kiritmaslik)
-      final pastAssessments = app.assessments
-          .where(
-            (a) =>
-                a.studentId == student.id &&
-                a.category == _category &&
-                !a.isDraft,
-          )
-          .toList();
+      final pastAssessments =
+          app.assessments
+              .where(
+                (a) =>
+                    a.studentId == student.id &&
+                    a.category == _category &&
+                    a.isCompleted,
+              )
+              .toList();
       double? realPreviousScore;
       if (pastAssessments.isNotEmpty) {
         pastAssessments.sort(
           (a, b) => b.assessmentDate.compareTo(a.assessmentDate),
         );
-        realPreviousScore = pastAssessments.first.totalScore;
+        final latestComparable = pastAssessments
+            .cast<AssessmentModel?>()
+            .firstWhere(
+              (previous) =>
+                  previous != null &&
+                  previous.specialistRole ==
+                      (user?.role.label ?? 'Mutaxassis') &&
+                  previous.type == _type &&
+                  previous.criteria.length == results.length &&
+                  previous.criteria.asMap().entries.every(
+                    (entry) =>
+                        entry.value.criterionName ==
+                            results[entry.key].criterionName &&
+                        entry.value.maxScore == results[entry.key].maxScore,
+                  ),
+              orElse: () => null,
+            );
+        realPreviousScore = latestComparable?.totalScore;
       }
 
       final assessment = AssessmentModel(
@@ -183,12 +196,8 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
         type: _type,
         category: _category,
         title: _titleCtrl.text.trim(),
-        notes: _notesCtrl.text.trim().isNotEmpty
-            ? _notesCtrl.text.trim()
-            : 'Rejali kasbiy diagnostika o‘tkazildi.',
-        recommendations: _recommendationsCtrl.text.trim().isNotEmpty
-            ? _recommendationsCtrl.text.trim()
-            : 'Mashg‘ulotlarni belgilangan tartibda davom ettirish.',
+        notes: _notesCtrl.text.trim(),
+        recommendations: _recommendationsCtrl.text.trim(),
         totalScore: total,
         maxScore: maxTotal,
         previousScore: realPreviousScore,
@@ -200,15 +209,12 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
       await app.addAssessment(assessment);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${user?.role.label} xulosasi muvaffaqiyatli saqlandi!',
-            ),
-            backgroundColor: AppColors.success,
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AssessmentResultScreen(assessment: assessment),
           ),
         );
-        Navigator.pop(context);
       }
     }
   }
@@ -223,9 +229,12 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
     final roleIcon = premiumRoleIcon(role);
 
     if (role == UserRole.psychologist) {
-      final initialStudent = widget.initialStudentId != null
-          ? students.where((s) => s.id == widget.initialStudentId).firstOrNull
-          : null;
+      final initialStudent =
+          widget.initialStudentId != null
+              ? students
+                  .where((s) => s.id == widget.initialStudentId)
+                  .firstOrNull
+              : null;
       return CreateAssessmentFlow(initialStudent: initialStudent);
     }
 
@@ -285,9 +294,10 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
     _selectedStudentId ??= students.isNotEmpty ? students.first.id : null;
 
-    final categories = role.assessmentCategories.isNotEmpty
-        ? role.assessmentCategories
-        : ['Umumiy pedagogik monitoring'];
+    final categories =
+        role.assessmentCategories.isNotEmpty
+            ? role.assessmentCategories
+            : ['Umumiy pedagogik monitoring'];
 
     if (_category.isEmpty || !categories.contains(_category)) {
       _category = categories.first;
@@ -325,11 +335,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                             ),
                           ),
                           alignment: Alignment.center,
-                          child: Icon(
-                            roleIcon,
-                            color: role.color,
-                            size: 19,
-                          ),
+                          child: Icon(roleIcon, color: role.color, size: 19),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -445,22 +451,23 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                             labelText: 'O‘quvchini tanlang *',
                             prefixIcon: Icon(LucideIcons.userSearch, size: 18),
                           ),
-                          items: students
-                              .map(
-                                (s) => DropdownMenuItem(
-                                  value: s.id,
-                                  child: Text(
-                                    '${s.fullName} (${s.grade} - ${s.primaryNeed})',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 13),
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (v) =>
-                              setState(() => _selectedStudentId = v),
-                          validator: (v) =>
-                              v == null ? 'O‘quvchini tanlang' : null,
+                          items:
+                              students
+                                  .map(
+                                    (s) => DropdownMenuItem(
+                                      value: s.id,
+                                      child: Text(
+                                        '${s.fullName} (${s.grade} - ${s.primaryNeed})',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged:
+                              (v) => setState(() => _selectedStudentId = v),
+                          validator:
+                              (v) => v == null ? 'O‘quvchini tanlang' : null,
                         ),
                         const SizedBox(height: 14),
 
@@ -475,18 +482,19 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                               color: role.color,
                             ),
                           ),
-                          items: categories
-                              .map(
-                                (c) => DropdownMenuItem(
-                                  value: c,
-                                  child: Text(
-                                    c,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 13),
-                                  ),
-                                ),
-                              )
-                              .toList(),
+                          items:
+                              categories
+                                  .map(
+                                    (c) => DropdownMenuItem(
+                                      value: c,
+                                      child: Text(
+                                        c,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
                           onChanged: (v) => setState(() => _category = v!),
                         ),
                         const SizedBox(height: 14),
@@ -500,9 +508,11 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                               size: 18,
                             ),
                           ),
-                          validator: (v) => v == null || v.trim().isEmpty
-                              ? 'Nomini kiriting'
-                              : null,
+                          validator:
+                              (v) =>
+                                  v == null || v.trim().isEmpty
+                                      ? 'Nomini kiriting'
+                                      : null,
                         ),
                       ],
                     ),
@@ -547,8 +557,9 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                               label:
                                   'Jami: ${_totalScore.toInt()} / ${_maxTotalScore.toInt()} ball',
                               color: role.color,
-                              backgroundColor:
-                                  role.color.withValues(alpha: 0.08),
+                              backgroundColor: role.color.withValues(
+                                alpha: 0.08,
+                              ),
                               icon: LucideIcons.award,
                             ),
                           ],
@@ -562,6 +573,15 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                             height: 1.4,
                           ),
                         ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Bu ichki pedagogik kuzatuv rubrikasi; standartlashtirilgan test yoki tibbiy tashxis o‘rnini bosmaydi. Faqat o‘tkazilgan kuzatuv natijalarini kiriting.',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: AppColors.warning,
+                            height: 1.4,
+                          ),
+                        ),
                         const SizedBox(height: 18),
 
                         // Dinamik mezon slayderlari
@@ -570,6 +590,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                           final score = item['score'] as double;
                           final max = item['max'] as double;
                           final name = item['name'] as String;
+                          final rated = item['rated'] as bool;
 
                           return GlassWell(
                             margin: const EdgeInsets.only(bottom: 12),
@@ -607,7 +628,9 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                         ),
                                       ),
                                       child: Text(
-                                        '${score.toInt()} / ${max.toInt()} ball',
+                                        rated
+                                            ? '${score.toInt()} / ${max.toInt()} ball'
+                                            : 'Baholanmagan',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w800,
                                           fontSize: 11.5,
@@ -638,9 +661,13 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                       alpha: 0.16,
                                     ),
                                     label: '${score.toInt()}',
+                                    onChangeStart: (_) {
+                                      setState(() => item['rated'] = true);
+                                    },
                                     onChanged: (v) {
                                       setState(() {
                                         item['score'] = v;
+                                        item['rated'] = true;
                                       });
                                     },
                                   ),
@@ -691,9 +718,11 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                             hintText:
                                 'Bola erishgan natijalar, dinamika va xususiyatlar...',
                           ),
-                          validator: (v) => v == null || v.trim().isEmpty
-                              ? 'Xulosa matnini kiriting'
-                              : null,
+                          validator:
+                              (v) =>
+                                  v == null || v.trim().isEmpty
+                                      ? 'Xulosa matnini kiriting'
+                                      : null,
                         ),
                         const SizedBox(height: 14),
                         TextFormField(
@@ -705,9 +734,11 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                             hintText:
                                 'Uyda va darslarda qo‘llanilishi lozim bo‘lgan uslublar...',
                           ),
-                          validator: (v) => v == null || v.trim().isEmpty
-                              ? 'Tavsiyalarni kiriting'
-                              : null,
+                          validator:
+                              (v) =>
+                                  v == null || v.trim().isEmpty
+                                      ? 'Tavsiyalarni kiriting'
+                                      : null,
                         ),
                       ],
                     ),

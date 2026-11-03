@@ -8,6 +8,7 @@ class AssessmentResponseModel {
   String answerDisplay;
   double? score;
   final double? maxScore;
+  final String? scoringSchema;
   bool isEvaluated;
   String? psychologistNotes;
 
@@ -21,6 +22,7 @@ class AssessmentResponseModel {
     this.answerDisplay = '',
     this.score,
     this.maxScore,
+    this.scoringSchema,
     this.isEvaluated = true,
     this.psychologistNotes,
   });
@@ -35,6 +37,7 @@ class AssessmentResponseModel {
     String? answerDisplay,
     double? score,
     double? maxScore,
+    String? scoringSchema,
     bool? isEvaluated,
     String? psychologistNotes,
   }) {
@@ -48,24 +51,26 @@ class AssessmentResponseModel {
       answerDisplay: answerDisplay ?? this.answerDisplay,
       score: score ?? this.score,
       maxScore: maxScore ?? this.maxScore,
+      scoringSchema: scoringSchema ?? this.scoringSchema,
       isEvaluated: isEvaluated ?? this.isEvaluated,
       psychologistNotes: psychologistNotes ?? this.psychologistNotes,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'questionId': questionId,
-        'questionTitle': questionTitle,
-        'questionText': questionText,
-        'domain': domain,
-        'questionType': questionType,
-        'answer': answer,
-        'answerDisplay': answerDisplay,
-        'score': score,
-        'maxScore': maxScore,
-        'isEvaluated': isEvaluated,
-        'psychologistNotes': psychologistNotes,
-      };
+    'questionId': questionId,
+    'questionTitle': questionTitle,
+    'questionText': questionText,
+    'domain': domain,
+    'questionType': questionType,
+    'answer': answer,
+    'answerDisplay': answerDisplay,
+    'score': score,
+    'maxScore': maxScore,
+    'scoringSchema': scoringSchema,
+    'isEvaluated': isEvaluated,
+    'psychologistNotes': psychologistNotes,
+  };
 
   factory AssessmentResponseModel.fromJson(Map<String, dynamic> json) =>
       AssessmentResponseModel(
@@ -78,6 +83,7 @@ class AssessmentResponseModel {
         answerDisplay: json['answerDisplay'] as String? ?? '',
         score: (json['score'] as num?)?.toDouble(),
         maxScore: (json['maxScore'] as num?)?.toDouble(),
+        scoringSchema: json['scoringSchema'] as String?,
         isEvaluated: json['isEvaluated'] as bool? ?? true,
         psychologistNotes: json['psychologistNotes'] as String?,
       );

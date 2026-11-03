@@ -121,7 +121,10 @@ class QuestionSelectionService {
         if (ability == AbilityLevel.full) continue;
         final hint = question.adaptationHint;
         if (ability == AbilityLevel.partial || hint != null) {
-          suitability = _worse(suitability, QuestionSuitability.needsAdaptation);
+          suitability = _worse(
+            suitability,
+            QuestionSuitability.needsAdaptation,
+          );
           reasons.add(
             '${r.label} talab qilinadi (bolada: ${ability.label.toLowerCase()})'
             '${hint != null ? '. Moslashtirish: $hint' : ''}',
@@ -152,9 +155,11 @@ class QuestionSelectionService {
     StudentModel student, {
     String? domain,
   }) {
-    return rankForStudent(questions, student, domain: domain)
-        .where((f) => f.question.isStandard && f.isRecommended)
-        .toList();
+    return rankForStudent(
+      questions,
+      student,
+      domain: domain,
+    ).where((f) => f.question.isStandard && f.isRecommended).toList();
   }
 
   /// Savollarni bola uchun tartiblab qaytaradi: avval mos, keyin moslashtirish kerak,
@@ -167,11 +172,12 @@ class QuestionSelectionService {
     int? grade,
     bool onlyReady = true,
   }) {
-    final fits = questions
-        .where((q) => domain == null || q.domain == domain)
-        .where((q) => !onlyReady || q.isReady)
-        .map((q) => evaluate(q, student, grade: grade))
-        .toList();
+    final fits =
+        questions
+            .where((q) => domain == null || q.domain == domain)
+            .where((q) => !onlyReady || q.isReady)
+            .map((q) => evaluate(q, student, grade: grade))
+            .toList();
     int rank(QuestionFit f) =>
         f.suitability.index * 2 + (f.gradeMatches ? 0 : 1);
     fits.sort((a, b) => rank(a).compareTo(rank(b)));
@@ -206,10 +212,54 @@ class QuestionSelectionService {
   /// Ikki baholash natijasini foiz bo'yicha solishtirish mumkinmi?
   /// Faqat bir xil savollar to'plami bilan o'tkazilganda.
   bool areComparable(AssessmentModel a, AssessmentModel b) {
-    if (a.studentId != b.studentId) return false;
-    if (a.questionIds.isEmpty || b.questionIds.isEmpty) return false;
-    return a.questionIds.toSet().length == b.questionIds.toSet().length &&
-        a.questionIds.toSet().containsAll(b.questionIds);
+    if (a.studentId != b.studentId ||
+        a.specialistRole != b.specialistRole ||
+        a.category != b.category ||
+        a.type != b.type ||
+        a.maxScore <= 0 ||
+        b.maxScore <= 0) {
+      return false;
+    }
+
+    if (a.questionIds.isNotEmpty || b.questionIds.isNotEmpty) {
+      if (a.questionIds.isEmpty ||
+          b.questionIds.isEmpty ||
+          a.questionIds.toSet().length != b.questionIds.toSet().length ||
+          !a.questionIds.toSet().containsAll(b.questionIds)) {
+        return false;
+      }
+      // Javob yozuvlari savol matni va baholash maksimumini snapshot sifatida
+      // saqlaydi. Savol banki keyin tahrirlangan bo‘lsa ham, eski natija o‘zgarmaydi.
+      if (a.responses.isNotEmpty || b.responses.isNotEmpty) {
+        if (a.responses.length != b.responses.length) return false;
+        final oldById = {for (final r in a.responses) r.questionId: r};
+        for (final response in b.responses) {
+          final old = oldById[response.questionId];
+          if (old == null ||
+              old.questionText != response.questionText ||
+              old.domain != response.domain ||
+              old.questionType != response.questionType ||
+              old.maxScore != response.maxScore ||
+              old.scoringSchema != response.scoringSchema) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    if (a.criteria.isNotEmpty || b.criteria.isNotEmpty) {
+      if (a.criteria.length != b.criteria.length) return false;
+      return a.criteria.asMap().entries.every((entry) {
+        final other = b.criteria[entry.key];
+        return entry.value.criterionName == other.criterionName &&
+            entry.value.maxScore == other.maxScore;
+      });
+    }
+
+    // Eski yozuvlarda mezon/savol snapshot'i bo‘lmasligi mumkin. Ularni faqat
+    // turi, yo‘nalishi va maksimal bali bir xil bo‘lsa qiyoslaymiz.
+    return a.maxScore == b.maxScore;
   }
 
   QuestionSuitability _worse(QuestionSuitability a, QuestionSuitability b) =>

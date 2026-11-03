@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../models/assessment_model.dart';
+import '../../../services/question_selection_service.dart';
 
 class AssessmentCompareDialog extends StatefulWidget {
   final AssessmentModel currentAssessment;
@@ -21,10 +22,11 @@ class AssessmentCompareDialog extends StatefulWidget {
   }) {
     return showDialog(
       context: context,
-      builder: (_) => AssessmentCompareDialog(
-        currentAssessment: currentAssessment,
-        studentAssessments: studentAssessments,
-      ),
+      builder:
+          (_) => AssessmentCompareDialog(
+            currentAssessment: currentAssessment,
+            studentAssessments: studentAssessments,
+          ),
     );
   }
 
@@ -43,9 +45,15 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
     _assessmentA = widget.currentAssessment;
 
     // Boshqa baholashlar ro'yxatidan eng yaqinini topish
-    final others = widget.studentAssessments
-        .where((a) => a.id != _assessmentA.id && a.status == 'completed')
-        .toList();
+    final others =
+        widget.studentAssessments
+            .where(
+              (a) =>
+                  a.id != _assessmentA.id &&
+                  a.isCompleted &&
+                  QuestionSelectionService().areComparable(_assessmentA, a),
+            )
+            .toList();
     if (others.isNotEmpty) {
       _assessmentB = others.first;
     }
@@ -54,9 +62,15 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
   @override
   Widget build(BuildContext context) {
     final df = DateFormat('dd.MM.yyyy');
-    final others = widget.studentAssessments
-        .where((a) => a.id != _assessmentA.id && a.status == 'completed')
-        .toList();
+    final others =
+        widget.studentAssessments
+            .where(
+              (a) =>
+                  a.id != _assessmentA.id &&
+                  a.isCompleted &&
+                  QuestionSelectionService().areComparable(_assessmentA, a),
+            )
+            .toList();
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -210,18 +224,21 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                                     vertical: 8,
                                   ),
                                 ),
-                                items: others
-                                    .map(
-                                      (a) => DropdownMenuItem(
-                                        value: a,
-                                        child: Text(
-                                          '${a.title} (${df.format(a.assessmentDate)})',
-                                          style: const TextStyle(fontSize: 12),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
+                                items:
+                                    others
+                                        .map(
+                                          (a) => DropdownMenuItem(
+                                            value: a,
+                                            child: Text(
+                                              '${a.title} (${df.format(a.assessmentDate)})',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
                                 onChanged: (v) {
                                   if (v != null) {
                                     setState(() => _assessmentB = v);
@@ -234,11 +251,20 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                         const SizedBox(height: 18),
 
                         if (_assessmentB != null) ...[
-                          _buildScoreComparisonCard(_assessmentA, _assessmentB!),
+                          _buildScoreComparisonCard(
+                            _assessmentA,
+                            _assessmentB!,
+                          ),
                           const SizedBox(height: 18),
-                          _buildDomainComparisonTable(_assessmentA, _assessmentB!),
+                          _buildDomainComparisonTable(
+                            _assessmentA,
+                            _assessmentB!,
+                          ),
                           const SizedBox(height: 18),
-                          _buildConclusionsComparison(_assessmentA, _assessmentB!),
+                          _buildConclusionsComparison(
+                            _assessmentA,
+                            _assessmentB!,
+                          ),
                         ],
                       ],
                     ),
@@ -274,11 +300,15 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
           Column(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
-                  color: isPositive
-                      ? const Color(0xFFECFDF5)
-                      : const Color(0xFFFEF2F2),
+                  color:
+                      isPositive
+                          ? const Color(0xFFECFDF5)
+                          : const Color(0xFFFEF2F2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -288,9 +318,10 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                           ? Icons.trending_up_rounded
                           : Icons.trending_down_rounded,
                       size: 16,
-                      color: isPositive
-                          ? const Color(0xFF059669)
-                          : const Color(0xFFDC2626),
+                      color:
+                          isPositive
+                              ? const Color(0xFF059669)
+                              : const Color(0xFFDC2626),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -298,9 +329,10 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: isPositive
-                            ? const Color(0xFF059669)
-                            : const Color(0xFFDC2626),
+                        color:
+                            isPositive
+                                ? const Color(0xFF059669)
+                                : const Color(0xFFDC2626),
                       ),
                     ),
                   ],
@@ -309,7 +341,10 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
               const SizedBox(height: 4),
               Text(
                 isPositive ? 'Ijobiy o‘sish' : 'Pasayish / Regressiya',
-                style: const TextStyle(fontSize: 10.5, color: AppColors.textMuted),
+                style: const TextStyle(
+                  fontSize: 10.5,
+                  color: AppColors.textMuted,
+                ),
               ),
             ],
           ),
@@ -355,10 +390,8 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
 
   Widget _buildDomainComparisonTable(AssessmentModel a, AssessmentModel b) {
     // Ikkala baholashdagi yo'nalishlar
-    final allDomains = {
-      ...?a.domainScores?.keys,
-      ...?b.domainScores?.keys,
-    }.toList();
+    final allDomains =
+        {...?a.domainScores?.keys, ...?b.domainScores?.keys}.toList();
 
     if (allDomains.isEmpty) {
       return const SizedBox.shrink();
@@ -433,9 +466,10 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: isPos
-                              ? const Color(0xFF059669)
-                              : const Color(0xFFDC2626),
+                          color:
+                              isPos
+                                  ? const Color(0xFF059669)
+                                  : const Color(0xFFDC2626),
                         ),
                         textAlign: TextAlign.end,
                       ),

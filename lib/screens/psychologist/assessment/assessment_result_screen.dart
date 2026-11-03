@@ -6,6 +6,8 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/assessment_templates.dart';
 import '../../../models/assessment_model.dart';
 import '../../../providers/app_provider.dart';
+import '../../../services/question_selection_service.dart';
+import '../../referrals/referrals_screen.dart';
 import 'assessment_compare_dialog.dart';
 
 class AssessmentResultScreen extends StatelessWidget {
@@ -26,9 +28,22 @@ class AssessmentResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final df = DateFormat('dd.MM.yyyy HH:mm');
     final app = context.watch<AppProvider>();
-    final studentAssessments = app.assessments
-        .where((a) => a.studentId == assessment.studentId)
-        .toList();
+    final studentAssessments =
+        app.assessments
+            .where((a) => a.studentId == assessment.studentId)
+            .toList();
+    final comparableAssessments =
+        studentAssessments
+            .where(
+              (candidate) =>
+                  candidate.id != assessment.id &&
+                  candidate.isCompleted &&
+                  QuestionSelectionService().areComparable(
+                    assessment,
+                    candidate,
+                  ),
+            )
+            .toList();
 
     final evaluatedResponses =
         assessment.responses.where((r) => r.isEvaluated).toList();
@@ -37,13 +52,13 @@ class AssessmentResultScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Psixologik Baholash Natijalari'),
+        title: const Text('Baholash natijalari'),
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1.0),
           child: Divider(height: 1, thickness: 1, color: AppColors.border),
         ),
         actions: [
-          if (studentAssessments.length > 1)
+          if (comparableAssessments.isNotEmpty)
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFF4F46E5)),
@@ -121,8 +136,9 @@ class AssessmentResultScreen extends StatelessWidget {
                                         ),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFECFDF5),
-                                          borderRadius:
-                                              BorderRadius.circular(6),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
                                         child: Text(
                                           assessment.status == 'completed'
@@ -147,7 +163,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'O‘tkazilgan sana: ${df.format(assessment.assessmentDate)} • Psixolog: ${assessment.specialistName}',
+                                    'O‘tkazilgan sana: ${df.format(assessment.assessmentDate)} • Mutaxassis: ${assessment.specialistName}',
                                     style: const TextStyle(
                                       fontSize: 11,
                                       color: AppColors.textMuted,
@@ -235,6 +251,61 @@ class AssessmentResultScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
+                // Baholash xulosasidan yo‘naltirishni boshlash mumkin; qabul
+                // qiluvchi xizmatni mutaxassis o‘zi tanlaydi.
+                Card(
+                  elevation: 0,
+                  color: const Color(0xFFF8FAFC),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    side: const BorderSide(color: AppColors.border),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Natija bo‘yicha psixolog, logoped, maxsus pedagog, ota-ona yoki tibbiyotga yo‘naltirish yarating.',
+                          style: TextStyle(fontSize: 13, height: 1.4),
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: FilledButton.icon(
+                            onPressed: () {
+                              final supporting = [
+                                if (assessment.notes.trim().isNotEmpty)
+                                  'Xulosa: ${assessment.notes.trim()}',
+                                if (assessment.recommendations
+                                    .trim()
+                                    .isNotEmpty)
+                                  'Tavsiya: ${assessment.recommendations.trim()}',
+                              ].join('\n');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => ReferralsScreen(
+                                        initialStudentId: assessment.studentId,
+                                        initialAssessmentId: assessment.id,
+                                        initialReason:
+                                            '${assessment.title} — ${assessment.category} baholash natijasi bo‘yicha mutaxassis ko‘rigi so‘raladi.',
+                                        initialObservations: supporting,
+                                      ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.forward_to_inbox_outlined),
+                            label: const Text('Yo‘naltirish'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
                 // YONALISHLAR BO'YICHA TAQSIMOT
                 if (assessment.domainScores != null &&
                     assessment.domainScores!.isNotEmpty) ...[
@@ -256,60 +327,63 @@ class AssessmentResultScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(18),
                       child: Column(
-                        children: assessment.domainScores!.entries.map((e) {
-                          final domain = e.key;
-                          final pct = e.value;
+                        children:
+                            assessment.domainScores!.entries.map((e) {
+                              final domain = e.key;
+                              final pct = e.value;
 
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      domain,
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          domain,
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${pct.toStringAsFixed(0)}%',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF4F46E5),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      '${pct.toStringAsFixed(0)}%',
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF4F46E5),
+                                    const SizedBox(height: 4),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: LinearProgressIndicator(
+                                        value: (pct / 100.0).clamp(0.0, 1.0),
+                                        minHeight: 8,
+                                        backgroundColor: const Color(
+                                          0xFFE2E8F0,
+                                        ),
+                                        valueColor:
+                                            const AlwaysStoppedAnimation<Color>(
+                                              Color(0xFF4F46E5),
+                                            ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 4),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: LinearProgressIndicator(
-                                    value: (pct / 100.0).clamp(0.0, 1.0),
-                                    minHeight: 8,
-                                    backgroundColor: const Color(0xFFE2E8F0),
-                                    valueColor:
-                                        const AlwaysStoppedAnimation<Color>(
-                                      Color(0xFF4F46E5),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                              );
+                            }).toList(),
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
                 ],
 
-                // PSIXOLOGNING YAKUNIY XULOSASI VA TAVSIYALARI
+                // Mutaxassisning yakuniy xulosasi va tavsiyalari
                 Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
@@ -321,17 +395,17 @@ class AssessmentResultScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.psychology_alt_outlined,
                               color: Color(0xFF4F46E5),
                               size: 20,
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
-                              'Psixologning Professional Xulosasi',
-                              style: TextStyle(
+                              '${assessment.specialistRole} xulosasi',
+                              style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
@@ -365,7 +439,7 @@ class AssessmentResultScreen extends StatelessWidget {
                               ),
                               SizedBox(width: 8),
                               Text(
-                                'Korreksion-rivojlantiruvchi tavsiyalar:',
+                                'Keyingi ish bo‘yicha tavsiyalar:',
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
@@ -390,201 +464,271 @@ class AssessmentResultScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
-                // SAVOLLAR VA JAVOBLAR PROTOKOLI (DETAIL BREAKDOWN)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Ishlatilgan Savollar va Javoblar Protokoli',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                if (assessment.responses.isNotEmpty) ...[
+                  // Savol-javob protokoli
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Ishlatilgan Savollar va Javoblar Protokoli',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '${assessment.responses.length} ta topshiriq',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
+                      Text(
+                        '${assessment.responses.length} ta topshiriq',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textMuted,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
 
-                ...assessment.responses.asMap().entries.map((entry) {
-                  final idx = entry.key;
-                  final r = entry.value;
+                  ...assessment.responses.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final r = entry.value;
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 26,
-                                height: 26,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFEEF2FF),
-                                  borderRadius: BorderRadius.circular(6),
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 26,
+                                  height: 26,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEEF2FF),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    '${idx + 1}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF4F46E5),
+                                    ),
+                                  ),
                                 ),
-                                child: Text(
-                                  '${idx + 1}',
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    (r.questionTitle != null &&
+                                            r.questionTitle!.isNotEmpty)
+                                        ? r.questionTitle!
+                                        : r.questionText,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13.5,
+                                    ),
+                                  ),
+                                ),
+                                if (!r.isEvaluated)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFFBEB),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: const Color(
+                                          0xFFF59E0B,
+                                        ).withValues(alpha: 0.3),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Baholanmadi',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFFD97706),
+                                      ),
+                                    ),
+                                  )
+                                else if (r.questionType != 'open_text')
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFECFDF5),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      '${(r.score ?? 0.0).toStringAsFixed((r.score ?? 0.0).truncateToDouble() == (r.score ?? 0.0) ? 0 : 1)} / ${(r.maxScore ?? 0.0).toStringAsFixed(0)} ball',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF059669),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              r.questionText,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+
+                            // Javob bloki
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Berilgan javob / Natija: ',
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      r.answer?.isNotEmpty == true
+                                          ? r.answer!
+                                          : (r.isEvaluated
+                                              ? 'Javob qayd etilgan'
+                                              : 'Baholanmadi / O‘tkazib yuborildi'),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color:
+                                            r.answer?.isNotEmpty == true
+                                                ? AppColors.textPrimary
+                                                : AppColors.textMuted,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Psixolog kuzatuv izohi
+                            if (r.psychologistNotes != null &&
+                                r.psychologistNotes!.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(
+                                    Icons.comment_outlined,
+                                    size: 14,
+                                    color: Color(0xFF64748B),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      'Psixolog kuzatuvi: ${r.psychologistNotes!}',
+                                      style: const TextStyle(
+                                        fontSize: 11.5,
+                                        color: Color(0xFF64748B),
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                ] else if (assessment.criteria.isNotEmpty) ...[
+                  const Text(
+                    'Baholangan mezonlar',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...assessment.criteria.map((criterion) {
+                    final ratio =
+                        criterion.maxScore > 0
+                            ? (criterion.score / criterion.maxScore).clamp(
+                              0.0,
+                              1.0,
+                            )
+                            : 0.0;
+                    return Card(
+                      elevation: 0,
+                      margin: const EdgeInsets.only(bottom: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: const BorderSide(color: AppColors.border),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    criterion.criterionName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  '${criterion.score.toStringAsFixed(1)} / ${criterion.maxScore.toStringAsFixed(1)} ball',
                                   style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w700,
                                     color: Color(0xFF4F46E5),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  (r.questionTitle != null &&
-                                          r.questionTitle!.isNotEmpty)
-                                      ? r.questionTitle!
-                                      : r.questionText,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13.5,
-                                  ),
-                                ),
-                              ),
-                              if (!r.isEvaluated)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFFFBEB),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(
-                                      color: const Color(0xFFF59E0B)
-                                          .withValues(alpha: 0.3),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Baholanmadi',
-                                    style: TextStyle(
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFFD97706),
-                                    ),
-                                  ),
-                                )
-                              else if (r.questionType != 'open_text')
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFECFDF5),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    '${(r.score ?? 0.0).toStringAsFixed((r.score ?? 0.0).truncateToDouble() == (r.score ?? 0.0) ? 0 : 1)} / ${(r.maxScore ?? 0.0).toStringAsFixed(0)} ball',
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF059669),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            r.questionText,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-
-                          // Javob bloki
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFC),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Berilgan javob / Natija: ',
-                                  style: TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textMuted,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    r.answer?.isNotEmpty == true
-                                        ? r.answer!
-                                        : (r.isEvaluated
-                                            ? 'Javob qayd etilgan'
-                                            : 'Baholanmadi / O‘tkazib yuborildi'),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: r.answer?.isNotEmpty == true
-                                          ? AppColors.textPrimary
-                                          : AppColors.textMuted,
-                                    ),
-                                  ),
-                                ),
                               ],
                             ),
-                          ),
-
-                          // Psixolog kuzatuv izohi
-                          if (r.psychologistNotes != null &&
-                              r.psychologistNotes!.isNotEmpty) ...[
                             const SizedBox(height: 8),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(
-                                  Icons.comment_outlined,
-                                  size: 14,
-                                  color: Color(0xFF64748B),
+                            LinearProgressIndicator(value: ratio),
+                            if (criterion.notes?.trim().isNotEmpty == true) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                criterion.notes!,
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  color: AppColors.textSecondary,
                                 ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    'Psixolog kuzatuvi: ${r.psychologistNotes!}',
-                                    style: const TextStyle(
-                                      fontSize: 11.5,
-                                      color: Color(0xFF64748B),
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
+                ],
 
                 const SizedBox(height: 16),
 

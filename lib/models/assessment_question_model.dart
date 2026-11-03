@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'development_profile_model.dart';
 
 class AssessmentQuestionOption {
@@ -11,11 +13,7 @@ class AssessmentQuestionOption {
     this.score = 0.0,
   });
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'text': text,
-        'score': score,
-      };
+  Map<String, dynamic> toJson() => {'id': id, 'text': text, 'score': score};
 
   factory AssessmentQuestionOption.fromJson(Map<String, dynamic> json) =>
       AssessmentQuestionOption(
@@ -24,11 +22,7 @@ class AssessmentQuestionOption {
         score: (json['score'] as num?)?.toDouble() ?? 0.0,
       );
 
-  AssessmentQuestionOption copyWith({
-    String? id,
-    String? text,
-    double? score,
-  }) {
+  AssessmentQuestionOption copyWith({String? id, String? text, double? score}) {
     return AssessmentQuestionOption(
       id: id ?? this.id,
       text: text ?? this.text,
@@ -41,9 +35,12 @@ class AssessmentQuestionModel {
   final String id;
   final String? title;
   final String text;
-  final String domain; // 'Kognitiv va intellekt', 'Diqqat va xotira', 'Emotsional va xavotir', 'Ijtimoiy moslashuv va motivatsiya', 'Xulq-atvor va iroda'
-  final String? targetAgeRange; // '7–10 yosh (1-4 sinf)', '11–15 yosh (5-9 sinf)', 'Barcha yoshlar'
-  final String questionType; // 'yes_no', 'single_choice', 'multiple_choice', 'scale_1_5', 'open_text'
+  final String
+  domain; // 'Kognitiv va intellekt', 'Diqqat va xotira', 'Emotsional va xavotir', 'Ijtimoiy moslashuv va motivatsiya', 'Xulq-atvor va iroda'
+  final String?
+  targetAgeRange; // '7–10 yosh (1-4 sinf)', '11–15 yosh (5-9 sinf)', 'Barcha yoshlar'
+  final String
+  questionType; // 'yes_no', 'single_choice', 'multiple_choice', 'scale_1_5', 'open_text'
   final List<AssessmentQuestionOption> options;
   final String? scoringCriteria;
   final String? psychologistNotes;
@@ -88,11 +85,28 @@ class AssessmentQuestionModel {
   bool get isReady => status == 'ready';
   bool get isDraft => status == 'draft';
 
-  String get questionTitle => (title != null && title!.isNotEmpty) ? title! : text;
+  String get questionTitle =>
+      (title != null && title!.isNotEmpty) ? title! : text;
   String get questionText => text;
   String get safeAgeRange => targetAgeRange ?? 'Barcha yoshlar';
   String get safeCriteria => scoringCriteria ?? '';
   String get safeNotes => psychologistNotes ?? '';
+
+  /// Question scoring rules captured with each response so later question-bank
+  /// edits do not silently change the meaning of historical comparisons.
+  String get scoringSchema => jsonEncode({
+    'criteria': scoringCriteria,
+    'options':
+        options
+            .map(
+              (option) => {
+                'id': option.id,
+                'text': option.text,
+                'score': option.score,
+              },
+            )
+            .toList(),
+  });
 
   /// Savol mo'ljallangan sinflar oralig'i. null = barcha sinflar.
   /// Tartib: aniq minGrade/maxGrade -> matndagi '(1-4 sinf)' -> yosh oralig'idan
@@ -106,7 +120,10 @@ class AssessmentQuestionModel {
       r'(\d+)\s*[–—-]\s*(\d+)\s*-?\s*sinf',
     ).firstMatch(text);
     if (byGrade != null) {
-      return _ordered(int.parse(byGrade.group(1)!), int.parse(byGrade.group(2)!));
+      return _ordered(
+        int.parse(byGrade.group(1)!),
+        int.parse(byGrade.group(2)!),
+      );
     }
     final byAge = RegExp(r'(\d+)\s*[–—-]\s*(\d+)').firstMatch(text);
     if (byAge != null) {
@@ -201,26 +218,26 @@ class AssessmentQuestionModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'text': text,
-        'domain': domain,
-        'targetAgeRange': targetAgeRange,
-        'questionType': questionType,
-        'options': options.map((o) => o.toJson()).toList(),
-        'scoringCriteria': scoringCriteria,
-        'psychologistNotes': psychologistNotes,
-        'authorId': authorId,
-        'authorName': authorName,
-        'isStandard': isStandard,
-        'status': status,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt?.toIso8601String(),
-        'requirements': requirements?.map((r) => r.name).toList(),
-        'adaptationHint': adaptationHint,
-        'minGrade': minGrade,
-        'maxGrade': maxGrade,
-      };
+    'id': id,
+    'title': title,
+    'text': text,
+    'domain': domain,
+    'targetAgeRange': targetAgeRange,
+    'questionType': questionType,
+    'options': options.map((o) => o.toJson()).toList(),
+    'scoringCriteria': scoringCriteria,
+    'psychologistNotes': psychologistNotes,
+    'authorId': authorId,
+    'authorName': authorName,
+    'isStandard': isStandard,
+    'status': status,
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt?.toIso8601String(),
+    'requirements': requirements?.map((r) => r.name).toList(),
+    'adaptationHint': adaptationHint,
+    'minGrade': minGrade,
+    'maxGrade': maxGrade,
+  };
 
   factory AssessmentQuestionModel.fromJson(Map<String, dynamic> json) =>
       AssessmentQuestionModel(
@@ -230,9 +247,13 @@ class AssessmentQuestionModel {
         domain: json['domain'] as String? ?? 'Kognitiv va intellekt',
         targetAgeRange: json['targetAgeRange'] as String?,
         questionType: json['questionType'] as String? ?? 'yes_no',
-        options: (json['options'] as List<dynamic>?)
-                ?.map((e) =>
-                    AssessmentQuestionOption.fromJson(e as Map<String, dynamic>))
+        options:
+            (json['options'] as List<dynamic>?)
+                ?.map(
+                  (e) => AssessmentQuestionOption.fromJson(
+                    e as Map<String, dynamic>,
+                  ),
+                )
                 .toList() ??
             const [],
         scoringCriteria: json['scoringCriteria'] as String?,
@@ -241,16 +262,19 @@ class AssessmentQuestionModel {
         authorName: json['authorName'] as String? ?? 'Dilnoza Usmonova',
         isStandard: json['isStandard'] as bool? ?? false,
         status: json['status'] as String? ?? 'ready',
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'] as String)
-            : DateTime.now(),
-        updatedAt: json['updatedAt'] != null
-            ? DateTime.parse(json['updatedAt'] as String)
-            : null,
-        requirements: (json['requirements'] as List<dynamic>?)
-            ?.map((e) => QuestionRequirement.fromName(e as String?))
-            .whereType<QuestionRequirement>()
-            .toSet(),
+        createdAt:
+            json['createdAt'] != null
+                ? DateTime.parse(json['createdAt'] as String)
+                : DateTime.now(),
+        updatedAt:
+            json['updatedAt'] != null
+                ? DateTime.parse(json['updatedAt'] as String)
+                : null,
+        requirements:
+            (json['requirements'] as List<dynamic>?)
+                ?.map((e) => QuestionRequirement.fromName(e as String?))
+                .whereType<QuestionRequirement>()
+                .toSet(),
         adaptationHint: json['adaptationHint'] as String?,
         minGrade: (json['minGrade'] as num?)?.toInt(),
         maxGrade: (json['maxGrade'] as num?)?.toInt(),

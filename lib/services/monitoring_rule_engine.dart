@@ -3,12 +3,16 @@ import '../models/student_model.dart';
 import '../models/assessment_model.dart';
 import '../models/session_model.dart';
 import '../models/iep_model.dart';
+import 'question_selection_service.dart';
 
 class MonitoringRuleEngine {
   static final MonitoringRuleEngine _instance =
       MonitoringRuleEngine._internal();
   factory MonitoringRuleEngine() => _instance;
   MonitoringRuleEngine._internal();
+
+  final QuestionSelectionService _questionSelection =
+      QuestionSelectionService();
 
   /// Berilgan bazadagi barcha ma'lumotlar asosida 6 ta rasmiy qoida bo'yicha tahlil o'tkazish
   List<MonitoringAlertModel> evaluateRules({
@@ -32,15 +36,12 @@ class MonitoringRuleEngine {
     for (final student in students) {
       if (student.status == 'Arxivlangan') continue;
 
-      final studentSessions = sessions
-          .where((s) => s.studentId == student.id)
-          .toList();
-      final studentAssessments = assessments
-          .where((a) => a.studentId == student.id)
-          .toList();
-      final studentPlans = iepPlans
-          .where((p) => p.studentId == student.id)
-          .toList();
+      final studentSessions =
+          sessions.where((s) => s.studentId == student.id).toList();
+      final studentAssessments =
+          assessments.where((a) => a.studentId == student.id).toList();
+      final studentPlans =
+          iepPlans.where((p) => p.studentId == student.id).toList();
 
       // ==================== QOIDA 1: QATNASHILMAGAN MASHG'ULOTLAR ====================
       // 2 yoki undan ortiq o'tkazib yuborilgan mashg'ulotlar
@@ -58,7 +59,8 @@ class MonitoringRuleEngine {
             severity: missedSessions.length >= 3 ? 'XAVF' : 'DIQQAT',
             message:
                 '${student.fullName} rejalashtirilgan ${missedSessions.length} ta korreksion mashg‘ulotga kelmadi.',
-            suggestedAction: 'Ota-ona bilan bog‘lanib qatnashmaslik sababini aniqlash va dars jadvalini qayta ko‘rib chiqish.',
+            suggestedAction:
+                'Ota-ona bilan bog‘lanib qatnashmaslik sababini aniqlash va dars jadvalini qayta ko‘rib chiqish.',
             responsiblePersonName: missedSessions.first.specialistName,
             responsiblePersonId: missedSessions.first.specialistId,
             status: 'Ochiq',
@@ -69,9 +71,12 @@ class MonitoringRuleEngine {
 
       // ==================== QOIDA 2: MUDDATI O'TGAN BAHOLASHLAR ====================
       // Rejalashtirilgan takroriy baholash muddati o'tib ketgan
-      final overdueAssessments = studentAssessments.where((a) {
-        return a.reviewDate != null && a.reviewDate!.isBefore(now);
-      }).toList();
+      final overdueAssessments =
+          studentAssessments.where((a) {
+            return a.isCompleted &&
+                a.reviewDate != null &&
+                a.reviewDate!.isBefore(now);
+          }).toList();
       final rule2Key = '${student.id}_OVERDUE_ASSESSMENT';
       if (overdueAssessments.isNotEmpty &&
           !resolvedRuleKeys.contains(rule2Key)) {
@@ -87,7 +92,8 @@ class MonitoringRuleEngine {
             severity: 'DIQQAT',
             message:
                 '${lastDue.title} bo‘yicha oraliq monitoring tekshiruv muddati yetib kelgan.',
-            suggestedAction: 'Mutaxassis tomonidan bolaning dolzarb ko‘nikmalari qayta baholanib, reja yangilanishi lozim.',
+            suggestedAction:
+                'Mutaxassis tomonidan bolaning dolzarb ko‘nikmalari qayta baholanib, reja yangilanishi lozim.',
             responsiblePersonName: lastDue.specialistName,
             responsiblePersonId: lastDue.specialistId,
             status: 'Ochiq',
@@ -98,15 +104,29 @@ class MonitoringRuleEngine {
 
       // ==================== QOIDA 3: SAMARASIZLIK / O'SIShNING YO'QLIGI ====================
       // Oxirgi 2 ta taqqoslanadigan baholashda ball umuman o'zgarmagan (diff == 0)
-      if (studentAssessments.length >= 2) {
-        final sortedAss = List<AssessmentModel>.from(studentAssessments)
+      final completedAssessments =
+          studentAssessments
+              .where((assessment) => assessment.isCompleted)
+              .toList();
+      if (completedAssessments.length >= 2) {
+        final sortedAss = List<AssessmentModel>.from(completedAssessments)
           ..sort((a, b) => b.assessmentDate.compareTo(a.assessmentDate));
-        final latest = sortedAss[0];
-        final previous = sortedAss[1];
+        final latest = sortedAss.first;
+        final previous =
+            sortedAss
+                .skip(1)
+                .where(
+                  (candidate) =>
+                      _questionSelection.areComparable(latest, candidate),
+                )
+                .firstOrNull;
 
-        if (latest.category == previous.category &&
-            latest.maxScore == previous.maxScore) {
-          final diff = latest.totalScore - previous.totalScore;
+        if (previous != null) {
+          // Different maximum scores and assessment variants are normalized to
+          // percentage points before the trend rules are applied.
+          final latestPercent = latest.percentage;
+          final previousPercent = previous.percentage;
+          final diff = latestPercent - previousPercent;
           final rule3Key = '${student.id}_NO_PROGRESS_ASSESSMENT';
           if (diff == 0 && !resolvedRuleKeys.contains(rule3Key)) {
             generatedAlerts.add(
@@ -119,8 +139,9 @@ class MonitoringRuleEngine {
                 studentGrade: student.grade,
                 severity: 'DIQQAT',
                 message:
-                    '${latest.category} yo‘nalishida ketma-ket 2 ta baholashda ko‘rsatkich o‘zgarmay qoldi (${latest.totalScore} ball).',
-                suggestedAction: 'Qo‘llanilayotgan pedagogik metodika va mashqlar murakkabligini konsiliumda qayta ko‘rib chiqish.',
+                    '${latest.category} yo‘nalishida taqqoslanadigan ikki baholash orasida ko‘rsatkich o‘zgarmadi (${latestPercent.toStringAsFixed(1)}%).',
+                suggestedAction:
+                    'Qo‘llanilayotgan pedagogik metodika va mashqlar murakkabligini konsiliumda qayta ko‘rib chiqish.',
                 responsiblePersonName: latest.specialistName,
                 responsiblePersonId: latest.specialistId,
                 status: 'Ochiq',
@@ -142,8 +163,9 @@ class MonitoringRuleEngine {
                 studentGrade: student.grade,
                 severity: 'XAVF',
                 message:
-                    '${latest.category} bo‘yicha oldingi baholashga nisbatan natija pasaygan (${diff.toStringAsFixed(1)} ball).',
-                suggestedAction: 'Shifokor-pediatr va psixolog ishtirokida bolaning umumiy holatini zudlik bilan o‘rganish.',
+                    '${latest.category} bo‘yicha taqqoslanadigan oldingi baholashga nisbatan natija pasaygan (${diff.toStringAsFixed(1)} foiz punkt).',
+                suggestedAction:
+                    'Natijani mutaxassislar jamoasi bilan qayta ko‘rib chiqish; zarurat bo‘lsa, pedagog ota-ona bilan kelishib tegishli mutaxassisga yo‘naltirish yaratadi.',
                 responsiblePersonName: latest.specialistName,
                 responsiblePersonId: latest.specialistId,
                 status: 'Ochiq',
@@ -157,9 +179,10 @@ class MonitoringRuleEngine {
       // ==================== QOIDA 5: ITR MAQSAD MUDDATI O'TGANI ====================
       for (final plan in studentPlans) {
         if (plan.status != 'Faol') continue;
-        final overdueObjectives = plan.objectives.where((obj) {
-          return obj.targetDate.isBefore(now) && !obj.isCompleted;
-        }).toList();
+        final overdueObjectives =
+            plan.objectives.where((obj) {
+              return obj.targetDate.isBefore(now) && !obj.isCompleted;
+            }).toList();
 
         final rule5Key = '${student.id}_OVERDUE_IEP_OBJECTIVE';
         if (overdueObjectives.isNotEmpty &&
@@ -176,7 +199,8 @@ class MonitoringRuleEngine {
               severity: 'DIQQAT',
               message:
                   'ITRdagi "${firstObj.title}" vazifasi muddati o‘tgan bo‘lsa-da, hali yakunlanmagan (${firstObj.progressPercent}%).',
-              suggestedAction: 'Koordinator boshchiligida maqsadni kichikroq bosqichlarga ajratish yoki muddatni rasmiylashtirish.',
+              suggestedAction:
+                  'Koordinator boshchiligida maqsadni kichikroq bosqichlarga ajratish yoki muddatni rasmiylashtirish.',
               responsiblePersonName: plan.responsibleTeacherName,
               responsiblePersonId: plan.responsibleTeacherId,
               status: 'Ochiq',
@@ -187,10 +211,11 @@ class MonitoringRuleEngine {
       }
 
       // ==================== QOIDA 6: IZOHSIZ MASHG'ULOTLAR ====================
-      final completedWithoutNotes = studentSessions.where((s) {
-        return s.isCompleted &&
-            (s.observations == null || s.observations!.trim().isEmpty);
-      }).toList();
+      final completedWithoutNotes =
+          studentSessions.where((s) {
+            return s.isCompleted &&
+                (s.observations == null || s.observations!.trim().isEmpty);
+          }).toList();
       final rule6Key = '${student.id}_MISSING_OBSERVATION';
       if (completedWithoutNotes.isNotEmpty &&
           !resolvedRuleKeys.contains(rule6Key)) {
@@ -206,7 +231,8 @@ class MonitoringRuleEngine {
             severity: 'MA’LUMOT',
             message:
                 '${sample.topic} mashg‘uloti yakunlangan, biroq mutaxassis kuzatuv izohi yozilmagan.',
-            suggestedAction: 'O‘tkazilgan korreksion ish natijalari va tavsiyalarni mashg‘ulot profiliga qayd etish.',
+            suggestedAction:
+                'O‘tkazilgan korreksion ish natijalari va tavsiyalarni mashg‘ulot profiliga qayd etish.',
             responsiblePersonName: sample.specialistName,
             responsiblePersonId: sample.specialistId,
             status: 'Ochiq',
@@ -229,13 +255,16 @@ class MonitoringRuleEngine {
       if (merged.containsKey(generated.id) || openRuleKeys.contains(key)) {
         // Ochiq signal saqlanadi (ID, holat, yaratilgan sana), lekin matni joriy
         // holatga yangilanadi — masalan, ITR maqsadi foizi o'zgarganda.
-        final existingId = merged.containsKey(generated.id)
-            ? generated.id
-            : merged.values
-                  .firstWhere(
-                    (a) => !a.isResolved && '${a.studentId}_${a.ruleCode}' == key,
-                  )
-                  .id;
+        final existingId =
+            merged.containsKey(generated.id)
+                ? generated.id
+                : merged.values
+                    .firstWhere(
+                      (a) =>
+                          !a.isResolved &&
+                          '${a.studentId}_${a.ruleCode}' == key,
+                    )
+                    .id;
         final existing = merged[existingId]!;
         if (!existing.isResolved) {
           merged[existingId] = existing.copyWith(

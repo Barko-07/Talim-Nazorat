@@ -3087,6 +3087,26 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               ),
                             ),
                           ),
+                        if (preview == null)
+                          Container(
+                            margin: const EdgeInsets.only(top: 8),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFFBEB),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFFDE68A),
+                              ),
+                            ),
+                            child: const Text(
+                              'Tizim darajani hozircha aniq tavsiya qila olmaydi. 1-sinfdan boshlab sinflarni ketma-ket baholab, birinchi o‘zlashtirilmagan talab aniqlanguncha davom eting. Barcha mavjud talablar bajarilgan bo‘lsa, o‘qituvchi darajani qo‘lda tasdiqlasin.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF92400E),
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
                         const SizedBox(height: 12),
                         ...standards.map((std) {
                           final currentMastery = results[std.id];
@@ -3198,7 +3218,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   ),
                   FilledButton(
                     onPressed:
-                        results.isEmpty
+                        results.isEmpty ||
+                                (preview == null && manualGrade == null)
                             ? null
                             : () async {
                               try {

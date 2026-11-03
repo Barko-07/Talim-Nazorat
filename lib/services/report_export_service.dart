@@ -191,7 +191,7 @@ class ReportExportService {
     final buffer = StringBuffer();
     buffer.write(utf8Bom);
     buffer.writeln(
-      'ID,Sana,O‘quvchi,Yuborgan mutaxassis,Yo‘naltirilgan xizmat,Sababi,Muhimlik,Holati,Xulosa',
+      'ID,Bog‘langan baholash ID,Sana,O‘quvchi,Yuborgan mutaxassis,Yo‘naltirilgan xizmat,Sababi,Muhimlik,Holati,Xulosa',
     );
 
     for (final r in referrals) {
@@ -200,6 +200,7 @@ class ReportExportService {
       buffer.writeln(
         [
           _sanitizeCsv(r.id),
+          _sanitizeCsv(r.sourceAssessmentId ?? ''),
           _sanitizeCsv(dateStr),
           _sanitizeCsv(r.studentName),
           _sanitizeCsv(r.fromSpecialistName),
@@ -311,16 +312,20 @@ class ReportExportService {
       '${WorkKind.values.map((k) => k.label).join(',')},Jami yozuvlar,Oxirgi faollik',
     );
     for (final s in r.specialists) {
-      b.writeln([
-        _sanitizeCsv(s.fullName),
-        _sanitizeCsv(s.role),
-        s.childrenAssigned,
-        s.childrenWorkedWith,
-        (s.coverage * 100).round(),
-        ...WorkKind.values.map((k) => s.recordsByKind[k] ?? 0),
-        s.totalRecords,
-        _sanitizeCsv(s.lastActivity == null ? '—' : df.format(s.lastActivity!)),
-      ].join(','));
+      b.writeln(
+        [
+          _sanitizeCsv(s.fullName),
+          _sanitizeCsv(s.role),
+          s.childrenAssigned,
+          s.childrenWorkedWith,
+          (s.coverage * 100).round(),
+          ...WorkKind.values.map((k) => s.recordsByKind[k] ?? 0),
+          s.totalRecords,
+          _sanitizeCsv(
+            s.lastActivity == null ? '—' : df.format(s.lastActivity!),
+          ),
+        ].join(','),
+      );
     }
     return b.toString();
   }

@@ -27,30 +27,35 @@ class SubjectLevelService {
     return {for (final g in counts.keys) g: sums[g]! / counts[g]!};
   }
 
-  /// Tavsiya etiladigan daraja: talablari o'zlashtirilgan eng yuqori sinf,
-  /// undan pastdagi baholangan sinflar ham o'zlashtirilgan bo'lishi sharti bilan.
-  /// Baholanmagan quyi sinflar o'zlashtirilgan deb qabul qilinadi.
-  /// 0 = 1-sinf talablariga hali yetmagan. null = hech narsa baholanmagan.
+  /// Birinchi o‘zlashtirilmagan sinfdan oldingi uzluksiz darajani tavsiya qiladi.
+  /// 0 = 1-sinf talablariga hali yetmagan; null = quyi sinflarda dalil yetarli
+  /// emas yoki mavjud talablarning barchasi bajarilgan bo‘lib, yuqori chegara
+  /// aniqlanmagan. Baholanmagan sinflar o‘zlashtirilgan deb olinmaydi.
   int? suggestGrade(
     Map<String, Mastery> results,
     List<CurriculumStandard> standards,
   ) {
     final byGrade = masteryByGrade(results, standards);
     if (byGrade.isEmpty) return null;
-    final grades = byGrade.keys.toList()..sort();
-    var achieved = grades.first - 1;
-    for (final g in grades) {
-      if (byGrade[g]! >= masteryThreshold) {
-        achieved = g;
+    final assessed = byGrade.keys.toList()..sort();
+    if (assessed.first > 1) return null;
+    for (var g = 1; g <= assessed.last; g++) {
+      if (!byGrade.containsKey(g)) return null;
+    }
+    var achieved = 0;
+    for (final grade in assessed) {
+      if (byGrade[grade]! >= masteryThreshold) {
+        achieved = grade;
       } else {
-        break;
+        return achieved;
       }
     }
-    return achieved < 0 ? 0 : achieved;
+    // Barcha mavjud talablar bajarilgani bolaning yuqori chegarasi topildi degani emas.
+    return null;
   }
 
-  /// Eng quyi baholangan sinf ham o'zlashtirilmagan bo'lsa, haqiqiy daraja undan ham
-  /// past bo'lishi mumkin — quyiroq sinf talablarini ham tekshirish kerak.
+  /// Eng quyi baholangan sinf ham o‘zlashtirilmagan yoki quyi sinflarda
+  /// baholanmagan oraliq bo‘lsa, pastroq sinflarni tekshirish kerak.
   /// (Masalan, 7-sinf o'quvchisi faqat 7-sinf talablari bo'yicha tekshirilib, o'tolmagan.)
   bool needsLowerGradeCheck(
     Map<String, Mastery> results,
@@ -58,8 +63,12 @@ class SubjectLevelService {
   ) {
     final byGrade = masteryByGrade(results, standards);
     if (byGrade.isEmpty) return false;
-    final lowest = byGrade.keys.reduce((a, b) => a < b ? a : b);
-    return lowest > 1 && byGrade[lowest]! < masteryThreshold;
+    final assessed = byGrade.keys.toList()..sort();
+    if (assessed.first > 1) return true;
+    for (var g = 1; g <= assessed.last; g++) {
+      if (!byGrade.containsKey(g)) return true;
+    }
+    return false;
   }
 
   /// Keyingi ishlash kerak bo'lgan talablar: tasdiqlangan darajadagi o'zlashtirilmaganlari
@@ -70,22 +79,25 @@ class SubjectLevelService {
     List<CurriculumStandard> standards,
   ) {
     return standards.where((s) {
-      if (s.grade > confirmedGrade + 1) return false;
-      if (s.grade < confirmedGrade) return false;
-      return results[s.id] != Mastery.mastered;
-    }).toList()..sort((a, b) => a.grade.compareTo(b.grade));
+        if (s.grade > confirmedGrade + 1) return false;
+        if (s.grade < confirmedGrade) return false;
+        return results[s.id] != Mastery.mastered;
+      }).toList()
+      ..sort((a, b) => a.grade.compareTo(b.grade));
   }
 
   /// Foydalanuvchiga ko'rsatiladigan qisqa xulosa
   String describe(SubjectLevelAssessment a) {
-    final level = a.confirmedGrade == 0
-        ? '1-sinf talablariga hali yetmagan'
-        : '${a.confirmedGrade}-sinf darajasi';
-    final gapText = a.gap > 0
-        ? ' (sinfidan ${a.gap} sinf past)'
-        : a.gap < 0
-        ? ' (sinfidan ${-a.gap} sinf yuqori)'
-        : ' (sinfiga mos)';
+    final level =
+        a.confirmedGrade == 0
+            ? '1-sinf talablariga hali yetmagan'
+            : '${a.confirmedGrade}-sinf darajasi';
+    final gapText =
+        a.gap > 0
+            ? ' (sinfidan ${a.gap} sinf past)'
+            : a.gap < 0
+            ? ' (sinfidan ${-a.gap} sinf yuqori)'
+            : ' (sinfiga mos)';
     return '${a.classGrade}-sinf o‘quvchisi, ${a.subject}: $level$gapText';
   }
 }

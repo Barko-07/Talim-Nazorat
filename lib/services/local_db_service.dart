@@ -1921,6 +1921,15 @@ class LocalDbService {
       throw ValidationException('Kamida bitta talab bo‘yicha natija kiriting.');
     }
     final suggested = _subjectLevels.suggestGrade(cleanResults, standards);
+    final finalGrade = confirmedGrade ?? suggested;
+    if (finalGrade == null) {
+      throw ValidationException(
+        'Darajani tavsiya qilish uchun 1-sinfdan boshlab uzluksiz baholang yoki o‘qituvchi tasdiqlangan darajani tanlang.',
+      );
+    }
+    if (finalGrade < 0 || finalGrade > GradeBand.highestGrade) {
+      throw ValidationException('Tasdiqlangan daraja noto‘g‘ri.');
+    }
     final classGrade =
         GradeBand.parseGrade(student.grade) ??
         (student.age - 6).clamp(GradeBand.lowestGrade, GradeBand.highestGrade);
@@ -1931,10 +1940,7 @@ class LocalDbService {
       classGrade: classGrade,
       results: cleanResults,
       suggestedGrade: suggested,
-      confirmedGrade: (confirmedGrade ?? suggested ?? 0).clamp(
-        GradeBand.lowestGrade,
-        GradeBand.highestGrade,
-      ),
+      confirmedGrade: finalGrade,
       assessedById: byUser.id,
       assessedByName: byUser.fullName,
       assessedAt: DateTime.now(),

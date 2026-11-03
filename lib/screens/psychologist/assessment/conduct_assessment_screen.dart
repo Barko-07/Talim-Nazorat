@@ -56,17 +56,19 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
     if (widget.assessment.responses.isNotEmpty) {
       _responses = List.from(widget.assessment.responses);
     } else {
-      _responses = _questions.map((q) {
-        return AssessmentResponseModel(
-          questionId: q.id,
-          questionTitle: q.title,
-          questionText: q.questionText,
-          domain: q.domain,
-          questionType: q.questionType,
-          maxScore: q.maxScore,
-          isEvaluated: false,
-        );
-      }).toList();
+      _responses =
+          _questions.map((q) {
+            return AssessmentResponseModel(
+              questionId: q.id,
+              questionTitle: q.title,
+              questionText: q.questionText,
+              domain: q.domain,
+              questionType: q.questionType,
+              maxScore: q.maxScore,
+              scoringSchema: q.scoringSchema,
+              isEvaluated: false,
+            );
+          }).toList();
     }
 
     // Agar savollar soni responses dan ko'p bo'lsa, moslashtirish
@@ -80,6 +82,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
           domain: q.domain,
           questionType: q.questionType,
           maxScore: q.maxScore,
+          scoringSchema: q.scoringSchema,
           isEvaluated: false,
         ),
       );
@@ -175,17 +178,14 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
       }
     }
 
-    final double percent = totalMax > 0 ? (totalEarned / totalMax) * 100.0 : 0.0;
+    final double percent =
+        totalMax > 0 ? (totalEarned / totalMax) * 100.0 : 0.0;
 
     final conclusionCtrl = TextEditingController(
-      text: widget.assessment.generalConclusion?.isNotEmpty == true
-          ? widget.assessment.generalConclusion!
-          : 'Diagnostika jarayonida o‘quvchining psixologik holati va individual xususiyatlari me’yoriy ko‘rsatkichlar doirasida qayd etildi.',
+      text: widget.assessment.generalConclusion ?? '',
     );
     final recCtrl = TextEditingController(
-      text: widget.assessment.recommendations.isNotEmpty
-          ? widget.assessment.recommendations
-          : 'Pedagog va ota-onalar bilan hamkorlikda individual yordam rejasini davom ettirish tavsiya etiladi.',
+      text: widget.assessment.recommendations,
     );
 
     showModalBottomSheet(
@@ -195,265 +195,292 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          return ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.9,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+      builder:
+          (ctx) => StatefulBuilder(
+            builder: (context, setModalState) {
+              return ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.9,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFECFDF5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.task_alt_rounded,
-                          color: Color(0xFF059669),
-                          size: 22,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Natijalarni Tekshirish va Yakunlash',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              'Xulosani tasdiqlashdan oldin kiritilgan ma’lumotlarni ko‘rib chiqing',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close_rounded),
-                        onPressed: () => Navigator.pop(ctx),
-                      ),
-                    ],
-                  ),
-                  const Divider(height: 20),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
                         children: [
-                          // Ballar va javoblar statistikasi
                           Container(
-                            padding: const EdgeInsets.all(14),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFC),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.border),
+                              color: const Color(0xFFECFDF5),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            child: const Icon(
+                              Icons.task_alt_rounded,
+                              color: Color(0xFF059669),
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildMetricBox(
-                                  'Javob berildi',
-                                  '${evaluatedResponses.length} / ${_responses.length}',
-                                  const Color(0xFF059669),
-                                ),
-                                _buildMetricBox(
-                                  'O‘tkazib yuborildi',
-                                  '${skippedResponses.length} ta',
-                                  skippedResponses.isEmpty
-                                      ? Colors.grey
-                                      : const Color(0xFFD97706),
-                                ),
-                                if (totalMax > 0)
-                                  _buildMetricBox(
-                                    'Jami ball',
-                                    '${totalEarned.toStringAsFixed(1)} / ${totalMax.toStringAsFixed(0)} (${percent.toStringAsFixed(0)}%)',
-                                    const Color(0xFF4F46E5),
+                                Text(
+                                  'Natijalarni Tekshirish va Yakunlash',
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
                                   ),
+                                ),
+                                Text(
+                                  'Xulosani tasdiqlashdan oldin kiritilgan ma’lumotlarni ko‘rib chiqing',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textMuted,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 16),
-
-                          // Sohalar bo'yicha taqsimot
-                          if (domainScoresMap.isNotEmpty) ...[
-                            const Text(
-                              'Yo‘nalishlar kesimida natijalar:',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            ...domainScoresMap.entries.map((e) {
-                              final dName = e.key;
-                              final dEarned = e.value[0];
-                              final dMax = e.value[1];
-                              final dPct = dMax > 0 ? (dEarned / dMax) : 0.0;
-
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 6),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded),
+                            onPressed: () => Navigator.pop(ctx),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 20),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Ballar va javoblar statistikasi
+                              Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8FAFC),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColors.border),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                    _buildMetricBox(
+                                      'Javob berildi',
+                                      '${evaluatedResponses.length} / ${_responses.length}',
+                                      const Color(0xFF059669),
+                                    ),
+                                    _buildMetricBox(
+                                      'O‘tkazib yuborildi',
+                                      '${skippedResponses.length} ta',
+                                      skippedResponses.isEmpty
+                                          ? Colors.grey
+                                          : const Color(0xFFD97706),
+                                    ),
+                                    if (totalMax > 0)
+                                      _buildMetricBox(
+                                        'Jami ball',
+                                        '${totalEarned.toStringAsFixed(1)} / ${totalMax.toStringAsFixed(0)} (${percent.toStringAsFixed(0)}%)',
+                                        const Color(0xFF4F46E5),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Sohalar bo'yicha taqsimot
+                              if (domainScoresMap.isNotEmpty) ...[
+                                const Text(
+                                  'Yo‘nalishlar kesimida natijalar:',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                ...domainScoresMap.entries.map((e) {
+                                  final dName = e.key;
+                                  final dEarned = e.value[0];
+                                  final dMax = e.value[1];
+                                  final dPct =
+                                      dMax > 0 ? (dEarned / dMax) : 0.0;
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 6),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          dName,
-                                          style: const TextStyle(fontSize: 12),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              dName,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${dEarned.toStringAsFixed(1)} / ${dMax.toStringAsFixed(0)} ball (${(dPct * 100).toStringAsFixed(0)}%)',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF4F46E5),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        Text(
-                                          '${dEarned.toStringAsFixed(1)} / ${dMax.toStringAsFixed(0)} ball (${(dPct * 100).toStringAsFixed(0)}%)',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF4F46E5),
+                                        const SizedBox(height: 3),
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                          child: LinearProgressIndicator(
+                                            value: dPct.clamp(0.0, 1.0),
+                                            minHeight: 6,
+                                            backgroundColor: const Color(
+                                              0xFFE2E8F0,
+                                            ),
+                                            valueColor:
+                                                const AlwaysStoppedAnimation<
+                                                  Color
+                                                >(Color(0xFF4F46E5)),
                                           ),
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 3),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(4),
-                                      child: LinearProgressIndicator(
-                                        value: dPct.clamp(0.0, 1.0),
-                                        minHeight: 6,
-                                        backgroundColor: const Color(0xFFE2E8F0),
-                                        valueColor:
-                                            const AlwaysStoppedAnimation<Color>(
-                                          Color(0xFF4F46E5),
+                                  );
+                                }),
+                                const SizedBox(height: 16),
+                              ],
+
+                              // Umumiy psixologik xulosa
+                              TextFormField(
+                                controller: conclusionCtrl,
+                                maxLines: 3,
+                                decoration: const InputDecoration(
+                                  labelText: 'Umumiy psixologik xulosa *',
+                                  hintText:
+                                      'O‘quvchining diagnostika davridagi umumiy holati va xulosasi...',
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+
+                              // Korreksion tavsiyalar
+                              TextFormField(
+                                controller: recCtrl,
+                                maxLines: 3,
+                                decoration: const InputDecoration(
+                                  labelText:
+                                      'Korreksion-rivojlantiruvchi tavsiyalar *',
+                                  hintText:
+                                      'Tavsiya etilayotgan mashg‘ulotlar, ota-onalar va o‘qituvchilar uchun tavsiyalar...',
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Rasmiy ogohlantirish
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFFBEB),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: const Color(
+                                      0xFFF59E0B,
+                                    ).withValues(alpha: 0.3),
+                                  ),
+                                ),
+                                child: const Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline_rounded,
+                                      size: 16,
+                                      color: Color(0xFFD97706),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        AssessmentTemplates.disclaimerNotice,
+                                        style: TextStyle(
+                                          fontSize: 10.5,
+                                          color: Color(0xFF92400E),
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              );
-                            }),
-                            const SizedBox(height: 16),
-                          ],
-
-                          // Umumiy psixologik xulosa
-                          TextFormField(
-                            controller: conclusionCtrl,
-                            maxLines: 3,
-                            decoration: const InputDecoration(
-                              labelText: 'Umumiy psixologik xulosa *',
-                              hintText:
-                                  'O‘quvchining diagnostika davridagi umumiy holati va xulosasi...',
-                            ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 12),
-
-                          // Korreksion tavsiyalar
-                          TextFormField(
-                            controller: recCtrl,
-                            maxLines: 3,
-                            decoration: const InputDecoration(
-                              labelText:
-                                  'Korreksion-rivojlantiruvchi tavsiyalar *',
-                              hintText:
-                                  'Tavsiya etilayotgan mashg‘ulotlar, ota-onalar va o‘qituvchilar uchun tavsiyalar...',
-                            ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text('Savollarga qaytish'),
                           ),
-                          const SizedBox(height: 16),
-
-                          // Rasmiy ogohlantirish
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFFBEB),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: const Color(0xFFF59E0B)
-                                    .withValues(alpha: 0.3),
+                          const SizedBox(width: 12),
+                          FilledButton.icon(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: const Color(0xFF059669),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
                               ),
                             ),
-                            child: const Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.info_outline_rounded,
-                                  size: 16,
-                                  color: Color(0xFFD97706),
-                                ),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    AssessmentTemplates.disclaimerNotice,
-                                    style: TextStyle(
-                                      fontSize: 10.5,
-                                      color: Color(0xFF92400E),
+                            icon: const Icon(
+                              Icons.check_circle_rounded,
+                              size: 18,
+                            ),
+                            label: const Text('Baholashni to‘liq yakunlash'),
+                            onPressed: () async {
+                              if (conclusionCtrl.text.trim().isEmpty ||
+                                  recCtrl.text.trim().isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Baholashni yakunlash uchun xulosa va keyingi tavsiyani kiriting.',
                                     ),
+                                    backgroundColor: AppColors.warning,
+                                  ),
+                                );
+                                return;
+                              }
+                              Navigator.pop(ctx);
+                              await _finalizeAssessment(
+                                totalScore: totalEarned,
+                                maxScore:
+                                    totalMax > 0
+                                        ? totalMax
+                                        : widget.assessment.maxScore,
+                                generalConclusion: conclusionCtrl.text.trim(),
+                                recommendations: recCtrl.text.trim(),
+                                domainScores: domainScoresMap.map(
+                                  (k, v) => MapEntry(
+                                    k,
+                                    v[1] > 0 ? (v[0] / v[1]) * 100.0 : 0.0,
                                   ),
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      OutlinedButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: const Text('Savollarga qaytish'),
-                      ),
-                      const SizedBox(width: 12),
-                      FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF059669),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 12,
-                          ),
-                        ),
-                        icon: const Icon(Icons.check_circle_rounded, size: 18),
-                        label: const Text('Baholashni to‘liq yakunlash'),
-                        onPressed: () async {
-                          Navigator.pop(ctx);
-                          await _finalizeAssessment(
-                            totalScore: totalEarned,
-                            maxScore: totalMax > 0
-                                ? totalMax
-                                : widget.assessment.maxScore,
-                            generalConclusion: conclusionCtrl.text.trim(),
-                            recommendations: recCtrl.text.trim(),
-                            domainScores: domainScoresMap.map(
-                              (k, v) => MapEntry(
-                                k,
-                                v[1] > 0 ? (v[0] / v[1]) * 100.0 : 0.0,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+                ),
+              );
+            },
+          ),
     );
   }
 
@@ -468,13 +495,14 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
     final auth = context.read<AuthProvider>();
 
     // Mezonlar ro'yxatini shakllantirish
-    final criteria = domainScores.entries.map((e) {
-      return AssessmentCriterionResult(
-        criterionName: e.key,
-        score: e.value,
-        maxScore: 100.0,
-      );
-    }).toList();
+    final criteria =
+        domainScores.entries.map((e) {
+          return AssessmentCriterionResult(
+            criterionName: e.key,
+            score: e.value,
+            maxScore: 100.0,
+          );
+        }).toList();
 
     final completed = widget.assessment.copyWith(
       responses: _responses,
@@ -519,9 +547,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
     if (_questions.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('Baholash jarayoni')),
-        body: const Center(
-          child: Text('Baholash uchun savollar topilmadi.'),
-        ),
+        body: const Center(child: Text('Baholash uchun savollar topilmadi.')),
       );
     }
 
@@ -605,16 +631,18 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                             height: 28,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: isCur
-                                  ? const Color(0xFF4F46E5)
-                                  : isAns
+                              color:
+                                  isCur
+                                      ? const Color(0xFF4F46E5)
+                                      : isAns
                                       ? const Color(0xFFECFDF5)
                                       : const Color(0xFFF1F5F9),
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
-                                color: isCur
-                                    ? const Color(0xFF4F46E5)
-                                    : isAns
+                                color:
+                                    isCur
+                                        ? const Color(0xFF4F46E5)
+                                        : isAns
                                         ? const Color(0xFF059669)
                                         : AppColors.border,
                               ),
@@ -624,9 +652,10 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: isCur
-                                    ? Colors.white
-                                    : isAns
+                                color:
+                                    isCur
+                                        ? Colors.white
+                                        : isAns
                                         ? const Color(0xFF059669)
                                         : AppColors.textPrimary,
                               ),
@@ -751,8 +780,9 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                               color: const Color(0xFFFFFBEB),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: const Color(0xFFF59E0B)
-                                    .withValues(alpha: 0.3),
+                                color: const Color(
+                                  0xFFF59E0B,
+                                ).withValues(alpha: 0.3),
                               ),
                             ),
                             child: const Row(
@@ -807,7 +837,9 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                             padding: const EdgeInsets.all(10),
                             decoration: const BoxDecoration(
                               color: Color(0xFFF8FAFC),
-                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(8),
+                              ),
                             ),
                             child: Row(
                               children: [
@@ -841,9 +873,10 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     OutlinedButton.icon(
-                      onPressed: _currentIndex > 0
-                          ? () => _goToIndex(_currentIndex - 1)
-                          : null,
+                      onPressed:
+                          _currentIndex > 0
+                              ? () => _goToIndex(_currentIndex - 1)
+                              : null,
                       icon: const Icon(Icons.arrow_back_rounded, size: 18),
                       label: const Text('Oldingi savol'),
                     ),
@@ -889,146 +922,163 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
   ) {
     if (q.questionType == 'yes_no') {
       return Row(
-        children: q.options.map((opt) {
-          final isSelected = r.answer == opt.text;
-          final isYes = opt.text.toLowerCase().contains('ha');
+        children:
+            q.options.map((opt) {
+              final isSelected = r.answer == opt.text;
+              final isYes = opt.text.toLowerCase().contains('ha');
 
-          return Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    r.answer = opt.text;
-                    r.score = opt.score;
-                    r.isEvaluated = true;
-                  });
-                },
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? (isYes
-                            ? const Color(0xFFECFDF5)
-                            : const Color(0xFFFEF2F2))
-                        : const Color(0xFFF8FAFC),
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        r.answer = opt.text;
+                        r.score = opt.score;
+                        r.isEvaluated = true;
+                      });
+                    },
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isSelected
-                          ? (isYes
-                              ? const Color(0xFF059669)
-                              : const Color(0xFFDC2626))
-                          : AppColors.border,
-                      width: isSelected ? 2 : 1,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected
+                                ? (isYes
+                                    ? const Color(0xFFECFDF5)
+                                    : const Color(0xFFFEF2F2))
+                                : const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color:
+                              isSelected
+                                  ? (isYes
+                                      ? const Color(0xFF059669)
+                                      : const Color(0xFFDC2626))
+                                  : AppColors.border,
+                          width: isSelected ? 2 : 1,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            isYes
+                                ? Icons.check_circle_outline_rounded
+                                : Icons.cancel_outlined,
+                            size: 28,
+                            color:
+                                isSelected
+                                    ? (isYes
+                                        ? const Color(0xFF059669)
+                                        : const Color(0xFFDC2626))
+                                    : Colors.grey,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            opt.text,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color:
+                                  isSelected
+                                      ? (isYes
+                                          ? const Color(0xFF059669)
+                                          : const Color(0xFFDC2626))
+                                      : AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${opt.score.toStringAsFixed(0)} ball',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color:
+                                  isSelected
+                                      ? (isYes
+                                          ? const Color(0xFF059669)
+                                          : const Color(0xFFDC2626))
+                                      : AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        isYes
-                            ? Icons.check_circle_outline_rounded
-                            : Icons.cancel_outlined,
-                        size: 28,
-                        color: isSelected
-                            ? (isYes
-                                ? const Color(0xFF059669)
-                                : const Color(0xFFDC2626))
-                            : Colors.grey,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        opt.text,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: isSelected
-                              ? (isYes
-                                  ? const Color(0xFF059669)
-                                  : const Color(0xFFDC2626))
-                              : AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${opt.score.toStringAsFixed(0)} ball',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: isSelected
-                              ? (isYes
-                                  ? const Color(0xFF059669)
-                                  : const Color(0xFFDC2626))
-                              : AppColors.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-              ),
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
       );
     } else if (q.questionType == 'single_choice') {
       return Column(
-        children: q.options.map((opt) {
-          final isSelected = r.answer == opt.text;
+        children:
+            q.options.map((opt) {
+              final isSelected = r.answer == opt.text;
 
-          return Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFEEF2FF) : Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: isSelected ? const Color(0xFF4F46E5) : AppColors.border,
-                width: isSelected ? 1.5 : 1,
-              ),
-            ),
-            child: RadioListTile<String>(
-              value: opt.text,
-              groupValue: r.answer,
-              activeColor: const Color(0xFF4F46E5),
-              title: Text(
-                opt.text,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-              secondary: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? const Color(0xFF4F46E5)
-                      : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  '${opt.score.toStringAsFixed(opt.score.truncateToDouble() == opt.score ? 0 : 1)} b',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                  color: isSelected ? const Color(0xFFEEF2FF) : Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color:
+                        isSelected ? const Color(0xFF4F46E5) : AppColors.border,
+                    width: isSelected ? 1.5 : 1,
                   ),
                 ),
-              ),
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() {
-                    r.answer = val;
-                    r.score = opt.score;
-                    r.isEvaluated = true;
-                  });
-                }
-              },
-            ),
-          );
-        }).toList(),
+                child: RadioListTile<String>(
+                  value: opt.text,
+                  groupValue: r.answer,
+                  activeColor: const Color(0xFF4F46E5),
+                  title: Text(
+                    opt.text,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  secondary: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          isSelected
+                              ? const Color(0xFF4F46E5)
+                              : const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '${opt.score.toStringAsFixed(opt.score.truncateToDouble() == opt.score ? 0 : 1)} b',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            isSelected ? Colors.white : AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() {
+                        r.answer = val;
+                        r.score = opt.score;
+                        r.isEvaluated = true;
+                      });
+                    }
+                  },
+                ),
+              );
+            }).toList(),
       );
     } else if (q.questionType == 'multiple_choice') {
       final selectedList =
-          (r.answer ?? '').split(';').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+          (r.answer ?? '')
+              .split(';')
+              .map((s) => s.trim())
+              .where((s) => s.isNotEmpty)
+              .toList();
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1062,11 +1112,15 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                   ),
                 ),
                 secondary: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
-                    color: isChecked
-                        ? const Color(0xFF4F46E5)
-                        : const Color(0xFFF1F5F9),
+                    color:
+                        isChecked
+                            ? const Color(0xFF4F46E5)
+                            : const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -1105,7 +1159,8 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
         ],
       );
     } else if (q.questionType == 'scale_1_5') {
-      final currentVal = (r.score != null && r.score! > 0) ? r.score!.round() : 3;
+      final currentVal =
+          (r.score != null && r.score! > 0) ? r.score!.round() : 3;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1118,7 +1173,10 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                 style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFEEF2FF),
                   borderRadius: BorderRadius.circular(8),
@@ -1156,14 +1214,16 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isSel
-                            ? const Color(0xFF4F46E5)
-                            : const Color(0xFFF8FAFC),
+                        color:
+                            isSel
+                                ? const Color(0xFF4F46E5)
+                                : const Color(0xFFF8FAFC),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: isSel
-                              ? const Color(0xFF4F46E5)
-                              : AppColors.border,
+                          color:
+                              isSel
+                                  ? const Color(0xFF4F46E5)
+                                  : AppColors.border,
                         ),
                       ),
                       child: Text(
