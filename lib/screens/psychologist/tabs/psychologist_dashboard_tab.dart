@@ -3,12 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../models/user_model.dart';
 import '../../../models/session_model.dart';
 import '../../../models/psychologist_observation_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
-import '../../students/student_detail_screen.dart';
 
 class PsychologistDashboardTab extends StatelessWidget {
   final Function(int tabIndex)? onNavigateToTab;
@@ -39,11 +37,12 @@ class PsychologistDashboardTab extends StatelessWidget {
 
     // Bugungi mashg'ulotlar
     final now = DateTime.now();
-    final todaySessions = mySessions.where((s) {
-      return s.scheduledAt.year == now.year &&
-          s.scheduledAt.month == now.month &&
-          s.scheduledAt.day == now.day;
-    }).toList();
+    final todaySessions =
+        mySessions.where((s) {
+          return s.scheduledAt.year == now.year &&
+              s.scheduledAt.month == now.month &&
+              s.scheduledAt.day == now.day;
+        }).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -55,7 +54,11 @@ class PsychologistDashboardTab extends StatelessWidget {
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF1E1B4B), Color(0xFF312E81), Color(0xFF4338CA)],
+                colors: [
+                  Color(0xFF1E1B4B),
+                  Color(0xFF312E81),
+                  Color(0xFF4338CA),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -75,7 +78,9 @@ class PsychologistDashboardTab extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: const Icon(
                     Icons.psychology_rounded,
@@ -96,10 +101,14 @@ class PsychologistDashboardTab extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF818CF8).withValues(alpha: 0.25),
+                              color: const Color(
+                                0xFF818CF8,
+                              ).withValues(alpha: 0.25),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: const Color(0xFF818CF8).withValues(alpha: 0.4),
+                                color: const Color(
+                                  0xFF818CF8,
+                                ).withValues(alpha: 0.4),
                               ),
                             ),
                             child: const Text(
@@ -125,7 +134,9 @@ class PsychologistDashboardTab extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        user != null ? 'Xush kelibsiz, ${user.fullName}!' : 'Psixolog ish stoli',
+                        user != null
+                            ? 'Xush kelibsiz, ${user.fullName}!'
+                            : 'Psixolog ish stoli',
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
@@ -153,9 +164,10 @@ class PsychologistDashboardTab extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               final isWide = constraints.maxWidth > 800;
-              final cardWidth = isWide
-                  ? (constraints.maxWidth - 36) / 4
-                  : (constraints.maxWidth - 12) / 2;
+              final cardWidth =
+                  isWide
+                      ? (constraints.maxWidth - 36) / 4
+                      : (constraints.maxWidth - 12) / 2;
 
               return Wrap(
                 spacing: 12,
@@ -309,8 +321,16 @@ class PsychologistDashboardTab extends StatelessWidget {
             builder: (context, constraints) {
               final isDesktop = constraints.maxWidth >= 900;
 
-              final sessionsBlock = _buildTodaySessionsCard(context, todaySessions, timeFormat);
-              final observationsBlock = _buildRecentObservationsCard(context, myObservations, df);
+              final sessionsBlock = _buildTodaySessionsCard(
+                context,
+                todaySessions,
+                timeFormat,
+              );
+              final observationsBlock = _buildRecentObservationsCard(
+                context,
+                myObservations,
+                df,
+              );
 
               if (isDesktop) {
                 return Row(
@@ -457,7 +477,10 @@ class PsychologistDashboardTab extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () => onNavigateToTab?.call(7),
-                  child: const Text('Barchasi →', style: TextStyle(fontSize: 12)),
+                  child: const Text(
+                    'Barchasi →',
+                    style: TextStyle(fontSize: 12),
+                  ),
                 ),
               ],
             ),
@@ -467,20 +490,23 @@ class PsychologistDashboardTab extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 30),
                 alignment: Alignment.center,
                 child: Column(
-                    children: [
-                      Icon(
-                        Icons.event_available_rounded,
-                        size: 38,
-                        color: Colors.grey.shade300,
+                  children: [
+                    Icon(
+                      Icons.event_available_rounded,
+                      size: 38,
+                      color: Colors.grey.shade300,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Bugunga rejalashtirilgan mashg‘ulotlar yo‘q',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Bugunga rejalashtirilgan mashg‘ulotlar yo‘q',
-                        style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                      ),
-                    ],
-                  ),
-                )
+                    ),
+                  ],
+                ),
+              )
             else
               ListView.separated(
                 shrinkWrap: true,
@@ -540,9 +566,10 @@ class PsychologistDashboardTab extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: s.isCompleted
-                              ? const Color(0xFFECFDF5)
-                              : const Color(0xFFEFF6FF),
+                          color:
+                              s.isCompleted
+                                  ? const Color(0xFFECFDF5)
+                                  : const Color(0xFFEFF6FF),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -550,9 +577,10 @@ class PsychologistDashboardTab extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: s.isCompleted
-                                ? const Color(0xFF059669)
-                                : const Color(0xFF0284C7),
+                            color:
+                                s.isCompleted
+                                    ? const Color(0xFF059669)
+                                    : const Color(0xFF0284C7),
                           ),
                         ),
                       ),
@@ -615,20 +643,23 @@ class PsychologistDashboardTab extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 30),
                 alignment: Alignment.center,
                 child: Column(
-                    children: [
-                      Icon(
-                        Icons.notes_rounded,
-                        size: 38,
-                        color: Colors.grey.shade300,
+                  children: [
+                    Icon(
+                      Icons.notes_rounded,
+                      size: 38,
+                      color: Colors.grey.shade300,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Hozircha kuzatuvlar kiritilmagan',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Hozircha kuzatuvlar kiritilmagan',
-                        style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                      ),
-                    ],
-                  ),
-                )
+                    ),
+                  ],
+                ),
+              )
             else
               ListView.separated(
                 shrinkWrap: true,

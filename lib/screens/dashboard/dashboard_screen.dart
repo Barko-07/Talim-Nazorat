@@ -77,8 +77,8 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   backgroundColor: AppColors.warningBg,
                   borderColor: AppColors.warningBorder,
-                  onTap: () =>
-                      _openModule(context, 5, const MonitoringScreen()),
+                  onTap:
+                      () => _openModule(context, 5, const MonitoringScreen()),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final isNarrow = constraints.maxWidth < 430;
@@ -174,8 +174,12 @@ class DashboardScreen extends StatelessWidget {
                         subtitle: 'Inklyuziv ro‘yxatda',
                         icon: LucideIcons.users,
                         color: AppColors.primary,
-                        onTap: () =>
-                            _openModule(context, 1, const StudentsListScreen()),
+                        onTap:
+                            () => _openModule(
+                              context,
+                              1,
+                              const StudentsListScreen(),
+                            ),
                       ),
                       _buildKpiCard(
                         title: 'Faol ITR rejalari',
@@ -183,8 +187,9 @@ class DashboardScreen extends StatelessWidget {
                         subtitle: 'Ijro etilayotgan',
                         icon: LucideIcons.bookOpenCheck,
                         color: AppColors.info,
-                        onTap: () =>
-                            _openModule(context, 4, const IepListScreen()),
+                        onTap:
+                            () =>
+                                _openModule(context, 4, const IepListScreen()),
                       ),
                       _buildKpiCard(
                         title: 'Bu oygi darslar',
@@ -192,18 +197,20 @@ class DashboardScreen extends StatelessWidget {
                         subtitle: 'O‘tkazilgan va rejada',
                         icon: LucideIcons.calendarCheck2,
                         color: AppColors.purple,
-                        onTap: () =>
-                            _openModule(context, 3, const SessionsScreen()),
+                        onTap:
+                            () =>
+                                _openModule(context, 3, const SessionsScreen()),
                       ),
                       _buildKpiCard(
                         title: 'O‘rtacha o‘sish',
                         value:
-                            '+${app.averageDevelopmentGrowth.toStringAsFixed(1)}%',
-                        subtitle: 'Oxirgi chorakda',
+                            '${app.averageDevelopmentGrowth >= 0 ? '+' : ''}${app.averageDevelopmentGrowth.toStringAsFixed(1)} ball',
+                        subtitle: 'Oldingi baholashlarga nisbatan',
                         icon: LucideIcons.trendingUp,
                         color: AppColors.success,
-                        onTap: () =>
-                            _openModule(context, 6, const ReportsScreen()),
+                        onTap:
+                            () =>
+                                _openModule(context, 6, const ReportsScreen()),
                       ),
                     ],
                   )
@@ -250,20 +257,20 @@ class DashboardScreen extends StatelessWidget {
 
                   return isWide
                       ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: leftCard),
-                            const SizedBox(width: 10),
-                            Expanded(child: rightCard),
-                          ],
-                        )
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: leftCard),
+                          const SizedBox(width: 10),
+                          Expanded(child: rightCard),
+                        ],
+                      )
                       : Column(
-                          children: [
-                            leftCard,
-                            const SizedBox(height: 10),
-                            rightCard,
-                          ],
-                        );
+                        children: [
+                          leftCard,
+                          const SizedBox(height: 10),
+                          rightCard,
+                        ],
+                      );
                 },
               ),
             ],
@@ -276,10 +283,8 @@ class DashboardScreen extends StatelessWidget {
   String _initialsFor(String? fullName) {
     final cleaned = (fullName ?? '').trim();
     if (cleaned.isEmpty) return 'M';
-    final parts = cleaned
-        .split(RegExp(r'\s+'))
-        .where((p) => p.isNotEmpty)
-        .toList();
+    final parts =
+        cleaned.split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
     if (parts.length >= 2) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
@@ -289,8 +294,7 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildWelcomeHero(BuildContext context, UserModel? user) {
     final fullName = user?.fullName ?? 'Mutaxassis';
     final roleLabel = user?.role.label ?? 'Mutaxassis';
-    final institutionName =
-        user?.institutionName ?? '';
+    final institutionName = user?.institutionName ?? '';
     final initials = _initialsFor(user?.fullName);
 
     return GlassSurface(
@@ -415,9 +419,14 @@ class DashboardScreen extends StatelessWidget {
     final redCount = summary?.count(StatusColor.red) ?? 0;
     final yellowCount = summary?.count(StatusColor.yellow) ?? 0;
     final greenCount = summary?.count(StatusColor.green) ?? 0;
-    final pendingReferrals = app.referrals
-        .where((r) => r.status == 'Ko‘rib chiqilmoqda' || r.status == 'Qabul qilindi')
-        .length;
+    final pendingReferrals =
+        app.referrals
+            .where(
+              (r) =>
+                  r.status == 'Ko‘rib chiqilmoqda' ||
+                  r.status == 'Qabul qilindi',
+            )
+            .length;
 
     return SurfaceCard(
       borderRadius: 22,
@@ -427,7 +436,11 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(LucideIcons.activity, size: 19, color: AppColors.primary),
+              const Icon(
+                LucideIcons.activity,
+                size: 19,
+                color: AppColors.primary,
+              ),
               const SizedBox(width: 9),
               const Expanded(
                 child: Text(
@@ -440,7 +453,8 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               InkWell(
-                onTap: () => _openModule(context, 1, const StudentsListScreen()),
+                onTap:
+                    () => _openModule(context, 1, const StudentsListScreen()),
                 child: const Text(
                   'Ro‘yxatni ochish →',
                   style: TextStyle(
@@ -490,14 +504,18 @@ class DashboardScreen extends StatelessWidget {
     double prevAvg = 58;
     double currAvg = 72;
     if (assessments.isNotEmpty) {
-      final currScores = assessments
-          .where((a) => a.maxScore > 0)
-          .map((a) => (a.totalScore / a.maxScore * 100).clamp(0.0, 100.0))
-          .toList();
-      final prevScores = assessments
-          .where((a) => a.previousScore != null && a.maxScore > 0)
-          .map((a) => (a.previousScore! / a.maxScore * 100).clamp(0.0, 100.0))
-          .toList();
+      final currScores =
+          assessments
+              .where((a) => a.maxScore > 0)
+              .map((a) => (a.totalScore / a.maxScore * 100).clamp(0.0, 100.0))
+              .toList();
+      final prevScores =
+          assessments
+              .where((a) => a.previousScore != null && a.maxScore > 0)
+              .map(
+                (a) => (a.previousScore! / a.maxScore * 100).clamp(0.0, 100.0),
+              )
+              .toList();
       if (currScores.isNotEmpty) {
         currAvg = currScores.reduce((a, b) => a + b) / currScores.length;
       }
@@ -587,9 +605,10 @@ class DashboardScreen extends StatelessWidget {
                       getTooltipItems: (touchedSpots) {
                         return touchedSpots.map((spot) {
                           final idx = spot.x.toInt();
-                          final month = (idx >= 0 && idx < months.length)
-                              ? months[idx]
-                              : '';
+                          final month =
+                              (idx >= 0 && idx < months.length)
+                                  ? months[idx]
+                                  : '';
                           return LineTooltipItem(
                             '$month\n${spot.y.toInt()} ball',
                             const TextStyle(
@@ -607,11 +626,12 @@ class DashboardScreen extends StatelessWidget {
                     show: true,
                     drawVerticalLine: false,
                     horizontalInterval: 25,
-                    getDrawingHorizontalLine: (_) => FlLine(
-                      color: AppColors.borderSlate.withValues(alpha: 0.7),
-                      strokeWidth: 1,
-                      dashArray: [5, 5],
-                    ),
+                    getDrawingHorizontalLine:
+                        (_) => FlLine(
+                          color: AppColors.borderSlate.withValues(alpha: 0.7),
+                          strokeWidth: 1,
+                          dashArray: [5, 5],
+                        ),
                   ),
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
@@ -619,14 +639,15 @@ class DashboardScreen extends StatelessWidget {
                         showTitles: true,
                         interval: 25,
                         reservedSize: 34,
-                        getTitlesWidget: (val, _) => Text(
-                          '${val.toInt()}',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textMuted,
-                            fontFeatures: [FontFeature.tabularFigures()],
-                          ),
-                        ),
+                        getTitlesWidget:
+                            (val, _) => Text(
+                              '${val.toInt()}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.textMuted,
+                                fontFeatures: [FontFeature.tabularFigures()],
+                              ),
+                            ),
                       ),
                     ),
                     bottomTitles: AxisTitles(
@@ -683,12 +704,13 @@ class DashboardScreen extends StatelessWidget {
                       isStrokeCapRound: true,
                       dotData: FlDotData(
                         show: true,
-                        getDotPainter: (_, _, _, _) => FlDotCirclePainter(
-                          radius: 5,
-                          color: Colors.white,
-                          strokeWidth: 2.6,
-                          strokeColor: AppColors.primary,
-                        ),
+                        getDotPainter:
+                            (_, _, _, _) => FlDotCirclePainter(
+                              radius: 5,
+                              color: Colors.white,
+                              strokeWidth: 2.6,
+                              strokeColor: AppColors.primary,
+                            ),
                       ),
                       belowBarData: BarAreaData(
                         show: true,
@@ -776,8 +798,8 @@ class DashboardScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            StudentDetailScreen(studentId: a.studentId),
+                        builder:
+                            (_) => StudentDetailScreen(studentId: a.studentId),
                       ),
                     );
                   },
@@ -893,8 +915,8 @@ class DashboardScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            StudentDetailScreen(studentId: s.studentId),
+                        builder:
+                            (_) => StudentDetailScreen(studentId: s.studentId),
                       ),
                     );
                   },
@@ -954,11 +976,13 @@ class DashboardScreen extends StatelessWidget {
     switch (role) {
       case UserRole.psychologist:
         sectionTitle = 'Amaliyotchi psixolog ish maydoni';
-        sectionSubtitle = 'Kognitiv, hissiy-irodaviy sohalarni baholash va korreksion mashg‘ulotlar';
+        sectionSubtitle =
+            'Kognitiv, hissiy-irodaviy sohalarni baholash va korreksion mashg‘ulotlar';
         actions = [
           {
             'title': 'Yangi baholash (Rubrika)',
-            'desc': 'Bola rivojlanish darajasini standart mezonlar bo‘yicha baholash',
+            'desc':
+                'Bola rivojlanish darajasini standart mezonlar bo‘yicha baholash',
             'icon': LucideIcons.brain,
             'color': AppColors.primary,
             'screen': const NewAssessmentScreen(),
@@ -984,7 +1008,8 @@ class DashboardScreen extends StatelessWidget {
 
       case UserRole.speechTherapist:
         sectionTitle = 'Logoped-defektolog ish maydoni';
-        sectionSubtitle = 'Nutq nuqsonlari korreksiyasi, fonematik eshitish va artikulyatsion tahlil';
+        sectionSubtitle =
+            'Nutq nuqsonlari korreksiyasi, fonematik eshitish va artikulyatsion tahlil';
         actions = [
           {
             'title': 'Nutq diagnostikasi',
@@ -1014,7 +1039,8 @@ class DashboardScreen extends StatelessWidget {
 
       case UserRole.specialEducation:
         sectionTitle = 'Maxsus pedagog (Defektolog) ish maydoni';
-        sectionSubtitle = 'Sensor, motorika va aqliy rivojlanishni moslashtirilgan ta’lim bilan qo‘llab-quvvatlash';
+        sectionSubtitle =
+            'Sensor, motorika va aqliy rivojlanishni moslashtirilgan ta’lim bilan qo‘llab-quvvatlash';
         actions = [
           {
             'title': 'Defektologik test',
@@ -1049,7 +1075,8 @@ class DashboardScreen extends StatelessWidget {
         actions = [
           {
             'title': 'DTS darajasi va fan topshiriqlari',
-            'desc': 'O‘quvchi profilida matematika, o‘qish va ona tili bo‘yicha haqiqiy darajani belgilash',
+            'desc':
+                'O‘quvchi profilida matematika, o‘qish va ona tili bo‘yicha haqiqiy darajani belgilash',
             'icon': LucideIcons.graduationCap,
             'color': AppColors.primary,
             'tabIndex': 1,
@@ -1057,7 +1084,8 @@ class DashboardScreen extends StatelessWidget {
           },
           {
             'title': 'Haftalik pedagogik baholash',
-            'desc': 'O‘quv ko‘nikmalari va o‘zlashtirish dinamikasini qayd etish',
+            'desc':
+                'O‘quv ko‘nikmalari va o‘zlashtirish dinamikasini qayd etish',
             'icon': LucideIcons.clipboardCheck,
             'color': AppColors.info,
             'screen': const NewAssessmentScreen(),
@@ -1080,7 +1108,8 @@ class DashboardScreen extends StatelessWidget {
         actions = [
           {
             'title': 'O‘quvchilar va Svetofor holati',
-            'desc': 'Ishlanmagan (Qizil) bolalarni aniqlash va mutaxassis biriktirish',
+            'desc':
+                'Ishlanmagan (Qizil) bolalarni aniqlash va mutaxassis biriktirish',
             'icon': LucideIcons.users,
             'color': AppColors.primary,
             'tabIndex': 1,
@@ -1088,14 +1117,16 @@ class DashboardScreen extends StatelessWidget {
           },
           {
             'title': 'Yo‘naltirishlar va Konsilium',
-            'desc': 'Psixolog, logoped, maxsus o‘qituvchi va ota-onaga yo‘naltirishlar',
+            'desc':
+                'Psixolog, logoped, maxsus o‘qituvchi va ota-onaga yo‘naltirishlar',
             'icon': LucideIcons.arrowLeftRight,
             'color': AppColors.info,
             'screen': const ReferralsScreen(),
           },
           {
             'title': 'ITR va Monitoring hisoboti',
-            'desc': 'Individual ta’lim rejalari ijrosi va maktab qamrov hisobotlari',
+            'desc':
+                'Individual ta’lim rejalari ijrosi va maktab qamrov hisobotlari',
             'icon': LucideIcons.bookOpenCheck,
             'color': AppColors.purple,
             'tabIndex': 4,
@@ -1106,7 +1137,8 @@ class DashboardScreen extends StatelessWidget {
 
       case UserRole.teacher:
         sectionTitle = 'Fan o‘qituvchisi / Tyutor ish maydoni';
-        sectionSubtitle = 'Sinfdagi inklyuziv muhit, o‘quv dasturini moslashtirish va davomat';
+        sectionSubtitle =
+            'Sinfdagi inklyuziv muhit, o‘quv dasturini moslashtirish va davomat';
         actions = [
           {
             'title': 'Dars davomati va faollik',
@@ -1140,11 +1172,13 @@ class DashboardScreen extends StatelessWidget {
       case UserRole.superAdmin:
       default:
         sectionTitle = 'Boshqaruv va Monitoring maydoni';
-        sectionSubtitle = 'Muassasa bo‘yicha tahliliy ko‘rsatkichlar, xavflar va mutaxassislar yuklamasi';
+        sectionSubtitle =
+            'Muassasa bo‘yicha tahliliy ko‘rsatkichlar, xavflar va mutaxassislar yuklamasi';
         actions = [
           {
             'title': 'Tahliliy hisobotlar',
-            'desc': 'Maktab inklyuziv ta’lim holati, choraklik natijalar va CSV eksport',
+            'desc':
+                'Maktab inklyuziv ta’lim holati, choraklik natijalar va CSV eksport',
             'icon': LucideIcons.chartColumn,
             'color': AppColors.primary,
             'tabIndex': 6,
@@ -1152,7 +1186,8 @@ class DashboardScreen extends StatelessWidget {
           },
           {
             'title': 'Monitoring signallari',
-            'desc': 'Rivojlanish regressiyasi va to‘xtab qolish xavfi ogohlantirishlari',
+            'desc':
+                'Rivojlanish regressiyasi va to‘xtab qolish xavfi ogohlantirishlari',
             'icon': LucideIcons.shieldAlert,
             'color': AppColors.warning,
             'tabIndex': 5,
@@ -1205,9 +1240,8 @@ class DashboardScreen extends StatelessWidget {
             tabletColumns: 1,
             desktopColumns: 3,
             spacing: 14,
-            children: actions
-                .map((act) => _buildActionTile(context, act))
-                .toList(),
+            children:
+                actions.map((act) => _buildActionTile(context, act)).toList(),
           ),
         ],
       ),

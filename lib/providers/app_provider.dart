@@ -125,8 +125,7 @@ class AppProvider extends ChangeNotifier {
   List<StudentModel> get allStudentsIncludingArchived =>
       _db.getStudents(forUser: _viewer, includeArchived: true);
 
-  List<AssessmentModel> get assessments =>
-      _db.getAssessments(forUser: _viewer);
+  List<AssessmentModel> get assessments => _db.getAssessments(forUser: _viewer);
   List<SessionModel> get sessions => _db.getSessions(forUser: _viewer);
   List<IndividualEducationPlanModel> get iepPlans =>
       _db.getIepPlans(forUser: _viewer);
@@ -164,10 +163,11 @@ class AppProvider extends ChangeNotifier {
   AssessmentQuestionModel? getQuestionById(String id) =>
       _db.getQuestionById(id);
 
-  List<UserModel> get specialists => _db
-      .getUsers(forUser: _viewer)
-      .where((u) => u.role != UserRole.superAdmin)
-      .toList();
+  List<UserModel> get specialists =>
+      _db
+          .getUsers(forUser: _viewer)
+          .where((u) => u.role != UserRole.superAdmin)
+          .toList();
   List<UserModel> get allUsers => _db.getUsers(forUser: _viewer);
 
   List<NotificationModel> get myNotifications {
@@ -185,7 +185,15 @@ class AppProvider extends ChangeNotifier {
   // ==================== DASHBOARD METRICS ====================
   int get totalStudentsCount => students.length;
   int get activeIepCount => iepPlans.where((p) => p.status == 'Faol').length;
-  int get thisMonthSessionsCount => sessions.length;
+  int get thisMonthSessionsCount {
+    final now = DateTime.now();
+    return sessions.where((session) {
+      final date = session.scheduledAt;
+      final sameMonth = date.year == now.year && date.month == now.month;
+      return sameMonth && (session.isCompleted || session.isScheduled);
+    }).length;
+  }
+
   int get attentionNeededCount => unresolvedAlerts.length;
 
   /// Haqiqiy saqlangan oraliq baholashlar bo'yicha hisoblangan o'rtacha o'sish
@@ -234,11 +242,7 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _db.deactivateStudent(
-        studentId,
-        reason,
-        byUser: _requireUser(),
-      );
+      await _db.deactivateStudent(studentId, reason, byUser: _requireUser());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -307,10 +311,7 @@ class AppProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteAssessment(
-    String id, {
-    UserModel? byUser,
-  }) async {
+  Future<void> deleteAssessment(String id, {UserModel? byUser}) async {
     _isLoading = true;
     notifyListeners();
     try {
@@ -349,10 +350,7 @@ class AppProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteQuestion(
-    String id, {
-    UserModel? byUser,
-  }) async {
+  Future<void> deleteQuestion(String id, {UserModel? byUser}) async {
     _isLoading = true;
     notifyListeners();
     try {
@@ -521,11 +519,7 @@ class AppProvider extends ChangeNotifier {
     bool isActive, {
     UserModel? byUser,
   }) async {
-    await _db.toggleUserActive(
-      userId,
-      isActive,
-      byUser: _requireUser(),
-    );
+    await _db.toggleUserActive(userId, isActive, byUser: _requireUser());
     notifyListeners();
   }
 
@@ -552,7 +546,9 @@ class AppProvider extends ChangeNotifier {
       _exportService.generateObservationsCsv(observations);
 
   // ==================== PSIXOLOGIK KUZATUVLAR ====================
-  List<PsychologicalObservationModel> getObservationsForStudent(String studentId) {
+  List<PsychologicalObservationModel> getObservationsForStudent(
+    String studentId,
+  ) {
     return _db.getObservations(forUser: _viewer, studentId: studentId);
   }
 
@@ -604,10 +600,14 @@ class AppProvider extends ChangeNotifier {
       _selection.workingGrade(student, domain);
 
   /// Baholash natijasidan keyin ishchi sinf bo'yicha tavsiya
-  LevelChangeAdvice adviseLevelChange(AssessmentModel assessment, int currentGrade) {
-    final ratio = assessment.maxScore > 0
-        ? assessment.totalScore / assessment.maxScore
-        : 0.0;
+  LevelChangeAdvice adviseLevelChange(
+    AssessmentModel assessment,
+    int currentGrade,
+  ) {
+    final ratio =
+        assessment.maxScore > 0
+            ? assessment.totalScore / assessment.maxScore
+            : 0.0;
     return _selection.adviseLevelChange(ratio, currentGrade);
   }
 
@@ -675,7 +675,9 @@ class AppProvider extends ChangeNotifier {
     );
   }
 
-  Future<AssessmentPlanModel> saveAssessmentPlan(AssessmentPlanModel plan) async {
+  Future<AssessmentPlanModel> saveAssessmentPlan(
+    AssessmentPlanModel plan,
+  ) async {
     final user = _requireUser();
     final saved = await _db.saveAssessmentPlan(plan, byUser: user);
     notifyListeners();
@@ -711,29 +713,49 @@ class AppProvider extends ChangeNotifier {
 
   /// Saqlashdan oldin ko'rsatish uchun: natijalardan tavsiya etiladigan daraja
   int? previewSubjectLevel(String subject, Map<String, Mastery> results) =>
-      _subjectLevels.suggestGrade(results, curriculumStandards(subject: subject));
-
-  /// Quyiroq sinf talablarini ham tekshirish kerakmi?
-  bool subjectLevelNeedsLowerCheck(String subject, Map<String, Mastery> results) =>
-      _subjectLevels.needsLowerGradeCheck(
+      _subjectLevels.suggestGrade(
         results,
         curriculumStandards(subject: subject),
       );
 
-  List<SubjectLevelAssessment> subjectLevelHistory(String studentId, {String? subject}) {
+  /// Quyiroq sinf talablarini ham tekshirish kerakmi?
+  bool subjectLevelNeedsLowerCheck(
+    String subject,
+    Map<String, Mastery> results,
+  ) => _subjectLevels.needsLowerGradeCheck(
+    results,
+    curriculumStandards(subject: subject),
+  );
+
+  List<SubjectLevelAssessment> subjectLevelHistory(
+    String studentId, {
+    String? subject,
+  }) {
     final user = _currentViewer;
     if (user == null) return [];
-    return _db.getSubjectLevels(forUser: user, studentId: studentId, subject: subject);
+    return _db.getSubjectLevels(
+      forUser: user,
+      studentId: studentId,
+      subject: subject,
+    );
   }
 
-  SubjectLevelAssessment? currentSubjectLevel(String studentId, String subject) {
+  SubjectLevelAssessment? currentSubjectLevel(
+    String studentId,
+    String subject,
+  ) {
     final user = _currentViewer;
     if (user == null) return null;
-    return _db.latestSubjectLevel(forUser: user, studentId: studentId, subject: subject);
+    return _db.latestSubjectLevel(
+      forUser: user,
+      studentId: studentId,
+      subject: subject,
+    );
   }
 
   /// "7-sinf o'quvchisi, Matematika: 3-sinf darajasi (sinfidan 4 sinf past)"
-  String describeSubjectLevel(SubjectLevelAssessment a) => _subjectLevels.describe(a);
+  String describeSubjectLevel(SubjectLevelAssessment a) =>
+      _subjectLevels.describe(a);
 
   /// Hozirgi darajaga mos keyingi talablar — topshiriq va ITR maqsadlari uchun
   List<CurriculumStandard> nextStandardsFor(String studentId, String subject) {
@@ -752,9 +774,10 @@ class AppProvider extends ChangeNotifier {
     String subject, {
     DynamicsPeriod period = DynamicsPeriod.measurement,
   }) {
-    final points = subjectLevelHistory(studentId, subject: subject)
-        .map((a) => DataPoint(a.assessedAt, a.confirmedGrade.toDouble()))
-        .toList();
+    final points =
+        subjectLevelHistory(studentId, subject: subject)
+            .map((a) => DataPoint(a.assessedAt, a.confirmedGrade.toDouble()))
+            .toList();
     return _dynamics.evaluate(
       points,
       period: period,
@@ -772,16 +795,25 @@ class AppProvider extends ChangeNotifier {
     return saved;
   }
 
-  Future<ProgressMeasurement> addMeasurement(ProgressMeasurement measurement) async {
+  Future<ProgressMeasurement> addMeasurement(
+    ProgressMeasurement measurement,
+  ) async {
     final saved = await _db.addMeasurement(measurement, byUser: _requireUser());
     notifyListeners();
     return saved;
   }
 
-  List<ProgressMeasurement> measurementsFor(String studentId, {String? metricId}) {
+  List<ProgressMeasurement> measurementsFor(
+    String studentId, {
+    String? metricId,
+  }) {
     final user = _currentViewer;
     if (user == null) return [];
-    return _db.getMeasurements(forUser: user, studentId: studentId, metricId: metricId);
+    return _db.getMeasurements(
+      forUser: user,
+      studentId: studentId,
+      metricId: metricId,
+    );
   }
 
   /// Ko'rsatkich bo'yicha dinamika: o'sish / pasayish / barqaror / samarasiz.
@@ -792,9 +824,11 @@ class AppProvider extends ChangeNotifier {
     DynamicsPeriod period = DynamicsPeriod.measurement,
   }) {
     final metric = _db.getProgressMetric(metricId);
-    final points = measurementsFor(studentId, metricId: metricId)
-        .map((m) => DataPoint(m.measuredAt, m.value))
-        .toList();
+    final points =
+        measurementsFor(
+          studentId,
+          metricId: metricId,
+        ).map((m) => DataPoint(m.measuredAt, m.value)).toList();
     return _dynamics.evaluate(
       points,
       higherIsBetter: metric?.higherIsBetter ?? true,
@@ -810,13 +844,20 @@ class AppProvider extends ChangeNotifier {
     DynamicsPeriod period = DynamicsPeriod.measurement,
   }) {
     final set = questionIds.toSet();
-    final points = assessments
-        .where((a) => a.studentId == studentId && a.status == 'completed')
-        .where((a) => a.questionIds.toSet().length == set.length &&
-            a.questionIds.toSet().containsAll(set))
-        .where((a) => a.maxScore > 0)
-        .map((a) => DataPoint(a.assessmentDate, a.totalScore / a.maxScore * 100))
-        .toList();
+    final points =
+        assessments
+            .where((a) => a.studentId == studentId && a.status == 'completed')
+            .where(
+              (a) =>
+                  a.questionIds.toSet().length == set.length &&
+                  a.questionIds.toSet().containsAll(set),
+            )
+            .where((a) => a.maxScore > 0)
+            .map(
+              (a) =>
+                  DataPoint(a.assessmentDate, a.totalScore / a.maxScore * 100),
+            )
+            .toList();
     return _dynamics.evaluate(points, period: period, unit: '%');
   }
 
@@ -867,17 +908,19 @@ class AppProvider extends ChangeNotifier {
     final current = currentSubjectLevel(studentId, subject);
     if (user == null || current == null) return [];
     return nextStandardsFor(studentId, subject)
-        .map((s) => SubjectTask(
-              id: 'task_${s.id}_${DateTime.now().millisecondsSinceEpoch}',
-              studentId: studentId,
-              subject: subject,
-              levelGrade: s.grade,
-              standardId: s.id,
-              title: s.description,
-              assignedById: user.id,
-              assignedByName: user.fullName,
-              assignedAt: DateTime.now(),
-            ))
+        .map(
+          (s) => SubjectTask(
+            id: 'task_${s.id}_${DateTime.now().millisecondsSinceEpoch}',
+            studentId: studentId,
+            subject: subject,
+            levelGrade: s.grade,
+            standardId: s.id,
+            title: s.description,
+            assignedById: user.id,
+            assignedByName: user.fullName,
+            assignedAt: DateTime.now(),
+          ),
+        )
         .toList();
   }
 
@@ -887,17 +930,33 @@ class AppProvider extends ChangeNotifier {
     return saved;
   }
 
-  Future<SubjectTask> completeSubjectTask(String taskId, Mastery result, {String? note}) async {
-    final saved = await _db.completeSubjectTask(taskId, result, note: note, byUser: _requireUser());
+  Future<SubjectTask> completeSubjectTask(
+    String taskId,
+    Mastery result, {
+    String? note,
+  }) async {
+    final saved = await _db.completeSubjectTask(
+      taskId,
+      result,
+      note: note,
+      byUser: _requireUser(),
+    );
     notifyListeners();
     return saved;
   }
 
-  List<SubjectTask> subjectTasksFor(String studentId, {String? subject, bool onlyOpen = false}) {
+  List<SubjectTask> subjectTasksFor(
+    String studentId, {
+    String? subject,
+    bool onlyOpen = false,
+  }) {
     final user = _currentViewer;
     if (user == null) return [];
     return _db.getSubjectTasks(
-      forUser: user, studentId: studentId, subject: subject, onlyOpen: onlyOpen,
+      forUser: user,
+      studentId: studentId,
+      subject: subject,
+      onlyOpen: onlyOpen,
     );
   }
 
@@ -934,10 +993,14 @@ class AppProvider extends ChangeNotifier {
       _reports.build(_requireUser(), from: from, to: to);
 
   String exportMonitoringReportCsv({DateTime? from, DateTime? to}) =>
-      _exportService.generateMonitoringReportCsv(buildReport(from: from, to: to));
+      _exportService.generateMonitoringReportCsv(
+        buildReport(from: from, to: to),
+      );
 
   String exportSpecialistActivityCsv({DateTime? from, DateTime? to}) =>
-      _exportService.generateSpecialistActivityCsv(buildReport(from: from, to: to));
+      _exportService.generateSpecialistActivityCsv(
+        buildReport(from: from, to: to),
+      );
 
   String exportDatabaseBackupJson() =>
       _db.exportDatabaseBackupJson(forUser: _currentViewer);
@@ -950,7 +1013,10 @@ class AppProvider extends ChangeNotifier {
   }
 
   Future<CaseConference> scheduleConference(CaseConference conference) async {
-    final saved = await _db.scheduleConference(conference, byUser: _requireUser());
+    final saved = await _db.scheduleConference(
+      conference,
+      byUser: _requireUser(),
+    );
     notifyListeners();
     return saved;
   }
@@ -985,7 +1051,10 @@ class AppProvider extends ChangeNotifier {
     return saved;
   }
 
-  Future<CaseConference> completeConferenceDecision(String conferenceId, String decisionId) async {
+  Future<CaseConference> completeConferenceDecision(
+    String conferenceId,
+    String decisionId,
+  ) async {
     final saved = await _db.completeConferenceDecision(
       conferenceId,
       decisionId,
@@ -1010,7 +1079,8 @@ class AppProvider extends ChangeNotifier {
   }
 
   /// Tovush bo'yicha keyingi qadam tavsiyasi
-  String soundNextStep(SoundProgress progress) => _soundTracker.nextStep(progress);
+  String soundNextStep(SoundProgress progress) =>
+      _soundTracker.nextStep(progress);
 
   Future<SoundEntry> recordSoundEntry(SoundEntry entry) async {
     final saved = await _db.recordSoundEntry(entry, byUser: _requireUser());
@@ -1037,7 +1107,9 @@ class AppProvider extends ChangeNotifier {
     }
     final fresh = _db.getUserById(cached.id);
     if (fresh == null || !fresh.isActive) {
-      throw const PermissionDeniedException('hisob bloklangan yoki o‘chirilgan.');
+      throw const PermissionDeniedException(
+        'hisob bloklangan yoki o‘chirilgan.',
+      );
     }
     return fresh;
   }

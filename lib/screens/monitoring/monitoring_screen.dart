@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/monitoring_alert_model.dart';
+import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../services/child_status_service.dart';
 import '../students/student_detail_screen.dart';
@@ -53,105 +54,106 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          return AlertDialog(
-            title: const Text('Signalni ko‘rib chiqish va yechim kiritish'),
-            content: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 460),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'O‘quvchi: ${alert.studentName} (${alert.studentGrade})',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      alert.ruleTitle,
-                      style: const TextStyle(
-                        fontSize: 12.5,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      alert.message,
-                      style: const TextStyle(
-                        fontSize: 12.5,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedStatus,
-                      isExpanded: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Yangi holati *',
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Ko‘rib chiqilmoqda',
-                          child: Text('Ko‘rib chiqilmoqda'),
+      builder:
+          (ctx) => StatefulBuilder(
+            builder: (context, setModalState) {
+              return AlertDialog(
+                title: const Text('Signalni ko‘rib chiqish va yechim kiritish'),
+                content: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 460),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'O‘quvchi: ${alert.studentName} (${alert.studentGrade})',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13.5,
+                          ),
                         ),
-                        DropdownMenuItem(
-                          value: 'Hal qilindi',
-                          child: Text('Hal qilindi (Yopish)'),
+                        const SizedBox(height: 4),
+                        Text(
+                          alert.ruleTitle,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        DropdownMenuItem(
-                          value: 'Rad etildi',
-                          child: Text('Rad etildi (Asossiz deb topildi)'),
+                        const SizedBox(height: 6),
+                        Text(
+                          alert.message,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          initialValue: selectedStatus,
+                          isExpanded: true,
+                          decoration: const InputDecoration(
+                            labelText: 'Yangi holati *',
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'Ko‘rib chiqilmoqda',
+                              child: Text('Ko‘rib chiqilmoqda'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Hal qilindi',
+                              child: Text('Hal qilindi (Yopish)'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Rad etildi',
+                              child: Text('Rad etildi (Asossiz deb topildi)'),
+                            ),
+                          ],
+                          onChanged: (val) {
+                            if (val != null) {
+                              setModalState(() => selectedStatus = val);
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: notesCtrl,
+                          maxLines: 3,
+                          decoration: const InputDecoration(
+                            labelText: 'Qabul qilingan chora va xulosalar *',
+                            hintText:
+                                'Ushbu muammo bo‘yicha qanday pedagogik qaror qabul qilindi...',
+                          ),
                         ),
                       ],
-                      onChanged: (val) {
-                        if (val != null) {
-                          setModalState(() => selectedStatus = val);
-                        }
-                      },
                     ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: notesCtrl,
-                      maxLines: 3,
-                      decoration: const InputDecoration(
-                        labelText: 'Qabul qilingan chora va xulosalar *',
-                        hintText:
-                            'Ushbu muammo bo‘yicha qanday pedagogik qaror qabul qilindi...',
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Bekor qilish'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  await app.resolveAlert(alert.id, notesCtrl.text.trim());
-                  if (ctx.mounted) {
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Signal muvaffaqiyatli saqlandi.'),
-                      ),
-                    );
-                  }
-                },
-                child: const Text('Saqlash'),
-              ),
-            ],
-          );
-        },
-      ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Bekor qilish'),
+                  ),
+                  FilledButton(
+                    onPressed: () async {
+                      await app.resolveAlert(alert.id, notesCtrl.text.trim());
+                      if (ctx.mounted) {
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Signal muvaffaqiyatli saqlandi.'),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text('Saqlash'),
+                  ),
+                ],
+              );
+            },
+          ),
     );
   }
 
@@ -197,11 +199,12 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
     ];
 
     final summary = app.monitoringSummary;
-    final filteredStatuses = summary == null
-        ? const <ChildStatus>[]
-        : (_selectedSvetoforFilter == null
-              ? summary.statuses
-              : summary.byColor(_selectedSvetoforFilter!));
+    final filteredStatuses =
+        summary == null
+            ? const <ChildStatus>[]
+            : (_selectedSvetoforFilter == null
+                ? summary.statuses
+                : summary.byColor(_selectedSvetoforFilter!));
 
     final scrollBody = SingleChildScrollView(
       child: ResponsivePageContainer(
@@ -221,9 +224,10 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                   'Faqat ochiqlar': unresolvedCount,
                   'Barcha signallar': allAlertsCount,
                 },
-                onSelected: (v) => setState(
-                  () => _showOnlyUnresolved = v == 'Faqat ochiqlar',
-                ),
+                onSelected:
+                    (v) => setState(
+                      () => _showOnlyUnresolved = v == 'Faqat ochiqlar',
+                    ),
               ),
             ),
             const SizedBox(height: 18),
@@ -263,23 +267,26 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                           color: AppColors.primary,
                           bg: AppColors.primaryLight,
                           selected: _selectedSvetoforFilter == null,
-                          onTap: () => setState(
-                            () => _selectedSvetoforFilter = null,
-                          ),
+                          onTap:
+                              () => setState(
+                                () => _selectedSvetoforFilter = null,
+                              ),
                         ),
                         _buildSvetoforCounter(
                           label: '🔴 Qizil (Ishlanmagan)',
                           count: summary.count(StatusColor.red),
                           color: const Color(0xFFDC2626),
                           bg: const Color(0xFFFEF2F2),
-                          selected:
-                              _selectedSvetoforFilter == StatusColor.red,
-                          onTap: () => setState(
-                            () => _selectedSvetoforFilter =
-                                _selectedSvetoforFilter == StatusColor.red
-                                ? null
-                                : StatusColor.red,
-                          ),
+                          selected: _selectedSvetoforFilter == StatusColor.red,
+                          onTap:
+                              () => setState(
+                                () =>
+                                    _selectedSvetoforFilter =
+                                        _selectedSvetoforFilter ==
+                                                StatusColor.red
+                                            ? null
+                                            : StatusColor.red,
+                              ),
                         ),
                         _buildSvetoforCounter(
                           label: '🟡 Sariq (E’tibor talab)',
@@ -288,12 +295,15 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                           bg: const Color(0xFFFFFBEB),
                           selected:
                               _selectedSvetoforFilter == StatusColor.yellow,
-                          onTap: () => setState(
-                            () => _selectedSvetoforFilter =
-                                _selectedSvetoforFilter == StatusColor.yellow
-                                ? null
-                                : StatusColor.yellow,
-                          ),
+                          onTap:
+                              () => setState(
+                                () =>
+                                    _selectedSvetoforFilter =
+                                        _selectedSvetoforFilter ==
+                                                StatusColor.yellow
+                                            ? null
+                                            : StatusColor.yellow,
+                              ),
                         ),
                         _buildSvetoforCounter(
                           label: '🟢 Yashil (Ijobiy)',
@@ -302,12 +312,15 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                           bg: const Color(0xFFECFDF5),
                           selected:
                               _selectedSvetoforFilter == StatusColor.green,
-                          onTap: () => setState(
-                            () => _selectedSvetoforFilter =
-                                _selectedSvetoforFilter == StatusColor.green
-                                ? null
-                                : StatusColor.green,
-                          ),
+                          onTap:
+                              () => setState(
+                                () =>
+                                    _selectedSvetoforFilter =
+                                        _selectedSvetoforFilter ==
+                                                StatusColor.green
+                                            ? null
+                                            : StatusColor.green,
+                              ),
                         ),
                       ],
                     ),
@@ -342,9 +355,10 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                     tabletColumns: 2,
                     desktopColumns: 2,
                     spacing: 12,
-                    children: rules
-                        .map((r) => _buildRuleTile(r.$1, r.$2, r.$3))
-                        .toList(),
+                    children:
+                        rules
+                            .map((r) => _buildRuleTile(r.$1, r.$2, r.$3))
+                            .toList(),
                   ),
                 ],
               ),
@@ -450,9 +464,10 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
               decoration: BoxDecoration(
-                color: selected
-                    ? Colors.white.withValues(alpha: 0.22)
-                    : color.withValues(alpha: 0.14),
+                color:
+                    selected
+                        ? Colors.white.withValues(alpha: 0.22)
+                        : color.withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -578,6 +593,65 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                           fontSize: 11.5,
                           color: AppColors.textMuted,
                         ),
+                      ),
+                    ],
+                    if (st.specialistWorkStatuses.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Mutaxassislar bo‘yicha ish holati',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children:
+                            st.specialistWorkStatuses.map((work) {
+                              final color = _colorFor(work.color);
+                              final bg = _bgFor(work.color);
+                              final stateLabel =
+                                  work.lastWorkAt == null
+                                      ? 'Ish boshlanmagan'
+                                      : work.color == StatusColor.yellow
+                                      ? '30 kundan ortiq'
+                                      : 'Faol';
+                              return Tooltip(
+                                message:
+                                    work.lastWorkAt == null
+                                        ? '${work.specialist.fullName}: ish qayd etilmagan'
+                                        : '${work.specialist.fullName}: oxirgi ish ${df.format(work.lastWorkAt!)}',
+                                child: Container(
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 240,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: bg,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: color.withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '${work.specialist.role.label}: $stateLabel',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: color,
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                       ),
                     ],
                   ],

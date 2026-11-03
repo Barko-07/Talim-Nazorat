@@ -18,22 +18,40 @@ void main() {
   const school = '5-sonli umumiy o‘rta ta’lim maktabi';
 
   final admin = UserModel(
-    id: 'cs_admin', email: 'cs.admin@talim.uz', fullName: 'Admin', role: UserRole.superAdmin,
+    id: 'cs_admin',
+    email: 'cs.admin@talim.uz',
+    fullName: 'Admin',
+    role: UserRole.superAdmin,
   );
   final coordinator = UserModel(
-    id: 'cs_coord', email: 'cs.coord@talim.uz', fullName: 'Koordinator',
-    role: UserRole.coordinator, institutionId: 'inst_chortoq_5', institutionName: school,
+    id: 'cs_coord',
+    email: 'cs.coord@talim.uz',
+    fullName: 'Koordinator',
+    role: UserRole.coordinator,
+    institutionId: 'inst_chortoq_5',
+    institutionName: school,
   );
 
   late UserModel psy; // bazadagi psixolog (user_psychologist)
   late UserModel speech; // bazadagi logoped (user_speech)
 
-  Future<StudentModel> child(String id, {List<String> assigned = const []}) async {
+  Future<StudentModel> child(
+    String id, {
+    List<String> assigned = const [],
+  }) async {
     await db.addStudent(
       StudentModel(
-        id: id, institutionId: 'inst_chortoq_5', institutionName: school,
-        firstName: id, lastName: 'Test', dateOfBirth: DateTime(2016), gender: 'Erkak',
-        grade: '3-A', status: 'Faol', primaryNeed: 'x', supportLevel: '1-daraja',
+        id: id,
+        institutionId: 'inst_chortoq_5',
+        institutionName: school,
+        firstName: id,
+        lastName: 'Test',
+        dateOfBirth: DateTime(2016),
+        gender: 'Erkak',
+        grade: '3-A',
+        status: 'Faol',
+        primaryNeed: 'x',
+        supportLevel: '1-daraja',
         createdAt: DateTime.now(),
       ),
       byUser: admin,
@@ -50,13 +68,18 @@ void main() {
       db.addMeasurement(
         ProgressMeasurement(
           id: '${studentId}_${at.millisecondsSinceEpoch}_$v',
-          studentId: studentId, metricId: ProgressMetrics.attentionSpan.id,
-          value: v, measuredAt: at, recordedById: '', recordedByName: '',
+          studentId: studentId,
+          metricId: ProgressMetrics.attentionSpan.id,
+          value: v,
+          measuredAt: at,
+          recordedById: '',
+          recordedByName: '',
         ),
         byUser: by,
       );
 
-  ChildStatus status(String id) => service.statusFor(db.getStudentById(id)!, coordinator);
+  ChildStatus status(String id) =>
+      service.statusFor(db.getStudentById(id)!, coordinator);
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
@@ -77,11 +100,18 @@ void main() {
     expect(s.color, StatusColor.red);
     expect(s.reasons.join(), contains('hech qanday ish'));
     expect(s.specialistsNotStarted, isNotEmpty);
+    expect(s.specialistWorkStatuses.single.color, StatusColor.red);
+    expect(s.specialistWorkStatuses.single.lastWorkAt, isNull);
   });
 
   test('RED: last work was more than 30 days ago', () async {
     await child('c_stale', assigned: ['user_psychologist']);
-    await measure('c_stale', psy, 2, DateTime.now().subtract(const Duration(days: 45)));
+    await measure(
+      'c_stale',
+      psy,
+      2,
+      DateTime.now().subtract(const Duration(days: 45)),
+    );
     final s = status('c_stale');
     expect(s.color, StatusColor.red);
     expect(s.reasons.join(), contains('kun oldin'));
@@ -113,6 +143,18 @@ void main() {
     final s = status('c_partial');
     expect(s.color, StatusColor.yellow);
     expect(s.specialistsNotStarted, [speech.fullName]);
+    expect(
+      s.specialistWorkStatuses
+          .singleWhere((w) => w.specialist.id == speech.id)
+          .color,
+      StatusColor.red,
+    );
+    expect(
+      s.specialistWorkStatuses
+          .singleWhere((w) => w.specialist.id == psy.id)
+          .color,
+      StatusColor.green,
+    );
   });
 
   test('GREEN: recent work with growth (2 → 5 minutes)', () async {
@@ -147,27 +189,37 @@ void main() {
     final mine = service.summaryFor(db.getUserById('user_psychologist')!);
     expect(mine.statuses.map((s) => s.student.id), isNot(contains('c_other')));
     expect(
-      () => service.statusFor(db.getStudentById('c_other')!, db.getUserById('user_psychologist')!),
+      () => service.statusFor(
+        db.getStudentById('c_other')!,
+        db.getUserById('user_psychologist')!,
+      ),
       throwsA(isA<PermissionDeniedException>()),
     );
   });
 
   test('the same open alert is never listed twice for one child', () {
-    final open = db
-        .getAlerts(onlyUnresolved: true)
-        .map((a) => '${a.studentId}_${a.ruleCode}')
-        .toList();
+    final open =
+        db
+            .getAlerts(onlyUnresolved: true)
+            .map((a) => '${a.studentId}_${a.ruleCode}')
+            .toList();
     expect(open.length, open.toSet().length);
   });
 
-  test('an open alert keeps its identity but its text follows the current facts', () {
-    final open = db.getAlerts(onlyUnresolved: true);
-    expect(open.any((a) => a.message.contains('ITR dagi')), false);
-  });
+  test(
+    'an open alert keeps its identity but its text follows the current facts',
+    () {
+      final open = db.getAlerts(onlyUnresolved: true);
+      expect(open.any((a) => a.message.contains('ITR dagi')), false);
+    },
+  );
 
-  test('confidential notes count as work without exposing their content', () async {
-    await child('c_conf', assigned: ['user_psychologist']);
-    final records = db.getWorkRecords('c_conf');
-    expect(records, isEmpty);
-  });
+  test(
+    'confidential notes count as work without exposing their content',
+    () async {
+      await child('c_conf', assigned: ['user_psychologist']);
+      final records = db.getWorkRecords('c_conf');
+      expect(records, isEmpty);
+    },
+  );
 }

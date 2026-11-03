@@ -75,9 +75,10 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
     _selectedStatus = q?.status ?? 'ready';
 
     if (q != null && q.options.isNotEmpty) {
-      _options = q.options
-          .map((o) => _OptionDraft(text: o.text, score: o.score))
-          .toList();
+      _options =
+          q.options
+              .map((o) => _OptionDraft(text: o.text, score: o.score))
+              .toList();
     } else {
       _options = _defaultOptionsForType(_selectedType);
     }
@@ -103,7 +104,10 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
       return [
         _OptionDraft(text: 'Mustaqil va aniq bajaradi', score: 5.0),
         _OptionDraft(text: 'Kichik yordam bilan uddalaydi', score: 3.0),
-        _OptionDraft(text: 'Qiyinchilikka uchraydi yoki bajara olmaydi', score: 1.0),
+        _OptionDraft(
+          text: 'Qiyinchilikka uchraydi yoki bajara olmaydi',
+          score: 1.0,
+        ),
       ];
     } else if (type == 'scale_1_5') {
       return [
@@ -143,24 +147,6 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
     });
   }
 
-  double _calculateMaxScore() {
-    if (_selectedType == 'open_text') return 0.0;
-    if (_selectedType == 'scale_1_5') return 5.0;
-    if (_selectedType == 'multiple_choice') {
-      double sum = 0.0;
-      for (final opt in _options) {
-        if (opt.score > 0) sum += opt.score;
-      }
-      return sum > 0 ? sum : 5.0;
-    }
-    if (_options.isEmpty) return 5.0;
-    double max = 0.0;
-    for (final opt in _options) {
-      if (opt.score > max) max = opt.score;
-    }
-    return max > 0 ? max : 5.0;
-  }
-
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -171,23 +157,23 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
     final isNew = widget.existingQuestion == null;
     final now = DateTime.now();
 
-    final maxScore = _calculateMaxScore();
-    final minScore = _selectedType == 'open_text' ? 0.0 : 0.0;
-
-    final parsedOptions = _options.map((o) {
-      return AssessmentQuestionOption(
-        id: 'opt_${const Uuid().v4().substring(0, 6)}',
-        text: o.text.trim(),
-        score: o.score,
-      );
-    }).toList();
+    final parsedOptions =
+        _options.map((o) {
+          return AssessmentQuestionOption(
+            id: 'opt_${const Uuid().v4().substring(0, 6)}',
+            text: o.text.trim(),
+            score: o.score,
+          );
+        }).toList();
 
     final question = AssessmentQuestionModel(
-      id: widget.existingQuestion?.id ??
+      id:
+          widget.existingQuestion?.id ??
           'q_custom_${const Uuid().v4().substring(0, 8)}',
-      title: _titleCtrl.text.trim().isEmpty
-          ? _textCtrl.text.trim()
-          : _titleCtrl.text.trim(),
+      title:
+          _titleCtrl.text.trim().isEmpty
+              ? _textCtrl.text.trim()
+              : _titleCtrl.text.trim(),
       text: _textCtrl.text.trim(),
       domain: _selectedDomain,
       targetAgeRange: _ageCtrl.text.trim(),
@@ -195,10 +181,12 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
       options: parsedOptions,
       scoringCriteria: _criteriaCtrl.text.trim(),
       psychologistNotes: _notesCtrl.text.trim(),
-      authorId: widget.existingQuestion?.authorId ??
+      authorId:
+          widget.existingQuestion?.authorId ??
           currentUser?.id ??
           'user_psychologist',
-      authorName: widget.existingQuestion?.authorName ??
+      authorName:
+          widget.existingQuestion?.authorName ??
           currentUser?.fullName ??
           'Amaliyotchi psixolog',
       isStandard: widget.existingQuestion?.isStandard ?? false,
@@ -297,7 +285,8 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                           controller: _titleCtrl,
                           decoration: const InputDecoration(
                             labelText: 'Savol nomi / Mavzusi (ixtiyoriy)',
-                            hintText: 'Masalan: Serial mantiqiy qatorlar tahlili',
+                            hintText:
+                                'Masalan: Serial mantiqiy qatorlar tahlili',
                             prefixIcon: Icon(Icons.label_outline, size: 20),
                           ),
                         ),
@@ -307,9 +296,11 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                         TextFormField(
                           controller: _textCtrl,
                           maxLines: 3,
-                          validator: (v) => v == null || v.trim().isEmpty
-                              ? 'Iltimos, savol yoki topshiriq matnini kiriting'
-                              : null,
+                          validator:
+                              (v) =>
+                                  v == null || v.trim().isEmpty
+                                      ? 'Iltimos, savol yoki topshiriq matnini kiriting'
+                                      : null,
                           decoration: const InputDecoration(
                             labelText: 'Savol yoki topshiriq matni *',
                             hintText:
@@ -333,20 +324,26 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   labelText: 'Baholash yo‘nalishi *',
-                                  prefixIcon: Icon(Icons.category_outlined, size: 20),
+                                  prefixIcon: Icon(
+                                    Icons.category_outlined,
+                                    size: 20,
+                                  ),
                                 ),
-                                items: _domains
-                                    .map(
-                                      (d) => DropdownMenuItem(
-                                        value: d,
-                                        child: Text(
-                                          d,
-                                          style: const TextStyle(fontSize: 12.5),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
+                                items:
+                                    _domains
+                                        .map(
+                                          (d) => DropdownMenuItem(
+                                            value: d,
+                                            child: Text(
+                                              d,
+                                              style: const TextStyle(
+                                                fontSize: 12.5,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
                                 onChanged: (v) {
                                   if (v != null) {
                                     setState(() => _selectedDomain = v);
@@ -362,7 +359,10 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                 decoration: const InputDecoration(
                                   labelText: 'Yosh / Sinf oralig‘i',
                                   hintText: 'Masalan: 1-4 sinf',
-                                  prefixIcon: Icon(Icons.school_outlined, size: 20),
+                                  prefixIcon: Icon(
+                                    Icons.school_outlined,
+                                    size: 20,
+                                  ),
                                 ),
                               ),
                             ),
@@ -380,20 +380,26 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   labelText: 'Savol turi *',
-                                  prefixIcon: Icon(Icons.tune_rounded, size: 20),
+                                  prefixIcon: Icon(
+                                    Icons.tune_rounded,
+                                    size: 20,
+                                  ),
                                 ),
-                                items: _typeNames.entries
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value: e.key,
-                                        child: Text(
-                                          e.value,
-                                          style: const TextStyle(fontSize: 12.5),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
+                                items:
+                                    _typeNames.entries
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                            value: e.key,
+                                            child: Text(
+                                              e.value,
+                                              style: const TextStyle(
+                                                fontSize: 12.5,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
                                 onChanged: _onTypeChanged,
                               ),
                             ),
@@ -405,7 +411,10 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   labelText: 'Holati',
-                                  prefixIcon: Icon(Icons.flag_outlined, size: 20),
+                                  prefixIcon: Icon(
+                                    Icons.flag_outlined,
+                                    size: 20,
+                                  ),
                                 ),
                                 items: const [
                                   DropdownMenuItem(
@@ -486,12 +495,16 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                           controller: _notesCtrl,
                           maxLines: 2,
                           decoration: const InputDecoration(
-                            labelText: 'Psixolog uchun metodik ko‘rsatma / izoh',
+                            labelText:
+                                'Psixolog uchun metodik ko‘rsatma / izoh',
                             hintText:
                                 'Tekshiruv vaqtida bolaning qanday reaksiyalariga e’tibor qaratish kerak...',
                             prefixIcon: Padding(
                               padding: EdgeInsets.only(bottom: 24),
-                              child: Icon(Icons.tips_and_updates_outlined, size: 20),
+                              child: Icon(
+                                Icons.tips_and_updates_outlined,
+                                size: 20,
+                              ),
                             ),
                           ),
                         ),
@@ -522,7 +535,9 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                         ),
                       ),
                       icon: const Icon(Icons.save_rounded, size: 18),
-                      label: Text(isNew ? 'Savolni saqlash' : 'O‘zgarishlarni saqlash'),
+                      label: Text(
+                        isNew ? 'Savolni saqlash' : 'O‘zgarishlarni saqlash',
+                      ),
                       onPressed: _save,
                     ),
                   ],
@@ -589,7 +604,10 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                 TextButton.icon(
                   onPressed: _addOption,
                   icon: const Icon(Icons.add_circle_outline, size: 16),
-                  label: const Text('Variant qo‘shish', style: TextStyle(fontSize: 12)),
+                  label: const Text(
+                    'Variant qo‘shish',
+                    style: TextStyle(fontSize: 12),
+                  ),
                 ),
             ],
           ),
@@ -645,7 +663,9 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                       initialValue: opt.score.toStringAsFixed(
                         opt.score.truncateToDouble() == opt.score ? 0 : 1,
                       ),
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       onChanged: (v) {
                         final val = double.tryParse(v);
                         if (val != null) opt.score = val;
@@ -664,9 +684,15 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                       ),
                     ),
                   ),
-                  if (!isScale && _selectedType != 'yes_no' && _options.length > 2)
+                  if (!isScale &&
+                      _selectedType != 'yes_no' &&
+                      _options.length > 2)
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        size: 20,
+                        color: Colors.red,
+                      ),
                       onPressed: () => _removeOption(idx),
                       tooltip: 'Variantni o‘chirish',
                     ),

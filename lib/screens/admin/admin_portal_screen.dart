@@ -7,6 +7,7 @@ import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../main_navigation_screen.dart';
 import '../auth/login_screen.dart';
+import '../referrals/referrals_screen.dart';
 
 import 'tabs/admin_overview_tab.dart';
 import 'tabs/admin_users_tab.dart';
@@ -20,13 +21,31 @@ import 'tabs/admin_monitoring_tab.dart';
 import 'tabs/admin_settings_tab.dart';
 import 'tabs/admin_audit_tab.dart';
 
+class _AdminNavCategory {
+  final String title;
+  final List<_AdminNavItemData> items;
+  const _AdminNavCategory(this.title, this.items);
+}
+
+class _AdminNavItemData {
+  final int index;
+  final String title;
+  final IconData icon;
+  final IconData activeIcon;
+  final bool hasAlertBadge;
+  const _AdminNavItemData({
+    required this.index,
+    required this.title,
+    required this.icon,
+    required this.activeIcon,
+    this.hasAlertBadge = false,
+  });
+}
+
 class AdminPortalScreen extends StatefulWidget {
   final int initialTabIndex;
 
-  const AdminPortalScreen({
-    super.key,
-    this.initialTabIndex = 0,
-  });
+  const AdminPortalScreen({super.key, this.initialTabIndex = 0});
 
   @override
   State<AdminPortalScreen> createState() => _AdminPortalScreenState();
@@ -54,62 +73,88 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
     }
   }
 
-  final List<Map<String, dynamic>> _navItems = const [
-    {
-      'title': 'Bosh sahifa',
-      'icon': Icons.dashboard_outlined,
-      'activeIcon': Icons.dashboard_rounded,
-    },
-    {
-      'title': 'Foydalanuvchilar',
-      'icon': Icons.manage_accounts_outlined,
-      'activeIcon': Icons.manage_accounts_rounded,
-    },
-    {
-      'title': 'Mutaxassislar',
-      'icon': Icons.psychology_outlined,
-      'activeIcon': Icons.psychology_rounded,
-    },
-    {
-      'title': 'O‘quvchilar',
-      'icon': Icons.groups_outlined,
-      'activeIcon': Icons.groups_rounded,
-    },
-    {
-      'title': 'Muassasalar',
-      'icon': Icons.apartment_outlined,
-      'activeIcon': Icons.apartment_rounded,
-    },
-    {
-      'title': 'Sinflar',
-      'icon': Icons.school_outlined,
-      'activeIcon': Icons.school_rounded,
-    },
-    {
-      'title': 'Rollar va ruxsatlar',
-      'icon': Icons.security_outlined,
-      'activeIcon': Icons.security_rounded,
-    },
-    {
-      'title': 'Hisobotlar',
-      'icon': Icons.bar_chart_outlined,
-      'activeIcon': Icons.bar_chart_rounded,
-    },
-    {
-      'title': 'Monitoring',
-      'icon': Icons.shield_outlined,
-      'activeIcon': Icons.shield_rounded,
-    },
-    {
-      'title': 'Sozlamalar',
-      'icon': Icons.settings_suggest_outlined,
-      'activeIcon': Icons.settings_suggest_rounded,
-    },
-    {
-      'title': 'Audit jurnali',
-      'icon': Icons.history_edu_outlined,
-      'activeIcon': Icons.history_edu_rounded,
-    },
+  static const List<_AdminNavCategory> _categories = [
+    _AdminNavCategory('ASOSIY BOSHQARUV', [
+      _AdminNavItemData(
+        index: 0,
+        title: 'Boshqaruv paneli',
+        icon: Icons.dashboard_outlined,
+        activeIcon: Icons.dashboard_rounded,
+      ),
+    ]),
+    _AdminNavCategory('MONITORING VA TAHLIL', [
+      _AdminNavItemData(
+        index: 8,
+        title: 'Monitoring markazi',
+        icon: Icons.shield_outlined,
+        activeIcon: Icons.shield_rounded,
+        hasAlertBadge: true,
+      ),
+      _AdminNavItemData(
+        index: 7,
+        title: 'Tahliliy hisobotlar',
+        icon: Icons.bar_chart_outlined,
+        activeIcon: Icons.bar_chart_rounded,
+      ),
+    ]),
+    _AdminNavCategory('REYESTRLAR VA KADRLAR', [
+      _AdminNavItemData(
+        index: 3,
+        title: 'O‘quvchilar reyestri',
+        icon: Icons.groups_outlined,
+        activeIcon: Icons.groups_rounded,
+      ),
+      _AdminNavItemData(
+        index: 2,
+        title: 'Pedagog-mutaxassislar',
+        icon: Icons.psychology_outlined,
+        activeIcon: Icons.psychology_rounded,
+      ),
+      _AdminNavItemData(
+        index: 4,
+        title: 'Ta’lim muassasalari',
+        icon: Icons.apartment_outlined,
+        activeIcon: Icons.apartment_rounded,
+      ),
+      _AdminNavItemData(
+        index: 5,
+        title: 'Sinflar va guruhlar',
+        icon: Icons.school_outlined,
+        activeIcon: Icons.school_rounded,
+      ),
+      _AdminNavItemData(
+        index: 11,
+        title: 'Yo‘naltirishlar jurnali',
+        icon: Icons.alt_route_outlined,
+        activeIcon: Icons.alt_route_rounded,
+      ),
+    ]),
+    _AdminNavCategory('XAVFSIZLIK VA MA’MURIYAT', [
+      _AdminNavItemData(
+        index: 1,
+        title: 'Foydalanuvchilar',
+        icon: Icons.manage_accounts_outlined,
+        activeIcon: Icons.manage_accounts_rounded,
+      ),
+      _AdminNavItemData(
+        index: 6,
+        title: 'Rollar va ruxsatlar',
+        icon: Icons.security_outlined,
+        activeIcon: Icons.security_rounded,
+      ),
+      _AdminNavItemData(
+        index: 10,
+        title: 'Audit jurnali',
+        icon: Icons.history_edu_outlined,
+        activeIcon: Icons.history_edu_rounded,
+      ),
+      _AdminNavItemData(
+        index: 9,
+        title: 'Tizim sozlamalari',
+        icon: Icons.settings_suggest_outlined,
+        activeIcon: Icons.settings_suggest_rounded,
+      ),
+    ]),
   ];
 
   @override
@@ -134,7 +179,24 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
       const AdminMonitoringTab(),
       const AdminSettingsTab(),
       const AdminAuditTab(),
+      const ReferralsScreen(),
     ];
+
+    // Rolga mos sarlavha va status
+    final String roleTag;
+    final String portalSubtitle;
+    if (user?.role == UserRole.institutionAdmin) {
+      roleTag = 'MUASSASA ADMINI';
+      portalSubtitle = user?.institutionName ?? 'Muassasa ma’muriyati';
+    } else if (user?.role == UserRole.reviewer) {
+      roleTag = 'METODIK NAZORAT';
+      portalSubtitle =
+          'Namangan viloyat ta’lim sifatini monitoring qilish markazi';
+    } else {
+      roleTag = 'TIZIM ADMINISTRATORI';
+      portalSubtitle =
+          'O‘zbekiston Respublikasi Maktabgacha va maktab ta’limi vazirligi • Namangan viloyati';
+    }
 
     return Scaffold(
       key: _scaffoldKey,
@@ -188,9 +250,9 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                           color: const Color(0xFF073A82),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
-                          'ADMIN PORTAL',
-                          style: TextStyle(
+                        child: Text(
+                          roleTag,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -201,7 +263,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                     ],
                   ),
                   Text(
-                    'O‘zbekiston Respublikasi Maktabgacha va maktab ta’limi vazirligi • Namangan viloyati',
+                    portalSubtitle,
                     style: const TextStyle(
                       fontSize: 11,
                       color: AppColors.textMuted,
@@ -229,9 +291,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const MainNavigationScreen(),
-                ),
+                MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
               );
             },
             icon: const Icon(Icons.swap_horiz_rounded, size: 18),
@@ -275,6 +335,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                         user?.fullName ?? 'Administrator',
                         style: const TextStyle(
                           fontSize: 12,
+                          height: 1.0,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
@@ -283,6 +344,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                         user?.role.label ?? 'Tizim administratori',
                         style: const TextStyle(
                           fontSize: 10,
+                          height: 1.0,
                           color: AppColors.textMuted,
                         ),
                       ),
@@ -307,32 +369,34 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
           const SizedBox(width: 12),
         ],
       ),
-      drawer: isDesktop
-          ? null
-          : Drawer(
-              child: _buildSidebarContent(
-                context,
-                unresolvedAlertsCount,
-                isDrawer: true,
+      drawer:
+          isDesktop
+              ? null
+              : Drawer(
+                child: _buildSidebarContent(
+                  context,
+                  unresolvedAlertsCount,
+                  userRole: user?.role,
+                  isDrawer: true,
+                ),
               ),
-            ),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (isDesktop)
-            Container(
+            SizedBox(
               width: 260,
-              decoration: const BoxDecoration(
+              child: Material(
                 color: Colors.white,
-                border: Border(
-                  right: BorderSide(color: AppColors.border),
+                shape: const Border(right: BorderSide(color: AppColors.border)),
+                child: _buildSidebarContent(
+                  context,
+                  unresolvedAlertsCount,
+                  userRole: user?.role,
                 ),
               ),
-              child: _buildSidebarContent(context, unresolvedAlertsCount),
             ),
-          Expanded(
-            child: screens[_selectedIndex],
-          ),
+          Expanded(child: screens[_selectedIndex.clamp(0, screens.length - 1)]),
         ],
       ),
     );
@@ -341,6 +405,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
   Widget _buildSidebarContent(
     BuildContext context,
     int alertCount, {
+    UserRole? userRole,
     bool isDrawer = false,
   }) {
     return Column(
@@ -368,64 +433,103 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-            itemCount: _navItems.length,
-            itemBuilder: (context, index) {
-              final item = _navItems[index];
-              final isSelected = _selectedIndex == index;
-              final isMonitoring = index == 8;
-
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 2),
-                child: ListTile(
-                  dense: true,
-                  selected: isSelected,
-                  selectedTileColor: AppColors.primaryLight,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  leading: Icon(
-                    isSelected ? item['activeIcon'] : item['icon'],
-                    color: isSelected
-                        ? AppColors.primary
-                        : AppColors.textSecondary,
-                    size: 20,
-                  ),
-                  title: Text(
-                    item['title'],
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textPrimary,
+            itemCount: _categories.length,
+            itemBuilder: (context, catIdx) {
+              final cat = _categories[catIdx];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 12,
+                      right: 12,
+                      top: 14,
+                      bottom: 6,
+                    ),
+                    child: Text(
+                      cat.title,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textMuted,
+                        letterSpacing: 0.8,
+                      ),
                     ),
                   ),
-                  trailing: (isMonitoring && alertCount > 0)
-                      ? Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
+                  ...cat.items.map((item) {
+                    final isSelected = _selectedIndex == item.index;
+                    final isMonitoring = item.hasAlertBadge;
+
+                    // Rolga mos matn o'zgarishi
+                    String itemTitle = item.title;
+                    if (item.index == 4 &&
+                        userRole == UserRole.institutionAdmin) {
+                      itemTitle = 'Mening muassasam';
+                    }
+
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 1.5),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          dense: true,
+                          selected: isSelected,
+                          selectedTileColor: AppColors.primaryLight,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          decoration: BoxDecoration(
-                            color: AppColors.error,
-                            borderRadius: BorderRadius.circular(10),
+                          leading: Icon(
+                            isSelected ? item.activeIcon : item.icon,
+                            color:
+                                isSelected
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary,
+                            size: 19,
                           ),
-                          child: Text(
-                            '$alertCount',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                          title: Text(
+                            itemTitle,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight:
+                                  isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
+                              color:
+                                  isSelected
+                                      ? AppColors.primary
+                                      : AppColors.textPrimary,
                             ),
                           ),
-                        )
-                      : null,
-                  onTap: () {
-                    setState(() => _selectedIndex = index);
-                    if (isDrawer) Navigator.pop(context);
-                  },
-                ),
+                          trailing:
+                              (isMonitoring && alertCount > 0)
+                                  ? Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.error,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      '$alertCount',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  )
+                                  : null,
+                          onTap: () {
+                            setState(() => _selectedIndex = item.index);
+                            if (isDrawer) Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    );
+                  }),
+                ],
               );
             },
           ),
@@ -437,36 +541,37 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
   void _confirmLogout(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Tizimdan chiqish'),
-        content: const Text(
-          'Haqiqatan ham Administrator portalidan chiqmoqchimisiz?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Bekor qilish'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Tizimdan chiqish'),
+            content: const Text(
+              'Haqiqatan ham Administrator portalidan chiqmoqchimisiz?',
             ),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              final auth = context.read<AuthProvider>();
-              await auth.logout();
-              if (context.mounted) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  (route) => false,
-                );
-              }
-            },
-            child: const Text('Chiqish'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Bekor qilish'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  final auth = context.read<AuthProvider>();
+                  await auth.logout();
+                  if (context.mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
+                    );
+                  }
+                },
+                child: const Text('Chiqish'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

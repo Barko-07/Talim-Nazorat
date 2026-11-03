@@ -2,20 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'core/theme/app_theme.dart';
+import 'core/constants/app_colors.dart';
 import 'providers/auth_provider.dart';
 import 'providers/app_provider.dart';
-import 'services/local_db_service.dart';
 import 'models/user_model.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/admin/admin_portal_screen.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Mahalliy ma'lumotlar bazasini initsializatsiya qilish (Zero Supabase)
-  await LocalDbService().init();
-
+  // Ilovani bazaning boshlang'ich yuklanishini kutib turmasdan ko'rsatamiz.
+  // AuthProvider tayyor holatda bo'lguncha foydalanuvchiga yuklanish ekrani chiqadi.
   runApp(
     MultiProvider(
       providers: [
@@ -39,8 +38,11 @@ class TalimNazoratApp extends StatelessWidget {
       home: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           if (auth.isLoading) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
+            return const _AppLoadingScreen();
+          }
+          if (auth.initializationError != null) {
+            return _InitializationErrorScreen(
+              onRetry: auth.retryInitialization,
             );
           }
           if (auth.isAuthenticated) {
@@ -54,4 +56,96 @@ class TalimNazoratApp extends StatelessWidget {
       ),
     );
   }
+}
+
+class _AppLoadingScreen extends StatelessWidget {
+  const _AppLoadingScreen();
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFFF5F8FC),
+    body: Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.09),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: const Icon(
+              Icons.account_balance_rounded,
+              color: AppColors.primary,
+              size: 30,
+            ),
+          ),
+          const SizedBox(height: 18),
+          const Text(
+            'TA’LIM NAZORAT',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 16),
+          const SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2.4),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Ma’lumotlar yuklanmoqda…',
+            style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class _InitializationErrorScreen extends StatelessWidget {
+  const _InitializationErrorScreen({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFFF5F8FC),
+    body: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.storage_rounded,
+                size: 42,
+                color: AppColors.warning,
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'Mahalliy ma’lumotlarni ochib bo‘lmadi',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Saqlangan ma’lumotlar ustidan yozilmadi. Sahifani qayta yuklashga urinib ko‘ring. Muammo takrorlansa, brauzer ma’lumotlarini tozalamang va administratorga murojaat qiling.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.textMuted, height: 1.45),
+              ),
+              const SizedBox(height: 18),
+              FilledButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Qayta urinish'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }

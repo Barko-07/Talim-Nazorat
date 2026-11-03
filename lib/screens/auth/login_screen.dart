@@ -70,8 +70,7 @@ class _LoginScreenState extends State<LoginScreen>
         setState(() => _errorMessage = null);
       }
     });
-    final initialSchools =
-        NamanganData.getSchoolsForDistrict('Chortoq tumani');
+    final initialSchools = NamanganData.getSchoolsForDistrict('Chortoq tumani');
     if (initialSchools.isNotEmpty) {
       _institutionCtrl.text = initialSchools.first;
     }
@@ -103,15 +102,16 @@ class _LoginScreenState extends State<LoginScreen>
         String searchQuery = '';
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final filteredSchools = searchQuery.isEmpty
-                ? allSchools
-                : allSchools
-                    .where(
-                      (s) => s
-                          .toLowerCase()
-                          .contains(searchQuery.toLowerCase()),
-                    )
-                    .toList();
+            final filteredSchools =
+                searchQuery.isEmpty
+                    ? allSchools
+                    : allSchools
+                        .where(
+                          (s) => s.toLowerCase().contains(
+                            searchQuery.toLowerCase(),
+                          ),
+                        )
+                        .toList();
 
             return SizedBox(
               height: MediaQuery.sizeOf(context).height * 0.78,
@@ -178,8 +178,8 @@ class _LoginScreenState extends State<LoginScreen>
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 22),
                         child: TextField(
-                          onChanged: (val) =>
-                              setModalState(() => searchQuery = val),
+                          onChanged:
+                              (val) => setModalState(() => searchQuery = val),
                           decoration: const InputDecoration(
                             hintText: 'Maktab raqami yoki nomini qidiring...',
                             prefixIcon: Icon(
@@ -192,82 +192,91 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       const SizedBox(height: 12),
                       Expanded(
-                        child: filteredSchools.isEmpty
-                            ? const Center(
-                                child: Text(
-                                  'Bunday maktab topilmadi',
-                                  style: TextStyle(color: AppColors.textMuted),
-                                ),
-                              )
-                            : ListView.separated(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 22,
-                                  vertical: 8,
-                                ),
-                                itemCount: filteredSchools.length,
-                                separatorBuilder: (_, _) =>
-                                    const SizedBox(height: 8),
-                                itemBuilder: (context, index) {
-                                  final school = filteredSchools[index];
-                                  final isSelected =
-                                      _institutionCtrl.text == school;
-
-                                  return SurfaceCard(
-                                    elevated: false,
-                                    borderRadius: 12,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 15,
-                                      vertical: 13,
+                        child:
+                            filteredSchools.isEmpty
+                                ? const Center(
+                                  child: Text(
+                                    'Bunday maktab topilmadi',
+                                    style: TextStyle(
+                                      color: AppColors.textMuted,
                                     ),
-                                    backgroundColor: isSelected
-                                        ? AppColors.primaryLight
-                                        : AppColors.glassWellFill,
-                                    borderColor: isSelected
-                                        ? AppColors.primary
-                                            .withValues(alpha: 0.4)
-                                        : AppColors.border,
-                                    onTap: () {
-                                      setState(() {
-                                        _institutionCtrl.text = school;
-                                        _errorMessage = null;
-                                      });
-                                      Navigator.of(sheetContext).pop();
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          LucideIcons.school,
-                                          color: isSelected
-                                              ? AppColors.primary
-                                              : AppColors.textMuted,
-                                          size: 18,
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            school,
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: isSelected
-                                                  ? FontWeight.w700
-                                                  : FontWeight.w500,
-                                              color: isSelected
-                                                  ? AppColors.primary
-                                                  : AppColors.textPrimary,
-                                            ),
-                                          ),
-                                        ),
-                                        if (isSelected)
-                                          const Icon(
-                                            LucideIcons.circleCheck,
-                                            color: AppColors.primary,
+                                  ),
+                                )
+                                : ListView.separated(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 22,
+                                    vertical: 8,
+                                  ),
+                                  itemCount: filteredSchools.length,
+                                  separatorBuilder:
+                                      (_, _) => const SizedBox(height: 8),
+                                  itemBuilder: (context, index) {
+                                    final school = filteredSchools[index];
+                                    final isSelected =
+                                        _institutionCtrl.text == school;
+
+                                    return SurfaceCard(
+                                      elevated: false,
+                                      borderRadius: 12,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 15,
+                                        vertical: 13,
+                                      ),
+                                      backgroundColor:
+                                          isSelected
+                                              ? AppColors.primaryLight
+                                              : AppColors.glassWellFill,
+                                      borderColor:
+                                          isSelected
+                                              ? AppColors.primary.withValues(
+                                                alpha: 0.4,
+                                              )
+                                              : AppColors.border,
+                                      onTap: () {
+                                        setState(() {
+                                          _institutionCtrl.text = school;
+                                          _errorMessage = null;
+                                        });
+                                        Navigator.of(sheetContext).pop();
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            LucideIcons.school,
+                                            color:
+                                                isSelected
+                                                    ? AppColors.primary
+                                                    : AppColors.textMuted,
                                             size: 18,
                                           ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              school,
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight:
+                                                    isSelected
+                                                        ? FontWeight.w700
+                                                        : FontWeight.w500,
+                                                color:
+                                                    isSelected
+                                                        ? AppColors.primary
+                                                        : AppColors.textPrimary,
+                                              ),
+                                            ),
+                                          ),
+                                          if (isSelected)
+                                            const Icon(
+                                              LucideIcons.circleCheck,
+                                              color: AppColors.primary,
+                                              size: 18,
+                                            ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
                       ),
                     ],
                   ),
@@ -317,8 +326,9 @@ class _LoginScreenState extends State<LoginScreen>
     } else if (_signUpStep == 1) {
       if (_institutionCtrl.text.trim().isEmpty) {
         setState(
-          () => _errorMessage =
-              'Iltimos, Chortoq tumanidagi maktabingizni tanlang.',
+          () =>
+              _errorMessage =
+                  'Iltimos, Chortoq tumanidagi maktabingizni tanlang.',
         );
         return;
       }
@@ -327,8 +337,9 @@ class _LoginScreenState extends State<LoginScreen>
       final digits = phone.replaceAll(RegExp(r'\D'), '');
       if (digits.length < 9) {
         setState(
-          () => _errorMessage =
-              'Iltimos, to‘liq telefon raqamingizni kiriting (masalan: +998 90 123 45 67).',
+          () =>
+              _errorMessage =
+                  'Iltimos, to‘liq telefon raqamingizni kiriting (masalan: +998 90 123 45 67).',
         );
         return;
       }
@@ -356,10 +367,8 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   bool get _hasMinLength => _signUpPasswordCtrl.text.trim().length >= 8;
-  bool get _hasUppercase =>
-      RegExp(r'[A-Z]').hasMatch(_signUpPasswordCtrl.text);
-  bool get _hasLowercase =>
-      RegExp(r'[a-z]').hasMatch(_signUpPasswordCtrl.text);
+  bool get _hasUppercase => RegExp(r'[A-Z]').hasMatch(_signUpPasswordCtrl.text);
+  bool get _hasLowercase => RegExp(r'[a-z]').hasMatch(_signUpPasswordCtrl.text);
   bool get _hasDigit => RegExp(r'[0-9]').hasMatch(_signUpPasswordCtrl.text);
 
   int get _passwordStrengthScore =>
@@ -380,8 +389,9 @@ class _LoginScreenState extends State<LoginScreen>
 
     if (!_hasMinLength || !_hasUppercase || !_hasLowercase || !_hasDigit) {
       setState(
-        () => _errorMessage =
-            'Parolda kamida 8 ta belgi, 1 ta katta harf (A-Z), 1 ta kichik harf (a-z) va 1 ta raqam (0-9) bo‘lishi shart.',
+        () =>
+            _errorMessage =
+                'Parolda kamida 8 ta belgi, 1 ta katta harf (A-Z), 1 ta kichik harf (a-z) va 1 ta raqam (0-9) bo‘lishi shart.',
       );
       return;
     }
@@ -405,12 +415,14 @@ class _LoginScreenState extends State<LoginScreen>
       role: roleToRegister,
       region: NamanganData.defaultRegion,
       district: _selectedDistrict,
-      institutionName: _institutionCtrl.text.trim().isNotEmpty
-          ? _institutionCtrl.text.trim()
-          : '9-sonli inklyuziv ta’lim tayanch maktabi',
-      specialization: _specializationCtrl.text.trim().isNotEmpty
-          ? _specializationCtrl.text.trim()
-          : roleToRegister.label,
+      institutionName:
+          _institutionCtrl.text.trim().isNotEmpty
+              ? _institutionCtrl.text.trim()
+              : '9-sonli inklyuziv ta’lim tayanch maktabi',
+      specialization:
+          _specializationCtrl.text.trim().isNotEmpty
+              ? _specializationCtrl.text.trim()
+              : roleToRegister.label,
       qualificationCategory: 'Mutaxassis',
       experienceYears: 3,
       password: _signUpPasswordCtrl.text.trim(),
@@ -505,32 +517,33 @@ class _LoginScreenState extends State<LoginScreen>
                     ],
 
                     GlassSurface(
-                      borderRadius: 20,
-                      blur: 18,
-                      opacity: 0.96,
-                      boxShadow: AppColors.elevatedShadow,
-                      padding: const EdgeInsets.all(24),
-                      child: PageTransitionSwitcher(
-                        duration: const Duration(milliseconds: 210),
-                        transitionBuilder: (child, primary, secondary) {
-                          return FadeThroughTransition(
-                            fillColor: Colors.transparent,
-                            animation: primary,
-                            secondaryAnimation: secondary,
-                            child: child,
-                          );
-                        },
-                        child: _tabController.index == 0
-                            ? KeyedSubtree(
-                                key: const ValueKey('tab_login'),
-                                child: _buildLoginView(auth),
-                              )
-                            : KeyedSubtree(
-                                key: const ValueKey('tab_signup'),
-                                child: _buildStepByStepSignUpView(auth),
-                              ),
-                      ),
-                    )
+                          borderRadius: 20,
+                          blur: 18,
+                          opacity: 0.96,
+                          boxShadow: AppColors.elevatedShadow,
+                          padding: const EdgeInsets.all(24),
+                          child: PageTransitionSwitcher(
+                            duration: const Duration(milliseconds: 210),
+                            transitionBuilder: (child, primary, secondary) {
+                              return FadeThroughTransition(
+                                fillColor: Colors.transparent,
+                                animation: primary,
+                                secondaryAnimation: secondary,
+                                child: child,
+                              );
+                            },
+                            child:
+                                _tabController.index == 0
+                                    ? KeyedSubtree(
+                                      key: const ValueKey('tab_login'),
+                                      child: _buildLoginView(auth),
+                                    )
+                                    : KeyedSubtree(
+                                      key: const ValueKey('tab_signup'),
+                                      child: _buildStepByStepSignUpView(auth),
+                                    ),
+                          ),
+                        )
                         .animate()
                         .fadeIn(
                           delay: 50.ms,
@@ -570,11 +583,7 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildBrandHeader() {
     return Column(
       children: [
-        const Icon(
-          LucideIcons.landmark,
-          color: AppColors.primary,
-          size: 38,
-        ),
+        const Icon(LucideIcons.landmark, color: AppColors.primary, size: 38),
         const SizedBox(height: 14),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
@@ -665,15 +674,16 @@ class _LoginScreenState extends State<LoginScreen>
                   isSelected ? AppColors.glassWhiteBorder : Colors.transparent,
               width: 0.85,
             ),
-            boxShadow: isSelected
-                ? const [
-                    BoxShadow(
-                      color: Color(0x0D0F172A),
-                      blurRadius: 6,
-                      offset: Offset(0, 2),
-                    ),
-                  ]
-                : null,
+            boxShadow:
+                isSelected
+                    ? const [
+                      BoxShadow(
+                        color: Color(0x0D0F172A),
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
+                    ]
+                    : null,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -691,11 +701,11 @@ class _LoginScreenState extends State<LoginScreen>
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight:
-                        isSelected ? FontWeight.w800 : FontWeight.w600,
-                    color: isSelected
-                        ? AppColors.primary
-                        : AppColors.textSecondary,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -729,7 +739,37 @@ class _LoginScreenState extends State<LoginScreen>
             height: 1.35,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(11),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF7E6),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFF2D48A)),
+          ),
+          child: const Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                size: 17,
+                color: Color(0xFF9A6700),
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Bu versiyada ma’lumotlar faqat ushbu qurilma yoki brauzerda saqlanadi. Haqiqiy bolalar ma’lumotlarini kiritmang.',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    height: 1.35,
+                    color: Color(0xFF704D00),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
 
         TextField(
           controller: _loginIdentifierCtrl,
@@ -763,8 +803,7 @@ class _LoginScreenState extends State<LoginScreen>
                 size: 18,
                 color: AppColors.textMuted,
               ),
-              onPressed: () =>
-                  setState(() => _loginObscure = !_loginObscure),
+              onPressed: () => setState(() => _loginObscure = !_loginObscure),
             ),
           ),
         ),
@@ -774,29 +813,30 @@ class _LoginScreenState extends State<LoginScreen>
           height: 48,
           child: FilledButton(
             onPressed: auth.isLoading ? null : _handleLogin,
-            child: auth.isLoading
-                ? const SizedBox(
-                    height: 19,
-                    width: 19,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Tizimga kirish',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
+            child:
+                auth.isLoading
+                    ? const SizedBox(
+                      height: 19,
+                      width: 19,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
                       ),
-                      SizedBox(width: 8),
-                      Icon(LucideIcons.arrowRight, size: 17),
-                    ],
-                  ),
+                    )
+                    : const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Tizimga kirish',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(LucideIcons.arrowRight, size: 17),
+                      ],
+                    ),
           ),
         ),
         const SizedBox(height: 10),
@@ -839,53 +879,66 @@ class _LoginScreenState extends State<LoginScreen>
     final ctrl = TextEditingController(text: _loginIdentifierCtrl.text.trim());
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Parolni tiklash so‘rovi'),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Telefon raqamingiz yoki elektron pochtangizni kiriting. Muassasa yoki tizim administratoriga parolni tiklash so‘rovi yuboriladi va sizga vaqtinchalik parol taqdim etiladi.',
-                style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary, height: 1.4),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Parolni tiklash so‘rovi'),
+            content: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Telefon raqamingiz yoki elektron pochtangizni kiriting. Muassasa yoki tizim administratoriga parolni tiklash so‘rovi yuboriladi va sizga vaqtinchalik parol taqdim etiladi.',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: AppColors.textSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: ctrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Telefon raqam yoki Email *',
+                      hintText: '+998 90 123 45 67 yoki login@talim.uz',
+                      prefixIcon: Icon(
+                        LucideIcons.keyRound,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: ctrl,
-                decoration: const InputDecoration(
-                  labelText: 'Telefon raqam yoki Email *',
-                  hintText: '+998 90 123 45 67 yoki login@talim.uz',
-                  prefixIcon: Icon(LucideIcons.keyRound, size: 18, color: AppColors.primary),
-                ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Bekor qilish'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  final res = await context
+                      .read<AuthProvider>()
+                      .requestPasswordRecovery(ctrl.text);
+                  if (ctx.mounted) {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(res['message'] as String),
+                        backgroundColor:
+                            res['success'] == true
+                                ? AppColors.success
+                                : AppColors.error,
+                      ),
+                    );
+                  }
+                },
+                child: const Text('So‘rov yuborish'),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Bekor qilish'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              final res = await context.read<AuthProvider>().requestPasswordRecovery(ctrl.text);
-              if (ctx.mounted) {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(res['message'] as String),
-                    backgroundColor:
-                        res['success'] == true ? AppColors.success : AppColors.error,
-                  ),
-                );
-              }
-            },
-            child: const Text('So‘rov yuborish'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -949,9 +1002,7 @@ class _LoginScreenState extends State<LoginScreen>
                     right: index == 3 ? 0 : 3,
                   ),
                   decoration: BoxDecoration(
-                    color: isPassed
-                        ? AppColors.primary
-                        : AppColors.borderSlate,
+                    color: isPassed ? AppColors.primary : AppColors.borderSlate,
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
@@ -1078,9 +1129,10 @@ class _LoginScreenState extends State<LoginScreen>
       (UserRole.teacher, 'Fan o‘qituvchisi', LucideIcons.bookOpen),
     ];
 
-    final selectedSchool = _institutionCtrl.text.isNotEmpty
-        ? _institutionCtrl.text
-        : 'Maktab tanlanmagan';
+    final selectedSchool =
+        _institutionCtrl.text.isNotEmpty
+            ? _institutionCtrl.text
+            : 'Maktab tanlanmagan';
 
     return KeyedSubtree(
       key: const ValueKey('step_2_profession'),
@@ -1119,87 +1171,97 @@ class _LoginScreenState extends State<LoginScreen>
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: availableRoles.map((item) {
-              final r = item.$1;
-              final title = item.$2;
-              final icon = item.$3;
-              final isSelected = _selectedRole == r;
+            children:
+                availableRoles.map((item) {
+                  final r = item.$1;
+                  final title = item.$2;
+                  final icon = item.$3;
+                  final isSelected = _selectedRole == r;
 
-              return SurfaceCard(
-                elevated: false,
-                borderRadius: 12,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 13,
-                  vertical: 10,
-                ),
-                backgroundColor: isSelected
-                    ? AppColors.primaryLight
-                    : const Color(0xFFF8FAFC),
-                borderColor: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.55)
-                    : AppColors.border,
-                onTap: () {
-                  setState(() {
-                    _selectedRole = r;
-                    _specializationCtrl.text = r.label;
-                  });
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary.withValues(alpha: 0.12)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.35)
-                              : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        icon,
-                        size: 16,
-                        color: isSelected
-                            ? AppColors.primary
-                            : const Color(0xFF334155),
-                      ),
+                  return SurfaceCard(
+                    elevated: false,
+                    borderRadius: 12,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 13,
+                      vertical: 10,
                     ),
-                    const SizedBox(width: 9),
-                    Flexible(
-                      child: Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: _myGovFont(
-                          fontSize: 13.5,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.w500,
-                          color: isSelected
-                              ? AppColors.primary
-                              : const Color(0xFF1E293B),
-                          letterSpacing: -0.05,
+                    backgroundColor:
+                        isSelected
+                            ? AppColors.primaryLight
+                            : const Color(0xFFF8FAFC),
+                    borderColor:
+                        isSelected
+                            ? AppColors.primary.withValues(alpha: 0.55)
+                            : AppColors.border,
+                    onTap: () {
+                      setState(() {
+                        _selectedRole = r;
+                        _specializationCtrl.text = r.label;
+                      });
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color:
+                                isSelected
+                                    ? AppColors.primary.withValues(alpha: 0.12)
+                                    : Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color:
+                                  isSelected
+                                      ? AppColors.primary.withValues(
+                                        alpha: 0.35,
+                                      )
+                                      : const Color(0xFFE2E8F0),
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Icon(
+                            icon,
+                            size: 16,
+                            color:
+                                isSelected
+                                    ? AppColors.primary
+                                    : const Color(0xFF334155),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 9),
+                        Flexible(
+                          child: Text(
+                            title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: _myGovFont(
+                              fontSize: 13.5,
+                              fontWeight:
+                                  isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                              color:
+                                  isSelected
+                                      ? AppColors.primary
+                                      : const Color(0xFF1E293B),
+                              letterSpacing: -0.05,
+                            ),
+                          ),
+                        ),
+                        if (isSelected) ...[
+                          const SizedBox(width: 6),
+                          const Icon(
+                            LucideIcons.circleCheck,
+                            color: AppColors.primary,
+                            size: 15,
+                          ),
+                        ],
+                      ],
                     ),
-                    if (isSelected) ...[
-                      const SizedBox(width: 6),
-                      const Icon(
-                        LucideIcons.circleCheck,
-                        color: AppColors.primary,
-                        size: 15,
-                      ),
-                    ],
-                  ],
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
           ),
           const SizedBox(height: 16),
           Text(
@@ -1215,11 +1277,16 @@ class _LoginScreenState extends State<LoginScreen>
             initialValue: _selectedDistrict,
             isExpanded: true,
             decoration: const InputDecoration(
-              prefixIcon: Icon(LucideIcons.mapPin, size: 18, color: AppColors.primary),
+              prefixIcon: Icon(
+                LucideIcons.mapPin,
+                size: 18,
+                color: AppColors.primary,
+              ),
             ),
-            items: NamanganData.districts
-                .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                .toList(),
+            items:
+                NamanganData.districts
+                    .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                    .toList(),
             onChanged: (val) {
               if (val == null) return;
               setState(() {
@@ -1385,8 +1452,8 @@ class _LoginScreenState extends State<LoginScreen>
                   size: 18,
                   color: AppColors.textMuted,
                 ),
-                onPressed: () =>
-                    setState(() => _signUpObscure = !_signUpObscure),
+                onPressed:
+                    () => setState(() => _signUpObscure = !_signUpObscure),
               ),
             ),
           ),
@@ -1411,9 +1478,10 @@ class _LoginScreenState extends State<LoginScreen>
                   size: 18,
                   color: AppColors.textMuted,
                 ),
-                onPressed: () => setState(
-                  () => _signUpConfirmObscure = !_signUpConfirmObscure,
-                ),
+                onPressed:
+                    () => setState(
+                      () => _signUpConfirmObscure = !_signUpConfirmObscure,
+                    ),
               ),
             ),
           ),
@@ -1424,22 +1492,24 @@ class _LoginScreenState extends State<LoginScreen>
 
   Widget _buildPasswordRequirementsBox() {
     final score = _passwordStrengthScore;
-    final Color activeColor = score <= 1
-        ? AppColors.error
-        : score == 2
+    final Color activeColor =
+        score <= 1
+            ? AppColors.error
+            : score == 2
             ? const Color(0xFFD97706)
             : score == 3
-                ? AppColors.primary
-                : AppColors.success;
-    final String strengthLabel = score == 0
-        ? 'Parol talablari'
-        : score == 1
+            ? AppColors.primary
+            : AppColors.success;
+    final String strengthLabel =
+        score == 0
+            ? 'Parol talablari'
+            : score == 1
             ? 'Kuchsiz parol'
             : score == 2
-                ? 'O‘rtacha parol'
-                : score == 3
-                    ? 'Yaxshi parol'
-                    : 'Kuchli parol';
+            ? 'O‘rtacha parol'
+            : score == 3
+            ? 'Yaxshi parol'
+            : 'Kuchli parol';
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -1459,9 +1529,7 @@ class _LoginScreenState extends State<LoginScreen>
                 style: _myGovFont(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: score == 0
-                      ? const Color(0xFF334155)
-                      : activeColor,
+                  color: score == 0 ? const Color(0xFF334155) : activeColor,
                 ),
               ),
               Text(
@@ -1491,25 +1559,13 @@ class _LoginScreenState extends State<LoginScreen>
             }),
           ),
           const SizedBox(height: 11),
-          _buildPasswordRuleRow(
-            'Kamida 8 ta belgi',
-            _hasMinLength,
-          ),
+          _buildPasswordRuleRow('Kamida 8 ta belgi', _hasMinLength),
           const SizedBox(height: 6),
-          _buildPasswordRuleRow(
-            'Kamida 1 ta katta harf (A–Z)',
-            _hasUppercase,
-          ),
+          _buildPasswordRuleRow('Kamida 1 ta katta harf (A–Z)', _hasUppercase),
           const SizedBox(height: 6),
-          _buildPasswordRuleRow(
-            'Kamida 1 ta kichik harf (a–z)',
-            _hasLowercase,
-          ),
+          _buildPasswordRuleRow('Kamida 1 ta kichik harf (a–z)', _hasLowercase),
           const SizedBox(height: 6),
-          _buildPasswordRuleRow(
-            'Kamida 1 ta raqam (0–9)',
-            _hasDigit,
-          ),
+          _buildPasswordRuleRow('Kamida 1 ta raqam (0–9)', _hasDigit),
         ],
       ),
     );
@@ -1530,9 +1586,7 @@ class _LoginScreenState extends State<LoginScreen>
             style: _myGovFont(
               fontSize: 12.5,
               fontWeight: met ? FontWeight.w600 : FontWeight.w500,
-              color: met
-                  ? const Color(0xFF0F172A)
-                  : const Color(0xFF64748B),
+              color: met ? const Color(0xFF0F172A) : const Color(0xFF64748B),
             ),
           ),
         ),
@@ -1563,41 +1617,43 @@ class _LoginScreenState extends State<LoginScreen>
           child: SizedBox(
             height: 48,
             child: FilledButton(
-              onPressed: auth.isLoading
-                  ? null
-                  : (isLastStep ? _handleSignUp : _nextStep),
-              child: auth.isLoading
-                  ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            isLastStep ? 'Ro‘yxatdan o‘tish' : 'Keyingisi',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 13.5,
+              onPressed:
+                  auth.isLoading
+                      ? null
+                      : (isLastStep ? _handleSignUp : _nextStep),
+              child:
+                  auth.isLoading
+                      ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                      : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              isLastStep ? 'Ro‘yxatdan o‘tish' : 'Keyingisi',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13.5,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        Icon(
-                          isLastStep
-                              ? LucideIcons.check
-                              : LucideIcons.arrowRight,
-                          size: 16,
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            isLastStep
+                                ? LucideIcons.check
+                                : LucideIcons.arrowRight,
+                            size: 16,
+                          ),
+                        ],
+                      ),
             ),
           ),
         ),

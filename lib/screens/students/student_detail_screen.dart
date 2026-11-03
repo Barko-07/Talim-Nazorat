@@ -10,7 +10,6 @@ import '../../core/widgets/glass_widgets.dart';
 import '../../models/achievement_model.dart';
 import '../../models/assessment_model.dart';
 import '../../models/audit_log_model.dart';
-import '../../models/case_conference_model.dart';
 import '../../models/curriculum_model.dart';
 import '../../models/iep_model.dart';
 import '../../models/progress_measurement_model.dart';
@@ -78,65 +77,66 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     final messenger = ScaffoldMessenger.of(context);
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('O‘quvchi anketasini arxivlash'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${student.fullName} anketasini faol ro‘yxatdan arxivga o‘tkazmoqchimisiz? Barcha tarixiy yozuvlar (baholashlar, ITR, mashg‘ulotlar) to‘liq saqlanadi.',
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondary,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: reasonController,
-              decoration: const InputDecoration(
-                labelText: 'Arxivlash sababi *',
-                hintText:
-                    'Masalan: Boshqa maktabga ko‘chib o‘tdi yoki bosqichni yakunladi',
-              ),
-              maxLines: 2,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Bekor qilish'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () async {
-              final reason = reasonController.text.trim();
-              if (reason.isEmpty) {
-                messenger.showSnackBar(
-                  const SnackBar(
-                    content: Text('Iltimos, arxivlash sababini yozing'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('O‘quvchi anketasini arxivlash'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${student.fullName} anketasini faol ro‘yxatdan arxivga o‘tkazmoqchimisiz? Barcha tarixiy yozuvlar (baholashlar, ITR, mashg‘ulotlar) to‘liq saqlanadi.',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                    height: 1.4,
                   ),
-                );
-                return;
-              }
-              Navigator.pop(ctx);
-              await context.read<AppProvider>().deactivateStudent(
-                student.id,
-                reason,
-                byUser: currentUser,
-              );
-              messenger.showSnackBar(
-                const SnackBar(
-                  content: Text('O‘quvchi muvaffaqiyatli arxivlandi'),
                 ),
-              );
-            },
-            child: const Text('Arxivlash'),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: reasonController,
+                  decoration: const InputDecoration(
+                    labelText: 'Arxivlash sababi *',
+                    hintText:
+                        'Masalan: Boshqa maktabga ko‘chib o‘tdi yoki bosqichni yakunladi',
+                  ),
+                  maxLines: 2,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Bekor qilish'),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                onPressed: () async {
+                  final reason = reasonController.text.trim();
+                  if (reason.isEmpty) {
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        content: Text('Iltimos, arxivlash sababini yozing'),
+                      ),
+                    );
+                    return;
+                  }
+                  Navigator.pop(ctx);
+                  await context.read<AppProvider>().deactivateStudent(
+                    student.id,
+                    reason,
+                    byUser: currentUser,
+                  );
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('O‘quvchi muvaffaqiyatli arxivlandi'),
+                    ),
+                  );
+                },
+                child: const Text('Arxivlash'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -148,38 +148,43 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     final messenger = ScaffoldMessenger.of(context);
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('O‘quvchini qayta faollashtirish'),
-        content: Text(
-          '${student.fullName} anketasini arxivdan qayta faol holatga o‘tkazishni tasdiqlaysizmi?',
-          style: const TextStyle(fontSize: 13, height: 1.4),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Bekor qilish'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('O‘quvchini qayta faollashtirish'),
+            content: Text(
+              '${student.fullName} anketasini arxivdan qayta faol holatga o‘tkazishni tasdiqlaysizmi?',
+              style: const TextStyle(fontSize: 13, height: 1.4),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Bekor qilish'),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.success,
+                ),
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  final updated = student.copyWith(
+                    status: 'Faol',
+                    deactivationReason: null,
+                    deactivatedAt: null,
+                  );
+                  await context.read<AppProvider>().updateStudent(
+                    updated,
+                    byUser: currentUser,
+                  );
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('O‘quvchi qayta faollashtirildi'),
+                    ),
+                  );
+                },
+                child: const Text('Faollashtirish'),
+              ),
+            ],
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.success),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              final updated = student.copyWith(
-                status: 'Faol',
-                deactivationReason: null,
-                deactivatedAt: null,
-              );
-              await context.read<AppProvider>().updateStudent(
-                updated,
-                byUser: currentUser,
-              );
-              messenger.showSnackBar(
-                const SnackBar(content: Text('O‘quvchi qayta faollashtirildi')),
-              );
-            },
-            child: const Text('Faollashtirish'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -190,103 +195,110 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   ) {
     final app = context.read<AppProvider>();
     final messenger = ScaffoldMessenger.of(context);
-    final availableSpecialists = app.specialists
-        .where((u) => !student.assignedSpecialistIds.contains(u.id))
-        .toList();
+    final availableSpecialists =
+        app.specialists
+            .where((u) => !student.assignedSpecialistIds.contains(u.id))
+            .toList();
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Mutaxassis biriktirish'),
-        content: SizedBox(
-          width: 430,
-          child: availableSpecialists.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'Barcha mutaxassislar allaqachon biriktirilgan yoki mutaxassislar ro‘yxati bo‘sh.',
-                    style: TextStyle(fontSize: 13, color: AppColors.textMuted),
-                  ),
-                )
-              : ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: availableSpecialists.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 8),
-                  itemBuilder: (c, i) {
-                    final sp = availableSpecialists[i];
-                    return GlassWell(
-                      borderRadius: 12,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            premiumRoleIcon(sp.role),
-                            color: sp.role.color,
-                            size: 20,
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Mutaxassis biriktirish'),
+            content: SizedBox(
+              width: 430,
+              child:
+                  availableSpecialists.isEmpty
+                      ? const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text(
+                          'Barcha mutaxassislar allaqachon biriktirilgan yoki mutaxassislar ro‘yxati bo‘sh.',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textMuted,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                      )
+                      : ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: availableSpecialists.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 8),
+                        itemBuilder: (c, i) {
+                          final sp = availableSpecialists[i];
+                          return GlassWell(
+                            borderRadius: 12,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            child: Row(
                               children: [
-                                Text(
-                                  sp.fullName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 13.5,
-                                    color: AppColors.textPrimary,
+                                Icon(
+                                  premiumRoleIcon(sp.role),
+                                  color: sp.role.color,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        sp.fullName,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13.5,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${sp.role.label} • ${sp.institutionName ?? ''}',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 11.5,
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Text(
-                                  '${sp.role.label} • ${sp.institutionName ?? ''}',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 11.5,
-                                    color: AppColors.textMuted,
+                                IconButton(
+                                  icon: const Icon(
+                                    LucideIcons.userPlus,
+                                    color: AppColors.primary,
+                                    size: 18,
                                   ),
+                                  onPressed: () async {
+                                    Navigator.pop(ctx);
+                                    await app.assignSpecialistToStudent(
+                                      student.id,
+                                      sp.id,
+                                      byUser: currentUser,
+                                    );
+                                    messenger.showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          '${sp.fullName} ushbu o‘quvchiga biriktirildi',
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              LucideIcons.userPlus,
-                              color: AppColors.primary,
-                              size: 18,
-                            ),
-                            onPressed: () async {
-                              Navigator.pop(ctx);
-                              await app.assignSpecialistToStudent(
-                                student.id,
-                                sp.id,
-                                byUser: currentUser,
-                              );
-                              messenger.showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    '${sp.fullName} ushbu o‘quvchiga biriktirildi',
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Yopish'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Yopish'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -298,33 +310,33 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     final student = app.students.firstWhere(
       (s) => s.id == widget.studentId,
-      orElse: () => app.allStudentsIncludingArchived.firstWhere(
-        (s) => s.id == widget.studentId,
-        orElse: () => app.students.isNotEmpty
-            ? app.students.first
-            : app.allStudentsIncludingArchived.first,
-      ),
+      orElse:
+          () => app.allStudentsIncludingArchived.firstWhere(
+            (s) => s.id == widget.studentId,
+            orElse:
+                () =>
+                    app.students.isNotEmpty
+                        ? app.students.first
+                        : app.allStudentsIncludingArchived.first,
+          ),
     );
 
-    final assessments = app.assessments
-        .where((a) => a.studentId == student.id)
-        .toList();
-    final sessions = app.sessions
-        .where((s) => s.studentId == student.id)
-        .toList();
-    final iepPlans = app.iepPlans
-        .where((p) => p.studentId == student.id)
-        .toList();
-    final referrals = app.referrals
-        .where((r) => r.studentId == student.id)
-        .toList();
-    final auditLogs = app.auditLogs
-        .where(
-          (a) =>
-              a.details.contains(student.firstName) ||
-              a.details.contains(student.id),
-        )
-        .toList();
+    final assessments =
+        app.assessments.where((a) => a.studentId == student.id).toList();
+    final sessions =
+        app.sessions.where((s) => s.studentId == student.id).toList();
+    final iepPlans =
+        app.iepPlans.where((p) => p.studentId == student.id).toList();
+    final referrals =
+        app.referrals.where((r) => r.studentId == student.id).toList();
+    final auditLogs =
+        app.auditLogs
+            .where(
+              (a) =>
+                  a.details.contains(student.firstName) ||
+                  a.details.contains(student.id),
+            )
+            .toList();
 
     final isArchived = student.status == 'Arxivlangan';
     final canArchive =
@@ -352,8 +364,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   size: 19,
                 ),
                 tooltip: 'O‘quvchini arxivlash',
-                onPressed: () =>
-                    _showArchiveDialog(context, student, currentUser),
+                onPressed:
+                    () => _showArchiveDialog(context, student, currentUser),
               ),
             ),
           if (canArchive && isArchived)
@@ -366,8 +378,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   size: 19,
                 ),
                 tooltip: 'Arxivdan qaytarish',
-                onPressed: () =>
-                    _showUnarchiveDialog(context, student, currentUser),
+                onPressed:
+                    () => _showUnarchiveDialog(context, student, currentUser),
               ),
             ),
         ],
@@ -470,9 +482,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
         (_access.canManageUsers(currentUser) ||
             currentUser.role == UserRole.coordinator);
 
-    final assignedStaff = app.allUsers
-        .where((u) => s.assignedSpecialistIds.contains(u.id))
-        .toList();
+    final assignedStaff =
+        app.allUsers
+            .where((u) => s.assignedSpecialistIds.contains(u.id))
+            .toList();
 
     return SingleChildScrollView(
       child: ResponsivePageContainer(
@@ -530,26 +543,30 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final isCompact = constraints.maxWidth < 430;
-                  final firstInitial = s.lastName.isNotEmpty
-                      ? s.lastName.substring(0, 1).toUpperCase()
-                      : '';
-                  final secondInitial = s.firstName.isNotEmpty
-                      ? s.firstName.substring(0, 1).toUpperCase()
-                      : '?';
+                  final firstInitial =
+                      s.lastName.isNotEmpty
+                          ? s.lastName.substring(0, 1).toUpperCase()
+                          : '';
+                  final secondInitial =
+                      s.firstName.isNotEmpty
+                          ? s.firstName.substring(0, 1).toUpperCase()
+                          : '?';
                   final initials = '$firstInitial$secondInitial';
 
                   final avatar = Container(
                     width: isCompact ? 46 : 52,
                     height: isCompact ? 46 : 52,
                     decoration: BoxDecoration(
-                      color: isArchived
-                          ? AppColors.glassWellFill
-                          : AppColors.primaryLight,
+                      color:
+                          isArchived
+                              ? AppColors.glassWellFill
+                              : AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(isCompact ? 13 : 14),
                       border: Border.all(
-                        color: isArchived
-                            ? AppColors.border
-                            : AppColors.primaryTint,
+                        color:
+                            isArchived
+                                ? AppColors.border
+                                : AppColors.primaryTint,
                         width: 1.0,
                       ),
                     ),
@@ -559,9 +576,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       style: TextStyle(
                         fontSize: isCompact ? 16 : 18,
                         fontWeight: FontWeight.w700,
-                        color: isArchived
-                            ? AppColors.textMuted
-                            : AppColors.primary,
+                        color:
+                            isArchived
+                                ? AppColors.textMuted
+                                : AppColors.primary,
                         letterSpacing: 0.2,
                       ),
                     ),
@@ -604,11 +622,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         children: [
                           StatusPill(
                             label: 'Holati: ${s.status}',
-                            color: isArchived
-                                ? AppColors.warning
-                                : AppColors.success,
-                            backgroundColor:
-                                Colors.white.withValues(alpha: 0.86),
+                            color:
+                                isArchived
+                                    ? AppColors.warning
+                                    : AppColors.success,
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.86,
+                            ),
                             showDot: true,
                           ),
                           Builder(
@@ -643,8 +663,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             StatusPill(
                               label: 'Koordinator: ${s.coordinatorName}',
                               color: AppColors.info,
-                              backgroundColor:
-                                  Colors.white.withValues(alpha: 0.86),
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.86,
+                              ),
                               icon: LucideIcons.shieldCheck,
                             ),
                         ],
@@ -816,11 +837,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             'Biriktirish',
                             style: TextStyle(fontSize: 12.5),
                           ),
-                          onPressed: () => _showAssignSpecialistDialog(
-                            context,
-                            s,
-                            currentUser,
-                          ),
+                          onPressed:
+                              () => _showAssignSpecialistDialog(
+                                context,
+                                s,
+                                currentUser,
+                              ),
                         ),
                     ],
                   ),
@@ -1135,146 +1157,160 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) => AlertDialog(
-          title: const Text('Logopedik tovush bosqichini qayd etish'),
-          content: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 460),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DropdownButtonFormField<SpeechSound>(
-                    initialValue: selectedSound,
-                    isExpanded: true,
-                    decoration: const InputDecoration(labelText: 'Tovush *'),
-                    items: sounds
-                        .map(
-                          (snd) => DropdownMenuItem(
-                            value: snd,
-                            child: Text(
-                              '${snd.display.toUpperCase()} — ${snd.group.label}',
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (context, setModalState) => AlertDialog(
+                  title: const Text('Logopedik tovush bosqichini qayd etish'),
+                  content: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 460),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          DropdownButtonFormField<SpeechSound>(
+                            initialValue: selectedSound,
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Tovush *',
+                            ),
+                            items:
+                                sounds
+                                    .map(
+                                      (snd) => DropdownMenuItem(
+                                        value: snd,
+                                        child: Text(
+                                          '${snd.display.toUpperCase()} — ${snd.group.label}',
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) {
+                              if (v != null)
+                                setModalState(() => selectedSound = v);
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<SoundStage>(
+                            initialValue: selectedStage,
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Hozirgi bosqich *',
+                            ),
+                            items:
+                                SoundStage.values
+                                    .map(
+                                      (st) => DropdownMenuItem(
+                                        value: st,
+                                        child: Text(
+                                          st.label,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) {
+                              if (v != null)
+                                setModalState(() => selectedStage = v);
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<SoundDisorder>(
+                            initialValue: selectedDisorder,
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Buzilish turi',
+                            ),
+                            items:
+                                SoundDisorder.values
+                                    .map(
+                                      (d) => DropdownMenuItem(
+                                        value: d,
+                                        child: Text(d.label),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) {
+                              if (v != null)
+                                setModalState(() => selectedDisorder = v);
+                            },
+                          ),
+                          if (selectedDisorder ==
+                              SoundDisorder.substitution) ...[
+                            const SizedBox(height: 10),
+                            DropdownButtonFormField<String?>(
+                              initialValue: substitutedWith,
+                              decoration: const InputDecoration(
+                                labelText: 'Qaysi tovushga almashtiradi? *',
+                              ),
+                              items:
+                                  sounds
+                                      .where((x) => x.id != selectedSound.id)
+                                      .map(
+                                        (x) => DropdownMenuItem(
+                                          value: x.id,
+                                          child: Text(x.display.toUpperCase()),
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged:
+                                  (v) =>
+                                      setModalState(() => substitutedWith = v),
+                            ),
+                          ],
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: noteCtrl,
+                            decoration: const InputDecoration(
+                              labelText: 'Logoped izohi',
                             ),
                           ),
-                        )
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) setModalState(() => selectedSound = v);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<SoundStage>(
-                    initialValue: selectedStage,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Hozirgi bosqich *',
-                    ),
-                    items: SoundStage.values
-                        .map(
-                          (st) => DropdownMenuItem(
-                            value: st,
-                            child: Text(
-                              st.label,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) setModalState(() => selectedStage = v);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<SoundDisorder>(
-                    initialValue: selectedDisorder,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Buzilish turi',
-                    ),
-                    items: SoundDisorder.values
-                        .map(
-                          (d) => DropdownMenuItem(
-                            value: d,
-                            child: Text(d.label),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) setModalState(() => selectedDisorder = v);
-                    },
-                  ),
-                  if (selectedDisorder == SoundDisorder.substitution) ...[
-                    const SizedBox(height: 10),
-                    DropdownButtonFormField<String?>(
-                      initialValue: substitutedWith,
-                      decoration: const InputDecoration(
-                        labelText: 'Qaysi tovushga almashtiradi? *',
+                        ],
                       ),
-                      items: sounds
-                          .where((x) => x.id != selectedSound.id)
-                          .map(
-                            (x) => DropdownMenuItem(
-                              value: x.id,
-                              child: Text(x.display.toUpperCase()),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Bekor qilish'),
+                    ),
+                    FilledButton(
+                      onPressed: () async {
+                        try {
+                          await app.recordSoundEntry(
+                            SoundEntry(
+                              id: const Uuid().v4(),
+                              studentId: s.id,
+                              soundId: selectedSound.id,
+                              stage: selectedStage,
+                              disorder:
+                                  selectedStage.isMastered
+                                      ? SoundDisorder.none
+                                      : selectedDisorder,
+                              substitutedWith:
+                                  selectedDisorder == SoundDisorder.substitution
+                                      ? substitutedWith
+                                      : null,
+                              note: noteCtrl.text.trim(),
+                              recordedById: '',
+                              recordedByName: '',
+                              recordedAt: DateTime.now(),
                             ),
-                          )
-                          .toList(),
-                      onChanged: (v) =>
-                          setModalState(() => substitutedWith = v),
+                          );
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        } on AppException catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        }
+                      },
+                      child: const Text('Saqlash'),
                     ),
                   ],
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: noteCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Logoped izohi',
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Bekor qilish'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                try {
-                  await app.recordSoundEntry(
-                    SoundEntry(
-                      id: const Uuid().v4(),
-                      studentId: s.id,
-                      soundId: selectedSound.id,
-                      stage: selectedStage,
-                      disorder: selectedStage.isMastered
-                          ? SoundDisorder.none
-                          : selectedDisorder,
-                      substitutedWith:
-                          selectedDisorder == SoundDisorder.substitution
-                          ? substitutedWith
-                          : null,
-                      note: noteCtrl.text.trim(),
-                      recordedById: '',
-                      recordedByName: '',
-                      recordedAt: DateTime.now(),
-                    ),
-                  );
-                  if (ctx.mounted) Navigator.pop(ctx);
-                } on AppException catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(e.toString())),
-                    );
-                  }
-                }
-              },
-              child: const Text('Saqlash'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -1304,11 +1340,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    LucideIcons.award,
-                    color: Color(0xFF059669),
-                    size: 20,
-                  ),
+                  Icon(LucideIcons.award, color: Color(0xFF059669), size: 20),
                   SizedBox(width: 10),
                   Text(
                     'Mening Yutuqlar Pasportim',
@@ -1403,76 +1435,82 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) => AlertDialog(
-          title: const Text('Yangi yutuq qo‘shish'),
-          content: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DropdownButtonFormField<AchievementCategory>(
-                  initialValue: category,
-                  decoration: const InputDecoration(labelText: 'Toifa'),
-                  items: AchievementCategory.values
-                      .map(
-                        (c) => DropdownMenuItem(value: c, child: Text(c.label)),
-                      )
-                      .toList(),
-                  onChanged: (v) {
-                    if (v != null) setModalState(() => category = v);
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: titleCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Yutuq sarlavhasi *',
-                    hintText: 'Masalan: Maktab tadbirida she’r o‘qidi',
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: descCtrl,
-                  decoration: const InputDecoration(labelText: 'Izoh'),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Bekor qilish'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                final title = titleCtrl.text.trim();
-                if (title.isEmpty) return;
-                try {
-                  await app.addAchievement(
-                    Achievement(
-                      id: const Uuid().v4(),
-                      studentId: s.id,
-                      category: category,
-                      title: title,
-                      description: descCtrl.text.trim(),
-                      achievedAt: DateTime.now(),
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (context, setModalState) => AlertDialog(
+                  title: const Text('Yangi yutuq qo‘shish'),
+                  content: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 440),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        DropdownButtonFormField<AchievementCategory>(
+                          initialValue: category,
+                          decoration: const InputDecoration(labelText: 'Toifa'),
+                          items:
+                              AchievementCategory.values
+                                  .map(
+                                    (c) => DropdownMenuItem(
+                                      value: c,
+                                      child: Text(c.label),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: (v) {
+                            if (v != null) setModalState(() => category = v);
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        TextField(
+                          controller: titleCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Yutuq sarlavhasi *',
+                            hintText: 'Masalan: Maktab tadbirida she’r o‘qidi',
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        TextField(
+                          controller: descCtrl,
+                          decoration: const InputDecoration(labelText: 'Izoh'),
+                        ),
+                      ],
                     ),
-                  );
-                  if (ctx.mounted) Navigator.pop(ctx);
-                } on AppException catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(e.toString())),
-                    );
-                  }
-                }
-              },
-              child: const Text('Saqlash'),
-            ),
-          ],
-        ),
-      ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Bekor qilish'),
+                    ),
+                    FilledButton(
+                      onPressed: () async {
+                        final title = titleCtrl.text.trim();
+                        if (title.isEmpty) return;
+                        try {
+                          await app.addAchievement(
+                            Achievement(
+                              id: const Uuid().v4(),
+                              studentId: s.id,
+                              category: category,
+                              title: title,
+                              description: descCtrl.text.trim(),
+                              achievedAt: DateTime.now(),
+                            ),
+                          );
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        } on AppException catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        }
+                      },
+                      child: const Text('Saqlash'),
+                    ),
+                  ],
+                ),
+          ),
     );
   }
 
@@ -1492,11 +1530,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
         children: [
           const Row(
             children: [
-              Icon(
-                LucideIcons.users,
-                color: AppColors.primary,
-                size: 20,
-              ),
+              Icon(LucideIcons.users, color: AppColors.primary, size: 20),
               SizedBox(width: 10),
               Text(
                 'Mutaxassislar Konsiliumi (Qo‘shma muhokamalar)',
@@ -1633,24 +1667,27 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
         title: 'Ushbu o‘quvchiga hali baholash o‘tkazilmagan',
         subtitle:
             'Kasbiy diagnostika natijalarini kiritib, dinamikani kuzatishni boshlang.',
-        action: currentRole.canCreateAssessments
-            ? FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: currentRole.color,
-                ),
-                icon: const Icon(LucideIcons.plus, size: 16),
-                label: Text('${currentRole.label} baholashi kiritish'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          NewAssessmentScreen(initialStudentId: student.id),
-                    ),
-                  );
-                },
-              )
-            : null,
+        action:
+            currentRole.canCreateAssessments
+                ? FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: currentRole.color,
+                  ),
+                  icon: const Icon(LucideIcons.plus, size: 16),
+                  label: Text('${currentRole.label} baholashi kiritish'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => NewAssessmentScreen(
+                              initialStudentId: student.id,
+                            ),
+                      ),
+                    );
+                  },
+                )
+                : null,
       );
     }
 
@@ -1664,22 +1701,24 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               title: 'Baholashlar tarixi',
               subtitle:
                   'O‘tkazilgan jami diagnostikalar • ${assessments.length} ta',
-              action: currentRole.canCreateAssessments
-                  ? HeaderActionButton(
-                      icon: LucideIcons.plus,
-                      label: 'Yangi baholash',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => NewAssessmentScreen(
-                              initialStudentId: student.id,
+              action:
+                  currentRole.canCreateAssessments
+                      ? HeaderActionButton(
+                        icon: LucideIcons.plus,
+                        label: 'Yangi baholash',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => NewAssessmentScreen(
+                                    initialStudentId: student.id,
+                                  ),
                             ),
-                          ),
-                        );
-                      },
-                    )
-                  : null,
+                          );
+                        },
+                      )
+                      : null,
             ),
             const SizedBox(height: 18),
             ...assessments.map((a) {
@@ -1723,8 +1762,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             label:
                                 '${a.totalScore.toInt()} / ${a.maxScore.toInt()} ball',
                             color: AppColors.success,
-                            backgroundColor:
-                                Colors.white.withValues(alpha: 0.85),
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.85,
+                            ),
                           ),
                         ],
                       ),
@@ -1760,8 +1800,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           StatusPill(
                             label: a.specialistRole,
                             color: AppColors.textSecondary,
-                            backgroundColor:
-                                Colors.white.withValues(alpha: 0.8),
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.8,
+                            ),
                           ),
                           Text(
                             df.format(a.assessmentDate),
@@ -1827,81 +1868,85 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
       child: ResponsivePageContainer(
         maxWidth: 1060,
         child: Column(
-          children: sessions.map((s) {
-            final isDone = s.status == 'Bajarildi';
-            final statusColor = isDone ? AppColors.success : AppColors.info;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 14),
-              child: SurfaceCard(
-                borderRadius: 26,
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Icon(
-                        isDone ? LucideIcons.circleCheck : LucideIcons.clock,
-                        color: statusColor,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+          children:
+              sessions.map((s) {
+                final isDone = s.status == 'Bajarildi';
+                final statusColor = isDone ? AppColors.success : AppColors.info;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: SurfaceCard(
+                    borderRadius: 26,
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Icon(
+                            isDone
+                                ? LucideIcons.circleCheck
+                                : LucideIcons.clock,
+                            color: statusColor,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Text(
-                                  s.topic,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 14.5,
-                                    color: AppColors.textPrimary,
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      s.topic,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14.5,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
                                   ),
+                                  const SizedBox(width: 10),
+                                  StatusPill(
+                                    label: s.status,
+                                    color: statusColor,
+                                    backgroundColor: Colors.white.withValues(
+                                      alpha: 0.85,
+                                    ),
+                                    showDot: true,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                '${s.specialistName} • ${df.format(s.scheduledAt)}',
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  color: AppColors.textMuted,
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              StatusPill(
-                                label: s.status,
-                                color: statusColor,
-                                backgroundColor:
-                                    Colors.white.withValues(alpha: 0.85),
-                                showDot: true,
-                              ),
+                              if (s.activities != null &&
+                                  s.activities!.isNotEmpty) ...[
+                                const SizedBox(height: 6),
+                                Text(
+                                  s.activities!,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
-                          const SizedBox(height: 5),
-                          Text(
-                            '${s.specialistName} • ${df.format(s.scheduledAt)}',
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                          if (s.activities != null &&
-                              s.activities!.isNotEmpty) ...[
-                            const SizedBox(height: 6),
-                            Text(
-                              s.activities!,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textSecondary,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
+                  ),
+                );
+              }).toList(),
         ),
       ),
     );
@@ -1942,8 +1987,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>
-                          IepPrintScreen(plan: plan, student: student),
+                      builder:
+                          (_) => IepPrintScreen(plan: plan, student: student),
                     ),
                   );
                 },
@@ -1984,11 +2029,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           const SizedBox(width: 10),
                           StatusPill(
                             label: '${obj.progressPercent}%',
-                            color: obj.progressPercent >= 80
-                                ? AppColors.success
-                                : AppColors.primary,
-                            backgroundColor:
-                                Colors.white.withValues(alpha: 0.86),
+                            color:
+                                obj.progressPercent >= 80
+                                    ? AppColors.success
+                                    : AppColors.primary,
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.86,
+                            ),
                           ),
                         ],
                       ),
@@ -2083,20 +2130,21 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     );
 
     // Umumiy baholash dinamikasi (oxirgi baholash savollari bo'yicha)
-    final latestCompleted = sorted.where((a) => a.status == 'completed').lastOrNull;
-    final overallAssessmentDyn = latestCompleted != null &&
-            latestCompleted.questionIds.isNotEmpty
-        ? app.assessmentDynamics(
-            student.id,
-            latestCompleted.questionIds,
-            period: _selectedDynamicsPeriod,
-          )
-        : const DynamicsResult(
-            status: DynamicsStatus.insufficientData,
-            series: [],
-            reason:
-                'Taqqoslash uchun bir xil savollar to‘plami bilan kamida 2 ta baholash kerak.',
-          );
+    final latestCompleted =
+        sorted.where((a) => a.status == 'completed').lastOrNull;
+    final overallAssessmentDyn =
+        latestCompleted != null && latestCompleted.questionIds.isNotEmpty
+            ? app.assessmentDynamics(
+              student.id,
+              latestCompleted.questionIds,
+              period: _selectedDynamicsPeriod,
+            )
+            : const DynamicsResult(
+              status: DynamicsStatus.insufficientData,
+              series: [],
+              reason:
+                  'Taqqoslash uchun bir xil savollar to‘plami bilan kamida 2 ta baholash kerak.',
+            );
 
     return SingleChildScrollView(
       child: ResponsivePageContainer(
@@ -2132,27 +2180,34 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         selected:
                             _selectedDynamicsPeriod ==
                             DynamicsPeriod.measurement,
-                        onSelected: (_) => setState(
-                          () => _selectedDynamicsPeriod =
-                              DynamicsPeriod.measurement,
-                        ),
+                        onSelected:
+                            (_) => setState(
+                              () =>
+                                  _selectedDynamicsPeriod =
+                                      DynamicsPeriod.measurement,
+                            ),
                       ),
                       ChoiceChip(
                         label: const Text('Oylik dinamika'),
                         selected:
                             _selectedDynamicsPeriod == DynamicsPeriod.month,
-                        onSelected: (_) => setState(
-                          () => _selectedDynamicsPeriod = DynamicsPeriod.month,
-                        ),
+                        onSelected:
+                            (_) => setState(
+                              () =>
+                                  _selectedDynamicsPeriod =
+                                      DynamicsPeriod.month,
+                            ),
                       ),
                       ChoiceChip(
                         label: const Text('Choraklik dinamika'),
                         selected:
                             _selectedDynamicsPeriod == DynamicsPeriod.quarter,
-                        onSelected: (_) => setState(
-                          () =>
-                              _selectedDynamicsPeriod = DynamicsPeriod.quarter,
-                        ),
+                        onSelected:
+                            (_) => setState(
+                              () =>
+                                  _selectedDynamicsPeriod =
+                                      DynamicsPeriod.quarter,
+                            ),
                       ),
                     ],
                   ),
@@ -2160,8 +2215,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     FilledButton.icon(
                       icon: const Icon(LucideIcons.plus, size: 16),
                       label: const Text('Yangi o‘lchov kiritish'),
-                      onPressed: () =>
-                          _showAddMeasurementDialog(context, student, app),
+                      onPressed:
+                          () =>
+                              _showAddMeasurementDialog(context, student, app),
                     ),
                 ],
               ),
@@ -2181,7 +2237,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       overallAssessmentDyn.status == DynamicsStatus.growth
                           ? LucideIcons.trendingUp
                           : overallAssessmentDyn.status ==
-                                DynamicsStatus.decline
+                              DynamicsStatus.decline
                           ? LucideIcons.trendingDown
                           : LucideIcons.activity,
                       color: _dynamicsColor(overallAssessmentDyn.status),
@@ -2372,13 +2428,14 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               show: true,
                               drawVerticalLine: false,
                               horizontalInterval: 25,
-                              getDrawingHorizontalLine: (_) => FlLine(
-                                color: AppColors.borderSlate.withValues(
-                                  alpha: 0.7,
-                                ),
-                                strokeWidth: 1,
-                                dashArray: [4, 4],
-                              ),
+                              getDrawingHorizontalLine:
+                                  (_) => FlLine(
+                                    color: AppColors.borderSlate.withValues(
+                                      alpha: 0.7,
+                                    ),
+                                    strokeWidth: 1,
+                                    dashArray: [4, 4],
+                                  ),
                             ),
                             borderData: FlBorderData(show: false),
                             titlesData: FlTitlesData(
@@ -2393,13 +2450,14 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   showTitles: true,
                                   reservedSize: 36,
                                   interval: 25,
-                                  getTitlesWidget: (val, _) => Text(
-                                    '${val.toInt()}%',
-                                    style: const TextStyle(
-                                      fontSize: 10.5,
-                                      color: AppColors.textMuted,
-                                    ),
-                                  ),
+                                  getTitlesWidget:
+                                      (val, _) => Text(
+                                        '${val.toInt()}%',
+                                        style: const TextStyle(
+                                          fontSize: 10.5,
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
                                 ),
                               ),
                               bottomTitles: AxisTitles(
@@ -2419,9 +2477,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                       space: 8,
                                       fitInside:
                                           SideTitleFitInsideData.fromTitleMeta(
-                                        meta,
-                                        distanceFromEdge: 0,
-                                      ),
+                                            meta,
+                                            distanceFromEdge: 0,
+                                          ),
                                       child: Text(
                                         DateFormat(
                                           'dd.MM',
@@ -2444,11 +2502,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 color: AppColors.primary,
                                 barWidth: 3,
                                 spots: List.generate(sorted.length, (i) {
-                                  final pct = sorted[i].maxScore > 0
-                                      ? (sorted[i].totalScore /
-                                                sorted[i].maxScore) *
-                                            100
-                                      : 0.0;
+                                  final pct =
+                                      sorted[i].maxScore > 0
+                                          ? (sorted[i].totalScore /
+                                                  sorted[i].maxScore) *
+                                              100
+                                          : 0.0;
                                   return FlSpot(
                                     i.toDouble(),
                                     pct.clamp(0, 100),
@@ -2456,8 +2515,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 }),
                                 dotData: FlDotData(
                                   show: true,
-                                  getDotPainter: (_, _, _, _) =>
-                                      FlDotCirclePainter(
+                                  getDotPainter:
+                                      (_, _, _, _) => FlDotCirclePainter(
                                         radius: 4.5,
                                         color: Colors.white,
                                         strokeWidth: 2.5,
@@ -2540,10 +2599,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             ),
                             const SizedBox(width: 8),
                             StatusPill(
-                              label: '${a.totalScore.toInt()} ball (${a.trend})',
+                              label:
+                                  '${a.totalScore.toInt()} ball (${a.trend})',
                               color: AppColors.primary,
-                              backgroundColor:
-                                  Colors.white.withValues(alpha: 0.85),
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.85,
+                              ),
                             ),
                           ],
                         ),
@@ -2571,94 +2632,98 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) => AlertDialog(
-          title: const Text('Yangi rivojlanish o‘lchovini kiritish'),
-          content: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DropdownButtonFormField<ProgressMetric>(
-                  initialValue: selectedMetric,
-                  isExpanded: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Ko‘rsatkich *',
-                  ),
-                  items: metrics
-                      .map(
-                        (m) => DropdownMenuItem(
-                          value: m,
-                          child: Text(
-                            '${m.name} (${m.unit})',
-                            overflow: TextOverflow.ellipsis,
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (context, setModalState) => AlertDialog(
+                  title: const Text('Yangi rivojlanish o‘lchovini kiritish'),
+                  content: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 440),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        DropdownButtonFormField<ProgressMetric>(
+                          initialValue: selectedMetric,
+                          isExpanded: true,
+                          decoration: const InputDecoration(
+                            labelText: 'Ko‘rsatkich *',
+                          ),
+                          items:
+                              metrics
+                                  .map(
+                                    (m) => DropdownMenuItem(
+                                      value: m,
+                                      child: Text(
+                                        '${m.name} (${m.unit})',
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: (v) {
+                            if (v != null)
+                              setModalState(() => selectedMetric = v);
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: valCtrl,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: 'Qiymat (${selectedMetric.unit}) *',
+                            hintText: 'Masalan: 5',
                           ),
                         ),
-                      )
-                      .toList(),
-                  onChanged: (v) {
-                    if (v != null) setModalState(() => selectedMetric = v);
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: valCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Qiymat (${selectedMetric.unit}) *',
-                    hintText: 'Masalan: 5',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: noteCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Izoh (ixtiyoriy)',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Bekor qilish'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                final v = double.tryParse(
-                  valCtrl.text.trim().replaceAll(',', '.'),
-                );
-                if (v == null) return;
-                try {
-                  await app.addMeasurement(
-                    ProgressMeasurement(
-                      id: const Uuid().v4(),
-                      studentId: student.id,
-                      metricId: selectedMetric.id,
-                      value: v,
-                      measuredAt: DateTime.now(),
-                      recordedById: '',
-                      recordedByName: '',
-                      note: noteCtrl.text.trim(),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: noteCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Izoh (ixtiyoriy)',
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                  if (ctx.mounted) Navigator.pop(ctx);
-                } on AppException catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(e.toString())),
-                    );
-                  }
-                }
-              },
-              child: const Text('Saqlash'),
-            ),
-          ],
-        ),
-      ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Bekor qilish'),
+                    ),
+                    FilledButton(
+                      onPressed: () async {
+                        final v = double.tryParse(
+                          valCtrl.text.trim().replaceAll(',', '.'),
+                        );
+                        if (v == null) return;
+                        try {
+                          await app.addMeasurement(
+                            ProgressMeasurement(
+                              id: const Uuid().v4(),
+                              studentId: student.id,
+                              metricId: selectedMetric.id,
+                              value: v,
+                              measuredAt: DateTime.now(),
+                              recordedById: '',
+                              recordedByName: '',
+                              note: noteCtrl.text.trim(),
+                            ),
+                          );
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        } on AppException catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        }
+                      },
+                      child: const Text('Saqlash'),
+                    ),
+                  ],
+                ),
+          ),
     );
   }
 
@@ -2668,8 +2733,14 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     AppProvider app,
   ) {
     final subjects = app.curriculumSubjects;
-    final canEditDts = app.canUseModule(WorkspaceModule.subjectLevel, edit: true);
-    final canEditTasks = app.canUseModule(WorkspaceModule.subjectTasks, edit: true);
+    final canEditDts = app.canUseModule(
+      WorkspaceModule.subjectLevel,
+      edit: true,
+    );
+    final canEditTasks = app.canUseModule(
+      WorkspaceModule.subjectTasks,
+      edit: true,
+    );
 
     return SurfaceCard(
       borderRadius: 26,
@@ -2721,14 +2792,14 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: hasGap
-                    ? const Color(0xFFFFFBEB)
-                    : const Color(0xFFF9FAFC),
+                color:
+                    hasGap ? const Color(0xFFFFFBEB) : const Color(0xFFF9FAFC),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: hasGap
-                      ? const Color(0xFFD97706).withValues(alpha: 0.35)
-                      : AppColors.border,
+                  color:
+                      hasGap
+                          ? const Color(0xFFD97706).withValues(alpha: 0.35)
+                          : AppColors.border,
                 ),
               ),
               child: Column(
@@ -2760,15 +2831,18 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           const SizedBox(width: 6),
                           if (level != null)
                             StatusPill(
-                              label: level.confirmedGrade == 0
-                                  ? 'Haqiqiy daraja: 1-sinfdan past'
-                                  : 'Haqiqiy daraja: ${level.confirmedGrade}-sinf${level.gap > 0 ? " (${level.gap} sinf past)" : ""}',
-                              color: hasGap
-                                  ? const Color(0xFFD97706)
-                                  : const Color(0xFF059669),
-                              backgroundColor: hasGap
-                                  ? const Color(0xFFFEF3C7)
-                                  : const Color(0xFFECFDF5),
+                              label:
+                                  level.confirmedGrade == 0
+                                      ? 'Haqiqiy daraja: 1-sinfdan past'
+                                      : 'Haqiqiy daraja: ${level.confirmedGrade}-sinf${level.gap > 0 ? " (${level.gap} sinf past)" : ""}',
+                              color:
+                                  hasGap
+                                      ? const Color(0xFFD97706)
+                                      : const Color(0xFF059669),
+                              backgroundColor:
+                                  hasGap
+                                      ? const Color(0xFFFEF3C7)
+                                      : const Color(0xFFECFDF5),
                               showDot: true,
                             )
                           else
@@ -2800,12 +2874,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 'DTS darajasini tekshirish',
                                 style: TextStyle(fontSize: 12),
                               ),
-                              onPressed: () => _showSubjectLevelCheckDialog(
-                                context,
-                                s,
-                                subject,
-                                app,
-                              ),
+                              onPressed:
+                                  () => _showSubjectLevelCheckDialog(
+                                    context,
+                                    s,
+                                    subject,
+                                    app,
+                                  ),
                             ),
                           if (canEditTasks && level != null)
                             FilledButton.tonalIcon(
@@ -2821,12 +2896,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 '${level.confirmedGrade == 0 ? 1 : level.confirmedGrade}-sinf darajasida vazifa berish',
                                 style: const TextStyle(fontSize: 12),
                               ),
-                              onPressed: () => _showAssignSubjectTaskDialog(
-                                context,
-                                s,
-                                subject,
-                                app,
-                              ),
+                              onPressed:
+                                  () => _showAssignSubjectTaskDialog(
+                                    context,
+                                    s,
+                                    subject,
+                                    app,
+                                  ),
                             ),
                         ],
                       ),
@@ -2866,9 +2942,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   ? LucideIcons.circleCheck
                                   : LucideIcons.circleDot,
                               size: 15,
-                              color: t.isCompleted
-                                  ? AppColors.success
-                                  : AppColors.primary,
+                              color:
+                                  t.isCompleted
+                                      ? AppColors.success
+                                      : AppColors.primary,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -2895,23 +2972,24 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     await app.completeSubjectTask(t.id, m);
                                   } on AppException catch (e) {
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                            SnackBar(
-                                              content: Text(e.toString()),
-                                            ),
-                                          );
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(content: Text(e.toString())),
+                                      );
                                     }
                                   }
                                 },
-                                itemBuilder: (_) => Mastery.values
-                                    .map(
-                                      (m) => PopupMenuItem(
-                                        value: m,
-                                        child: Text(m.label),
-                                      ),
-                                    )
-                                    .toList(),
+                                itemBuilder:
+                                    (_) =>
+                                        Mastery.values
+                                            .map(
+                                              (m) => PopupMenuItem(
+                                                value: m,
+                                                child: Text(m.label),
+                                              ),
+                                            )
+                                            .toList(),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
@@ -2961,176 +3039,191 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          final preview = app.previewSubjectLevel(subject, results);
-          final needsLower = app.subjectLevelNeedsLowerCheck(subject, results);
+      builder:
+          (ctx) => StatefulBuilder(
+            builder: (context, setModalState) {
+              final preview = app.previewSubjectLevel(subject, results);
+              final needsLower = app.subjectLevelNeedsLowerCheck(
+                subject,
+                results,
+              );
 
-          return AlertDialog(
-            title: Text('$subject — DTS bilim darajasini aniqlash'),
-            content: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 580, maxHeight: 520),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'O‘quvchi: ${student.fullName} (Rasmiy sinfi: ${student.grade})',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (preview != null)
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFBFDBFE)),
-                        ),
-                        child: Text(
-                          'Tizim tavsiyasi: ${preview == 0 ? "1-sinf talablariga hali yetmagan" : "$preview-sinf darajasi"}${needsLower ? " (Quyiroq sinf talablarini ham tekshiring!)" : ""}',
+              return AlertDialog(
+                title: Text('$subject — DTS bilim darajasini aniqlash'),
+                content: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 580,
+                    maxHeight: 520,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'O‘quvchi: ${student.fullName} (Rasmiy sinfi: ${student.grade})',
                           style: const TextStyle(
-                            fontSize: 12.5,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF1E40AF),
+                            fontSize: 13.5,
                           ),
                         ),
-                      ),
-                    const SizedBox(height: 12),
-                    ...standards.map((std) {
-                      final currentMastery = results[std.id];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  StatusPill(
-                                    label: '${std.grade}-sinf',
-                                    color: AppColors.primary,
-                                    backgroundColor: AppColors.primaryLight,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  if (!std.isOfficial)
-                                    const Text(
-                                      '(Namuna)',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.textMuted,
-                                      ),
-                                    ),
-                                ],
+                        const SizedBox(height: 8),
+                        if (preview != null)
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEFF6FF),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFBFDBFE),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                std.description,
-                                style: const TextStyle(
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Wrap(
-                                spacing: 6,
-                                children: Mastery.values.map((m) {
-                                  final selected = currentMastery == m;
-                                  return ChoiceChip(
-                                    label: Text(
-                                      m.label,
-                                      style: const TextStyle(fontSize: 11.5),
-                                    ),
-                                    selected: selected,
-                                    onSelected: (_) {
-                                      setModalState(() {
-                                        results[std.id] = m;
-                                      });
-                                    },
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<int?>(
-                      initialValue: manualGrade,
-                      decoration: const InputDecoration(
-                        labelText: 'Tasdiqlangan haqiqiy daraja (ixtiyoriy)',
-                      ),
-                      items: [
-                        const DropdownMenuItem(
-                          value: null,
-                          child: Text('Tizim tavsiyasini qabul qilish'),
-                        ),
-                        for (int g = 0; g <= 9; g++)
-                          DropdownMenuItem(
-                            value: g,
+                            ),
                             child: Text(
-                              g == 0
-                                  ? '0 (1-sinfdan past)'
-                                  : '$g-sinf darajasi',
+                              'Tizim tavsiyasi: ${preview == 0 ? "1-sinf talablariga hali yetmagan" : "$preview-sinf darajasi"}${needsLower ? " (Quyiroq sinf talablarini ham tekshiring!)" : ""}',
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1E40AF),
+                              ),
                             ),
                           ),
-                      ],
-                      onChanged: (v) => setModalState(() => manualGrade = v),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: notesCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Pedagogik izoh',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Bekor qilish'),
-              ),
-              FilledButton(
-                onPressed: results.isEmpty
-                    ? null
-                    : () async {
-                        try {
-                          await app.saveSubjectLevel(
-                            studentId: student.id,
-                            subject: subject,
-                            results: results,
-                            confirmedGrade: manualGrade,
-                            notes: notesCtrl.text.trim(),
+                        const SizedBox(height: 12),
+                        ...standards.map((std) {
+                          final currentMastery = results[std.id];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      StatusPill(
+                                        label: '${std.grade}-sinf',
+                                        color: AppColors.primary,
+                                        backgroundColor: AppColors.primaryLight,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      if (!std.isOfficial)
+                                        const Text(
+                                          '(Namuna)',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: AppColors.textMuted,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    std.description,
+                                    style: const TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Wrap(
+                                    spacing: 6,
+                                    children:
+                                        Mastery.values.map((m) {
+                                          final selected = currentMastery == m;
+                                          return ChoiceChip(
+                                            label: Text(
+                                              m.label,
+                                              style: const TextStyle(
+                                                fontSize: 11.5,
+                                              ),
+                                            ),
+                                            selected: selected,
+                                            onSelected: (_) {
+                                              setModalState(() {
+                                                results[std.id] = m;
+                                              });
+                                            },
+                                          );
+                                        }).toList(),
+                                  ),
+                                ],
+                              ),
+                            ),
                           );
-                          if (ctx.mounted) Navigator.pop(ctx);
-                        } on AppException catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(e.toString())),
-                            );
-                          }
-                        }
-                      },
-                child: const Text('Saqlash'),
-              ),
-            ],
-          );
-        },
-      ),
+                        }),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<int?>(
+                          initialValue: manualGrade,
+                          decoration: const InputDecoration(
+                            labelText:
+                                'Tasdiqlangan haqiqiy daraja (ixtiyoriy)',
+                          ),
+                          items: [
+                            const DropdownMenuItem(
+                              value: null,
+                              child: Text('Tizim tavsiyasini qabul qilish'),
+                            ),
+                            for (int g = 0; g <= 9; g++)
+                              DropdownMenuItem(
+                                value: g,
+                                child: Text(
+                                  g == 0
+                                      ? '0 (1-sinfdan past)'
+                                      : '$g-sinf darajasi',
+                                ),
+                              ),
+                          ],
+                          onChanged:
+                              (v) => setModalState(() => manualGrade = v),
+                        ),
+                        const SizedBox(height: 10),
+                        TextField(
+                          controller: notesCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Pedagogik izoh',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Bekor qilish'),
+                  ),
+                  FilledButton(
+                    onPressed:
+                        results.isEmpty
+                            ? null
+                            : () async {
+                              try {
+                                await app.saveSubjectLevel(
+                                  studentId: student.id,
+                                  subject: subject,
+                                  results: results,
+                                  confirmedGrade: manualGrade,
+                                  notes: notesCtrl.text.trim(),
+                                );
+                                if (ctx.mounted) Navigator.pop(ctx);
+                              } on AppException catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(e.toString())),
+                                  );
+                                }
+                              }
+                            },
+                    child: const Text('Saqlash'),
+                  ),
+                ],
+              );
+            },
+          ),
     );
   }
 
@@ -3145,87 +3238,96 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     final targetGrade =
         (level?.confirmedGrade ?? 1) == 0 ? 1 : (level?.confirmedGrade ?? 1);
     final titleCtrl = TextEditingController(
-      text: drafts.isNotEmpty
-          ? drafts.first.title
-          : '$targetGrade-sinf darajasidagi individual mashq',
+      text:
+          drafts.isNotEmpty
+              ? drafts.first.title
+              : '$targetGrade-sinf darajasidagi individual mashq',
     );
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('$subject — Individual vazifa berish ($targetGrade-sinf darajasi)'),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (drafts.isNotEmpty) ...[
-                const Text(
-                  'DTS keyingi talablaridan tavsiya etilgan vazifalar:',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 6),
-                ...drafts.take(3).map(
-                  (d) => Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: ActionChip(
-                      label: Text(
-                        '[${d.levelGrade}-sinf] ${d.title}',
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 11.5),
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(
+              '$subject — Individual vazifa berish ($targetGrade-sinf darajasi)',
+            ),
+            content: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (drafts.isNotEmpty) ...[
+                    const Text(
+                      'DTS keyingi talablaridan tavsiya etilgan vazifalar:',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
                       ),
-                      onPressed: () => titleCtrl.text = d.title,
+                    ),
+                    const SizedBox(height: 6),
+                    ...drafts
+                        .take(3)
+                        .map(
+                          (d) => Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: ActionChip(
+                              label: Text(
+                                '[${d.levelGrade}-sinf] ${d.title}',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 11.5),
+                              ),
+                              onPressed: () => titleCtrl.text = d.title,
+                            ),
+                          ),
+                        ),
+                    const SizedBox(height: 10),
+                  ],
+                  TextField(
+                    controller: titleCtrl,
+                    maxLines: 2,
+                    decoration: const InputDecoration(
+                      labelText: 'Topshiriq mazmuni *',
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-              ],
-              TextField(
-                controller: titleCtrl,
-                maxLines: 2,
-                decoration: const InputDecoration(
-                  labelText: 'Topshiriq mazmuni *',
-                ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Bekor qilish'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  final text = titleCtrl.text.trim();
+                  if (text.isEmpty) return;
+                  try {
+                    await app.assignSubjectTask(
+                      SubjectTask(
+                        id: const Uuid().v4(),
+                        studentId: student.id,
+                        subject: subject,
+                        levelGrade: targetGrade,
+                        title: text,
+                        assignedById: '',
+                        assignedByName: '',
+                        assignedAt: DateTime.now(),
+                      ),
+                    );
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  } on AppException catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(e.toString())));
+                    }
+                  }
+                },
+                child: const Text('Topshiriqni biriktirish'),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Bekor qilish'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              final text = titleCtrl.text.trim();
-              if (text.isEmpty) return;
-              try {
-                await app.assignSubjectTask(
-                  SubjectTask(
-                    id: const Uuid().v4(),
-                    studentId: student.id,
-                    subject: subject,
-                    levelGrade: targetGrade,
-                    title: text,
-                    assignedById: '',
-                    assignedByName: '',
-                    assignedAt: DateTime.now(),
-                  ),
-                );
-                if (ctx.mounted) Navigator.pop(ctx);
-              } on AppException catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(e.toString())),
-                  );
-                }
-              }
-            },
-            child: const Text('Topshiriqni biriktirish'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -3235,7 +3337,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     AppProvider app,
   ) {
     final ap = s.accessProfile;
-    final canEditAp = app.canUseModule(WorkspaceModule.accessProfile, edit: true);
+    final canEditAp = app.canUseModule(
+      WorkspaceModule.accessProfile,
+      edit: true,
+    );
 
     return SurfaceCard(
       borderRadius: 26,
@@ -3279,8 +3384,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     ap == null ? 'Profilni to‘ldirish' : 'Tahrirlash',
                     style: const TextStyle(fontSize: 12),
                   ),
-                  onPressed: () =>
-                      _showEditAccessProfileDialog(context, s, app),
+                  onPressed:
+                      () => _showEditAccessProfileDialog(context, s, app),
                 ),
             ],
           ),
@@ -3349,156 +3454,176 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) => AlertDialog(
-          title: const Text('Imkoniyat profilini tahrirlash'),
-          content: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 460),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DropdownButtonFormField<CommunicationMode>(
-                    initialValue: comm,
-                    decoration: const InputDecoration(labelText: 'Muloqot usuli'),
-                    items: CommunicationMode.values
-                        .map(
-                          (m) => DropdownMenuItem(
-                            value: m,
-                            child: Text(m.label),
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (context, setModalState) => AlertDialog(
+                  title: const Text('Imkoniyat profilini tahrirlash'),
+                  content: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 460),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          DropdownButtonFormField<CommunicationMode>(
+                            initialValue: comm,
+                            decoration: const InputDecoration(
+                              labelText: 'Muloqot usuli',
+                            ),
+                            items:
+                                CommunicationMode.values
+                                    .map(
+                                      (m) => DropdownMenuItem(
+                                        value: m,
+                                        child: Text(m.label),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) {
+                              if (v != null) setModalState(() => comm = v);
+                            },
                           ),
-                        )
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) setModalState(() => comm = v);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<AbilityLevel>(
-                    initialValue: hearing,
-                    decoration: const InputDecoration(labelText: 'Eshitish'),
-                    items: AbilityLevel.values
-                        .map(
-                          (a) => DropdownMenuItem(
-                            value: a,
-                            child: Text(a.label),
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<AbilityLevel>(
+                            initialValue: hearing,
+                            decoration: const InputDecoration(
+                              labelText: 'Eshitish',
+                            ),
+                            items:
+                                AbilityLevel.values
+                                    .map(
+                                      (a) => DropdownMenuItem(
+                                        value: a,
+                                        child: Text(a.label),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) {
+                              if (v != null) setModalState(() => hearing = v);
+                            },
                           ),
-                        )
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) setModalState(() => hearing = v);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<AbilityLevel>(
-                    initialValue: vision,
-                    decoration: const InputDecoration(labelText: 'Ko‘rish'),
-                    items: AbilityLevel.values
-                        .map(
-                          (a) => DropdownMenuItem(
-                            value: a,
-                            child: Text(a.label),
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<AbilityLevel>(
+                            initialValue: vision,
+                            decoration: const InputDecoration(
+                              labelText: 'Ko‘rish',
+                            ),
+                            items:
+                                AbilityLevel.values
+                                    .map(
+                                      (a) => DropdownMenuItem(
+                                        value: a,
+                                        child: Text(a.label),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) {
+                              if (v != null) setModalState(() => vision = v);
+                            },
                           ),
-                        )
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) setModalState(() => vision = v);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<AbilityLevel>(
-                    initialValue: motor,
-                    decoration: const InputDecoration(
-                      labelText: 'Qo‘l motorikasi',
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<AbilityLevel>(
+                            initialValue: motor,
+                            decoration: const InputDecoration(
+                              labelText: 'Qo‘l motorikasi',
+                            ),
+                            items:
+                                AbilityLevel.values
+                                    .map(
+                                      (a) => DropdownMenuItem(
+                                        value: a,
+                                        child: Text(a.label),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) {
+                              if (v != null) setModalState(() => motor = v);
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<AbilityLevel>(
+                            initialValue: reading,
+                            decoration: const InputDecoration(
+                              labelText: 'O‘qish',
+                            ),
+                            items:
+                                AbilityLevel.values
+                                    .map(
+                                      (a) => DropdownMenuItem(
+                                        value: a,
+                                        child: Text(a.label),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) {
+                              if (v != null) setModalState(() => reading = v);
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<AbilityLevel>(
+                            initialValue: writing,
+                            decoration: const InputDecoration(
+                              labelText: 'Yozish',
+                            ),
+                            items:
+                                AbilityLevel.values
+                                    .map(
+                                      (a) => DropdownMenuItem(
+                                        value: a,
+                                        child: Text(a.label),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) {
+                              if (v != null) setModalState(() => writing = v);
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: notesCtrl,
+                            decoration: const InputDecoration(
+                              labelText: 'Izoh',
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    items: AbilityLevel.values
-                        .map(
-                          (a) => DropdownMenuItem(
-                            value: a,
-                            child: Text(a.label),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) setModalState(() => motor = v);
-                    },
                   ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<AbilityLevel>(
-                    initialValue: reading,
-                    decoration: const InputDecoration(labelText: 'O‘qish'),
-                    items: AbilityLevel.values
-                        .map(
-                          (a) => DropdownMenuItem(
-                            value: a,
-                            child: Text(a.label),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) setModalState(() => reading = v);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<AbilityLevel>(
-                    initialValue: writing,
-                    decoration: const InputDecoration(labelText: 'Yozish'),
-                    items: AbilityLevel.values
-                        .map(
-                          (a) => DropdownMenuItem(
-                            value: a,
-                            child: Text(a.label),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) setModalState(() => writing = v);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: notesCtrl,
-                    decoration: const InputDecoration(labelText: 'Izoh'),
-                  ),
-                ],
-              ),
-            ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Bekor qilish'),
+                    ),
+                    FilledButton(
+                      onPressed: () async {
+                        try {
+                          await app.updateStudentAccessProfile(
+                            s.id,
+                            StudentAccessProfile(
+                              communicationMode: comm,
+                              hearing: hearing,
+                              vision: vision,
+                              handMotor: motor,
+                              reading: reading,
+                              writing: writing,
+                              notes: notesCtrl.text.trim(),
+                              updatedAt: DateTime.now(),
+                            ),
+                          );
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        } on AppException catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        }
+                      },
+                      child: const Text('Saqlash'),
+                    ),
+                  ],
+                ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Bekor qilish'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                try {
-                  await app.updateStudentAccessProfile(
-                    s.id,
-                    StudentAccessProfile(
-                      communicationMode: comm,
-                      hearing: hearing,
-                      vision: vision,
-                      handMotor: motor,
-                      reading: reading,
-                      writing: writing,
-                      notes: notesCtrl.text.trim(),
-                      updatedAt: DateTime.now(),
-                    ),
-                  );
-                  if (ctx.mounted) Navigator.pop(ctx);
-                } on AppException catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(e.toString())),
-                    );
-                  }
-                }
-              },
-              child: const Text('Saqlash'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -3516,75 +3641,77 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
       child: ResponsivePageContainer(
         maxWidth: 1060,
         child: Column(
-          children: referrals.map((r) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 14),
-              child: SurfaceCard(
-                borderRadius: 26,
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 2),
-                      child: Icon(
-                        LucideIcons.arrowUpRight,
-                        color: AppColors.primary,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+          children:
+              referrals.map((r) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: SurfaceCard(
+                    borderRadius: 26,
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 2),
+                          child: Icon(
+                            LucideIcons.arrowUpRight,
+                            color: AppColors.primary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Text(
-                                  '${r.toSpecialistType}ga yo‘naltirish',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 14.5,
-                                    color: AppColors.textPrimary,
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      '${r.toSpecialistType}ga yo‘naltirish',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14.5,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
                                   ),
+                                  const SizedBox(width: 10),
+                                  StatusPill(
+                                    label: r.status,
+                                    color: AppColors.primary,
+                                    backgroundColor: Colors.white.withValues(
+                                      alpha: 0.85,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                'Yuborgan: ${r.fromSpecialistName}',
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  color: AppColors.textMuted,
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              StatusPill(
-                                label: r.status,
-                                color: AppColors.primary,
-                                backgroundColor:
-                                    Colors.white.withValues(alpha: 0.85),
+                              const SizedBox(height: 3),
+                              Text(
+                                'Sababi: ${r.reason}',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: AppColors.textSecondary,
+                                  height: 1.4,
+                                ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 5),
-                          Text(
-                            'Yuborgan: ${r.fromSpecialistName}',
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            'Sababi: ${r.reason}',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
+                  ),
+                );
+              }).toList(),
         ),
       ),
     );
@@ -3607,61 +3734,64 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
       child: ResponsivePageContainer(
         maxWidth: 1060,
         child: Column(
-          children: docs.map((doc) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 14),
-              child: SurfaceCard(
-                borderRadius: 26,
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    const Icon(
-                      LucideIcons.fileText,
-                      color: AppColors.error,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            doc.title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 14.5,
-                              color: AppColors.textPrimary,
-                            ),
+          children:
+              docs.map((doc) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: SurfaceCard(
+                    borderRadius: 26,
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          LucideIcons.fileText,
+                          color: AppColors.error,
+                          size: 22,
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                doc.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 14.5,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                doc.subtitle,
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            doc.subtitle,
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.textMuted,
-                            ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            LucideIcons.download,
+                            size: 19,
+                            color: AppColors.primary,
                           ),
-                        ],
-                      ),
+                          tooltip: 'Yuklab olish',
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Hujjat yuklab olindi.'),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      icon: const Icon(
-                        LucideIcons.download,
-                        size: 19,
-                        color: AppColors.primary,
-                      ),
-                      tooltip: 'Yuklab olish',
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Hujjat yuklab olindi.')),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
+                  ),
+                );
+              }).toList(),
         ),
       ),
     );
@@ -3681,68 +3811,73 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
       child: ResponsivePageContainer(
         maxWidth: 1060,
         child: Column(
-          children: logs.map((log) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: SurfaceCard(
-                borderRadius: 16,
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 2),
-                      child: Icon(
-                        LucideIcons.history,
-                        color: AppColors.primary,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 13),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            log.details,
-                            style: const TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                              height: 1.35,
-                            ),
+          children:
+              logs.map((log) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: SurfaceCard(
+                    borderRadius: 16,
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 2),
+                          child: Icon(
+                            LucideIcons.history,
+                            color: AppColors.primary,
+                            size: 18,
                           ),
-                          const SizedBox(height: 4),
-                          Wrap(
-                            spacing: 10,
-                            runSpacing: 4,
+                        ),
+                        const SizedBox(width: 13),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${log.userFullName} (${log.userRole})',
+                                log.details,
                                 style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textMuted,
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                  height: 1.35,
                                 ),
                               ),
-                              Text(
-                                DateFormat('dd.MM HH:mm').format(log.timestamp),
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  color: AppColors.textSubtle,
-                                  fontWeight: FontWeight.w600,
-                                  fontFeatures: [FontFeature.tabularFigures()],
-                                ),
+                              const SizedBox(height: 4),
+                              Wrap(
+                                spacing: 10,
+                                runSpacing: 4,
+                                children: [
+                                  Text(
+                                    '${log.userFullName} (${log.userRole})',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                  Text(
+                                    DateFormat(
+                                      'dd.MM HH:mm',
+                                    ).format(log.timestamp),
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      color: AppColors.textSubtle,
+                                      fontWeight: FontWeight.w600,
+                                      fontFeatures: [
+                                        FontFeature.tabularFigures(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
+                  ),
+                );
+              }).toList(),
         ),
       ),
     );

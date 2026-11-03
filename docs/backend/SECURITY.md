@@ -8,7 +8,7 @@ The app stores sensitive data about children with disabilities. This document li
 | Measure | Where |
 |---|---|
 | Passwords are stored only as PBKDF2-SHA256 hashes (20,000 iterations, random salt); plain-text passwords from older versions are converted on startup | `PasswordHasher`, `LocalDbService` |
-| No shared or master password; the demo password works only in test builds (`kDebugMode`) | `LocalDbService.verifyPassword` |
+| Demo password is accepted only in debug builds or when `DEMO_MODE=true`; public demo data is synthetic and local to each browser | `LocalDbService.verifyPassword`, `tool/vercel_build.sh` |
 | **Login doesn't reveal whether an account exists**: one message for every failure ("Login yoki parol noto‘g‘ri"); unknown accounts also run a dummy password check, so the response time is the same | `AuthProvider.login` |
 | **Brute-force protection:** 5 wrong attempts in 15 minutes locks that login for 15 minutes; restarting the app doesn't reset the counter | `LoginGuard` |
 | The role is checked only after the password is confirmed (no role leak) | `AuthProvider.login` |
@@ -48,7 +48,8 @@ All of these are recorded in the audit log (entity `Security`):
 - `getSecurityEvents()` returns the last 7 days of events, only to roles that can view the audit log.
 
 ### Data
-- Children's data lives only on the device, in the app's private storage.
+- This build has no server: records live only in the current device/browser profile and do not synchronize between specialists. The public Vercel build is a demo; real children's data must not be entered.
+- Local storage is not encrypted. Clearing browser/app data or losing the device can remove records; use the database export and keep backups outside the device.
 - **Android cloud backup is disabled** (`allowBackup="false"`), so data isn't copied to Google Drive.
 - **Unencrypted HTTP is blocked** on Android (`usesCleartextTraffic="false"`), so HTTPS is required.
 - A damaged record is set aside in a backup, so data is never silently lost.

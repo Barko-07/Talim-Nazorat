@@ -411,7 +411,12 @@ class LocalDbService {
   ) async {
     // Buzilgan jadval ustidan yozilmaydi — asl ma'lumotni tiklash imkoniyati saqlanadi
     if (_corruptedKeys.contains(key)) return;
-    await prefs.setString(key, jsonEncode(rows.toList()));
+    final saved = await prefs.setString(key, jsonEncode(rows.toList()));
+    if (!saved) {
+      throw const StorageWriteException(
+        'Ma’lumot saqlanmadi. Qurilmada bo‘sh joyni tekshiring; eski saqlangan ma’lumot o‘zgartirilmadi.',
+      );
+    }
   }
 
   void _reEvaluateRules() {
@@ -446,9 +451,10 @@ class LocalDbService {
       soundId: entry.soundId,
       stage: entry.stage,
       disorder: entry.disorder,
-      substitutedWith: entry.disorder == SoundDisorder.substitution
-          ? entry.substitutedWith
-          : null,
+      substitutedWith:
+          entry.disorder == SoundDisorder.substitution
+              ? entry.substitutedWith
+              : null,
       differentiatedFrom: entry.differentiatedFrom,
       note: entry.note,
       recordedById: byUser.id,
@@ -736,15 +742,16 @@ class LocalDbService {
     String? studentId,
   }) {
     return _conferences.where((c) {
-      if (studentId != null && c.studentId != studentId) return false;
-      final student = getStudentById(c.studentId);
-      if (student == null) return false;
-      final schoolWide =
-          forUser.role == UserRole.superAdmin ||
-          AccessControlService.schoolWideRoles.contains(forUser.role);
-      if (schoolWide) return _accessControl.canViewStudent(forUser, student);
-      return forUser.isActive && c.isParticipant(forUser.id);
-    }).toList()..sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
+        if (studentId != null && c.studentId != studentId) return false;
+        final student = getStudentById(c.studentId);
+        if (student == null) return false;
+        final schoolWide =
+            forUser.role == UserRole.superAdmin ||
+            AccessControlService.schoolWideRoles.contains(forUser.role);
+        if (schoolWide) return _accessControl.canViewStudent(forUser, student);
+        return forUser.isActive && c.isParticipant(forUser.id);
+      }).toList()
+      ..sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
   }
 
   // ==================== YUTUQLAR PASPORTI ====================
@@ -827,7 +834,9 @@ class LocalDbService {
     String fullName = 'Tizim administratori',
   }) async {
     if (!PasswordHasher.isHashed(passwordHash)) {
-      debugPrint('AppConfig: ADMIN_PASSWORD_HASH xesh emas — administrator yaratilmadi.');
+      debugPrint(
+        'AppConfig: ADMIN_PASSWORD_HASH xesh emas — administrator yaratilmadi.',
+      );
       return false;
     }
     final hasActiveAdmin = _users.any(
@@ -837,7 +846,8 @@ class LocalDbService {
     if (findUserByEmailOrPhone(email) != null) {
       await logSecurityEvent(
         action: 'SECURITY_ADMIN_BOOTSTRAP_REFUSED',
-        details: 'Administrator pochtasi boshqa hisobga tegishli — avtomatik yaratilmadi.',
+        details:
+            'Administrator pochtasi boshqa hisobga tegishli — avtomatik yaratilmadi.',
       );
       return false;
     }
@@ -882,7 +892,9 @@ class LocalDbService {
     required UserModel forUser,
     Duration within = const Duration(days: 7),
   }) {
-    if (!forUser.isActive || forUser.role != UserRole.superAdmin) return const [];
+    if (!forUser.isActive || forUser.role != UserRole.superAdmin) {
+      return const [];
+    }
     final since = DateTime.now().subtract(within);
     return _auditLogs
         .where((l) => l.entity == 'Security' && l.timestamp.isAfter(since))
@@ -1181,9 +1193,8 @@ class LocalDbService {
     }
 
     // Oxirgi faol tizim administratori rolini yo'qotmasligi kerak
-    final activeAdmins = _users
-        .where((u) => u.role == UserRole.superAdmin && u.isActive)
-        .length;
+    final activeAdmins =
+        _users.where((u) => u.role == UserRole.superAdmin && u.isActive).length;
     if (current.role == UserRole.superAdmin &&
         current.isActive &&
         (updated.role != UserRole.superAdmin || !updated.isActive) &&
@@ -1281,11 +1292,12 @@ class LocalDbService {
         map[name] = {
           'name': name,
           'district': 'Chortoq tumani',
-          'type': name.contains('internat')
-              ? 'Ixtisoslashtirilgan maktab-internati'
-              : name.contains('inklyuziv')
-              ? 'Inklyuziv tayanch maktab'
-              : 'Umumiy o‘rta ta’lim maktabi',
+          'type':
+              name.contains('internat')
+                  ? 'Ixtisoslashtirilgan maktab-internati'
+                  : name.contains('inklyuziv')
+                  ? 'Inklyuziv tayanch maktab'
+                  : 'Umumiy o‘rta ta’lim maktabi',
           'studentsCount': 0,
           'specialistsCount': 0,
           'activeIepCount': 0,
@@ -1301,9 +1313,10 @@ class LocalDbService {
         map[name] = {
           'name': name,
           'district': u.district ?? 'Namangan viloyati',
-          'type': name.contains('boshqarma')
-              ? 'Davlat boshqaruv organi'
-              : 'Ta’lim muassasasi',
+          'type':
+              name.contains('boshqarma')
+                  ? 'Davlat boshqaruv organi'
+                  : 'Ta’lim muassasasi',
           'studentsCount': 0,
           'specialistsCount': 0,
           'activeIepCount': 0,
@@ -1332,11 +1345,12 @@ class LocalDbService {
           map[sch] = {
             'name': sch,
             'district': district,
-            'type': sch.contains('internat')
-                ? 'Ixtisoslashtirilgan maktab-internati'
-                : sch.contains('inklyuziv')
-                ? 'Inklyuziv tayanch maktab'
-                : 'Umumiy o‘rta ta’lim maktabi',
+            'type':
+                sch.contains('internat')
+                    ? 'Ixtisoslashtirilgan maktab-internati'
+                    : sch.contains('inklyuziv')
+                    ? 'Inklyuziv tayanch maktab'
+                    : 'Umumiy o‘rta ta’lim maktabi',
             'studentsCount': 0,
             'specialistsCount': 0,
             'activeIepCount': 0,
@@ -1575,17 +1589,17 @@ class LocalDbService {
     );
     final sIndex = _students.indexWhere((s) => s.id == studentId);
     _students[sIndex] = student.copyWith(
-      assignedSpecialistIds: student.assignedSpecialistIds
-          .where((id) => id != specialistId)
-          .toList(),
+      assignedSpecialistIds:
+          student.assignedSpecialistIds
+              .where((id) => id != specialistId)
+              .toList(),
     );
     final uIndex = _users.indexWhere((u) => u.id == specialistId);
     if (uIndex != -1) {
       final u = _users[uIndex];
       _users[uIndex] = u.copyWith(
-        assignedStudentIds: u.assignedStudentIds
-            .where((id) => id != studentId)
-            .toList(),
+        assignedStudentIds:
+            u.assignedStudentIds.where((id) => id != studentId).toList(),
       );
     }
     await _persistAll();
@@ -1613,10 +1627,8 @@ class LocalDbService {
     final sIndex = _students.indexWhere((s) => s.id == student.id);
     final uIndex = _users.indexWhere((u) => u.id == specialist.id);
     _students[sIndex] = student.copyWith(
-      assignedSpecialistIds: {
-        ...student.assignedSpecialistIds,
-        specialist.id,
-      }.toList(),
+      assignedSpecialistIds:
+          {...student.assignedSpecialistIds, specialist.id}.toList(),
     );
     if (uIndex != -1) {
       final u = _users[uIndex];
@@ -1820,13 +1832,14 @@ class LocalDbService {
     int? grade,
   }) {
     return _curriculum.where((s) {
-      if (subject != null && s.subject != subject) return false;
-      if (grade != null && s.grade != grade) return false;
-      return true;
-    }).toList()..sort((a, b) {
-      final g = a.grade.compareTo(b.grade);
-      return g != 0 ? g : a.id.compareTo(b.id);
-    });
+        if (subject != null && s.subject != subject) return false;
+        if (grade != null && s.grade != grade) return false;
+        return true;
+      }).toList()
+      ..sort((a, b) {
+        final g = a.grade.compareTo(b.grade);
+        return g != 0 ? g : a.id.compareTo(b.id);
+      });
   }
 
   /// Fanlar ro'yxati (talablar mavjud bo'lganlar)
@@ -1867,10 +1880,8 @@ class LocalDbService {
   /// Namunaviy talablarni qo'shish — faqat rasmiy talablari yuklanmagan fanlar uchun
   Future<void> _syncCurriculumSeed() async {
     if (_corruptedKeys.contains('db_curriculum')) return;
-    final officialSubjects = _curriculum
-        .where((s) => s.isOfficial)
-        .map((s) => s.subject)
-        .toSet();
+    final officialSubjects =
+        _curriculum.where((s) => s.isOfficial).map((s) => s.subject).toSet();
     final existing = _curriculum.map((s) => s.id).toSet();
     var changed = false;
     for (final s in CurriculumStandardsSeed.standards) {
@@ -2327,9 +2338,10 @@ class LocalDbService {
       throw const ValidationException('Bunday savol allaqachon mavjud.');
     }
     // Foydalanuvchi qo'shgan savol standart bo'la olmaydi
-    final saved = byUser.role == UserRole.superAdmin
-        ? question
-        : question.copyWith(isStandard: false);
+    final saved =
+        byUser.role == UserRole.superAdmin
+            ? question
+            : question.copyWith(isStandard: false);
     _questions.insert(0, saved);
     await _persistAll();
     await addAuditLog(
@@ -2447,7 +2459,8 @@ class LocalDbService {
     if (duplicate) {
       return {
         'success': false,
-        'message': 'Ushbu vaqtda bu mutaxassis va o‘quvchi uchun allaqachon mashg‘ulot rejalashtirilgan.',
+        'message':
+            'Ushbu vaqtda bu mutaxassis va o‘quvchi uchun allaqachon mashg‘ulot rejalashtirilgan.',
       };
     }
 
@@ -2660,19 +2673,21 @@ class LocalDbService {
       actor: byUser,
     );
     final value = progress.clamp(0, 100);
-    final newObjectives = plan.objectives.map((obj) {
-      if (obj.id != objectiveId) return obj;
-      final newStatus = value >= 100
-          ? 'Bajarildi'
-          : value > 0
-          ? 'Jarayonda'
-          : 'Rejalashtirilgan';
-      return obj.copyWith(
-        progressPercent: value,
-        status: newStatus,
-        evidenceNotes: evidenceNotes ?? obj.evidenceNotes,
-      );
-    }).toList();
+    final newObjectives =
+        plan.objectives.map((obj) {
+          if (obj.id != objectiveId) return obj;
+          final newStatus =
+              value >= 100
+                  ? 'Bajarildi'
+                  : value > 0
+                  ? 'Jarayonda'
+                  : 'Rejalashtirilgan';
+          return obj.copyWith(
+            progressPercent: value,
+            status: newStatus,
+            evidenceNotes: evidenceNotes ?? obj.evidenceNotes,
+          );
+        }).toList();
 
     _iepPlans[pIndex] = plan.copyWith(objectives: newObjectives);
     _reEvaluateRules();
@@ -2849,9 +2864,8 @@ class LocalDbService {
       followUpAction: followUpAction ?? cur.followUpAction,
       followUpDate: followUpDate ?? cur.followUpDate,
       toSpecialistId: accepting && isRecipient ? byUser.id : cur.toSpecialistId,
-      toSpecialistName: accepting && isRecipient
-          ? byUser.fullName
-          : cur.toSpecialistName,
+      toSpecialistName:
+          accepting && isRecipient ? byUser.fullName : cur.toSpecialistName,
       updatedAt: DateTime.now(),
     );
 
@@ -3028,54 +3042,71 @@ class LocalDbService {
 
   /// Ma'lumotlar bazasining to'liq JSON zaxira nusxasi (parolsiz, foydalanuvchi ruxsatiga mos)
   String exportDatabaseBackupJson({UserModel? forUser}) {
-    final visibleStudents = getStudents(forUser: forUser, includeArchived: true);
+    final visibleStudents = getStudents(
+      forUser: forUser,
+      includeArchived: true,
+    );
     final visibleStudentIds = visibleStudents.map((s) => s.id).toSet();
     final payload = <String, dynamic>{
       'meta': {
-        'application': 'TA’LIM NAZORAT — Inklyuziv va maxsus ta’lim monitoring tizimi',
+        'application':
+            'TA’LIM NAZORAT — Inklyuziv va maxsus ta’lim monitoring tizimi',
         'schemaVersion': '2.0',
         'exportedAt': DateTime.now().toIso8601String(),
         'exportedBy': forUser?.fullName ?? 'System',
         'exportedByRole': forUser?.role.label ?? 'System',
       },
       'tables': {
-        'users': (forUser != null ? getUsers(forUser: forUser) : _users)
-            .map((u) => u.copyWith(password: '').toJson())
-            .toList(),
+        'users':
+            (forUser != null ? getUsers(forUser: forUser) : _users)
+                .map((u) => u.copyWith(password: '').toJson())
+                .toList(),
         'students': visibleStudents.map((s) => s.toJson()).toList(),
-        'assessments': getAssessments(forUser: forUser).map((a) => a.toJson()).toList(),
-        'sessions': getSessions(forUser: forUser).map((s) => s.toJson()).toList(),
-        'iepPlans': getIepPlans(forUser: forUser).map((p) => p.toJson()).toList(),
+        'assessments':
+            getAssessments(forUser: forUser).map((a) => a.toJson()).toList(),
+        'sessions':
+            getSessions(forUser: forUser).map((s) => s.toJson()).toList(),
+        'iepPlans':
+            getIepPlans(forUser: forUser).map((p) => p.toJson()).toList(),
         'alerts': getAlerts(forUser: forUser).map((a) => a.toJson()).toList(),
-        'referrals': getReferrals(forUser: forUser).map((r) => r.toJson()).toList(),
-        'observations': getObservations(forUser: forUser).map((o) => o.toJson()).toList(),
+        'referrals':
+            getReferrals(forUser: forUser).map((r) => r.toJson()).toList(),
+        'observations':
+            getObservations(forUser: forUser).map((o) => o.toJson()).toList(),
         'questions': _questions.map((q) => q.toJson()).toList(),
         'curriculumStandards': _curriculum.map((c) => c.toJson()).toList(),
-        'subjectLevels': _subjectLevelRecords
-            .where((l) => visibleStudentIds.contains(l.studentId))
-            .map((l) => l.toJson())
-            .toList(),
-        'subjectTasks': _subjectTasks
-            .where((t) => visibleStudentIds.contains(t.studentId))
-            .map((t) => t.toJson())
-            .toList(),
+        'subjectLevels':
+            _subjectLevelRecords
+                .where((l) => visibleStudentIds.contains(l.studentId))
+                .map((l) => l.toJson())
+                .toList(),
+        'subjectTasks':
+            _subjectTasks
+                .where((t) => visibleStudentIds.contains(t.studentId))
+                .map((t) => t.toJson())
+                .toList(),
         'progressMetrics': getProgressMetrics().map((m) => m.toJson()).toList(),
-        'measurements': _measurements
-            .where((m) => visibleStudentIds.contains(m.studentId))
-            .map((m) => m.toJson())
-            .toList(),
-        'soundEntries': _soundEntries
-            .where((e) => visibleStudentIds.contains(e.studentId))
-            .map((e) => e.toJson())
-            .toList(),
-        'achievements': _achievements
-            .where((a) => visibleStudentIds.contains(a.studentId))
-            .map((a) => a.toJson())
-            .toList(),
-        'conferences': (forUser != null ? getConferences(forUser: forUser) : _conferences)
-            .map((c) => c.toJson())
-            .toList(),
-        'auditLogs': getAuditLogs(forUser: forUser).map((l) => l.toJson()).toList(),
+        'measurements':
+            _measurements
+                .where((m) => visibleStudentIds.contains(m.studentId))
+                .map((m) => m.toJson())
+                .toList(),
+        'soundEntries':
+            _soundEntries
+                .where((e) => visibleStudentIds.contains(e.studentId))
+                .map((e) => e.toJson())
+                .toList(),
+        'achievements':
+            _achievements
+                .where((a) => visibleStudentIds.contains(a.studentId))
+                .map((a) => a.toJson())
+                .toList(),
+        'conferences':
+            (forUser != null ? getConferences(forUser: forUser) : _conferences)
+                .map((c) => c.toJson())
+                .toList(),
+        'auditLogs':
+            getAuditLogs(forUser: forUser).map((l) => l.toJson()).toList(),
       },
     };
     return const JsonEncoder.withIndent('  ').convert(payload);
@@ -3085,14 +3116,18 @@ class LocalDbService {
   String exportFullSeedBackupJson({DateTime? exportedAt}) {
     final payload = <String, dynamic>{
       'meta': {
-        'application': 'TA’LIM NAZORAT — Inklyuziv va maxsus ta’lim monitoring tizimi',
+        'application':
+            'TA’LIM NAZORAT — Inklyuziv va maxsus ta’lim monitoring tizimi',
         'schemaVersion': '2.0',
         'exportedAt': (exportedAt ?? DateTime.now()).toIso8601String(),
         'description':
             'To‘liq ma’lumotlar bazasi zaxira nusxasi (Users, Students, Assessments, Sessions, IEP, Alerts, Referrals, Observations, Questions, DTS Standards, SubjectLevels, SubjectTasks, ProgressMetrics, Measurements, SoundEntries, Achievements, CaseConferences)',
       },
       'tables': {
-        'users': SeedData.users.map((u) => u.copyWith(password: '').toJson()).toList(),
+        'users':
+            SeedData.users
+                .map((u) => u.copyWith(password: '').toJson())
+                .toList(),
         'students': SeedData.students.map((s) => s.toJson()).toList(),
         'assessments': SeedData.assessments.map((a) => a.toJson()).toList(),
         'sessions': SeedData.sessions.map((s) => s.toJson()).toList(),
@@ -3100,8 +3135,12 @@ class LocalDbService {
         'alerts': SeedData.monitoringAlerts.map((a) => a.toJson()).toList(),
         'referrals': SeedData.referrals.map((r) => r.toJson()).toList(),
         'observations': SeedData.observations.map((o) => o.toJson()).toList(),
-        'questions': PsychologicalQuestionsSeed.initialQuestions.map((q) => q.toJson()).toList(),
-        'curriculumStandards': CurriculumStandardsSeed.standards.map((c) => c.toJson()).toList(),
+        'questions':
+            PsychologicalQuestionsSeed.initialQuestions
+                .map((q) => q.toJson())
+                .toList(),
+        'curriculumStandards':
+            CurriculumStandardsSeed.standards.map((c) => c.toJson()).toList(),
         'subjectLevels': SeedData.subjectLevels.map((l) => l.toJson()).toList(),
         'subjectTasks': SeedData.subjectTasks.map((t) => t.toJson()).toList(),
         'progressMetrics': ProgressMetrics.all.map((m) => m.toJson()).toList(),
@@ -3120,7 +3159,9 @@ class LocalDbService {
   Future<void> requestPasswordRecovery(String identifier) async {
     final cleaned = identifier.trim();
     if (cleaned.isEmpty) {
-      throw const ValidationException('Telefon raqami yoki elektron pochtani kiriting.');
+      throw const ValidationException(
+        'Telefon raqami yoki elektron pochtani kiriting.',
+      );
     }
     final user = findUserByEmailOrPhone(cleaned);
     if (user != null) {
@@ -3153,7 +3194,8 @@ class LocalDbService {
         userRole: user.role.label,
         action: 'PASSWORD_RECOVERY_REQUEST',
         entity: 'Auth',
-        details: '${user.fullName} parolni tiklash bo‘yicha administratorga so‘rov yubordi',
+        details:
+            '${user.fullName} parolni tiklash bo‘yicha administratorga so‘rov yubordi',
       );
     }
   }

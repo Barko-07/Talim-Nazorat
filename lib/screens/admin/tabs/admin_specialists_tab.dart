@@ -29,22 +29,27 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
     final assessments = app.assessments;
     final sessions = app.sessions;
 
-    final filtered = allSpecialists.where((s) {
-      if (_search.isNotEmpty) {
-        final q = _search.toLowerCase();
-        final matchName = s.fullName.toLowerCase().contains(q);
-        final matchSpec = (s.specialization ?? '').toLowerCase().contains(q);
-        final matchInst = (s.institutionName ?? '').toLowerCase().contains(q);
-        if (!matchName && !matchSpec && !matchInst) return false;
-      }
-      if (_filterRole != null && s.role != _filterRole) return false;
-      if (_filterCategory != null &&
-          _filterCategory!.isNotEmpty &&
-          s.qualificationCategory != _filterCategory) {
-        return false;
-      }
-      return true;
-    }).toList();
+    final filtered =
+        allSpecialists.where((s) {
+          if (_search.isNotEmpty) {
+            final q = _search.toLowerCase();
+            final matchName = s.fullName.toLowerCase().contains(q);
+            final matchSpec = (s.specialization ?? '').toLowerCase().contains(
+              q,
+            );
+            final matchInst = (s.institutionName ?? '').toLowerCase().contains(
+              q,
+            );
+            if (!matchName && !matchSpec && !matchInst) return false;
+          }
+          if (_filterRole != null && s.role != _filterRole) return false;
+          if (_filterCategory != null &&
+              _filterCategory!.isNotEmpty &&
+              s.qualificationCategory != _filterCategory) {
+            return false;
+          }
+          return true;
+        }).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -78,7 +83,9 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                           color: const Color(0xFFF5F3FF),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFF7C3AED).withValues(alpha: 0.2),
+                            color: const Color(
+                              0xFF7C3AED,
+                            ).withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
@@ -119,7 +126,8 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                     child: TextField(
                       onChanged: (v) => setState(() => _search = v.trim()),
                       decoration: InputDecoration(
-                        hintText: 'F.I.SH, ixtisoslik yoki muassasa bo‘yicha...',
+                        hintText:
+                            'F.I.SH, ixtisoslik yoki muassasa bo‘yicha...',
                         prefixIcon: const Icon(Icons.search, size: 20),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -162,7 +170,10 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                         ].map(
                           (r) => DropdownMenuItem(
                             value: r,
-                            child: Text(r.label, overflow: TextOverflow.ellipsis),
+                            child: Text(
+                              r.label,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ],
@@ -229,11 +240,14 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                   sessions.where((s) => s.specialistId == sp.id).length;
 
               // Biriktirilgan o'quvchilar
-              final assignedStudents = allStudents
-                  .where((st) =>
-                      st.assignedSpecialistIds.contains(sp.id) ||
-                      sp.assignedStudentIds.contains(st.id))
-                  .toList();
+              final assignedStudents =
+                  allStudents
+                      .where(
+                        (st) =>
+                            st.assignedSpecialistIds.contains(sp.id) ||
+                            sp.assignedStudentIds.contains(st.id),
+                      )
+                      .toList();
 
               return Card(
                 elevation: 0,
@@ -249,7 +263,11 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                       CircleAvatar(
                         radius: 26,
                         backgroundColor: sp.role.color.withValues(alpha: 0.15),
-                        child: Icon(sp.role.icon, color: sp.role.color, size: 28),
+                        child: Icon(
+                          sp.role.icon,
+                          color: sp.role.color,
+                          size: 28,
+                        ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -328,17 +346,20 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                               children: [
                                 _buildMetricPill(
                                   icon: Icons.groups_rounded,
-                                  label: '${assignedStudents.length} ta bola biriktirilgan',
+                                  label:
+                                      '${assignedStudents.length} ta bola biriktirilgan',
                                   color: AppColors.primary,
                                 ),
                                 _buildMetricPill(
                                   icon: Icons.assignment_turned_in_rounded,
-                                  label: '$userAssessmentsCount ta baholash o‘tkazilgan',
+                                  label:
+                                      '$userAssessmentsCount ta baholash o‘tkazilgan',
                                   color: const Color(0xFF059669),
                                 ),
                                 _buildMetricPill(
                                   icon: Icons.event_available_rounded,
-                                  label: '$userSessionsCount ta korreksion mashg‘ulot',
+                                  label:
+                                      '$userSessionsCount ta korreksion mashg‘ulot',
                                   color: const Color(0xFFD97706),
                                 ),
                               ],
@@ -351,13 +372,14 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           OutlinedButton.icon(
-                            onPressed: () => _showAssignedStudentsDialog(
-                              context,
-                              sp,
-                              assignedStudents,
-                              allStudents,
-                              currentUser,
-                            ),
+                            onPressed:
+                                () => _showAssignedStudentsDialog(
+                                  context,
+                                  sp,
+                                  assignedStudents,
+                                  allStudents,
+                                  currentUser,
+                                ),
                             icon: const Icon(Icons.people_outline, size: 16),
                             label: const Text('O‘quvchilar ro‘yxati'),
                             style: OutlinedButton.styleFrom(
@@ -418,118 +440,130 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
     List<StudentModel> allStudents,
     UserModel? byUser,
   ) {
-    final app = context.read<AppProvider>();
-
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setSheetState) {
-          final unassignedToThis = allStudents
-              .where((st) =>
-                  !st.assignedSpecialistIds.contains(specialist.id) &&
-                  !specialist.assignedStudentIds.contains(st.id))
-              .toList();
+      builder:
+          (ctx) => StatefulBuilder(
+            builder: (context, setSheetState) {
+              final unassignedToThis =
+                  allStudents
+                      .where(
+                        (st) =>
+                            !st.assignedSpecialistIds.contains(specialist.id) &&
+                            !specialist.assignedStudentIds.contains(st.id),
+                      )
+                      .toList();
 
-          return AlertDialog(
-            title: Text(
-              '${specialist.fullName}ga biriktirilgan o‘quvchilar',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            content: SizedBox(
-              width: 500,
-              height: 400,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Lavozimi: ${specialist.role.label} • Muassasa: ${specialist.institutionName}',
-                    style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+              return AlertDialog(
+                title: Text(
+                  '${specialist.fullName}ga biriktirilgan o‘quvchilar',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const Divider(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+                content: SizedBox(
+                  width: 500,
+                  height: 400,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Joriy o‘quvchilar (${assigned.length}):',
+                        'Lavozimi: ${specialist.role.label} • Muassasa: ${specialist.institutionName}',
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                          fontSize: 12,
+                          color: AppColors.textMuted,
                         ),
                       ),
-                      if (unassignedToThis.isNotEmpty)
-                        TextButton.icon(
-                          onPressed: () {
-                            _showAssignStudentModal(
-                              ctx,
-                              specialist,
-                              unassignedToThis,
-                              byUser,
-                              onAssigned: () {
-                                Navigator.pop(ctx);
-                              },
-                            );
-                          },
-                          icon: const Icon(Icons.add, size: 16),
-                          label: const Text('Yangi bola biriktirish'),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: assigned.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'Hozircha o‘quvchi biriktirilmagan',
-                              style: TextStyle(color: AppColors.textMuted),
+                      const Divider(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Joriy o‘quvchilar (${assigned.length}):',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
                             ),
-                          )
-                        : ListView.separated(
-                            itemCount: assigned.length,
-                            separatorBuilder: (_, _) => const Divider(height: 1),
-                            itemBuilder: (c, idx) {
-                              final st = assigned[idx];
-                              return ListTile(
-                                dense: true,
-                                contentPadding: EdgeInsets.zero,
-                                leading: CircleAvatar(
-                                  radius: 14,
-                                  backgroundColor: AppColors.primaryLight,
+                          ),
+                          if (unassignedToThis.isNotEmpty)
+                            TextButton.icon(
+                              onPressed: () {
+                                _showAssignStudentModal(
+                                  ctx,
+                                  specialist,
+                                  unassignedToThis,
+                                  byUser,
+                                  onAssigned: () {
+                                    Navigator.pop(ctx);
+                                  },
+                                );
+                              },
+                              icon: const Icon(Icons.add, size: 16),
+                              label: const Text('Yangi bola biriktirish'),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child:
+                            assigned.isEmpty
+                                ? const Center(
                                   child: Text(
-                                    '${idx + 1}',
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.bold,
+                                    'Hozircha o‘quvchi biriktirilmagan',
+                                    style: TextStyle(
+                                      color: AppColors.textMuted,
                                     ),
                                   ),
+                                )
+                                : ListView.separated(
+                                  itemCount: assigned.length,
+                                  separatorBuilder:
+                                      (_, _) => const Divider(height: 1),
+                                  itemBuilder: (c, idx) {
+                                    final st = assigned[idx];
+                                    return ListTile(
+                                      dense: true,
+                                      contentPadding: EdgeInsets.zero,
+                                      leading: CircleAvatar(
+                                        radius: 14,
+                                        backgroundColor: AppColors.primaryLight,
+                                        child: Text(
+                                          '${idx + 1}',
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      title: Text(
+                                        st.fullName,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        '${st.grade} • ${st.primaryNeed}',
+                                        style: const TextStyle(fontSize: 11),
+                                      ),
+                                    );
+                                  },
                                 ),
-                                title: Text(
-                                  st.fullName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  '${st.grade} • ${st.primaryNeed}',
-                                  style: const TextStyle(fontSize: 11),
-                                ),
-                              );
-                            },
-                          ),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Yopish'),
                   ),
                 ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Yopish'),
-              ),
-            ],
-          );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 
@@ -545,60 +579,65 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
 
     showDialog(
       context: parentCtx,
-      builder: (dlgCtx) => StatefulBuilder(
-        builder: (context, setDlgState) => AlertDialog(
-          title: const Text('Mutaxassisga bola biriktirish'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<StudentModel>(
-                value: selectedStudent,
-                isExpanded: true,
-                decoration: const InputDecoration(labelText: 'O‘quvchini tanlang'),
-                items: unassigned
-                    .map(
-                      (st) => DropdownMenuItem(
-                        value: st,
-                        child: Text(
-                          '${st.fullName} (${st.grade}, ${st.institutionName})',
-                          style: const TextStyle(fontSize: 12),
-                          overflow: TextOverflow.ellipsis,
+      builder:
+          (dlgCtx) => StatefulBuilder(
+            builder:
+                (context, setDlgState) => AlertDialog(
+                  title: const Text('Mutaxassisga bola biriktirish'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DropdownButtonFormField<StudentModel>(
+                        value: selectedStudent,
+                        isExpanded: true,
+                        decoration: const InputDecoration(
+                          labelText: 'O‘quvchini tanlang',
                         ),
+                        items:
+                            unassigned
+                                .map(
+                                  (st) => DropdownMenuItem(
+                                    value: st,
+                                    child: Text(
+                                      '${st.fullName} (${st.grade}, ${st.institutionName})',
+                                      style: const TextStyle(fontSize: 12),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged: (v) {
+                          if (v != null) setDlgState(() => selectedStudent = v);
+                        },
                       ),
-                    )
-                    .toList(),
-                onChanged: (v) {
-                  if (v != null) setDlgState(() => selectedStudent = v);
-                },
-              ),
-            ],
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dlgCtx),
+                      child: const Text('Bekor qilish'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () async {
+                        if (selectedStudent != null) {
+                          await app.assignSpecialistToStudent(
+                            selectedStudent!.id,
+                            specialist.id,
+                            byUser: byUser,
+                          );
+                          Navigator.pop(dlgCtx);
+                          onAssigned();
+                        }
+                      },
+                      child: const Text('Biriktirish'),
+                    ),
+                  ],
+                ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dlgCtx),
-              child: const Text('Bekor qilish'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () async {
-                if (selectedStudent != null) {
-                  await app.assignSpecialistToStudent(
-                    selectedStudent!.id,
-                    specialist.id,
-                    byUser: byUser,
-                  );
-                  Navigator.pop(dlgCtx);
-                  onAssigned();
-                }
-              },
-              child: const Text('Biriktirish'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

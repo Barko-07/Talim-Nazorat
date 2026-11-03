@@ -3,18 +3,84 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/namangan_data.dart';
 import '../../../models/user_model.dart';
+import '../../../models/student_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/child_status_service.dart';
+import '../../../services/dynamics_service.dart';
+import '../../students/student_detail_screen.dart';
 
-class AdminOverviewTab extends StatelessWidget {
+class _AttentionItem {
+  final StudentModel student;
+  final ChildStatus status;
+  final int delayDays;
+  final String delayLabel;
+  final String specialistName;
+  final String missingActivity;
+
+  const _AttentionItem({
+    required this.student,
+    required this.status,
+    required this.delayDays,
+    required this.delayLabel,
+    required this.specialistName,
+    required this.missingActivity,
+  });
+}
+
+class AdminOverviewTab extends StatefulWidget {
   final Function(int) onNavigateTab;
 
-  const AdminOverviewTab({
-    super.key,
-    required this.onNavigateTab,
-  });
+  const AdminOverviewTab({super.key, required this.onNavigateTab});
+
+  @override
+  State<AdminOverviewTab> createState() => _AdminOverviewTabState();
+}
+
+class _AdminOverviewTabState extends State<AdminOverviewTab> {
+  String _selectedDistrict = 'Barchasi';
+  String _selectedInstitution = 'Barchasi';
+  String _selectedSpecialistId = 'Barchasi';
+  String _selectedPeriod = 'Barcha davr';
+  String _selectedDomain = 'Barchasi';
+
+  bool _initializedUserScope = false;
+  bool _showAllAttentionCases = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initializedUserScope) {
+      final auth = context.read<AuthProvider>();
+      final user = auth.currentUser;
+      if (user != null && user.role == UserRole.institutionAdmin) {
+        if (user.district != null && user.district!.isNotEmpty) {
+          _selectedDistrict = user.district!;
+        }
+        if (user.institutionName != null && user.institutionName!.isNotEmpty) {
+          _selectedInstitution = user.institutionName!;
+        }
+      }
+      _initializedUserScope = true;
+    }
+  }
+
+  void _resetFilters(UserModel? user) {
+    setState(() {
+      if (user?.role == UserRole.institutionAdmin) {
+        _selectedDistrict = user?.district ?? 'Chortoq tumani';
+        _selectedInstitution = user?.institutionName ?? 'Barchasi';
+      } else {
+        _selectedDistrict = 'Barchasi';
+        _selectedInstitution = 'Barchasi';
+      }
+      _selectedSpecialistId = 'Barchasi';
+      _selectedPeriod = 'Barcha davr';
+      _selectedDomain = 'Barchasi';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,680 +88,544 @@ class AdminOverviewTab extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
     final user = auth.currentUser;
     final df = DateFormat('dd.MM.yyyy HH:mm');
+    final dateOnlyDf = DateFormat('dd.MM.yyyy');
 
-    final totalStudents = app.allStudentsIncludingArchived.length;
-    final activeStudents = app.students.length;
-    final archivedStudents = totalStudents - activeStudents;
-    final specialists = app.specialists;
-    final users = app.allUsers;
-    final activeUsers = users.where((u) => u.isActive).length;
-    final blockedUsers = users.where((u) => !u.isActive).length;
-    final alerts = app.alerts;
-    final unresolvedAlerts = app.unresolvedAlerts;
-    final highAlerts = unresolvedAlerts.where((a) => a.severity == 'XAVF').length;
-    final iepPlans = app.iepPlans;
-    final activeIep = iepPlans.where((p) => p.status == 'Faol').length;
-    final auditLogs = app.auditLogs;
-    final institutions = app.institutionsSummary;
+    final isInstitutionAdmin = user?.role == UserRole.institutionAdmin;
+    final isReviewer = user?.role == UserRole.reviewer;
+
+    // 1. FILTRLAR RO'YXATI
+    final districtOptions = ['Barchasi', ...NamanganData.districts];
+    final List<String> institutionOptions = ['Barchasi'];
+    if (_selectedDistrict != 'Barchasi') {
+      final districtSchools =
+          NamanganData.districtSchools[_selectedDistrict] ?? [];
+      institutionOptions.addAll(districtSchools);
+      // bazadagi ushbu tumanga tegishli boshqa muassasalar
+      for (final inst in app.institutionsSummary) {
+        final name = inst['name'] as String? ?? '';
+        final dist = inst['district'] as String? ?? '';
+        if (dist == _selectedDistrict &&
+            !institutionOptions.contains(name) &&
+            name.isNotEmpty) {
+          institutionOptions.add(name);
+        }
+      }
+    } else {
+      for (final inst in app.institutionsSummary) {
+        final name = inst['name'] as String? ?? '';
+        if (name.isNotEmpty && !institutionOptions.contains(name)) {
+          institutionOptions.add(name);
+        }
+      }
+    }
+
+    final specialistOptions = <Map<String, String>>[
+      {'id': 'Barchasi', 'name': 'Barcha mutaxassislar'},
+    ];
+    for (final sp in app.specialists) {
+      if (_selectedDistrict != 'Barchasi' && sp.district != _selectedDistrict)
+        continue;
+      if (_selectedInstitution != 'Barchasi' &&
+          sp.institutionName != _selectedInstitution)
+        continue;
+      specialistOptions.add({
+        'id': sp.id,
+        'name': '${sp.fullName} (${sp.role.label})',
+      });
+    }
+
+    // 2. O'QUVCHILARNI FILTRLASH
+    final baseStudents = app.students;
+    final filteredStudents =
+        baseStudents.where((s) {
+          if (_selectedDistrict != 'Barchasi') {
+            final inst = app.institutionsSummary.firstWhere(
+              (i) =>
+                  i['name'] == s.institutionName || i['id'] == s.institutionId,
+              orElse: () => {},
+            );
+            final inDistrict =
+                (inst.isNotEmpty && inst['district'] == _selectedDistrict) ||
+                (NamanganData.districtSchools[_selectedDistrict]?.contains(
+                      s.institutionName,
+                    ) ??
+                    false);
+            if (!inDistrict) return false;
+          }
+
+          if (_selectedInstitution != 'Barchasi') {
+            if (s.institutionName != _selectedInstitution &&
+                s.institutionId != _selectedInstitution) {
+              return false;
+            }
+          }
+
+          if (_selectedSpecialistId != 'Barchasi') {
+            if (!s.assignedSpecialistIds.contains(_selectedSpecialistId)) {
+              return false;
+            }
+          }
+
+          return true;
+        }).toList();
+
+    final filteredStudentIds = filteredStudents.map((s) => s.id).toSet();
+
+    // 3. MUTAXASSISLARNI FILTRLASH
+    final filteredSpecialists =
+        app.specialists.where((sp) {
+          if (_selectedDistrict != 'Barchasi' &&
+              sp.district != _selectedDistrict)
+            return false;
+          if (_selectedInstitution != 'Barchasi' &&
+              sp.institutionName != _selectedInstitution)
+            return false;
+          if (_selectedSpecialistId != 'Barchasi' &&
+              sp.id != _selectedSpecialistId)
+            return false;
+          return true;
+        }).toList();
+
+    // 4. E'TIBOR TALAB ETILADIGAN HOLATLARNI HISOBLASH
+    final attentionCases = <_AttentionItem>[];
+    for (final s in filteredStudents) {
+      final st = app.childStatus(s);
+      if (st.color == StatusColor.red || st.color == StatusColor.yellow) {
+        final int delayDays;
+        final String delayLabel;
+        if (st.lastWorkAt != null) {
+          delayDays = DateTime.now().difference(st.lastWorkAt!).inDays;
+          delayLabel = '$delayDays kundan buyon faoliyat yo‘q';
+        } else {
+          delayDays = DateTime.now().difference(s.createdAt).inDays;
+          delayLabel = 'Ro‘yxatga olingandan buyon $delayDays kun o‘tdi';
+        }
+
+        final assignedNames =
+            app.specialists
+                .where((sp) => s.assignedSpecialistIds.contains(sp.id))
+                .map((sp) => sp.fullName)
+                .toList();
+        final specName =
+            assignedNames.isNotEmpty
+                ? assignedNames.join(', ')
+                : (st.specialistsNotStarted.isNotEmpty
+                    ? 'Hali ish boshlamagan: ${st.specialistsNotStarted.join(', ')}'
+                    : 'Biriktirilmagan');
+
+        attentionCases.add(
+          _AttentionItem(
+            student: s,
+            status: st,
+            delayDays: delayDays,
+            delayLabel: delayLabel,
+            specialistName: specName,
+            missingActivity:
+                st.reasons.isNotEmpty
+                    ? st.reasons.join(' • ')
+                    : (st.color == StatusColor.red
+                        ? 'Mutaxassis biriktirilmagan yoki ish boshlanmagan'
+                        : 'Qo‘shimcha monitoring va kuzatuv talab qilinadi'),
+          ),
+        );
+      }
+    }
+    // Tartiblash: qizillar oldinda, keyin kechikish kunlari bo'yicha
+    attentionCases.sort((a, b) {
+      if (a.status.color == StatusColor.red &&
+          b.status.color != StatusColor.red)
+        return -1;
+      if (a.status.color != StatusColor.red &&
+          b.status.color == StatusColor.red)
+        return 1;
+      return b.delayDays.compareTo(a.delayDays);
+    });
+
+    // 5. KPI STATISTIKASI (HAQIQIY MA'LUMOTLAR)
+    final totalChildren = filteredStudents.length;
+    final activeSpecialistsCount =
+        filteredSpecialists.where((u) => u.isActive).length;
+    final unworkedRedCount =
+        attentionCases.where((a) => a.status.color == StatusColor.red).length;
+    final yellowAttentionCount =
+        attentionCases
+            .where((a) => a.status.color == StatusColor.yellow)
+            .length;
+    final greenSuccessCount = (totalChildren -
+            unworkedRedCount -
+            yellowAttentionCount)
+        .clamp(0, totalChildren);
+
+    final incompleteAssessmentsCount =
+        filteredStudents.where((s) {
+          final childAssessments = app.assessments.where(
+            (a) => a.studentId == s.id,
+          );
+          return childAssessments.isEmpty ||
+              childAssessments.any(
+                (a) => a.isDraft || a.status != 'Yakunlandi',
+              );
+        }).length;
+
+    final activeIepPlansCount =
+        app.iepPlans.where((p) {
+          return p.status == 'Faol' && filteredStudentIds.contains(p.studentId);
+        }).length;
+
+    final pendingReferralsCount =
+        app.referrals.where((r) {
+          final isPending =
+              r.status == 'Ko‘rib chiqilmoqda' || r.status == 'Yangi';
+          return isPending &&
+              (filteredStudentIds.contains(r.studentId) ||
+                  r.toSpecialistId == _selectedSpecialistId);
+        }).length;
+
+    // 6. MONITORING MARKAZI INDIKATORLARI (6 TA ASOSIY SOHA)
+    final report = app.buildReport();
+    final regressionCount = report.dynamicsCounts[DynamicsStatus.decline] ?? 0;
+    final stagnantCount =
+        (report.dynamicsCounts[DynamicsStatus.stable] ?? 0) +
+        (report.dynamicsCounts[DynamicsStatus.ineffective] ?? 0);
+    final missingAssessmentsCount =
+        filteredStudents
+            .where(
+              (s) =>
+                  app.assessments
+                      .where((a) => a.studentId == s.id && !a.isDraft)
+                      .isEmpty,
+            )
+            .length;
+    final overdue30DaysActivitiesCount =
+        filteredStudents.where((s) {
+          final st = app.childStatus(s);
+          return st.lastWorkAt != null &&
+              DateTime.now().difference(st.lastWorkAt!).inDays > 30;
+        }).length;
+    final incompleteIepObjectivesCount =
+        app.iepPlans.where((p) {
+          return p.status == 'Faol' &&
+              p.objectives.any((o) => o.status != 'Bajarildi') &&
+              filteredStudentIds.contains(p.studentId);
+        }).length;
+
+    // 7. RIVOJLANISH SOHALARI TAHLILI
+    final speechSounds = app.speechSounds;
+    final totalTrackedSounds = speechSounds.length;
+    final speechAssessmentsCount =
+        app.assessments.where((a) {
+          final inScope = filteredStudentIds.contains(a.studentId);
+          final isSpeech =
+              a.title.toLowerCase().contains('nutq') ||
+              a.category.toLowerCase().contains('speech');
+          return inScope && isSpeech;
+        }).length;
+
+    final cognitiveAssessmentsCount =
+        app.assessments.where((a) {
+          final inScope = filteredStudentIds.contains(a.studentId);
+          final isCog =
+              a.title.toLowerCase().contains('kognitiv') ||
+              a.category.toLowerCase().contains('cognitive');
+          return inScope && isCog;
+        }).length;
+
+    final attentionMeasurementsCount = filteredStudents.fold<int>(0, (sum, s) {
+      final m1 =
+          app
+              .measurementsFor(s.id, metricId: 'metric_attention_minutes')
+              .length;
+      final m2 =
+          app.measurementsFor(s.id, metricId: 'metric_words_recalled').length;
+      return sum + m1 + m2;
+    });
+
+    final socialMeasurementsCount = filteredStudents.fold<int>(0, (sum, s) {
+      return sum +
+          app.measurementsFor(s.id, metricId: 'metric_peer_initiations').length;
+    });
+
+    final educationalTasksCount = filteredStudents.fold<int>(0, (sum, s) {
+      return sum + app.subjectTasksFor(s.id).where((t) => t.isCompleted).length;
+    });
+
+    final observationsCount =
+        app.observations
+            .where((o) => filteredStudentIds.contains(o.studentId))
+            .length;
+
+    // Tarixiy taqqoslash (oxirgi 30 kun va oldingi 30 kun)
+    final growthDynamicsCount =
+        report.dynamicsCounts[DynamicsStatus.growth] ?? 0;
+    final totalDynamicsCount = report.dynamicsCounts.values.fold(
+      0,
+      (a, b) => a + b,
+    );
+    final growthPercent =
+        totalDynamicsCount == 0
+            ? 0
+            : ((growthDynamicsCount / totalDynamicsCount) * 100).round();
+
+    // Faol filtrlar soni
+    int activeFiltersCount = 0;
+    if (_selectedDistrict != 'Barchasi') activeFiltersCount++;
+    if (_selectedInstitution != 'Barchasi') activeFiltersCount++;
+    if (_selectedSpecialistId != 'Barchasi') activeFiltersCount++;
+    if (_selectedPeriod != 'Barcha davr') activeFiltersCount++;
+    if (_selectedDomain != 'Barchasi') activeFiltersCount++;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. DAVLAT AXBOROT TIZIMI BOSH SHAPKA BANNERI
+          // 1. DAVLAT STANDARTI ASOSIDAGI RASMIY BOSH SHAPKA BANNERI (my.gov.uz uslubida)
+          _buildGovernmentHeader(user, isInstitutionAdmin, isReviewer),
+          const SizedBox(height: 20),
+
+          // 2. GLOBAL FILTRLAR PANELI (Hudud, Muassasa, Mutaxassis, Davr, Soha)
+          _buildGlobalFiltersCard(
+            districtOptions: districtOptions,
+            institutionOptions: institutionOptions,
+            specialistOptions: specialistOptions,
+            activeFiltersCount: activeFiltersCount,
+            user: user,
+            isInstitutionAdmin: isInstitutionAdmin,
+          ),
+          const SizedBox(height: 20),
+
+          // 3. ASOSIY STATISTIK KO'RSATKICHLAR (KPI DASHBOARD)
+          _buildKpiOverviewGrid(
+            totalChildren: totalChildren,
+            activeSpecialistsCount: activeSpecialistsCount,
+            unworkedRedCount: unworkedRedCount,
+            incompleteAssessmentsCount: incompleteAssessmentsCount,
+            activeIepPlansCount: activeIepPlansCount,
+            pendingReferralsCount: pendingReferralsCount,
+          ),
+          const SizedBox(height: 12),
+
+          // SVETOFOR TEZKOR MONITORING TASMASI
+          _buildSvetoforStrip(
+            redCount: unworkedRedCount,
+            yellowCount: yellowAttentionCount,
+            greenCount: greenSuccessCount,
+            unassignedCount:
+                filteredStudents
+                    .where((s) => s.assignedSpecialistIds.isEmpty)
+                    .length,
+          ),
+          const SizedBox(height: 24),
+
+          // 4. E'TIBOR TALAB ETILADIGAN HOLATLAR BO'LIMI (HAQIQIY BOLALAR, MAS'UL VA KECHIKISH MUDDATI BILAN)
+          _buildAttentionRequiredSection(
+            context,
+            attentionCases: attentionCases,
+            dateOnlyDf: dateOnlyDf,
+          ),
+          const SizedBox(height: 24),
+
+          // 5. MONITORING MARKAZI (6 TA MUHIM MONITORING INDIKATORI)
+          _buildMonitoringCenterSection(
+            regressionCount: regressionCount,
+            stagnantCount: stagnantCount,
+            missingAssessmentsCount: missingAssessmentsCount,
+            overdue30DaysActivitiesCount: overdue30DaysActivitiesCount,
+            incompleteIepObjectivesCount: incompleteIepObjectivesCount,
+            pendingReferralsCount: pendingReferralsCount,
+          ),
+          const SizedBox(height: 24),
+
+          // 6. RIVOJLANISH SOHALARI TAHLILI VA TARIXIY TAQQOSLASH
+          _buildDevelopmentAnalyticsSection(
+            totalTrackedSounds: totalTrackedSounds,
+            speechAssessmentsCount: speechAssessmentsCount,
+            cognitiveAssessmentsCount: cognitiveAssessmentsCount,
+            attentionMeasurementsCount: attentionMeasurementsCount,
+            socialMeasurementsCount: socialMeasurementsCount,
+            educationalTasksCount: educationalTasksCount,
+            observationsCount: observationsCount,
+            growthPercent: growthPercent,
+            growthCount: growthDynamicsCount,
+            declineCount: regressionCount,
+            stableCount: stagnantCount,
+          ),
+          const SizedBox(height: 24),
+
+          // 7. MUTAXASSISLAR ISH YUKLAMASI VA FAOLLIGI TAHLILI
+          _buildSpecialistWorkloadSection(
+            filteredSpecialists: filteredSpecialists,
+            filteredStudents: filteredStudents,
+            app: app,
+            dateOnlyDf: dateOnlyDf,
+          ),
+          const SizedBox(height: 24),
+
+          // 8. BOSHQARUV VA MA'MURIY AMALLAR (8 TA MODUL TEZKOR O'TISH)
+          _buildManagementFeaturesSection(),
+          const SizedBox(height: 24),
+
+          // 9. SO'NGGI TIZIM FAOLLIGI VA AUDIT JURNALI
+          _buildRecentActivitySection(app: app, df: df),
+        ],
+      ),
+    );
+  }
+
+  // ==================== 1. RASMIY SHAPKA BANNERI ====================
+  Widget _buildGovernmentHeader(
+    UserModel? user,
+    bool isInstitutionAdmin,
+    bool isReviewer,
+  ) {
+    final String titleText;
+    final String subtitleText;
+    final String badgeText;
+
+    if (isInstitutionAdmin) {
+      titleText =
+          '${user?.institutionName ?? 'Ta’lim muassasasi'} — Boshqaruv Paneli';
+      subtitleText =
+          'Muassasa o‘quvchilari monitoringi, biriktirilgan mutaxassislar faoliyati va ITR nazorati';
+      badgeText = 'MUASSASA DARAJASI • ${user?.district ?? 'Chortoq tumani'}';
+    } else if (isReviewer) {
+      titleText =
+          'Viloyat Ta’lim Sifatini Monitoring Qilish va Metodik Nazorat';
+      subtitleText =
+          'Hududlararo qiyosiy tahlil, davlat standartlariga moslik va tahliliy hisobotlar markazi';
+      badgeText = 'METODIK NAZORAT • NAMANGAN VILOYATI';
+    } else {
+      titleText = 'TA’LIM NAZORAT — Milliy va Hududiy Boshqaruv Markazi';
+      subtitleText =
+          'Alohida ta’lim ehtiyojlari bo‘lgan bolalar yagona davlat reyestri, 14 ta tuman monitoringi va idoralararo nazorat';
+      badgeText = 'RESPUBLIKA / VILOYAT BOSHQARUVI • 14 TA TUMAN';
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF073A82), Color(0xFF0A4DA2)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF073A82).withValues(alpha: 0.25),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF073A82), Color(0xFF0052CC)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.25),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
             ),
-            child: Row(
+            child: const Icon(
+              Icons.account_balance_rounded,
+              color: Colors.white,
+              size: 34,
+            ),
+          ),
+          const SizedBox(width: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFF10B981).withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.25),
+                      color: const Color(0xFF10B981).withValues(alpha: 0.4),
                     ),
                   ),
-                  child: const Icon(
-                    Icons.account_balance_rounded,
+                  child: Text(
+                    badgeText,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  titleText,
+                  style: const TextStyle(
                     color: Colors.white,
-                    size: 36,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.2,
                   ),
                 ),
-                const SizedBox(width: 18),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withValues(alpha: 0.25),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.4),
-                              ),
-                            ),
-                            child: const Text(
-                              'YAGONA DAVLAT REYESTRI • HUDUDIY MONITORING',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: const Text(
-                              'NAMANGAN VILOYATI',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'TA’LIM NAZORAT — Boshqaruv Markazi',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Alohida ta’lim ehtiyojlari bo‘lgan bolalar monitoringi, kadrlar hisobi va muassasalar faoliyati bo‘yicha kompleks ma’muriy tahlil. Administrator: ${user?.fullName ?? 'Boshqaruvchi'}',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.85),
-                          fontSize: 12,
-                          height: 1.35,
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 4),
+                Text(
+                  subtitleText,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.88),
+                    fontSize: 12,
+                    height: 1.35,
                   ),
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF10B981),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Text(
-                            'Tizim faol: Oflayn DB',
-                            style: TextStyle(
-                              color: Color(0xFF0F172A),
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Rollar bo‘yicha himoyalangan tizim',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.75),
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
-
-          // 2. ASOSIY STATISTIK KO'RSATKICHLAR (KPI BLOKLARI)
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final crossAxisCount = constraints.maxWidth >= 1000
-                  ? 4
-                  : constraints.maxWidth >= 600
-                      ? 2
-                      : 1;
-              return GridView.count(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: 2.1,
-                children: [
-                  _buildStatCard(
-                    title: 'JAMI FOYDALANUVCHILAR',
-                    value: users.length.toString(),
-                    subtitle: '$activeUsers faol • $blockedUsers bloklangan',
-                    icon: Icons.manage_accounts_rounded,
-                    color: const Color(0xFF0052CC),
-                    bgColor: const Color(0xFFEFF6FF),
-                    onTap: () => onNavigateTab(1), // Foydalanuvchilar
-                  ),
-                  _buildStatCard(
-                    title: 'PEDAGOG-MUTAXASSISLAR',
-                    value: specialists.length.toString(),
-                    subtitle: 'Psixolog, logoped, defektolog',
-                    icon: Icons.psychology_rounded,
-                    color: const Color(0xFF7C3AED),
-                    bgColor: const Color(0xFFF5F3FF),
-                    onTap: () => onNavigateTab(2), // Mutaxassislar
-                  ),
-                  _buildStatCard(
-                    title: 'ATEB O‘QUVCHILAR',
-                    value: activeStudents.toString(),
-                    subtitle: '$totalStudents jami ro‘yxatda • $archivedStudents arxiv',
-                    icon: Icons.groups_rounded,
-                    color: const Color(0xFF059669),
-                    bgColor: const Color(0xFFECFDF5),
-                    onTap: () => onNavigateTab(3), // O'quvchilar
-                  ),
-                  _buildStatCard(
-                    title: 'MONITORING SIGNALLARI',
-                    value: unresolvedAlerts.length.toString(),
-                    subtitle: '$highAlerts ta yuqori xavf • ${alerts.length} jami',
-                    icon: Icons.warning_amber_rounded,
-                    color: const Color(0xFFDC2626),
-                    bgColor: const Color(0xFFFEF2F2),
-                    onTap: () => onNavigateTab(8), // Monitoring
-                  ),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final crossAxisCount = constraints.maxWidth >= 1000
-                  ? 4
-                  : constraints.maxWidth >= 600
-                      ? 2
-                      : 1;
-              return GridView.count(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: 2.1,
-                children: [
-                  _buildStatCard(
-                    title: 'TA’LIM MUASSASALARI',
-                    value: institutions.length.toString(),
-                    subtitle: 'Maktab, internat, tayanch markazlar',
-                    icon: Icons.apartment_rounded,
-                    color: const Color(0xFF0F766E),
-                    bgColor: const Color(0xFFF0FDFA),
-                    onTap: () => onNavigateTab(4), // Muassasalar
-                  ),
-                  _buildStatCard(
-                    title: 'SINFLAR VA GURUHLAR',
-                    value: app.classesSummary.length.toString(),
-                    subtitle: 'Inklyuziv va maxsus sinflar',
-                    icon: Icons.school_rounded,
-                    color: const Color(0xFFD97706),
-                    bgColor: const Color(0xFFFFFBEB),
-                    onTap: () => onNavigateTab(5), // Sinflar
-                  ),
-                  _buildStatCard(
-                    title: 'FAOL ITR REJALARI',
-                    value: activeIep.toString(),
-                    subtitle: '${iepPlans.length} ta umumiy individual reja',
-                    icon: Icons.menu_book_rounded,
-                    color: const Color(0xFF0284C7),
-                    bgColor: const Color(0xFFF0F9FF),
-                    onTap: () => onNavigateTab(7), // Hisobotlar
-                  ),
-                  _buildStatCard(
-                    title: 'AUDIT JURNALI',
-                    value: auditLogs.length.toString(),
-                    subtitle: 'Qayd etilgan o‘zgarishlar va amallar',
-                    icon: Icons.history_edu_rounded,
-                    color: const Color(0xFF475569),
-                    bgColor: const Color(0xFFF8FAFC),
-                    onTap: () => onNavigateTab(10), // Audit jurnali
-                  ),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-
-          // 2.5. SVETOFOR VA ISHLANMAGAN BOLALAR NAZORATI
-          Builder(
-            builder: (context) {
-              final summary = app.monitoringSummary;
-              final redCount = summary?.count(StatusColor.red) ?? 0;
-              final yellowCount = summary?.count(StatusColor.yellow) ?? 0;
-              final greenCount = summary?.count(StatusColor.green) ?? 0;
-              final unassignedCount = app.students
-                  .where((s) => s.assignedSpecialistIds.isEmpty)
-                  .length;
-              return Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: AppColors.border),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Bolalar bilan ishlash holati (Svetofor monitoringi)',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.5,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => onNavigateTab(3),
-                            child: const Text(
-                              'O‘quvchilar reyestriga o‘tish →',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 8,
-                        children: [
-                          _buildBadge(
-                            label: '🔴 Qizil (Ishlanmagan / kechikkan): $redCount nafar',
-                            color: const Color(0xFFDC2626),
-                            bgColor: const Color(0xFFFEE2E2),
-                          ),
-                          _buildBadge(
-                            label: '🟡 Sariq (E’tibor talab): $yellowCount nafar',
-                            color: const Color(0xFFD97706),
-                            bgColor: const Color(0xFFFEF3C7),
-                          ),
-                          _buildBadge(
-                            label: '🟢 Yashil (Ijobiy natija): $greenCount nafar',
-                            color: const Color(0xFF16A34A),
-                            bgColor: const Color(0xFFDCFCE7),
-                          ),
-                          _buildBadge(
-                            label: '⚠ Mutaxassis biriktirilmagan: $unassignedCount nafar',
-                            color: const Color(0xFF7C3AED),
-                            bgColor: const Color(0xFFF5F3FF),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 24),
-
-          // 3. TAQSIMOT VA TEZKOR MA'MURIY BLOKLAR
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              // CHAP QISM: HUDUDLAR VA MUASSASALAR BO'YICHA TAHLIL
-              Expanded(
-                flex: 3,
-                child: Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.border),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: const [
-                                Icon(
-                                  Icons.account_tree_outlined,
-                                  color: AppColors.primary,
-                                  size: 20,
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Muassasalar bo‘yicha O‘quvchi va Kadrlar Taqsimoti',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            TextButton.icon(
-                              onPressed: () => onNavigateTab(4),
-                              icon: const Icon(Icons.arrow_forward, size: 14),
-                              label: const Text(
-                                'Barchasi',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Divider(height: 20),
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: institutions.take(5).length,
-                          separatorBuilder: (_, _) => const Divider(height: 1),
-                          itemBuilder: (context, index) {
-                            final inst = institutions[index];
-                            final stCount = inst['studentsCount'] as int;
-                            final spCount = inst['specialistsCount'] as int;
-                            final iepCount = inst['activeIepCount'] as int;
-
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 18,
-                                    backgroundColor: AppColors.primaryLight,
-                                    child: Text(
-                                      '${index + 1}',
-                                      style: const TextStyle(
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          inst['name'] as String,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 13,
-                                            color: AppColors.textPrimary,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          '${inst['district']} • ${inst['type']}',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            color: AppColors.textMuted,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  _buildBadge(
-                                    label: '$stCount bola',
-                                    color: AppColors.primary,
-                                    bgColor: AppColors.primaryLight,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  _buildBadge(
-                                    label: '$spCount mutaxassis',
-                                    color: const Color(0xFF7C3AED),
-                                    bgColor: const Color(0xFFF5F3FF),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  _buildBadge(
-                                    label: '$iepCount ITR',
-                                    color: const Color(0xFF059669),
-                                    bgColor: const Color(0xFFECFDF5),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
                 ),
-              ),
-              const SizedBox(width: 16),
-
-              // O'NG QISM: SO'NGGI AUDIT VA TEZKOR AMALLAR
-              Expanded(
-                flex: 2,
-                child: Column(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // TEZKOR AMALLAR
-                    Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: AppColors.border),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Tezkor Ma’muriy Amallar',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            _buildQuickActionBtn(
-                              icon: Icons.person_add_rounded,
-                              label: 'Yangi foydalanuvchi qo‘shish',
-                              color: AppColors.primary,
-                              onTap: () => onNavigateTab(1),
-                            ),
-                            const SizedBox(height: 8),
-                            _buildQuickActionBtn(
-                              icon: Icons.file_download_outlined,
-                              label: 'Viloyat hisobotlarini CSV yuklash',
-                              color: const Color(0xFF059669),
-                              onTap: () => onNavigateTab(7),
-                            ),
-                            const SizedBox(height: 8),
-                            _buildQuickActionBtn(
-                              icon: Icons.shield_outlined,
-                              label: 'Monitoring signallarini ko‘rish',
-                              color: const Color(0xFFDC2626),
-                              onTap: () => onNavigateTab(8),
-                            ),
-                          ],
-                        ),
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF10B981),
+                        shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(height: 16),
-
-                    // SO'NGGI AUDIT HARAKATLARI
-                    Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: AppColors.border),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'So‘nggi Audit Yozuvlari',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () => onNavigateTab(10),
-                                  child: const Text(
-                                    'Barchasi',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Divider(height: 16),
-                            if (auditLogs.isEmpty)
-                              const Padding(
-                                padding: EdgeInsets.all(12),
-                                child: Text('Audit yozuvlari mavjud emas'),
-                              )
-                            else
-                              ListView.separated(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: auditLogs.take(4).length,
-                                separatorBuilder: (_, _) =>
-                                    const Divider(height: 1),
-                                itemBuilder: (context, i) {
-                                  final log = auditLogs[i];
-                                  return Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 6,
-                                                vertical: 2,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.primaryLight,
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                              ),
-                                              child: Text(
-                                                log.action,
-                                                style: const TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.primary,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Expanded(
-                                              child: Text(
-                                                log.userFullName,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 11,
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                            Text(
-                                              df.format(log.timestamp),
-                                              style: const TextStyle(
-                                                fontSize: 10,
-                                                color: AppColors.textMuted,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          log.details,
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            color: AppColors.textSecondary,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                          ],
-                        ),
+                    const SizedBox(width: 6),
+                    const Text(
+                      'Tizim faol: Oflayn DB',
+                      style: TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Mas’ul: ${user?.fullName ?? 'Administrator'}',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.85),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -705,6 +635,1889 @@ class AdminOverviewTab extends StatelessWidget {
     );
   }
 
+  // ==================== 2. GLOBAL FILTRLAR PANELI ====================
+  Widget _buildGlobalFiltersCard({
+    required List<String> districtOptions,
+    required List<String> institutionOptions,
+    required List<Map<String, String>> specialistOptions,
+    required int activeFiltersCount,
+    required UserModel? user,
+    required bool isInstitutionAdmin,
+  }) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.filter_list_rounded,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Global Boshqaruv Filtrlari',
+                      style: TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    if (activeFiltersCount > 0) ...[
+                      const SizedBox(width: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '$activeFiltersCount ta filtr faol',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                TextButton.icon(
+                  onPressed:
+                      activeFiltersCount > 0 ? () => _resetFilters(user) : null,
+                  icon: const Icon(Icons.refresh_rounded, size: 16),
+                  label: const Text('Tozalash', style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(
+                    foregroundColor:
+                        activeFiltersCount > 0
+                            ? AppColors.error
+                            : AppColors.textMuted,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 20),
+            Wrap(
+              spacing: 14,
+              runSpacing: 12,
+              children: [
+                // 1. Tuman filtri
+                SizedBox(
+                  width: 210,
+                  child: DropdownButtonFormField<String>(
+                    value:
+                        districtOptions.contains(_selectedDistrict)
+                            ? _selectedDistrict
+                            : 'Barchasi',
+                    isExpanded: true,
+                    isDense: true,
+                    decoration: InputDecoration(
+                      labelText: 'Tuman / Shahar',
+                      labelStyle: const TextStyle(fontSize: 12),
+                      prefixIcon: const Icon(
+                        Icons.location_on_outlined,
+                        size: 18,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    items:
+                        districtOptions.map((d) {
+                          return DropdownMenuItem(
+                            value: d,
+                            child: Text(
+                              d,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          );
+                        }).toList(),
+                    onChanged:
+                        isInstitutionAdmin
+                            ? null
+                            : (val) {
+                              if (val != null) {
+                                setState(() {
+                                  _selectedDistrict = val;
+                                  _selectedInstitution = 'Barchasi';
+                                });
+                              }
+                            },
+                  ),
+                ),
+
+                // 2. Muassasa filtri
+                SizedBox(
+                  width: 250,
+                  child: DropdownButtonFormField<String>(
+                    value:
+                        institutionOptions.contains(_selectedInstitution)
+                            ? _selectedInstitution
+                            : 'Barchasi',
+                    isExpanded: true,
+                    isDense: true,
+                    decoration: InputDecoration(
+                      labelText: 'Ta’lim muassasasi',
+                      labelStyle: const TextStyle(fontSize: 12),
+                      prefixIcon: const Icon(
+                        Icons.apartment_outlined,
+                        size: 18,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    items:
+                        institutionOptions.map((inst) {
+                          return DropdownMenuItem(
+                            value: inst,
+                            child: Text(
+                              inst,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          );
+                        }).toList(),
+                    onChanged:
+                        isInstitutionAdmin
+                            ? null
+                            : (val) {
+                              if (val != null)
+                                setState(() => _selectedInstitution = val);
+                            },
+                  ),
+                ),
+
+                // 3. Mutaxassis filtri
+                SizedBox(
+                  width: 240,
+                  child: DropdownButtonFormField<String>(
+                    value:
+                        specialistOptions.any(
+                              (s) => s['id'] == _selectedSpecialistId,
+                            )
+                            ? _selectedSpecialistId
+                            : 'Barchasi',
+                    isExpanded: true,
+                    isDense: true,
+                    decoration: InputDecoration(
+                      labelText: 'Pedagog-mutaxassis',
+                      labelStyle: const TextStyle(fontSize: 12),
+                      prefixIcon: const Icon(
+                        Icons.psychology_outlined,
+                        size: 18,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    items:
+                        specialistOptions.map((sp) {
+                          return DropdownMenuItem(
+                            value: sp['id']!,
+                            child: Text(
+                              sp['name']!,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          );
+                        }).toList(),
+                    onChanged: (val) {
+                      if (val != null)
+                        setState(() => _selectedSpecialistId = val);
+                    },
+                  ),
+                ),
+
+                // 4. Davr filtri
+                SizedBox(
+                  width: 170,
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedPeriod,
+                    isExpanded: true,
+                    isDense: true,
+                    decoration: InputDecoration(
+                      labelText: 'Hisobot davri',
+                      labelStyle: const TextStyle(fontSize: 12),
+                      prefixIcon: const Icon(
+                        Icons.calendar_today_outlined,
+                        size: 16,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Barcha davr',
+                        child: Text(
+                          'Barcha davr',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'So‘nggi 7 kun',
+                        child: Text(
+                          'So‘nggi 7 kun',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'So‘nggi 30 kun',
+                        child: Text(
+                          'So‘nggi 30 kun',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Joriy chorak',
+                        child: Text(
+                          'Joriy chorak',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedPeriod = val);
+                    },
+                  ),
+                ),
+
+                // 5. Rivojlanish sohasi filtri
+                SizedBox(
+                  width: 200,
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedDomain,
+                    isExpanded: true,
+                    isDense: true,
+                    decoration: InputDecoration(
+                      labelText: 'Rivojlanish sohasi',
+                      labelStyle: const TextStyle(fontSize: 12),
+                      prefixIcon: const Icon(Icons.category_outlined, size: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Barchasi',
+                        child: Text(
+                          'Barcha sohalar',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Nutq va muloqot',
+                        child: Text(
+                          'Nutq va muloqot',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Kognitiv va intellekt',
+                        child: Text(
+                          'Kognitiv va intellekt',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Diqqat va xotira',
+                        child: Text(
+                          'Diqqat va xotira',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Xulq-atvor va ijtimoiy',
+                        child: Text(
+                          'Xulq-atvor va ijtimoiy',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'O‘quv va DTS fanlari',
+                        child: Text(
+                          'O‘quv va DTS fanlari',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedDomain = val);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== 3. KPI STATISTIK KO'RSATKICHLARI ====================
+  Widget _buildKpiOverviewGrid({
+    required int totalChildren,
+    required int activeSpecialistsCount,
+    required int unworkedRedCount,
+    required int incompleteAssessmentsCount,
+    required int activeIepPlansCount,
+    required int pendingReferralsCount,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount =
+            constraints.maxWidth >= 1100
+                ? 3
+                : constraints.maxWidth >= 650
+                ? 2
+                : 1;
+
+        return GridView.count(
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: 2.3,
+          children: [
+            // 1. Jami ro'yxatdagi bolalar
+            _buildStatCard(
+              title: 'JAMI RO‘YXATDAGI BOLALAR',
+              value: '$totalChildren nafar',
+              subtitle: 'Filtr bo‘yicha hisoblangan ATEB o‘quvchilar',
+              icon: Icons.groups_rounded,
+              color: const Color(0xFF0052CC),
+              bgColor: const Color(0xFFEFF6FF),
+              onTap: () => widget.onNavigateTab(3), // O'quvchilar tabi
+            ),
+
+            // 2. Faol mutaxassislar
+            _buildStatCard(
+              title: 'FAOL MUTAXASSISLAR',
+              value: '$activeSpecialistsCount nafar',
+              subtitle: 'Psixolog, logoped, defektolog va o‘qituvchilar',
+              icon: Icons.psychology_rounded,
+              color: const Color(0xFF7C3AED),
+              bgColor: const Color(0xFFF5F3FF),
+              onTap: () => widget.onNavigateTab(2), // Mutaxassislar tabi
+            ),
+
+            // 3. Ishlanmagan bolalar (Qizil)
+            _buildStatCard(
+              title: 'ISHLANMAGAN BOLALAR (QIZIL)',
+              value: '$unworkedRedCount nafar',
+              subtitle:
+                  'Zudlik bilan mutaxassis biriktirish va faoliyat talab etiladi',
+              icon: Icons.warning_rounded,
+              color: const Color(0xFFDC2626),
+              bgColor: const Color(0xFFFEF2F2),
+              onTap: () => widget.onNavigateTab(8), // Monitoring tabi
+            ),
+
+            // 4. Tugallanmagan baholashlar
+            _buildStatCard(
+              title: 'TUGALLANMAGAN BAHOLASHLAR',
+              value: '$incompleteAssessmentsCount ta',
+              subtitle:
+                  'Boshlang‘ich diagnostika o‘tkazilmagan yoki qoralamalar',
+              icon: Icons.assignment_late_outlined,
+              color: const Color(0xFFD97706),
+              bgColor: const Color(0xFFFFFBEB),
+              onTap: () => widget.onNavigateTab(8), // Monitoring tabi
+            ),
+
+            // 5. Faol ITR rejalari
+            _buildStatCard(
+              title: 'FAOL ITR REJALARI',
+              value: '$activeIepPlansCount ta',
+              subtitle:
+                  'Tasdiqlangan individual ta’lim va rivojlanish rejalari',
+              icon: Icons.menu_book_rounded,
+              color: const Color(0xFF059669),
+              bgColor: const Color(0xFFECFDF5),
+              onTap: () => widget.onNavigateTab(7), // Hisobotlar tabi
+            ),
+
+            // 6. Kutilayotgan yo‘naltirishlar
+            _buildStatCard(
+              title: 'KUTILAYOTGAN YO‘NALTIRISHLAR',
+              value: '$pendingReferralsCount ta',
+              subtitle:
+                  'Mutaxassislar ko‘rib chiqishi kutilayotgan yo‘llanmalar',
+              icon: Icons.alt_route_rounded,
+              color: const Color(0xFF0284C7),
+              bgColor: const Color(0xFFF0F9FF),
+              onTap: () => widget.onNavigateTab(11), // Yo'naltirishlar tabi
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ==================== SVETOFOR TASMASI ====================
+  Widget _buildSvetoforStrip({
+    required int redCount,
+    required int yellowCount,
+    required int greenCount,
+    required int unassignedCount,
+  }) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                const Text(
+                  'Svetofor statusi:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                _buildBadge(
+                  label: '🔴 Qizil (Ishlanmagan): $redCount',
+                  color: const Color(0xFFDC2626),
+                  bgColor: const Color(0xFFFEE2E2),
+                ),
+                _buildBadge(
+                  label: '🟡 Sariq (E’tibor talab): $yellowCount',
+                  color: const Color(0xFFD97706),
+                  bgColor: const Color(0xFFFEF3C7),
+                ),
+                _buildBadge(
+                  label: '🟢 Yashil (Faol / Ijobiy): $greenCount',
+                  color: const Color(0xFF16A34A),
+                  bgColor: const Color(0xFFDCFCE7),
+                ),
+                if (unassignedCount > 0)
+                  _buildBadge(
+                    label: '⚠ Mutaxassis biriktirilmagan: $unassignedCount',
+                    color: const Color(0xFF7C3AED),
+                    bgColor: const Color(0xFFF5F3FF),
+                  ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => widget.onNavigateTab(3),
+                child: const Text(
+                  'Barcha o‘quvchilar →',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== 4. E'TIBOR TALAB ETILADIGAN HOLATLAR ====================
+  Widget _buildAttentionRequiredSection(
+    BuildContext context, {
+    required List<_AttentionItem> attentionCases,
+    required DateFormat dateOnlyDf,
+  }) {
+    final displayCases =
+        _showAllAttentionCases
+            ? attentionCases
+            : attentionCases.take(5).toList();
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDC2626).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.error_outline_rounded,
+                          color: Color(0xFFDC2626),
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Flexible(
+                                  child: Text(
+                                    'E’tibor Talab Etiladigan O‘quvchilar va Kechikkan Amallar',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFDC2626),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    '${attentionCases.length}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              'Faoliyat kiritilmagan, 30 kundan ortiq kechikkan yoki testlari to‘liq bo‘lmagan bolalar',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (attentionCases.length > 5)
+                  TextButton(
+                    onPressed: () {
+                      setState(
+                        () => _showAllAttentionCases = !_showAllAttentionCases,
+                      );
+                    },
+                    child: Text(
+                      _showAllAttentionCases
+                          ? 'Qisqartirish'
+                          : 'Barchasini ko‘rish (${attentionCases.length})',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const Divider(height: 24),
+            if (attentionCases.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(24),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFECFDF5),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(
+                      Icons.check_circle_rounded,
+                      color: Color(0xFF10B981),
+                      size: 24,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      'Ajoyib natija! Tanlangan filtr bo‘yicha e’tibor talab qiluvchi kechikkan holatlar mavjud emas.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF065F46),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: displayCases.length,
+                separatorBuilder: (_, _) => const Divider(height: 16),
+                itemBuilder: (context, index) {
+                  final item = displayCases[index];
+                  final isRed = item.status.color == StatusColor.red;
+
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color:
+                          isRed
+                              ? const Color(0xFFFEF2F2)
+                              : const Color(0xFFFFFBEB),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color:
+                            isRed
+                                ? const Color(0xFFDC2626).withValues(alpha: 0.2)
+                                : const Color(
+                                  0xFFD97706,
+                                ).withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor:
+                              isRed
+                                  ? const Color(0xFFFEE2E2)
+                                  : const Color(0xFFFEF3C7),
+                          child: Icon(
+                            isRed
+                                ? Icons.priority_high_rounded
+                                : Icons.schedule_rounded,
+                            color:
+                                isRed
+                                    ? const Color(0xFFDC2626)
+                                    : const Color(0xFFD97706),
+                            size: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 4,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Text(
+                                    item.student.fullName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 1.5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: AppColors.border,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${item.student.grade} • ${item.student.institutionName}',
+                                      style: const TextStyle(
+                                        fontSize: 10.5,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ),
+                                  _buildBadge(
+                                    label: item.delayLabel,
+                                    color:
+                                        isRed
+                                            ? const Color(0xFFDC2626)
+                                            : const Color(0xFFD97706),
+                                    bgColor: Colors.white,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Yetishmayotgan faoliyat: ',
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      item.missingActivity,
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            isRed
+                                                ? const Color(0xFF991B1B)
+                                                : const Color(0xFF92400E),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.person_pin_outlined,
+                                    size: 14,
+                                    color: AppColors.textMuted,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(
+                                      'Mas’ul mutaxassis: ${item.specialistName}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor:
+                                isRed
+                                    ? const Color(0xFFDC2626)
+                                    : const Color(0xFFD97706),
+                            elevation: 0,
+                            side: BorderSide(
+                              color:
+                                  isRed
+                                      ? const Color(
+                                        0xFFDC2626,
+                                      ).withValues(alpha: 0.4)
+                                      : const Color(
+                                        0xFFD97706,
+                                      ).withValues(alpha: 0.4),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => StudentDetailScreen(
+                                      studentId: item.student.id,
+                                    ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 14,
+                          ),
+                          label: const Text(
+                            'Bolani ochish',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== 5. MONITORING MARKAZI (6 TA INDIKATOR) ====================
+  Widget _buildMonitoringCenterSection({
+    required int regressionCount,
+    required int stagnantCount,
+    required int missingAssessmentsCount,
+    required int overdue30DaysActivitiesCount,
+    required int incompleteIepObjectivesCount,
+    required int pendingReferralsCount,
+  }) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.shield_outlined,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Avtomatlashtirilgan Monitoring Markazi',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => widget.onNavigateTab(8), // Monitoring tabi
+                  child: const Text(
+                    'To‘liq monitoring paneli →',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 20),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final crossAxisCount =
+                    constraints.maxWidth >= 1000
+                        ? 3
+                        : constraints.maxWidth >= 600
+                        ? 2
+                        : 1;
+
+                return GridView.count(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 2.0,
+                  children: [
+                    _buildMonitoringTile(
+                      title: 'Rivojlanishda Pasayish',
+                      value: '$regressionCount nafar',
+                      description:
+                          'Oldingi davrga nisbatan orqaga ketish qayd etilgan',
+                      color: const Color(0xFFDC2626),
+                      bgColor: const Color(0xFFFEF2F2),
+                      icon: Icons.trending_down_rounded,
+                      onTap: () => widget.onNavigateTab(8),
+                    ),
+                    _buildMonitoringTile(
+                      title: 'O‘sish Yo‘q / To‘xtagan',
+                      value: '$stagnantCount nafar',
+                      description:
+                          'Kamida 30 kun davomida ko‘rsatkichlar o‘zgarmagan',
+                      color: const Color(0xFFD97706),
+                      bgColor: const Color(0xFFFFFBEB),
+                      icon: Icons.pause_circle_outline_rounded,
+                      onTap: () => widget.onNavigateTab(8),
+                    ),
+                    _buildMonitoringTile(
+                      title: 'Baholash O‘tkazilmagan',
+                      value: '$missingAssessmentsCount nafar',
+                      description:
+                          'Boshlang‘ich yoki diagnostik test topshirmagan',
+                      color: const Color(0xFF7C3AED),
+                      bgColor: const Color(0xFFF5F3FF),
+                      icon: Icons.help_outline_rounded,
+                      onTap: () => widget.onNavigateTab(8),
+                    ),
+                    _buildMonitoringTile(
+                      title: 'Muddati O‘tgan Faoliyat (>30 kun)',
+                      value: '$overdue30DaysActivitiesCount nafar',
+                      description:
+                          'Oxirgi 30 kunda birorta ham mashg‘ulot o‘tkazilmagan',
+                      color: const Color(0xFFB91C1C),
+                      bgColor: const Color(0xFFFEE2E2),
+                      icon: Icons.history_toggle_off_rounded,
+                      onTap: () => widget.onNavigateTab(8),
+                    ),
+                    _buildMonitoringTile(
+                      title: 'Yakunlanmagan ITR Rejalari',
+                      value: '$incompleteIepObjectivesCount ta',
+                      description:
+                          'Belgilangan muddatda erishilmagan reja maqsadlari',
+                      color: const Color(0xFF0284C7),
+                      bgColor: const Color(0xFFF0F9FF),
+                      icon: Icons.assignment_turned_in_outlined,
+                      onTap: () => widget.onNavigateTab(7),
+                    ),
+                    _buildMonitoringTile(
+                      title: 'Kutilayotgan Yo‘naltirishlar',
+                      value: '$pendingReferralsCount ta',
+                      description:
+                          'Mutaxassis tomonidan javob berilmagan yo‘llanmalar',
+                      color: const Color(0xFF0D9488),
+                      bgColor: const Color(0xFFF0FDFA),
+                      icon: Icons.alt_route_rounded,
+                      onTap: () => widget.onNavigateTab(11),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== 6. RIVOJLANISH SOHALARI TAHLILI ====================
+  Widget _buildDevelopmentAnalyticsSection({
+    required int totalTrackedSounds,
+    required int speechAssessmentsCount,
+    required int cognitiveAssessmentsCount,
+    required int attentionMeasurementsCount,
+    required int socialMeasurementsCount,
+    required int educationalTasksCount,
+    required int observationsCount,
+    required int growthPercent,
+    required int growthCount,
+    required int declineCount,
+    required int stableCount,
+  }) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.analytics_outlined,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Rivojlanish Yo‘nalishlari Tahlili va Tarixiy Qiyoslash',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => widget.onNavigateTab(7), // Hisobotlar
+                  child: const Text(
+                    'Batafsil tahlil →',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 20),
+
+            // TARIXIY TAQQOSLASH TASMASI
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 14,
+                    runSpacing: 4,
+                    children: [
+                      const Text(
+                        'Davrlararo Rivojlanish Dinamikasi (Oxirgi 30 kun oldingi davr bilan solishtirilganda):',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      Text(
+                        'Ijobiy o‘sish: $growthPercent%',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF059669),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: (growthCount * 10).clamp(1, 100),
+                          child: Container(
+                            height: 8,
+                            color: const Color(0xFF10B981),
+                          ),
+                        ),
+                        Expanded(
+                          flex: (stableCount * 10).clamp(1, 100),
+                          child: Container(
+                            height: 8,
+                            color: const Color(0xFFF59E0B),
+                          ),
+                        ),
+                        Expanded(
+                          flex: (declineCount * 10).clamp(1, 100),
+                          child: Container(
+                            height: 8,
+                            color: const Color(0xFFEF4444),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 14,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        '🟢 O‘sish: $growthCount ta ko‘rsatkich',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                      Text(
+                        '🟡 Barqaror: $stableCount ta ko‘rsatkich',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                      Text(
+                        '🔴 Pasayish: $declineCount ta ko‘rsatkich',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 6 TA SOHA BO'YICHA HAQIQIY METRIKALAR
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final crossAxisCount =
+                    constraints.maxWidth >= 1000
+                        ? 3
+                        : constraints.maxWidth >= 600
+                        ? 2
+                        : 1;
+
+                return GridView.count(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 2.1,
+                  children: [
+                    _buildDomainCard(
+                      title: 'Nutq va Muloqot',
+                      metric: '$totalTrackedSounds ta maqsadli tovush',
+                      sub:
+                          '$speechAssessmentsCount ta nutq tekshiruvi o‘tkazilgan',
+                      icon: Icons.record_voice_over_outlined,
+                      color: const Color(0xFF0284C7),
+                    ),
+                    _buildDomainCard(
+                      title: 'Kognitiv va Intellekt',
+                      metric: '$cognitiveAssessmentsCount ta kognitiv test',
+                      sub: 'Fikrlash, idrok va analiz ko‘nikmalari',
+                      icon: Icons.lightbulb_outline_rounded,
+                      color: const Color(0xFF7C3AED),
+                    ),
+                    _buildDomainCard(
+                      title: 'Diqqat va Xotira',
+                      metric:
+                          '$attentionMeasurementsCount ta qayd etilgan o‘lchov',
+                      sub: 'Diqqat barqarorligi va so‘z eslab qolish',
+                      icon: Icons.psychology_alt_outlined,
+                      color: const Color(0xFF0D9488),
+                    ),
+                    _buildDomainCard(
+                      title: 'Ijtimoiy-Hissiy Moslashuv',
+                      metric: '$socialMeasurementsCount ta ijtimoiy ko‘nikma',
+                      sub: 'Tengdoshlar muloqoti va ijtimoiy faollik',
+                      icon: Icons.diversity_3_outlined,
+                      color: const Color(0xFF059669),
+                    ),
+                    _buildDomainCard(
+                      title: 'O‘quv va DTS Standartlari',
+                      metric: '$educationalTasksCount ta bajarilgan topshiriq',
+                      sub: 'Matematika va Ona tili individual darajalari',
+                      icon: Icons.auto_stories_outlined,
+                      color: const Color(0xFFD97706),
+                    ),
+                    _buildDomainCard(
+                      title: 'Psixologik Kuzatuvlar',
+                      metric: '$observationsCount ta kuzatuv jurnali qaydi',
+                      sub: 'Emotsional holat, xavotir va xulq-atvor',
+                      icon: Icons.visibility_outlined,
+                      color: const Color(0xFF475569),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== 7. MUTAXASSISLAR ISH YUKLAMASI VA FAOLLIGI ====================
+  Widget _buildSpecialistWorkloadSection({
+    required List<UserModel> filteredSpecialists,
+    required List<StudentModel> filteredStudents,
+    required AppProvider app,
+    required DateFormat dateOnlyDf,
+  }) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final heading = Row(
+                  children: [
+                    const Icon(
+                      Icons.badge_outlined,
+                      color: AppColors.primary,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 8,
+                            children: [
+                              const Text(
+                                'Pedagog-Mutaxassislar Ish Yuklamasi va Faolligi',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryLight,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '${filteredSpecialists.length} nafar',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          const Text(
+                            'Biriktirilgan bolalar, o‘tkazilgan mashg‘ulotlar, ochiq yo‘llanmalar va qamrov ko‘rsatkichi',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+                final action = TextButton(
+                  onPressed: () => widget.onNavigateTab(2),
+                  child: const Text(
+                    'Barcha mutaxassislar →',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                );
+                if (constraints.maxWidth < 720) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      heading,
+                      Align(alignment: Alignment.centerRight, child: action),
+                    ],
+                  );
+                }
+                return Row(children: [Expanded(child: heading), action]);
+              },
+            ),
+            const Divider(height: 20),
+            if (filteredSpecialists.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(
+                  child: Text(
+                    'Tanlangan filtr bo‘yicha pedagog-mutaxassislar topilmadi.',
+                  ),
+                ),
+              )
+            else
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  headingRowColor: WidgetStateProperty.all(
+                    const Color(0xFFF8FAFC),
+                  ),
+                  dataRowMinHeight: 48,
+                  dataRowMaxHeight: 56,
+                  columns: const [
+                    DataColumn(
+                      label: Text(
+                        'Mutaxassis F.I.Sh.',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Lavozimi / Ixtisosligi',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Muassasasi',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Biriktirilgan',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Bajarilgan ishlar',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Kutilayotgan',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Qamrov %',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Holati',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                  rows:
+                      filteredSpecialists.map((sp) {
+                        final assignedCount =
+                            filteredStudents
+                                .where(
+                                  (s) =>
+                                      s.assignedSpecialistIds.contains(sp.id),
+                                )
+                                .length;
+                        final completedSessions =
+                            app.sessions
+                                .where((sess) => sess.specialistId == sp.id)
+                                .length;
+                        final completedAssessments =
+                            app.assessments
+                                .where(
+                                  (a) => a.specialistId == sp.id && !a.isDraft,
+                                )
+                                .length;
+                        final completedTasks =
+                            app
+                                .subjectTasksFor('')
+                                .where(
+                                  (t) =>
+                                      t.assignedById == sp.id && t.isCompleted,
+                                )
+                                .length;
+                        final totalCompleted =
+                            completedSessions +
+                            completedAssessments +
+                            completedTasks;
+
+                        final pendingReferrals =
+                            app.referrals
+                                .where(
+                                  (r) =>
+                                      r.toSpecialistId == sp.id &&
+                                      (r.status == 'Ko‘rib chiqilmoqda' ||
+                                          r.status == 'Yangi'),
+                                )
+                                .length;
+
+                        // Ishlanmagan bolalar
+                        final unworkedWithThisSpec =
+                            filteredStudents.where((s) {
+                              if (!s.assignedSpecialistIds.contains(sp.id))
+                                return false;
+                              final st = app.childStatus(s);
+                              return st.specialistsNotStarted.contains(
+                                sp.fullName,
+                              );
+                            }).length;
+
+                        final coveragePercent =
+                            assignedCount == 0
+                                ? 0
+                                : (((assignedCount - unworkedWithThisSpec)
+                                                .clamp(0, assignedCount) /
+                                            assignedCount) *
+                                        100)
+                                    .round();
+
+                        return DataRow(
+                          cells: [
+                            DataCell(
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 14,
+                                    backgroundColor: AppColors.primaryLight,
+                                    child: Text(
+                                      sp.fullName.isNotEmpty
+                                          ? sp.fullName.substring(0, 1)
+                                          : 'M',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    sp.fullName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                sp.role.label,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                sp.institutionName ?? 'Muassasa ko‘rsatilmagan',
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                '$assignedCount nafar',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                '$totalCompleted ta',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: Color(0xFF059669),
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                '$pendingReferrals ta yo‘llanma',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color:
+                                      pendingReferrals > 0
+                                          ? const Color(0xFFD97706)
+                                          : AppColors.textMuted,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 44,
+                                    child: Text(
+                                      '$coveragePercent%',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        color:
+                                            coveragePercent >= 80
+                                                ? const Color(0xFF059669)
+                                                : coveragePercent >= 50
+                                                ? const Color(0xFFD97706)
+                                                : const Color(0xFFDC2626),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  SizedBox(
+                                    width: 50,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(3),
+                                      child: LinearProgressIndicator(
+                                        value: coveragePercent / 100,
+                                        minHeight: 5,
+                                        backgroundColor: AppColors.border,
+                                        valueColor: AlwaysStoppedAnimation(
+                                          coveragePercent >= 80
+                                              ? const Color(0xFF059669)
+                                              : coveragePercent >= 50
+                                              ? const Color(0xFFD97706)
+                                              : const Color(0xFFDC2626),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            DataCell(
+                              _buildBadge(
+                                label: sp.isActive ? 'Faol' : 'Nofaol',
+                                color:
+                                    sp.isActive
+                                        ? const Color(0xFF059669)
+                                        : const Color(0xFFDC2626),
+                                bgColor:
+                                    sp.isActive
+                                        ? const Color(0xFFECFDF5)
+                                        : const Color(0xFFFEF2F2),
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== 8. BOSHQARUV VA MA'MURIY AMALLAR ====================
+  Widget _buildManagementFeaturesSection() {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.tune_rounded, color: AppColors.primary, size: 22),
+                SizedBox(width: 10),
+                Text(
+                  'Tizim Boshqaruvi va Ma’muriy Funksiyalar',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 20),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final crossAxisCount =
+                    constraints.maxWidth >= 1000
+                        ? 4
+                        : constraints.maxWidth >= 600
+                        ? 2
+                        : 1;
+
+                return GridView.count(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 2.2,
+                  children: [
+                    _buildManagementTile(
+                      title: 'Ta’lim Muassasalari',
+                      desc: 'Maktab, internat va markazlar',
+                      icon: Icons.apartment_rounded,
+                      color: const Color(0xFF0F766E),
+                      onTap: () => widget.onNavigateTab(4),
+                    ),
+                    _buildManagementTile(
+                      title: 'Foydalanuvchilar',
+                      desc: 'Hisoblar, qabul va faollashtirish',
+                      icon: Icons.manage_accounts_rounded,
+                      color: const Color(0xFF0052CC),
+                      onTap: () => widget.onNavigateTab(1),
+                    ),
+                    _buildManagementTile(
+                      title: 'Rollar va Ruxsatlar',
+                      desc: '8 ta rol matritsasi va huquqlar',
+                      icon: Icons.security_rounded,
+                      color: const Color(0xFF7C3AED),
+                      onTap: () => widget.onNavigateTab(6),
+                    ),
+                    _buildManagementTile(
+                      title: 'Mutaxassislarni Biriktirish',
+                      desc: 'Pedagoglar va bolalar bog‘lanishi',
+                      icon: Icons.assignment_ind_rounded,
+                      color: const Color(0xFFD97706),
+                      onTap: () => widget.onNavigateTab(2),
+                    ),
+                    _buildManagementTile(
+                      title: 'Yo‘naltirishlar Jurnali',
+                      desc: 'Logoped, psixolog va tibbiyot',
+                      icon: Icons.alt_route_rounded,
+                      color: const Color(0xFF0284C7),
+                      onTap: () => widget.onNavigateTab(11),
+                    ),
+                    _buildManagementTile(
+                      title: 'Tizim Audit Jurnali',
+                      desc: 'Xavfsizlik va o‘zgarishlar tarixi',
+                      icon: Icons.history_edu_rounded,
+                      color: const Color(0xFF475569),
+                      onTap: () => widget.onNavigateTab(10),
+                    ),
+                    _buildManagementTile(
+                      title: 'Tizim Sozlamalari',
+                      desc: 'DTS parametrlari va siyosat',
+                      icon: Icons.settings_suggest_rounded,
+                      color: const Color(0xFF64748B),
+                      onTap: () => widget.onNavigateTab(9),
+                    ),
+                    _buildManagementTile(
+                      title: 'Hisobotlar va Zaxira',
+                      desc: 'Viloyat CSV va JSON backup',
+                      icon: Icons.file_download_outlined,
+                      color: const Color(0xFF059669),
+                      onTap: () => widget.onNavigateTab(7),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== 9. SO'NGGI TIZIM FAOLLIGI VA AUDIT ====================
+  Widget _buildRecentActivitySection({
+    required AppProvider app,
+    required DateFormat df,
+  }) {
+    final recentLogs = app.auditLogs.take(5).toList();
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: const [
+                    Icon(
+                      Icons.history_rounded,
+                      color: AppColors.primary,
+                      size: 22,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      'So‘nggi Tizim Faolligi va Audit Qaydlari',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: () => widget.onNavigateTab(10), // Audit jurnali
+                  child: const Text(
+                    'Barcha yozuvlar →',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 18),
+            if (recentLogs.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Center(
+                  child: Text('Hozircha audit yozuvlari mavjud emas'),
+                ),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: recentLogs.length,
+                separatorBuilder: (_, _) => const Divider(height: 12),
+                itemBuilder: (context, i) {
+                  final log = recentLogs[i];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryLight,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            log.action,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    log.userFullName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    df.format(log.timestamp),
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                log.details,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== YORDAMCHI WIDGETLAR ====================
   Widget _buildStatCard({
     required String title,
     required String value,
@@ -718,7 +2531,7 @@ class AdminOverviewTab extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -735,7 +2548,7 @@ class AdminOverviewTab extends StatelessWidget {
               ),
               child: Icon(icon, color: color, size: 22),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -749,12 +2562,14 @@ class AdminOverviewTab extends StatelessWidget {
                       color: AppColors.textMuted,
                       letterSpacing: 0.5,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     value,
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
@@ -783,6 +2598,194 @@ class AdminOverviewTab extends StatelessWidget {
     );
   }
 
+  Widget _buildMonitoringTile({
+    required String title,
+    required String value,
+    required String description,
+    required Color color,
+    required Color bgColor,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 26),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: color,
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: AppColors.textMuted,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDomainCard({
+    required String title,
+    required String metric,
+    required String sub,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  metric,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+                Text(
+                  sub,
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    color: AppColors.textMuted,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildManagementTile({
+    required String title,
+    required String desc,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    desc,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      color: AppColors.textMuted,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded, size: 12, color: color),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildBadge({
     required String label,
     required Color color,
@@ -793,7 +2796,7 @@ class AdminOverviewTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Text(
         label,
@@ -801,43 +2804,6 @@ class AdminOverviewTab extends StatelessWidget {
           color: color,
           fontSize: 11,
           fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickActionBtn({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withValues(alpha: 0.15)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: 18),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
-              ),
-            ),
-            Icon(Icons.arrow_forward_ios, color: color, size: 12),
-          ],
         ),
       ),
     );

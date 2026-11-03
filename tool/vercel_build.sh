@@ -16,5 +16,7 @@ fi
 
 flutter config --enable-web
 flutter pub get
+# This URL is a public showcase, not a production system. Keep only synthetic
+# seed records and show an in-app warning against entering real child data.
 flutter build web --release --pwa-strategy=none --dart-define=DEMO_MODE=true
 

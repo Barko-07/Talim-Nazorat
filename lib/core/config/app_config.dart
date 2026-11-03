@@ -17,7 +17,9 @@ class AppConfig {
   static const adminEmail = String.fromEnvironment('ADMIN_EMAIL');
 
   /// Administrator parolining PBKDF2 xeshi (tool/hash_password.dart bilan olinadi)
-  static const adminPasswordHash = String.fromEnvironment('ADMIN_PASSWORD_HASH');
+  static const adminPasswordHash = String.fromEnvironment(
+    'ADMIN_PASSWORD_HASH',
+  );
 
   /// Administrator ismi (ixtiyoriy)
   static const adminFullName = String.fromEnvironment(
@@ -28,9 +30,11 @@ class AppConfig {
   /// Kelajakdagi server manzili (HTTPS bo'lishi shart)
   static const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
 
-  /// Taqdimot / Vercel demo rejimi (standart holatda yoqilgan — demo o'quvchilar va hisoblar ishlaydi).
-  /// Toza baza bilan chiqarish uchun: --dart-define=DEMO_MODE=false
-  static const demoMode = bool.fromEnvironment('DEMO_MODE', defaultValue: true);
+  /// Demo rejimi faqat aniq yoqilganda ishlaydi; release yig‘ilishlarda standart o‘chiq.
+  static const demoMode = bool.fromEnvironment(
+    'DEMO_MODE',
+    defaultValue: false,
+  );
 
   static bool get hasAdminBootstrap =>
       adminEmail.isNotEmpty && adminPasswordHash.isNotEmpty;
@@ -42,10 +46,12 @@ class AppConfig {
     if (adminEmail.isNotEmpty != adminPasswordHash.isNotEmpty) {
       issues.add('ADMIN_EMAIL va ADMIN_PASSWORD_HASH birga berilishi kerak.');
     }
-    if (adminEmail.isNotEmpty && !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(adminEmail)) {
+    if (adminEmail.isNotEmpty &&
+        !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(adminEmail)) {
       issues.add('ADMIN_EMAIL noto‘g‘ri formatda.');
     }
-    if (adminPasswordHash.isNotEmpty && !PasswordHasher.isHashed(adminPasswordHash)) {
+    if (adminPasswordHash.isNotEmpty &&
+        !PasswordHasher.isHashed(adminPasswordHash)) {
       issues.add(
         'ADMIN_PASSWORD_HASH ochiq parol emas, PBKDF2 xeshi bo‘lishi kerak (tool/hash_password.dart).',
       );

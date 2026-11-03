@@ -29,6 +29,7 @@ class ChildStatus {
 
   /// Biriktirilgan, lekin bola bilan hali ish qayd etmagan mutaxassislar (ismlari)
   final List<String> specialistsNotStarted;
+  final List<SpecialistWorkStatus> specialistWorkStatuses;
 
   const ChildStatus({
     required this.student,
@@ -37,6 +38,20 @@ class ChildStatus {
     required this.lastWorkAt,
     required this.assignedCount,
     required this.specialistsNotStarted,
+    required this.specialistWorkStatuses,
+  });
+}
+
+/// Bola uchun biriktirilgan мэргэжилтэн бүрийн ажил эхэлсэн эсэх, сүүлийн огноо.
+class SpecialistWorkStatus {
+  final UserModel specialist;
+  final DateTime? lastWorkAt;
+  final StatusColor color;
+
+  const SpecialistWorkStatus({
+    required this.specialist,
+    required this.lastWorkAt,
+    required this.color,
   });
 }
 
@@ -87,7 +102,9 @@ class ChildStatusService {
     List<MonitoringAlertModel>? unresolvedAlerts,
   }) {
     if (!_access.canViewStudent(viewer, student)) {
-      throw const PermissionDeniedException('bu o‘quvchi ma’lumotlarini ko‘rish huquqi yo‘q.');
+      throw const PermissionDeniedException(
+        'bu o‘quvchi ma’lumotlarini ko‘rish huquqi yo‘q.',
+      );
     }
     final today = now ?? DateTime.now();
     final red = <String>[];
@@ -99,31 +116,74 @@ class ChildStatusService {
     final lastWork = records.isEmpty ? null : records.last.at;
     final workedBy = records.map((r) => r.userId).toSet();
 
-    final assigned = student.assignedSpecialistIds
-        .map(_db.getUserById)
-        .whereType<UserModel>()
-        .where((u) => u.isActive && AccessControlService.childFacingRoles.contains(u.role))
-        .toList();
+    final assigned =
+        student.assignedSpecialistIds
+            .map(_db.getUserById)
+            .whereType<UserModel>()
+            .where(
+              (u) =>
+                  u.isActive &&
+                  AccessControlService.childFacingRoles.contains(u.role),
+            )
+            .toList();
+    final specialistStatuses =
+        assigned.map((specialist) {
+            final ownWork = records.where(
+              (record) => record.userId == specialist.id,
+            );
+            final lastWorkAt =
+                ownWork.isEmpty
+                    ? null
+                    : ownWork
+                        .map((record) => record.at)
+                        .reduce((a, b) => a.isAfter(b) ? a : b);
+            final color =
+                lastWorkAt == null
+                    ? StatusColor.red
+                    : today.difference(lastWorkAt).inDays > staleDays
+                    ? StatusColor.yellow
+                    : StatusColor.green;
+            return SpecialistWorkStatus(
+              specialist: specialist,
+              lastWorkAt: lastWorkAt,
+              color: color,
+            );
+          }).toList()
+          ..sort(
+            (a, b) => a.specialist.fullName.compareTo(b.specialist.fullName),
+          );
     final notStarted =
-        assigned.where((u) => !workedBy.contains(u.id)).map((u) => u.fullName).toList();
+        assigned
+            .where((u) => !workedBy.contains(u.id))
+            .map((u) => u.fullName)
+            .toList();
 
     if (assigned.isEmpty) {
       red.add('Bolaga hech qanday mutaxassis biriktirilmagan.');
     }
     if (lastWork == null) {
-      red.add('Bola bilan hali hech qanday ish (baholash, mashg‘ulot, kuzatuv, o‘lchov) qayd etilmagan.');
+      red.add(
+        'Bola bilan hali hech qanday ish (baholash, mashg‘ulot, kuzatuv, o‘lchov) qayd etilmagan.',
+      );
     } else {
       final days = today.difference(lastWork).inDays;
       if (days > staleDays) {
-        red.add('Oxirgi ish $days kun oldin qayd etilgan ($staleDays kundan ortiq).');
+        red.add(
+          'Oxirgi ish $days kun oldin qayd etilgan ($staleDays kundan ortiq).',
+        );
       }
     }
 
     // ---------- Dinamika ----------
-    final measurements = _db.getMeasurements(forUser: _systemViewer, studentId: student.id);
+    final measurements = _db.getMeasurements(
+      forUser: _systemViewer,
+      studentId: student.id,
+    );
     final byMetric = <String, List<DataPoint>>{};
     for (final m in measurements) {
-      byMetric.putIfAbsent(m.metricId, () => []).add(DataPoint(m.measuredAt, m.value));
+      byMetric
+          .putIfAbsent(m.metricId, () => [])
+          .add(DataPoint(m.measuredAt, m.value));
     }
     for (final entry in byMetric.entries) {
       final metric = _db.getProgressMetric(entry.key);
@@ -136,13 +196,21 @@ class ChildStatusService {
       _classify(r, metric.name, today, yellow, positives);
     }
 
-    final levels = _db.getSubjectLevels(forUser: _systemViewer, studentId: student.id);
+    final levels = _db.getSubjectLevels(
+      forUser: _systemViewer,
+      studentId: student.id,
+    );
     for (final subject in levels.map((l) => l.subject).toSet()) {
-      final points = levels
-          .where((l) => l.subject == subject)
-          .map((l) => DataPoint(l.assessedAt, l.confirmedGrade.toDouble()))
-          .toList();
-      final r = _dynamics.evaluate(points, absoluteThreshold: 0.5, unit: 'sinf darajasi');
+      final points =
+          levels
+              .where((l) => l.subject == subject)
+              .map((l) => DataPoint(l.assessedAt, l.confirmedGrade.toDouble()))
+              .toList();
+      final r = _dynamics.evaluate(
+        points,
+        absoluteThreshold: 0.5,
+        unit: 'sinf darajasi',
+      );
       _classify(r, '$subject (bilim darajasi)', today, yellow, positives);
     }
 
@@ -152,11 +220,20 @@ class ChildStatusService {
       _db.getSoundEntries(forUser: _systemViewer, studentId: student.id),
     );
     for (final p in soundProfile.sounds) {
-      _classify(p.dynamics, '"${p.sound.display}" tovushi', today, yellow, positives);
+      _classify(
+        p.dynamics,
+        '"${p.sound.display}" tovushi',
+        today,
+        yellow,
+        positives,
+      );
     }
 
     // ---------- ITR maqsadlari ----------
-    for (final plan in _db.getIepPlans(forUser: _systemViewer, studentId: student.id)) {
+    for (final plan in _db.getIepPlans(
+      forUser: _systemViewer,
+      studentId: student.id,
+    )) {
       for (final o in plan.objectives) {
         if (o.isCompleted) positives.add('ITR maqsadi bajarildi: ${o.title}.');
       }
@@ -171,7 +248,9 @@ class ChildStatusService {
     }
 
     if (notStarted.isNotEmpty && assigned.length > notStarted.length) {
-      yellow.add('Biriktirilgan, lekin hali ishlamagan: ${notStarted.join(', ')}.');
+      yellow.add(
+        'Biriktirilgan, lekin hali ishlamagan: ${notStarted.join(', ')}.',
+      );
     }
 
     // ---------- Yakuniy rang ----------
@@ -199,20 +278,26 @@ class ChildStatusService {
       lastWorkAt: lastWork,
       assignedCount: assigned.length,
       specialistsNotStarted: notStarted,
+      specialistWorkStatuses: specialistStatuses,
     );
   }
 
   /// Foydalanuvchi ko'ra oladigan barcha bolalar holati (qizil -> sariq -> yashil)
   MonitoringSummary summaryFor(UserModel viewer, {DateTime? now}) {
     final alerts = _db.getAlerts(forUser: _systemViewer, onlyUnresolved: true);
-    final statuses = _db
-        .getStudents(forUser: viewer)
-        .map((s) => statusFor(s, viewer, now: now, unresolvedAlerts: alerts))
-        .toList()
-      ..sort((a, b) {
-        final c = a.color.index.compareTo(b.color.index);
-        return c != 0 ? c : a.student.fullName.compareTo(b.student.fullName);
-      });
+    final statuses =
+        _db
+            .getStudents(forUser: viewer)
+            .map(
+              (s) => statusFor(s, viewer, now: now, unresolvedAlerts: alerts),
+            )
+            .toList()
+          ..sort((a, b) {
+            final c = a.color.index.compareTo(b.color.index);
+            return c != 0
+                ? c
+                : a.student.fullName.compareTo(b.student.fullName);
+          });
     return MonitoringSummary(statuses);
   }
 
@@ -228,7 +313,8 @@ class ChildStatusService {
       case DynamicsStatus.ineffective:
         yellow.add('$name — ${r.status.label}: ${r.reason}');
       case DynamicsStatus.growth:
-        final recent = r.latest != null &&
+        final recent =
+            r.latest != null &&
             today.difference(r.latest!.at).inDays <= positiveWindowDays;
         if (recent) positives.add('$name — ${r.status.label}: ${r.reason}');
       case DynamicsStatus.stable:

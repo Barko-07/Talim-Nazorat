@@ -16,10 +16,12 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   final LoginGuard _guard = LoginGuard();
   UserModel? _currentUser;
   bool _isLoading = true;
+  String? _initializationError;
 
   UserModel? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
   bool get isLoading => _isLoading;
+  String? get initializationError => _initializationError;
 
   UserRole get currentRole => _currentUser?.role ?? UserRole.reviewer;
 
@@ -55,7 +57,8 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     final prefs = await SharedPreferences.getInstance();
     final session = AuthSession.decode(prefs.getString(AuthSession.prefsKey));
     final fresh = _db.getUserById(cached.id);
-    final valid = session != null &&
+    final valid =
+        session != null &&
         session.isValid() &&
         session.userId == cached.id &&
         fresh != null &&
@@ -66,27 +69,38 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _checkSavedSession() async {
     _isLoading = true;
+    _initializationError = null;
     notifyListeners();
 
-    await _db.init();
-    _dummyHash.length; // soxta xeshni oldindan tayyorlash
+    try {
+      await _db.init();
+      _dummyHash.length; // soxta xeshni oldindan tayyorlash
 
-    final prefs = await SharedPreferences.getInstance();
-    // Eski versiyadagi muddatsiz sessiya kaliti bekor qilinadi — qayta kirish talab qilinadi
-    await prefs.remove('auth_user_id');
+      final prefs = await SharedPreferences.getInstance();
+      // Bazani o‘qigandan keyingina eskirgan sessiya kalitini bekor qilamiz.
+      await prefs.remove('auth_user_id');
 
-    final session = AuthSession.decode(prefs.getString(AuthSession.prefsKey));
-    final user = session == null ? null : _db.getUserById(session.userId);
-    if (session != null && session.isValid() && user != null && user.isActive) {
-      _currentUser = user;
-      await prefs.setString(AuthSession.prefsKey, session.touched().encode());
-    } else {
-      await prefs.remove(AuthSession.prefsKey);
+      final session = AuthSession.decode(prefs.getString(AuthSession.prefsKey));
+      final user = session == null ? null : _db.getUserById(session.userId);
+      if (session != null &&
+          session.isValid() &&
+          user != null &&
+          user.isActive) {
+        _currentUser = user;
+        await prefs.setString(AuthSession.prefsKey, session.touched().encode());
+      } else {
+        await prefs.remove(AuthSession.prefsKey);
+      }
+    } catch (_) {
+      _currentUser = null;
+      _initializationError = 'Local storage initialization failed.';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
+
+  Future<void> retryInitialization() => _checkSavedSession();
 
   /// Foydalanuvchi faolligini qayd etadi (faolliksiz vaqt shu paytdan hisoblanadi).
   /// Sessiya muddati tugagan bo'lsa — tizimdan chiqariladi.
@@ -98,7 +112,10 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     final session = AuthSession.decode(prefs.getString(AuthSession.prefsKey))!;
     final now = DateTime.now();
     if (now.difference(session.lastActive) > const Duration(minutes: 1)) {
-      await prefs.setString(AuthSession.prefsKey, session.touched(now: now).encode());
+      await prefs.setString(
+        AuthSession.prefsKey,
+        session.touched(now: now).encode(),
+      );
     }
   }
 
@@ -135,7 +152,8 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     final user = _db.findUserByEmailOrPhone(id);
     final accountKey = user == null ? null : LoginGuard.accountKey(user.id);
-    final locked = await _guard.lockRemaining(id) ??
+    final locked =
+        await _guard.lockRemaining(id) ??
         (accountKey == null ? null : await _guard.lockRemaining(accountKey));
     if (locked != null) {
       await _db.logSecurityEvent(
@@ -148,9 +166,10 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
       );
     }
 
-    final passwordOk = user != null
-        ? _db.verifyPassword(user, password.trim())
-        : (PasswordHasher.verify(password, _dummyHash) && false);
+    final passwordOk =
+        user != null
+            ? _db.verifyPassword(user, password.trim())
+            : (PasswordHasher.verify(password, _dummyHash) && false);
 
     if (user == null || !passwordOk) {
       var nowLocked = await _guard.registerFailure(id);
@@ -159,14 +178,18 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
       }
       await _db.logSecurityEvent(
         action: nowLocked ? 'SECURITY_LOCKOUT' : 'SECURITY_LOGIN_FAILED',
-        details: nowLocked
-            ? '${LoginGuard.maxFailures} ta noto‘g‘ri urinish — login vaqtincha bloklandi: ${LoginGuard.mask(id)}'
-            : 'Noto‘g‘ri login yoki parol: ${LoginGuard.mask(id)}',
+        details:
+            nowLocked
+                ? '${LoginGuard.maxFailures} ta noto‘g‘ri urinish — login vaqtincha bloklandi: ${LoginGuard.mask(id)}'
+                : 'Noto‘g‘ri login yoki parol: ${LoginGuard.mask(id)}',
         actor: user,
       );
       if (nowLocked) {
-        final wait = await _guard.lockRemaining(id) ??
-            (accountKey == null ? null : await _guard.lockRemaining(accountKey)) ??
+        final wait =
+            await _guard.lockRemaining(id) ??
+            (accountKey == null
+                ? null
+                : await _guard.lockRemaining(accountKey)) ??
             LoginGuard.lockDuration;
         return _fail(
           'Juda ko‘p noto‘g‘ri urinish. ${(wait.inSeconds / 60).ceil()} daqiqadan keyin qayta urinib ko‘ring.',
@@ -181,7 +204,9 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
         details: 'Bloklangan hisob bilan kirish urinishi',
         actor: user,
       );
-      return _fail('Ushbu hisob bloklangan. Iltimos, administrator bilan bog‘laning.');
+      return _fail(
+        'Ushbu hisob bloklangan. Iltimos, administrator bilan bog‘laning.',
+      );
     }
 
     // Soha mosligi faqat parol tasdiqlangandan keyin tekshiriladi (rol oshkor qilinmaydi)
@@ -193,7 +218,10 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (accountKey != null) await _guard.registerSuccess(accountKey);
     _currentUser = user;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(AuthSession.prefsKey, AuthSession.start(user.id).encode());
+    await prefs.setString(
+      AuthSession.prefsKey,
+      AuthSession.start(user.id).encode(),
+    );
 
     await _db.addAuditLog(
       userFullName: user.fullName,
@@ -263,9 +291,10 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
       experienceYears: experienceYears,
       institutionId:
           'inst_namangan_${district.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_').toLowerCase()}',
-      institutionName: institutionName.trim().isNotEmpty
-          ? institutionName.trim()
-          : '14-sonli inklyuziv maktab',
+      institutionName:
+          institutionName.trim().isNotEmpty
+              ? institutionName.trim()
+              : '14-sonli inklyuziv maktab',
       password: password.trim(),
       isActive: true,
     );
@@ -282,7 +311,10 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     // Bazadagi nusxa olinadi — xotirada ochiq parol saqlanmasin.
     _currentUser = _db.getUserById(newUser.id);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(AuthSession.prefsKey, AuthSession.start(newUser.id).encode());
+    await prefs.setString(
+      AuthSession.prefsKey,
+      AuthSession.start(newUser.id).encode(),
+    );
 
     _isLoading = false;
     notifyListeners();
@@ -335,7 +367,9 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     };
   }
 
-  Future<Map<String, dynamic>> requestPasswordRecovery(String identifier) async {
+  Future<Map<String, dynamic>> requestPasswordRecovery(
+    String identifier,
+  ) async {
     final cleaned = identifier.trim();
     if (cleaned.isEmpty) {
       return {

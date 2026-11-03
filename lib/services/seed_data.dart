@@ -16,8 +16,8 @@ import '../models/achievement_model.dart';
 import '../models/case_conference_model.dart';
 
 class SeedData {
-  /// Namunaviy hisoblar paroli. Faqat debug rejimida qabul qilinadi
-  /// (LocalDbService.verifyPassword) — release buildda ishlamaydi.
+  /// Namunaviy hisoblar paroli. Faqat debug yoki DEMO_MODE rejimida qabul qilinadi
+  /// (LocalDbService.verifyPassword); haqiqiy foydalanuvchi hisobi uchun emas.
   static const demoPassword = 'Parol2026!';
 
   static List<UserModel> get users => [
@@ -363,8 +363,10 @@ class SeedData {
       type: 'Sifatli pedagogik kuzatuv',
       category: 'Kognitiv va psixologik',
       title: 'Ixtiyoriy diqqat va o‘z-o‘zini boshqarish testi',
-      notes: 'Diqqat konsentratsiyasi 12 daqiqagacha cho‘zildi (ilgari 6-7 daqiqa edi).',
-      recommendations: 'Mashg‘ulotlar orasida qisqa tanaffus va vizual jadvaldan foydalanish.',
+      notes:
+          'Diqqat konsentratsiyasi 12 daqiqagacha cho‘zildi (ilgari 6-7 daqiqa edi).',
+      recommendations:
+          'Mashg‘ulotlar orasida qisqa tanaffus va vizual jadvaldan foydalanish.',
       totalScore: 65,
       maxScore: 100,
       previousScore: 65, // No change (Qoida 3)
@@ -403,7 +405,8 @@ class SeedData {
       topic: 'R tovushini bo‘g‘inlarda avtomatlashtirish',
       sessionType: 'Individual',
       goalDescription: 'R tovushini to‘g‘ri talaffuz qilish',
-      activities: 'Artikulyatsion gimnastika, piktogrammali kartalar bilan talaffuz mashqi.',
+      activities:
+          'Artikulyatsion gimnastika, piktogrammali kartalar bilan talaffuz mashqi.',
       observations: 'Bolada rag‘bat yuqori, topshiriqlarni mustaqil bajardi.',
       nextSteps: 'So‘zlar tarkibida qo‘llashga o‘tish.',
       attendanceConfirmed: true,
@@ -470,9 +473,12 @@ class SeedData {
       coordinatorId: 'user_coordinator',
       coordinatorName: 'Hakimova Zebo Erkinovna',
       status: 'Faol',
-      baselineSummary: 'Nutq tovushlari talaffuzida fonetik nuqsonlar bor, lug‘at boyligi yoshiga nisbatan chegaralangan.',
-      longTermGoals: 'Yil oxiriga qadar barcha tovushlarni to‘g‘ri artikulyatsiya qilish va o‘quv matnlarini tushunib o‘qish.',
-      supportStrategies: 'Haftasiga 2 marta individual logopedik mashg‘ulot, sinfda vizual jadvaldan foydalanish.',
+      baselineSummary:
+          'Nutq tovushlari talaffuzida fonetik nuqsonlar bor, lug‘at boyligi yoshiga nisbatan chegaralangan.',
+      longTermGoals:
+          'Yil oxiriga qadar barcha tovushlarni to‘g‘ri artikulyatsiya qilish va o‘quv matnlarini tushunib o‘qish.',
+      supportStrategies:
+          'Haftasiga 2 marta individual logopedik mashg‘ulot, sinfda vizual jadvaldan foydalanish.',
       objectives: [
         PlanObjectiveModel(
           id: 'obj_01',
@@ -485,7 +491,8 @@ class SeedData {
         ),
         PlanObjectiveModel(
           id: 'obj_02',
-          title: 'Qisqa ertak mazmunini 4-5 ta to‘liq gap bilan qayta so‘zlab berish',
+          title:
+              'Qisqa ertak mazmunini 4-5 ta to‘liq gap bilan qayta so‘zlab berish',
           domain: 'Nutq va muloqot',
           targetDate: DateTime(2026, 11, 20),
           status: 'Jarayonda',
@@ -536,7 +543,8 @@ class SeedData {
       toSpecialistType: 'Amaliyotchi psixolog',
       toSpecialistId: 'user_psychologist',
       toSpecialistName: 'Usmonova Dilnoza Anvarovna',
-      reason: 'Dars paytida giperaktivlik oshishi va e’tiborning tez chalg‘ishi kuzatildi.',
+      reason:
+          'Dars paytida giperaktivlik oshishi va e’tiborning tez chalg‘ishi kuzatildi.',
       priority: 'Rejali',
       status: 'Ko‘rib chiqilmoqda',
       createdAt: DateTime.now().subtract(const Duration(days: 5)),
@@ -551,7 +559,8 @@ class SeedData {
       toSpecialistType: 'Logoped-defektolog',
       toSpecialistId: 'user_speech',
       toSpecialistName: 'Sodiqov Bobur Mirzayevich',
-      reason: 'Nutq tovushlarini talaffuz qilishda artikulyatsion apparat tekshiruvi zarur.',
+      reason:
+          'Nutq tovushlarini talaffuz qilishda artikulyatsion apparat tekshiruvi zarur.',
       priority: 'Shoshilinch',
       status: 'Qabul qilindi',
       createdAt: DateTime.now().subtract(const Duration(days: 9)),
@@ -778,7 +787,8 @@ class SeedData {
       levelGrade: 2,
       standardId: 'dts_oqi_2_3',
       title: 'Qisqa hikoyani o‘qib, asosiy qahramon harakatini aytib berish',
-      description: '5-6 gapdan iborat hikoyani ovoz chiqarib o‘qish va savollarga javob berish.',
+      description:
+          '5-6 gapdan iborat hikoyani ovoz chiqarib o‘qish va savollarga javob berish.',
       assignedById: 'user_special_ed_teacher',
       assignedByName: 'Rahmonova Dildora Akmalovna',
       assignedAt: DateTime.now().subtract(const Duration(days: 4)),
@@ -893,7 +903,8 @@ class SeedData {
       studentId: 'student_01',
       category: AchievementCategory.skill,
       title: '«L» tovushini erkin nutqda xatosiz talaffuz qilishga erishdi',
-      description: 'Logopedik mashg‘ulotlar natijasida L tovushi to‘liq o‘zlashtirildi.',
+      description:
+          'Logopedik mashg‘ulotlar natijasida L tovushi to‘liq o‘zlashtirildi.',
       achievedAt: DateTime.now().subtract(const Duration(days: 5)),
       recordedById: 'user_speech',
       recordedByName: 'Sodiqov Bobur Mirzayevich',
@@ -902,8 +913,10 @@ class SeedData {
       id: 'ach_02',
       studentId: 'student_03',
       category: AchievementCategory.subject,
-      title: 'Matematikadan 3-sinf DTS darajasidagi 2 amalli masalalarni mustaqil yechdi',
-      description: 'Individual moslashtirilgan 3-sinf dasturi bo‘yicha yuqori natija.',
+      title:
+          'Matematikadan 3-sinf DTS darajasidagi 2 amalli masalalarni mustaqil yechdi',
+      description:
+          'Individual moslashtirilgan 3-sinf dasturi bo‘yicha yuqori natija.',
       achievedAt: DateTime.now().subtract(const Duration(days: 1)),
       recordedById: 'user_special_ed_teacher',
       recordedByName: 'Rahmonova Dildora Akmalovna',
@@ -915,7 +928,8 @@ class SeedData {
       id: 'cnf_01',
       studentId: 'student_01',
       studentName: 'Aliyev Jasur',
-      agenda: '1-chorak yakuni bo‘yicha logoped, psixolog va maxsus o‘qituvchi qo‘shma konsiliumi',
+      agenda:
+          '1-chorak yakuni bo‘yicha logoped, psixolog va maxsus o‘qituvchi qo‘shma konsiliumi',
       scheduledAt: DateTime.now().subtract(const Duration(days: 4)),
       convenedById: 'user_coordinator',
       convenedByName: 'Hakimova Zebo Erkinovna',
@@ -931,8 +945,10 @@ class SeedData {
           userId: 'user_speech',
           userName: 'Sodiqov Bobur Mirzayevich',
           role: 'Logoped-defektolog',
-          summary: 'L tovushi erkin nutqqa chiqdi, R tovushi so‘zlarda avtomatlashtirilmoqda.',
-          recommendations: 'Ota-onaga uyda har kuni 10 daqiqa artikulyatsion mashq berish.',
+          summary:
+              'L tovushi erkin nutqqa chiqdi, R tovushi so‘zlarda avtomatlashtirilmoqda.',
+          recommendations:
+              'Ota-onaga uyda har kuni 10 daqiqa artikulyatsion mashq berish.',
           at: DateTime.now().subtract(const Duration(days: 4)),
         ),
         ConferenceContribution(
@@ -940,7 +956,8 @@ class SeedData {
           userName: 'Usmonova Dilnoza Anvarovna',
           role: 'Amaliyotchi psixolog',
           summary: 'Diqqat davomiyligi 3 daqiqadan 8 daqiqagacha oshdi.',
-          recommendations: 'Darsda vizual jadval va rag‘bat stikerlarini davom ettirish.',
+          recommendations:
+              'Darsda vizual jadval va rag‘bat stikerlarini davom ettirish.',
           at: DateTime.now().subtract(const Duration(days: 4)),
         ),
       ],
@@ -949,7 +966,8 @@ class SeedData {
       decisions: [
         ConferenceDecision(
           id: 'dec_01',
-          text: 'R va L tovushlarini farqlash (differensiatsiya) mashqlarini boshlash',
+          text:
+              'R va L tovushlarini farqlash (differensiatsiya) mashqlarini boshlash',
           responsibleId: 'user_speech',
           responsibleName: 'Sodiqov Bobur Mirzayevich',
           dueDate: DateTime.now().add(const Duration(days: 14)),

@@ -23,3 +23,8 @@ class NotFoundException extends AppException {
 class ValidationException extends AppException {
   const ValidationException(super.message);
 }
+
+/// Mahalliy saqlash amali muvaffaqiyatsiz bo'lgan.
+class StorageWriteException extends AppException {
+  const StorageWriteException(super.message);
+}
