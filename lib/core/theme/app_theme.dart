@@ -7,7 +7,7 @@ import '../constants/app_colors.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
-    final baseFont = GoogleFonts.plusJakartaSans().fontFamily;
+    final baseFont = GoogleFonts.golosText().fontFamily;
 
     return ThemeData(
       useMaterial3: true,
@@ -15,6 +15,7 @@ class AppTheme {
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.background,
       fontFamily: baseFont,
+      textTheme: GoogleFonts.golosTextTextTheme(),
       splashFactory: InkRipple.splashFactory,
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
