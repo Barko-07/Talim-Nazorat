@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:talim_nazorat/models/user_model.dart';
 import 'package:talim_nazorat/providers/app_provider.dart';
 import 'package:talim_nazorat/providers/auth_provider.dart';
 import 'package:talim_nazorat/screens/admin/admin_portal_screen.dart';
@@ -195,9 +196,23 @@ void main() {
 
         final auth = AuthProvider();
         final app = AppProvider();
+        final db = LocalDbService();
+        final superAdmin = db.getUserById('user_admin')!;
+        await db.addUser(
+          UserModel(
+            id: 'test_inst_admin',
+            email: 'test.admin@talim.uz',
+            fullName: 'Test Direktor',
+            role: UserRole.institutionAdmin,
+            institutionId: 'inst_chortoq_5',
+            institutionName: '5-sonli umumiy o‘rta ta’lim maktabi',
+            password: 'TestPassword123!',
+          ),
+          byUser: superAdmin,
+        );
 
         // Login as Institution Admin (School Director)
-        await auth.login('maktab14.admin@talim.uz', SeedData.demoPassword);
+        await auth.login('test.admin@talim.uz', 'TestPassword123!');
         app.setCurrentUser(auth.currentUser);
 
         await tester.pumpWidget(

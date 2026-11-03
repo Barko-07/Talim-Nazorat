@@ -25,23 +25,6 @@
         "assignedStudentIds": []
       },
       {
-        "id": "user_director",
-        "email": "maktab14.admin@talim.uz",
-        "fullName": "Karimova Nargiza Shuhratovna",
-        "role": "INSTITUTION_ADMIN",
-        "region": "Namangan viloyati",
-        "district": "Chortoq tumani",
-        "institutionId": "inst_chortoq_5",
-        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
-        "phone": "+998 91 234-56-78",
-        "specialization": "Maktab direktori",
-        "qualificationCategory": "Mutaxassis",
-        "experienceYears": 3,
-        "password": "",
-        "isActive": true,
-        "assignedStudentIds": []
-      },
-      {
         "id": "user_coordinator",
         "email": "koordinator@talim.uz",
         "fullName": "Hakimova Zebo Erkinovna",
@@ -110,23 +93,6 @@
         "assignedStudentIds": []
       },
       {
-        "id": "user_special_ed_teacher",
-        "email": "maxsus.oqituvchi@talim.uz",
-        "fullName": "Rahmonova Dildora Akmalovna",
-        "role": "SPECIAL_ED_TEACHER",
-        "region": "Namangan viloyati",
-        "district": "Chortoq tumani",
-        "institutionId": "inst_chortoq_5",
-        "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
-        "phone": "+998 99 234-12-34",
-        "specialization": "Maxsus ta’lim o‘qituvchisi (boshlang‘ich sinflar)",
-        "qualificationCategory": "Mutaxassis",
-        "experienceYears": 3,
-        "password": "",
-        "isActive": true,
-        "assignedStudentIds": []
-      },
-      {
         "id": "user_teacher",
         "email": "oqituvchi@talim.uz",
         "fullName": "Nazarov Farrux Odilovich",
@@ -136,7 +102,7 @@
         "institutionId": "inst_chortoq_5",
         "institutionName": "5-sonli umumiy o‘rta ta’lim maktabi",
         "phone": "+998 97 678-90-12",
-        "specialization": "Inklyuziv sinf rahbari",
+        "specialization": "Inklyuziv sinf rahbari va fan o‘qituvchisi",
         "qualificationCategory": "Mutaxassis",
         "experienceYears": 3,
         "password": "",
@@ -195,7 +161,7 @@
         "coordinatorName": "Hakimova Zebo Erkinovna",
         "deactivationReason": null,
         "deactivatedAt": null,
-        "createdAt": "2026-07-05T18:56:16.209904",
+        "createdAt": "2026-07-06T15:27:05.404982",
         "accessProfile": null,
         "domainLevels": []
       },
@@ -232,7 +198,7 @@
         "coordinatorName": "Hakimova Zebo Erkinovna",
         "deactivationReason": null,
         "deactivatedAt": null,
-        "createdAt": "2026-08-04T18:56:16.209904",
+        "createdAt": "2026-08-05T15:27:05.404982",
         "accessProfile": null,
         "domainLevels": []
       },
@@ -269,7 +235,7 @@
         "coordinatorName": "Hakimova Zebo Erkinovna",
         "deactivationReason": null,
         "deactivatedAt": null,
-        "createdAt": "2026-06-05T18:56:16.209904",
+        "createdAt": "2026-06-06T15:27:05.404982",
         "accessProfile": null,
         "domainLevels": []
       },
@@ -306,7 +272,7 @@
         "coordinatorName": "Hakimova Zebo Erkinovna",
         "deactivationReason": null,
         "deactivatedAt": null,
-        "createdAt": "2026-09-18T18:56:16.209904",
+        "createdAt": "2026-09-19T15:27:05.404982",
         "accessProfile": null,
         "domainLevels": []
       },
@@ -344,7 +310,7 @@
         "coordinatorName": "Hakimova Zebo Erkinovna",
         "deactivationReason": null,
         "deactivatedAt": null,
-        "createdAt": "2026-07-25T18:56:16.209904",
+        "createdAt": "2026-07-26T15:27:05.405993",
         "accessProfile": null,
         "domainLevels": []
       },
@@ -381,7 +347,7 @@
         "coordinatorName": "Hakimova Zebo Erkinovna",
         "deactivationReason": null,
         "deactivatedAt": null,
-        "createdAt": "2026-08-14T18:56:16.209904",
+        "createdAt": "2026-08-15T15:27:05.405993",
         "accessProfile": null,
         "domainLevels": []
       }
@@ -394,7 +360,7 @@
         "specialistId": "user_speech",
         "specialistName": "Sodiqov Bobur Mirzayevich",
         "specialistRole": "Logoped-defektolog",
-        "assessmentDate": "2026-10-19T18:56:16.210885",
+        "assessmentDate": "2026-10-20T15:27:05.405993",
         "type": "Standart balli (Rubrika)",
         "category": "Nutq va muloqot",
         "title": "Fonematik idrok va tovush talaffuzi diagnostikasi",
@@ -429,7 +395,7 @@
         "generalConclusion": null,
         "domainScores": null,
         "followUpAction": null,
-        "reviewDate": "2026-12-02T18:56:16.210885",
+        "reviewDate": "2026-12-03T15:27:05.405993",
         "isDraft": false,
         "updatedAt": null,
         "createdAt": null
@@ -441,7 +407,7 @@
         "specialistId": "user_psychologist",
         "specialistName": "Usmonova Dilnoza Anvarovna",
         "specialistRole": "Amaliyotchi psixolog",
-        "assessmentDate": "2026-10-25T18:56:16.210885",
+        "assessmentDate": "2026-10-26T15:27:05.405993",
         "type": "Sifatli pedagogik kuzatuv",
         "category": "Kognitiv va psixologik",
         "title": "Ixtiyoriy diqqat va o‘z-o‘zini boshqarish testi",
@@ -476,7 +442,7 @@
         "generalConclusion": null,
         "domainScores": null,
         "followUpAction": null,
-        "reviewDate": "2026-11-17T18:56:16.210885",
+        "reviewDate": "2026-11-18T15:27:05.405993",
         "isDraft": false,
         "updatedAt": null,
         "createdAt": null
@@ -490,7 +456,7 @@
         "specialistId": "user_speech",
         "specialistName": "Sodiqov Bobur Mirzayevich",
         "specialistRole": "Logoped-defektolog",
-        "scheduledAt": "2026-10-31T15:56:16.211399",
+        "scheduledAt": "2026-11-01T12:27:05.405993",
         "durationMinutes": 45,
         "status": "Bajarildi",
         "topic": "R tovushini bo‘g‘inlarda avtomatlashtirish",
@@ -508,7 +474,7 @@
         "specialistId": "user_speech",
         "specialistName": "Sodiqov Bobur Mirzayevich",
         "specialistRole": "Logoped-defektolog",
-        "scheduledAt": "2026-10-30T18:56:16.211399",
+        "scheduledAt": "2026-10-31T15:27:05.405993",
         "durationMinutes": 45,
         "status": "Qatnashmadi",
         "topic": "Sensor integratsiya va nutq nafasi",
@@ -526,7 +492,7 @@
         "specialistId": "user_speech",
         "specialistName": "Sodiqov Bobur Mirzayevich",
         "specialistRole": "Logoped-defektolog",
-        "scheduledAt": "2026-11-01T18:56:16.211399",
+        "scheduledAt": "2026-11-02T15:27:05.405993",
         "durationMinutes": 45,
         "status": "Qatnashmadi",
         "topic": "Tovushlar talaffuzini mustahkamlash",
@@ -544,7 +510,7 @@
         "specialistId": "user_psychologist",
         "specialistName": "Usmonova Dilnoza Anvarovna",
         "specialistRole": "Amaliyotchi psixolog",
-        "scheduledAt": "2026-11-03T20:56:16.211399",
+        "scheduledAt": "2026-11-04T17:27:05.405993",
         "durationMinutes": 40,
         "status": "Rejalashtirilgan",
         "topic": "Diqqatni jamlash bo‘yicha korreksion o‘yinlar",
@@ -644,12 +610,13 @@
         "isResolved": false,
         "resolvedNotes": null,
         "resolvedAt": null,
-        "createdAt": "2026-11-01T18:56:16.211399"
+        "createdAt": "2026-11-02T15:27:05.406993"
       }
     ],
     "referrals": [
       {
         "id": "ref_01",
+        "sourceAssessmentId": null,
         "studentId": "student_02",
         "studentName": "Rustamova Malika",
         "fromSpecialistId": "user_teacher",
@@ -665,11 +632,12 @@
         "outcomeNotes": null,
         "followUpAction": null,
         "followUpDate": null,
-        "createdAt": "2026-10-28T18:56:16.211399",
+        "createdAt": "2026-10-29T15:27:05.406993",
         "updatedAt": null
       },
       {
         "id": "ref_02",
+        "sourceAssessmentId": null,
         "studentId": "student_04",
         "studentName": "Sobirova Zarnigor",
         "fromSpecialistId": "user_psychologist",
@@ -685,7 +653,7 @@
         "outcomeNotes": null,
         "followUpAction": null,
         "followUpDate": null,
-        "createdAt": "2026-10-24T18:56:16.211399",
+        "createdAt": "2026-10-25T15:27:05.406993",
         "updatedAt": null
       }
     ],
@@ -697,14 +665,14 @@
         "studentGrade": "3-A",
         "psychologistId": "user_psychologist",
         "psychologistName": "Usmonova Dilnoza (Psixolog)",
-        "date": "2026-10-31T18:56:16.212427",
+        "date": "2026-11-01T15:27:05.406993",
         "category": "Darsdagi xulq-atvor",
         "observationText": "Dars boshida diqqati barqaror bo‘ldi. Rangli kartochkalar bilan ishlashda qiziqish ko‘rsatdi. O‘qituvchining ko‘rsatmalariga ijobiy javob berdi.",
         "emotionalState": "Barqaror / Ijobiy",
         "triggerOrContext": "Yangi mavzu tushuntirilganda",
         "recommendationOrAction": "Vizual qo‘llanmalar orqali rag‘batlantirishni davom ettirish.",
         "isConfidential": true,
-        "createdAt": "2026-10-31T18:56:16.212427"
+        "createdAt": "2026-11-01T15:27:05.406993"
       },
       {
         "id": "obs_02",
@@ -713,14 +681,14 @@
         "studentGrade": "2-B",
         "psychologistId": "user_psychologist",
         "psychologistName": "Usmonova Dilnoza (Psixolog)",
-        "date": "2026-10-30T18:56:16.212427",
+        "date": "2026-10-31T15:27:05.406993",
         "category": "Hissiy holat (Affektiv)",
         "observationText": "Vazifani bajarishda xato qilishdan qo‘rqish belgilari kuzatildi. Barmoqlarini asabiy qisirlatish holati bo‘ldi.",
         "emotionalState": "Xavotirli",
         "triggerOrContext": "Yozma mustaqil ish topshirilganda",
         "recommendationOrAction": "Xavotirni kamaytiruvchi nafas mashqlari o‘rgatildi, o‘qituvchiga kichik hajmli topshiriqlar berish tavsiya qilindi.",
         "isConfidential": true,
-        "createdAt": "2026-10-30T18:56:16.212427"
+        "createdAt": "2026-10-31T15:27:05.406993"
       },
       {
         "id": "obs_03",
@@ -729,14 +697,14 @@
         "studentGrade": "1-A",
         "psychologistId": "user_psychologist",
         "psychologistName": "Usmonova Dilnoza (Psixolog)",
-        "date": "2026-10-28T18:56:16.212427",
+        "date": "2026-10-29T15:27:05.406993",
         "category": "Tengdoshlar bilan muloqot",
         "observationText": "Tengdoshlari bilan muloqotga kirishishga harakat qildi, biroq o‘yin qoidalarini oxirigacha kutishda sabrsizlik qildi.",
         "emotionalState": "Tirishqoq / Chalg‘uvchan",
         "triggerOrContext": "Tanaffus paytida jamoaviy o‘yinda",
         "recommendationOrAction": "Rolli ijtimoiy moslashuv o‘yinlarida psixolog nazoratida qatnashtirish.",
         "isConfidential": true,
-        "createdAt": "2026-10-28T18:56:16.212427"
+        "createdAt": "2026-10-29T15:27:05.406993"
       },
       {
         "id": "obs_04",
@@ -745,14 +713,14 @@
         "studentGrade": "3-A",
         "psychologistId": "user_psychologist",
         "psychologistName": "Usmonova Dilnoza (Psixolog)",
-        "date": "2026-11-01T18:56:16.212427",
+        "date": "2026-11-02T15:27:05.406993",
         "category": "Kognitiv faollik va diqqat",
         "observationText": "Landolt halqalari bo‘yicha diqqat tezligi 15% ga yaxshilandi. Chalg‘ish soni kamaydi.",
         "emotionalState": "Barqaror / Ijobiy",
         "triggerOrContext": "Korreksion individual mashg‘ulotda",
         "recommendationOrAction": "Mantiqiy ketma-ketlik vazifalarini bosqichma-bosqich murakkablashtirish.",
         "isConfidential": true,
-        "createdAt": "2026-11-01T18:56:16.212427"
+        "createdAt": "2026-11-02T15:27:05.406993"
       }
     ],
     "questions": [
@@ -2931,9 +2899,9 @@
         },
         "suggestedGrade": 3,
         "confirmedGrade": 3,
-        "assessedById": "user_special_ed_teacher",
-        "assessedByName": "Rahmonova Dildora Akmalovna",
-        "assessedAt": "2026-10-27T18:56:16.216983",
+        "assessedById": "user_teacher",
+        "assessedByName": "Nazarov Farrux Odilovich",
+        "assessedAt": "2026-10-28T15:27:05.409993",
         "notes": "Rasmiy 4-sinf o‘quvchisi, biroq DTS bo‘yicha 3-sinf matematika dasturini barqaror o‘zlashtirmoqda. Individual 3-sinf darajasida o‘qitiladi."
       },
       {
@@ -2952,9 +2920,9 @@
         },
         "suggestedGrade": 2,
         "confirmedGrade": 2,
-        "assessedById": "user_special_ed_teacher",
-        "assessedByName": "Rahmonova Dildora Akmalovna",
-        "assessedAt": "2026-10-23T18:56:16.217366",
+        "assessedById": "user_teacher",
+        "assessedByName": "Nazarov Farrux Odilovich",
+        "assessedAt": "2026-10-24T15:27:05.409993",
         "notes": "O‘qish va adabiyotdan 2-sinf me’yorlariga mos; bo‘g‘inlab va so‘zlab o‘qish tezligi ustida ishlanmoqda."
       },
       {
@@ -2970,9 +2938,9 @@
         },
         "suggestedGrade": 1,
         "confirmedGrade": 1,
-        "assessedById": "user_special_ed_teacher",
-        "assessedByName": "Rahmonova Dildora Akmalovna",
-        "assessedAt": "2026-10-21T18:56:16.217366",
+        "assessedById": "user_teacher",
+        "assessedByName": "Nazarov Farrux Odilovich",
+        "assessedAt": "2026-10-22T15:27:05.409993",
         "notes": "Vizual kartochkalar yordamida 1-sinf matematika dasturi (20 ichida qo‘shish va ayirish) asosida individual ishlanmoqda."
       }
     ],
@@ -2985,13 +2953,13 @@
         "standardId": "dts_mat_3_3",
         "title": "Matnli masalalarni 2 amal bilan yechish (3-sinf DTS)",
         "description": "Kattalashtirilgan shriftli kartochkada berilgan 3 ta matnli masalani chizma yordamida yechish.",
-        "assignedById": "user_special_ed_teacher",
-        "assignedByName": "Rahmonova Dildora Akmalovna",
-        "assignedAt": "2026-10-28T18:56:16.217978",
-        "dueDate": "2026-11-09T18:56:16.217978",
+        "assignedById": "user_teacher",
+        "assignedByName": "Nazarov Farrux Odilovich",
+        "assignedAt": "2026-10-29T15:27:05.412507",
+        "dueDate": "2026-11-10T15:27:05.412507",
         "result": "mastered",
         "resultNote": "3 ta masaladan 3 tasini mustaqil to‘g‘ri yechdi.",
-        "completedAt": "2026-11-01T18:56:16.217978"
+        "completedAt": "2026-11-02T15:27:05.412507"
       },
       {
         "id": "tsk_02",
@@ -3001,10 +2969,10 @@
         "standardId": "dts_oqi_2_3",
         "title": "Qisqa hikoyani o‘qib, asosiy qahramon harakatini aytib berish",
         "description": "5-6 gapdan iborat hikoyani ovoz chiqarib o‘qish va savollarga javob berish.",
-        "assignedById": "user_special_ed_teacher",
-        "assignedByName": "Rahmonova Dildora Akmalovna",
-        "assignedAt": "2026-10-29T18:56:16.217978",
-        "dueDate": "2026-11-07T18:56:16.217978",
+        "assignedById": "user_teacher",
+        "assignedByName": "Nazarov Farrux Odilovich",
+        "assignedAt": "2026-10-30T15:27:05.412507",
+        "dueDate": "2026-11-08T15:27:05.412507",
         "result": null,
         "resultNote": null,
         "completedAt": null
@@ -3088,7 +3056,7 @@
         "studentId": "student_01",
         "metricId": "metric_attention_minutes",
         "value": 3.0,
-        "measuredAt": "2026-09-28T18:56:16.218987",
+        "measuredAt": "2026-09-29T15:27:05.413989",
         "recordedById": "user_psychologist",
         "recordedByName": "Usmonova Dilnoza Anvarovna",
         "note": "Boshlang‘ich holat: 3 daqiqadan so‘ng chalg‘ish kuzatildi.",
@@ -3099,7 +3067,7 @@
         "studentId": "student_01",
         "metricId": "metric_attention_minutes",
         "value": 5.0,
-        "measuredAt": "2026-10-15T18:56:16.218987",
+        "measuredAt": "2026-10-16T15:27:05.413989",
         "recordedById": "user_psychologist",
         "recordedByName": "Usmonova Dilnoza Anvarovna",
         "note": "Vizual taymer qo‘llanganda 5 daqiqagacha barqaror ishladi.",
@@ -3110,7 +3078,7 @@
         "studentId": "student_01",
         "metricId": "metric_attention_minutes",
         "value": 8.0,
-        "measuredAt": "2026-10-30T18:56:16.218987",
+        "measuredAt": "2026-10-31T15:27:05.413989",
         "recordedById": "user_psychologist",
         "recordedByName": "Usmonova Dilnoza Anvarovna",
         "note": "O‘sish: 8 daqiqa davomida mustaqil topshiriq bajardi.",
@@ -3121,9 +3089,9 @@
         "studentId": "student_01",
         "metricId": "metric_reading_wpm",
         "value": 18.0,
-        "measuredAt": "2026-10-03T18:56:16.218987",
-        "recordedById": "user_special_ed_teacher",
-        "recordedByName": "Rahmonova Dildora Akmalovna",
+        "measuredAt": "2026-10-04T15:27:05.413989",
+        "recordedById": "user_teacher",
+        "recordedByName": "Nazarov Farrux Odilovich",
         "note": "Bo‘g‘inlab o‘qish: 18 so‘z/daqiqa.",
         "iepObjectiveId": null
       },
@@ -3132,9 +3100,9 @@
         "studentId": "student_01",
         "metricId": "metric_reading_wpm",
         "value": 29.0,
-        "measuredAt": "2026-10-29T18:56:16.218987",
-        "recordedById": "user_special_ed_teacher",
-        "recordedByName": "Rahmonova Dildora Akmalovna",
+        "measuredAt": "2026-10-30T15:27:05.413989",
+        "recordedById": "user_teacher",
+        "recordedByName": "Nazarov Farrux Odilovich",
         "note": "So‘zlab o‘qishga o‘tdi: 29 so‘z/daqiqa.",
         "iepObjectiveId": null
       }
@@ -3151,7 +3119,7 @@
         "note": "R tovushini L ga almashtiradi, artikulyatsion mashqlar boshlandi.",
         "recordedById": "user_speech",
         "recordedByName": "Sodiqov Bobur Mirzayevich",
-        "recordedAt": "2026-10-05T18:56:16.219982"
+        "recordedAt": "2026-10-06T15:27:05.414517"
       },
       {
         "id": "snd_02",
@@ -3164,7 +3132,7 @@
         "note": "Titrash hosil qilindi, R tovushi alohida qo‘yildi.",
         "recordedById": "user_speech",
         "recordedByName": "Sodiqov Bobur Mirzayevich",
-        "recordedAt": "2026-10-19T18:56:16.219982"
+        "recordedAt": "2026-10-20T15:27:05.414517"
       },
       {
         "id": "snd_03",
@@ -3177,7 +3145,7 @@
         "note": "So‘z boshida va o‘rtasida R tovushini to‘g‘ri talaffuz qilmoqda.",
         "recordedById": "user_speech",
         "recordedByName": "Sodiqov Bobur Mirzayevich",
-        "recordedAt": "2026-10-31T18:56:16.219982"
+        "recordedAt": "2026-11-01T15:27:05.414517"
       },
       {
         "id": "snd_04",
@@ -3190,7 +3158,7 @@
         "note": "L tovushi erkin nutqda to‘liq avtomatlashtirildi!",
         "recordedById": "user_speech",
         "recordedByName": "Sodiqov Bobur Mirzayevich",
-        "recordedAt": "2026-10-28T18:56:16.219982"
+        "recordedAt": "2026-10-29T15:27:05.414517"
       }
     ],
     "achievements": [
@@ -3200,7 +3168,7 @@
         "category": "skill",
         "title": "«L» tovushini erkin nutqda xatosiz talaffuz qilishga erishdi",
         "description": "Logopedik mashg‘ulotlar natijasida L tovushi to‘liq o‘zlashtirildi.",
-        "achievedAt": "2026-10-28T18:56:16.219982",
+        "achievedAt": "2026-10-29T15:27:05.414517",
         "recordedById": "user_speech",
         "recordedByName": "Sodiqov Bobur Mirzayevich"
       },
@@ -3210,9 +3178,9 @@
         "category": "subject",
         "title": "Matematikadan 3-sinf DTS darajasidagi 2 amalli masalalarni mustaqil yechdi",
         "description": "Individual moslashtirilgan 3-sinf dasturi bo‘yicha yuqori natija.",
-        "achievedAt": "2026-11-01T18:56:16.221018",
-        "recordedById": "user_special_ed_teacher",
-        "recordedByName": "Rahmonova Dildora Akmalovna"
+        "achievedAt": "2026-11-02T15:27:05.414517",
+        "recordedById": "user_teacher",
+        "recordedByName": "Nazarov Farrux Odilovich"
       }
     ],
     "conferences": [
@@ -3221,14 +3189,14 @@
         "studentId": "student_01",
         "studentName": "Aliyev Jasur",
         "agenda": "1-chorak yakuni bo‘yicha logoped, psixolog va maxsus o‘qituvchi qo‘shma konsiliumi",
-        "scheduledAt": "2026-10-29T18:56:16.221982",
+        "scheduledAt": "2026-10-30T15:27:05.417042",
         "convenedById": "user_coordinator",
         "convenedByName": "Hakimova Zebo Erkinovna",
         "participantIds": [
           "user_coordinator",
           "user_speech",
           "user_psychologist",
-          "user_special_ed_teacher"
+          "user_teacher"
         ],
         "status": "held",
         "contributions": [
@@ -3238,7 +3206,7 @@
             "role": "Logoped-defektolog",
             "summary": "L tovushi erkin nutqqa chiqdi, R tovushi so‘zlarda avtomatlashtirilmoqda.",
             "recommendations": "Ota-onaga uyda har kuni 10 daqiqa artikulyatsion mashq berish.",
-            "at": "2026-10-29T18:56:16.221982"
+            "at": "2026-10-30T15:27:05.417042"
           },
           {
             "userId": "user_psychologist",
@@ -3246,7 +3214,7 @@
             "role": "Amaliyotchi psixolog",
             "summary": "Diqqat davomiyligi 3 daqiqadan 8 daqiqagacha oshdi.",
             "recommendations": "Darsda vizual jadval va rag‘bat stikerlarini davom ettirish.",
-            "at": "2026-10-29T18:56:16.222980"
+            "at": "2026-10-30T15:27:05.417042"
           }
         ],
         "conclusion": "Barcha yo‘nalishlarda ijobiy dinamika tasdiqlandi. O‘qish fanidan 2-sinf darajasidan 3-sinf DTS talablariga bosqichma-bosqich o‘tkazish tavsiya etildi.",
@@ -3256,7 +3224,7 @@
             "text": "R va L tovushlarini farqlash (differensiatsiya) mashqlarini boshlash",
             "responsibleId": "user_speech",
             "responsibleName": "Sodiqov Bobur Mirzayevich",
-            "dueDate": "2026-11-16T18:56:16.222980",
+            "dueDate": "2026-11-17T15:27:05.417042",
             "isDone": false,
             "doneAt": null
           }
@@ -3272,7 +3240,7 @@
         "action": "LOGIN",
         "entity": "Auth",
         "details": "Tizimga muvaffaqiyatli kirildi",
-        "timestamp": "2026-11-02T16:56:16.224023"
+        "timestamp": "2026-11-03T13:27:05.419122"
       },
       {
         "id": "aud_02",
@@ -3281,7 +3249,7 @@
         "action": "CREATE",
         "entity": "Assessment",
         "details": "Aliyev Jasur uchun fonematik diagnostika saqlandi",
-        "timestamp": "2026-10-31T18:56:16.224023"
+        "timestamp": "2026-11-01T15:27:05.419122"
       }
     ],
     "notifications": [
@@ -3295,7 +3263,7 @@
         "relatedStudentId": "student_04",
         "relatedStudentName": "Sobirova Zarnigor",
         "isRead": false,
-        "createdAt": "2026-11-02T14:56:16.224023"
+        "createdAt": "2026-11-03T11:27:05.419122"
       },
       {
         "id": "notif_02",
@@ -3307,7 +3275,7 @@
         "relatedStudentId": "student_01",
         "relatedStudentName": "Aliyev Jasur",
         "isRead": true,
-        "createdAt": "2026-11-01T18:56:16.225035"
+        "createdAt": "2026-11-02T15:27:05.419122"
       }
     ]
   }

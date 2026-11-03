@@ -117,7 +117,7 @@ void main() {
     );
     final decoded = jsonDecode(backupJson) as Map<String, dynamic>;
     final tables = decoded['tables'] as Map<String, dynamic>;
-    expect((tables['users'] as List).length, greaterThanOrEqualTo(9));
+    expect((tables['users'] as List).length, greaterThanOrEqualTo(7));
     expect((tables['students'] as List).length, greaterThanOrEqualTo(6));
     expect((tables['questions'] as List).isNotEmpty, true);
     expect((tables['curriculumStandards'] as List).isNotEmpty, true);
@@ -127,10 +127,8 @@ void main() {
     expect((tables['soundEntries'] as List).isNotEmpty, true);
 
     final backupFile = File('backups/database_backup.json');
-    if (!backupFile.existsSync()) {
-      backupFile.parent.createSync(recursive: true);
-      backupFile.writeAsStringSync(backupJson);
-    }
+    backupFile.parent.createSync(recursive: true);
+    backupFile.writeAsStringSync(backupJson);
     expect(backupFile.existsSync(), true);
   });
 }

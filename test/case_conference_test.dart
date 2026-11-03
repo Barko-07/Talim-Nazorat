@@ -90,7 +90,7 @@ void main() {
     await expectLater(db.scheduleConference(draft(participants: [psy.id]), byUser: coordinator),
         throwsA(isA<ValidationException>()));
     await expectLater(
-        db.scheduleConference(draft(participants: [psy.id, 'user_director']), byUser: coordinator),
+        db.scheduleConference(draft(participants: [psy.id, 'user_admin']), byUser: coordinator),
         throwsA(isA<ValidationException>()));
     await expectLater(db.scheduleConference(draft(agenda: ' '), byUser: coordinator),
         throwsA(isA<ValidationException>()));

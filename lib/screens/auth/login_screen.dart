@@ -1121,11 +1121,6 @@ class _LoginScreenState extends State<LoginScreen>
       (UserRole.psychologist, 'Amaliyotchi psixolog', LucideIcons.idCard),
       (UserRole.speechTherapist, 'Logoped-defektolog', LucideIcons.mic),
       (UserRole.specialEducation, 'Defektolog', LucideIcons.shield),
-      (
-        UserRole.specialEdTeacher,
-        'Maxsus o‘qituvchi',
-        LucideIcons.graduationCap,
-      ),
       (UserRole.teacher, 'Fan o‘qituvchisi', LucideIcons.bookOpen),
     ];
 

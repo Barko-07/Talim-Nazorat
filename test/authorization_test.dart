@@ -73,9 +73,9 @@ void main() {
     });
 
     test('nobody can block or delete themselves', () async {
-      final director = db.getUserById('user_director')!;
+      final admin = db.getUserById('user_admin')!;
       await expectLater(
-        db.toggleUserActive(director.id, false, byUser: director),
+        db.toggleUserActive(admin.id, false, byUser: admin),
         throwsA(isA<ValidationException>()),
       );
     });
@@ -169,7 +169,7 @@ void main() {
 
     test('admins and reviewers cannot be assigned as specialists', () async {
       await expectLater(
-        db.assignSpecialistToStudent('student_04', 'user_director', byUser: coordinator),
+        db.assignSpecialistToStudent('student_04', 'user_admin', byUser: coordinator),
         throwsA(isA<ValidationException>()),
       );
     });

@@ -190,7 +190,7 @@ void main() {
       expect(log.userFullName, psy.fullName);
       // Tizim bo'ylab hodisalar — faqat tizim administratoriga
       expect(db.getSecurityEvents(forUser: db.getUserById('user_admin')!), isNotEmpty);
-      expect(db.getSecurityEvents(forUser: db.getUserById('user_director')!), isEmpty);
+      expect(db.getSecurityEvents(forUser: db.getUserById('user_coordinator')!), isEmpty);
       expect(db.getSecurityEvents(forUser: psy), isEmpty);
     });
 
@@ -198,8 +198,8 @@ void main() {
       final app = AppProvider();
       final teacher = db.getUserById('user_teacher')!;
       app.setCurrentUser(teacher); // eski nusxa xotirada
-      final director = db.getUserById('user_director')!;
-      await db.toggleUserActive(teacher.id, false, byUser: director);
+      final admin = db.getUserById('user_admin')!;
+      await db.toggleUserActive(teacher.id, false, byUser: admin);
       expect(app.students, isEmpty);
       expect(() => app.childStatus(db.getStudentById('student_02')!),
           throwsA(isA<PermissionDeniedException>()));
@@ -252,7 +252,7 @@ void main() {
       final app = AppProvider();
       final psy = db.getUserById('user_psychologist')!;
       app.setCurrentUser(psy);
-      await db.toggleUserActive(psy.id, false, byUser: db.getUserById('user_director')!);
+      await db.toggleUserActive(psy.id, false, byUser: db.getUserById('user_admin')!);
       final staleCopy = psy; // ekran saqlab qolgan eski nusxa (isActive: true)
       await expectLater(
         app.addObservation(

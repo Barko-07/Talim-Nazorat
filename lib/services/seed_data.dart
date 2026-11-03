@@ -35,18 +35,6 @@ class SeedData {
       specialization: 'Viloyat ta’lim koordinatori',
     ),
     UserModel(
-      id: 'user_director',
-      email: 'maktab14.admin@talim.uz',
-      fullName: 'Karimova Nargiza Shuhratovna',
-      role: UserRole.institutionAdmin,
-      region: 'Namangan viloyati',
-      district: 'Chortoq tumani',
-      institutionId: 'inst_chortoq_5',
-      institutionName: '5-sonli umumiy o‘rta ta’lim maktabi',
-      phone: '+998 91 234-56-78',
-      specialization: 'Maktab direktori',
-    ),
-    UserModel(
       id: 'user_coordinator',
       email: 'koordinator@talim.uz',
       fullName: 'Hakimova Zebo Erkinovna',
@@ -95,18 +83,6 @@ class SeedData {
       specialization: 'Maxsus pedagog / Defektolog',
     ),
     UserModel(
-      id: 'user_special_ed_teacher',
-      email: 'maxsus.oqituvchi@talim.uz',
-      fullName: 'Rahmonova Dildora Akmalovna',
-      role: UserRole.specialEdTeacher,
-      region: 'Namangan viloyati',
-      district: 'Chortoq tumani',
-      institutionId: 'inst_chortoq_5',
-      institutionName: '5-sonli umumiy o‘rta ta’lim maktabi',
-      phone: '+998 99 234-12-34',
-      specialization: 'Maxsus ta’lim o‘qituvchisi (boshlang‘ich sinflar)',
-    ),
-    UserModel(
       id: 'user_teacher',
       email: 'oqituvchi@talim.uz',
       fullName: 'Nazarov Farrux Odilovich',
@@ -116,7 +92,7 @@ class SeedData {
       institutionId: 'inst_chortoq_5',
       institutionName: '5-sonli umumiy o‘rta ta’lim maktabi',
       phone: '+998 97 678-90-12',
-      specialization: 'Inklyuziv sinf rahbari',
+      specialization: 'Inklyuziv sinf rahbari va fan o‘qituvchisi',
     ),
     UserModel(
       id: 'user_reviewer',
@@ -713,8 +689,8 @@ class SeedData {
       },
       suggestedGrade: 3,
       confirmedGrade: 3,
-      assessedById: 'user_special_ed_teacher',
-      assessedByName: 'Rahmonova Dildora Akmalovna',
+      assessedById: 'user_teacher',
+      assessedByName: 'Nazarov Farrux Odilovich',
       assessedAt: DateTime.now().subtract(const Duration(days: 6)),
       notes:
           'Rasmiy 4-sinf o‘quvchisi, biroq DTS bo‘yicha 3-sinf matematika dasturini barqaror o‘zlashtirmoqda. Individual 3-sinf darajasida o‘qitiladi.',
@@ -735,8 +711,8 @@ class SeedData {
       },
       suggestedGrade: 2,
       confirmedGrade: 2,
-      assessedById: 'user_special_ed_teacher',
-      assessedByName: 'Rahmonova Dildora Akmalovna',
+      assessedById: 'user_teacher',
+      assessedByName: 'Nazarov Farrux Odilovich',
       assessedAt: DateTime.now().subtract(const Duration(days: 10)),
       notes:
           'O‘qish va adabiyotdan 2-sinf me’yorlariga mos; bo‘g‘inlab va so‘zlab o‘qish tezligi ustida ishlanmoqda.',
@@ -754,8 +730,8 @@ class SeedData {
       },
       suggestedGrade: 1,
       confirmedGrade: 1,
-      assessedById: 'user_special_ed_teacher',
-      assessedByName: 'Rahmonova Dildora Akmalovna',
+      assessedById: 'user_teacher',
+      assessedByName: 'Nazarov Farrux Odilovich',
       assessedAt: DateTime.now().subtract(const Duration(days: 12)),
       notes:
           'Vizual kartochkalar yordamida 1-sinf matematika dasturi (20 ichida qo‘shish va ayirish) asosida individual ishlanmoqda.',
@@ -772,8 +748,8 @@ class SeedData {
       title: 'Matnli masalalarni 2 amal bilan yechish (3-sinf DTS)',
       description:
           'Kattalashtirilgan shriftli kartochkada berilgan 3 ta matnli masalani chizma yordamida yechish.',
-      assignedById: 'user_special_ed_teacher',
-      assignedByName: 'Rahmonova Dildora Akmalovna',
+      assignedById: 'user_teacher',
+      assignedByName: 'Nazarov Farrux Odilovich',
       assignedAt: DateTime.now().subtract(const Duration(days: 5)),
       dueDate: DateTime.now().add(const Duration(days: 7)),
       result: Mastery.mastered,
@@ -789,8 +765,8 @@ class SeedData {
       title: 'Qisqa hikoyani o‘qib, asosiy qahramon harakatini aytib berish',
       description:
           '5-6 gapdan iborat hikoyani ovoz chiqarib o‘qish va savollarga javob berish.',
-      assignedById: 'user_special_ed_teacher',
-      assignedByName: 'Rahmonova Dildora Akmalovna',
+      assignedById: 'user_teacher',
+      assignedByName: 'Nazarov Farrux Odilovich',
       assignedAt: DateTime.now().subtract(const Duration(days: 4)),
       dueDate: DateTime.now().add(const Duration(days: 5)),
     ),
@@ -833,8 +809,8 @@ class SeedData {
       metricId: 'metric_reading_wpm',
       value: 18,
       measuredAt: DateTime.now().subtract(const Duration(days: 30)),
-      recordedById: 'user_special_ed_teacher',
-      recordedByName: 'Rahmonova Dildora Akmalovna',
+      recordedById: 'user_teacher',
+      recordedByName: 'Nazarov Farrux Odilovich',
       note: 'Bo‘g‘inlab o‘qish: 18 so‘z/daqiqa.',
     ),
     ProgressMeasurement(
@@ -843,8 +819,8 @@ class SeedData {
       metricId: 'metric_reading_wpm',
       value: 29,
       measuredAt: DateTime.now().subtract(const Duration(days: 4)),
-      recordedById: 'user_special_ed_teacher',
-      recordedByName: 'Rahmonova Dildora Akmalovna',
+      recordedById: 'user_teacher',
+      recordedByName: 'Nazarov Farrux Odilovich',
       note: 'So‘zlab o‘qishga o‘tdi: 29 so‘z/daqiqa.',
     ),
   ];
@@ -918,8 +894,8 @@ class SeedData {
       description:
           'Individual moslashtirilgan 3-sinf dasturi bo‘yicha yuqori natija.',
       achievedAt: DateTime.now().subtract(const Duration(days: 1)),
-      recordedById: 'user_special_ed_teacher',
-      recordedByName: 'Rahmonova Dildora Akmalovna',
+      recordedById: 'user_teacher',
+      recordedByName: 'Nazarov Farrux Odilovich',
     ),
   ];
 
@@ -937,7 +913,7 @@ class SeedData {
         'user_coordinator',
         'user_speech',
         'user_psychologist',
-        'user_special_ed_teacher',
+        'user_teacher',
       ],
       status: ConferenceStatus.held,
       contributions: [

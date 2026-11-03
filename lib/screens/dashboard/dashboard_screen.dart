@@ -1069,9 +1069,10 @@ class DashboardScreen extends StatelessWidget {
         break;
 
       case UserRole.specialEdTeacher:
-        sectionTitle = 'Maxsus ta’lim o‘qituvchisi ish maydoni';
+      case UserRole.teacher:
+        sectionTitle = 'Fan o‘qituvchisi / Maxsus pedagog ish maydoni';
         sectionSubtitle =
-            'O‘quvchining haqiqiy DTS bilim darajasini aniqlash (masalan: 7-sinf → 3-sinf darajasi) va moslashtirilgan fan topshiriqlari';
+            'O‘quvchining haqiqiy DTS bilim darajasini aniqlash (masalan: 7-sinf → 3-sinf darajasi), topshiriqlar va dars davomati';
         actions = [
           {
             'title': 'DTS darajasi va fan topshiriqlari',
@@ -1083,86 +1084,19 @@ class DashboardScreen extends StatelessWidget {
             'screen': const StudentsListScreen(),
           },
           {
-            'title': 'Haftalik pedagogik baholash',
-            'desc':
-                'O‘quv ko‘nikmalari va o‘zlashtirish dinamikasini qayd etish',
+            'title': 'Dars davomati va mashg‘ulotlar',
+            'desc': 'Inklyuziv o‘quvchilarning darslardagi ishtiroki va davomati',
             'icon': LucideIcons.clipboardCheck,
             'color': AppColors.info,
-            'screen': const NewAssessmentScreen(),
-          },
-          {
-            'title': 'Individual ta’lim rejalari (ITR)',
-            'desc': 'Haqiqiy darajaga moslashtirilgan o‘quv maqsadlari ijrosi',
-            'icon': LucideIcons.bookOpenCheck,
-            'color': AppColors.purple,
-            'tabIndex': 4,
-            'screen': const IepListScreen(),
-          },
-        ];
-        break;
-
-      case UserRole.coordinator:
-        sectionTitle = 'Ta’lim koordinatori va ITR eksperti ish maydoni';
-        sectionSubtitle =
-            'Bolalarga mutaxassis biriktirish, konsilium chaqirish, ITR rejalari va Svetofor nazorati';
-        actions = [
-          {
-            'title': 'O‘quvchilar va Svetofor holati',
-            'desc':
-                'Ishlanmagan (Qizil) bolalarni aniqlash va mutaxassis biriktirish',
-            'icon': LucideIcons.users,
-            'color': AppColors.primary,
-            'tabIndex': 1,
-            'screen': const StudentsListScreen(),
-          },
-          {
-            'title': 'Yo‘naltirishlar va Konsilium',
-            'desc':
-                'Psixolog, logoped, maxsus o‘qituvchi va ota-onaga yo‘naltirishlar',
-            'icon': LucideIcons.arrowLeftRight,
-            'color': AppColors.info,
-            'screen': const ReferralsScreen(),
-          },
-          {
-            'title': 'ITR va Monitoring hisoboti',
-            'desc':
-                'Individual ta’lim rejalari ijrosi va maktab qamrov hisobotlari',
-            'icon': LucideIcons.bookOpenCheck,
-            'color': AppColors.purple,
-            'tabIndex': 4,
-            'screen': const IepListScreen(),
-          },
-        ];
-        break;
-
-      case UserRole.teacher:
-        sectionTitle = 'Fan o‘qituvchisi / Tyutor ish maydoni';
-        sectionSubtitle =
-            'Sinfdagi inklyuziv muhit, o‘quv dasturini moslashtirish va davomat';
-        actions = [
-          {
-            'title': 'Dars davomati va faollik',
-            'desc': 'Inklyuziv o‘quvchilarning umumiy sinfdagi ishtiroki',
-            'icon': LucideIcons.clipboardCheck,
-            'color': AppColors.primary,
             'tabIndex': 3,
             'screen': const SessionsScreen(),
           },
           {
-            'title': 'O‘quvchilar ro‘yxati',
-            'desc': 'Sinfdagi alohida ehtiyojli o‘quvchilar profillari',
-            'icon': LucideIcons.users,
-            'color': AppColors.info,
-            'tabIndex': 1,
-            'screen': const StudentsListScreen(),
-          },
-          {
-            'title': 'ITR tavsiyalari',
-            'desc': 'Mutaxassislar tomonidan tavsiya etilgan dars usullari',
-            'icon': LucideIcons.bookOpen,
+            'title': 'Mutaxassisga yo‘naltirish (Referral)',
+            'desc': 'Bolani psixolog, logoped yoki defektologga yo‘naltirish',
+            'icon': LucideIcons.arrowLeftRight,
             'color': AppColors.purple,
-            'tabIndex': 4,
-            'screen': const IepListScreen(),
+            'screen': const ReferralsScreen(),
           },
         ];
         break;

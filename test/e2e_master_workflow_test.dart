@@ -300,8 +300,8 @@ void main() {
     );
 
     // 22-24. Management reviews child progress, identifies unworked children, and generates reports
-    final director = db.getUserById('user_director')!;
-    app.setCurrentUser(director);
+    final adminUser = db.getUserById('user_admin')!;
+    app.setCurrentUser(adminUser);
 
     final workedStatus = app.childStatus(db.getStudentById('student_e2e_7th')!);
     final unworkedStatus = app.childStatus(db.getStudentById('student_e2e_unworked')!);
