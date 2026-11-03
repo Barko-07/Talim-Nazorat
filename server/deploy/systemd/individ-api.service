@@ -1,0 +1,43 @@
+# /etc/systemd/system/individ-api.service
+[Unit]
+Description=Individ API
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+User=individ
+Group=individ
+WorkingDirectory=/srv/individ/server
+EnvironmentFile=/etc/individ/individ.env
+# Listens only on localhost; nginx is the only way in. No --reload, no debug.
+# --no-proxy-headers: the app itself decides when to trust X-Real-IP / X-Forwarded-Proto.
+ExecStart=/srv/individ/server/.venv/bin/uvicorn app.main:create_app --factory \
+    --host 127.0.0.1 --port 8000 --workers 2 --no-proxy-headers --no-server-header \
+    --log-level warning
+Restart=on-failure
+RestartSec=3
+
+# Sandboxing
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

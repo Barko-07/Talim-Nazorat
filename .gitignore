@@ -81,4 +81,16 @@ devtools_options.yaml
 *.p12
 secrets/
 
+# Database backups and local databases may contain children's data
+backups/
+*.db
+*.sqlite
+*.sqlite3
+*.sql.gz*
+
+# Python server
+server/.venv/
+**/__pycache__/
+.pytest_cache/
+
 .codex/

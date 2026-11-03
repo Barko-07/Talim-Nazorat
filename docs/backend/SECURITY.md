@@ -1,4 +1,6 @@
-# TA’LIM NAZORAT security
+# Individ security
+
+> **Server backend:** the protections for the server (2FA, cookies, CSRF, rate limiting, encryption, deployment) are in [`server/`](../../server/README.md); the full review and test results are in [SECURITY_REPORT.md](../security/SECURITY_REPORT.md).
 
 The app stores sensitive data about children with disabilities. This document lists what is **in place now**, and what **must be done when the server is set up**.
 
