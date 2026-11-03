@@ -32,7 +32,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
       case StatusColor.yellow:
         return const Color(0xFFD97706);
       case StatusColor.green:
-        return const Color(0xFF059669);
+        return const Color(0xFF12803A);
     }
   }
 
@@ -43,7 +43,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
       case StatusColor.yellow:
         return const Color(0xFFFFFBEB);
       case StatusColor.green:
-        return const Color(0xFFECFDF5);
+        return const Color(0xFFEEF9EC);
     }
   }
 
@@ -109,10 +109,10 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFECFDF5),
+                          color: const Color(0xFFEEF9EC),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFF059669).withValues(alpha: 0.2),
+                            color: const Color(0xFF12803A).withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
@@ -120,7 +120,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF059669),
+                            color: Color(0xFF12803A),
                           ),
                         ),
                       ),
@@ -312,14 +312,14 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                   label: Text(
                     '🟢 Yashil — Ijobiy (${summary.count(StatusColor.green)})',
                   ),
-                  selectedColor: const Color(0xFF059669),
-                  backgroundColor: const Color(0xFFECFDF5),
+                  selectedColor: const Color(0xFF12803A),
+                  backgroundColor: const Color(0xFFEEF9EC),
                   labelStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: _filterColor == StatusColor.green
                         ? Colors.white
-                        : const Color(0xFF059669),
+                        : const Color(0xFF12803A),
                   ),
                   onSelected: (v) => setState(
                     () => _filterColor = v ? StatusColor.green : null,
@@ -569,12 +569,12 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: isArchived ? const Color(0xFFFEF2F2) : const Color(0xFFECFDF5),
+        color: isArchived ? const Color(0xFFFEF2F2) : const Color(0xFFEEF9EC),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: isArchived
               ? const Color(0xFFFECACA)
-              : const Color(0xFFA7F3D0),
+              : const Color(0xFFC3EBBE),
         ),
       ),
       child: Text(
@@ -584,7 +584,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
           fontWeight: FontWeight.bold,
           color: isArchived
               ? const Color(0xFFDC2626)
-              : const Color(0xFF059669),
+              : const Color(0xFF12803A),
         ),
       ),
     );

@@ -571,8 +571,8 @@ class ReportsScreen extends StatelessWidget {
               ),
               StatusPill(
                 label: '🟢 Yashil (Ijobiy natija): $greenCount ta',
-                color: const Color(0xFF16A34A),
-                backgroundColor: const Color(0xFFDCFCE7),
+                color: const Color(0xFF12803A),
+                backgroundColor: const Color(0xFFE4F6E1),
               ),
               StatusPill(
                 label: '📈 O‘sish: $growthCount',

@@ -3058,7 +3058,7 @@ class LocalDbService {
     final payload = <String, dynamic>{
       'meta': {
         'application':
-            'TA’LIM NAZORAT — Inklyuziv va maxsus ta’lim monitoring tizimi',
+            'Individ — Inklyuziv va maxsus ta’lim monitoring tizimi',
         'schemaVersion': '2.0',
         'exportedAt': DateTime.now().toIso8601String(),
         'exportedBy': forUser?.fullName ?? 'System',
@@ -3125,7 +3125,7 @@ class LocalDbService {
     final payload = <String, dynamic>{
       'meta': {
         'application':
-            'TA’LIM NAZORAT — Inklyuziv va maxsus ta’lim monitoring tizimi',
+            'Individ — Inklyuziv va maxsus ta’lim monitoring tizimi',
         'schemaVersion': '2.0',
         'exportedAt': (exportedAt ?? DateTime.now()).toIso8601String(),
         'description':

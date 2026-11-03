@@ -167,10 +167,10 @@ class _PsychologistAssessmentsTabState
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFECFDF5),
+                          color: const Color(0xFFEEF9EC),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: const Color(0xFF059669)
+                            color: const Color(0xFF12803A)
                                 .withValues(alpha: 0.3),
                           ),
                         ),
@@ -179,7 +179,7 @@ class _PsychologistAssessmentsTabState
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF059669),
+                            color: Color(0xFF12803A),
                           ),
                         ),
                       ),
@@ -219,7 +219,7 @@ class _PsychologistAssessmentsTabState
               ),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
+                  backgroundColor: const Color(0xFF0062CC),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 18,
                     vertical: 12,
@@ -455,7 +455,7 @@ class _PsychologistAssessmentsTabState
                     const SizedBox(height: 16),
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
+                        backgroundColor: const Color(0xFF0062CC),
                       ),
                       icon: const Icon(Icons.add, size: 16),
                       label: const Text('Yangi baholash boshlash'),
@@ -502,7 +502,7 @@ class _PsychologistAssessmentsTabState
                                     decoration: BoxDecoration(
                                       color: isDraft
                                           ? const Color(0xFFFFFBEB)
-                                          : const Color(0xFFEEF2FF),
+                                          : const Color(0xFFEAF3FD),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
@@ -511,7 +511,7 @@ class _PsychologistAssessmentsTabState
                                           : Icons.psychology_rounded,
                                       color: isDraft
                                           ? const Color(0xFFD97706)
-                                          : const Color(0xFF4F46E5),
+                                          : const Color(0xFF0062CC),
                                       size: 20,
                                     ),
                                   ),
@@ -539,14 +539,14 @@ class _PsychologistAssessmentsTabState
                                             decoration: BoxDecoration(
                                               color: isDraft
                                                   ? const Color(0xFFFFFBEB)
-                                                  : const Color(0xFFECFDF5),
+                                                  : const Color(0xFFEEF9EC),
                                               borderRadius:
                                                   BorderRadius.circular(4),
                                               border: Border.all(
                                                 color: isDraft
                                                     ? const Color(0xFFD97706)
                                                         .withValues(alpha: 0.3)
-                                                    : const Color(0xFF059669)
+                                                    : const Color(0xFF12803A)
                                                         .withValues(alpha: 0.3),
                                               ),
                                             ),
@@ -557,7 +557,7 @@ class _PsychologistAssessmentsTabState
                                                 fontWeight: FontWeight.bold,
                                                 color: isDraft
                                                     ? const Color(0xFFD97706)
-                                                    : const Color(0xFF059669),
+                                                    : const Color(0xFF12803A),
                                               ),
                                             ),
                                           ),
@@ -583,7 +583,7 @@ class _PsychologistAssessmentsTabState
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w800,
                                         fontSize: 15,
-                                        color: Color(0xFF4F46E5),
+                                        color: Color(0xFF0062CC),
                                       ),
                                     ),
                                     Container(
@@ -592,7 +592,7 @@ class _PsychologistAssessmentsTabState
                                         vertical: 1,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFECFDF5),
+                                        color: const Color(0xFFEEF9EC),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
@@ -600,7 +600,7 @@ class _PsychologistAssessmentsTabState
                                         style: const TextStyle(
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF059669),
+                                          color: Color(0xFF12803A),
                                         ),
                                       ),
                                     ),
@@ -707,7 +707,7 @@ class _PsychologistAssessmentsTabState
                                         icon: const Icon(
                                           Icons.compare_arrows_rounded,
                                           size: 18,
-                                          color: Color(0xFF4F46E5),
+                                          color: Color(0xFF0062CC),
                                         ),
                                         tooltip: 'Taqqoslash',
                                         onPressed: () {
@@ -722,7 +722,7 @@ class _PsychologistAssessmentsTabState
                                     FilledButton.icon(
                                       style: FilledButton.styleFrom(
                                         backgroundColor:
-                                            const Color(0xFF4F46E5),
+                                            const Color(0xFF0062CC),
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 12,
                                           vertical: 8,

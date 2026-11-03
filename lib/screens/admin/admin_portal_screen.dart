@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/widgets/brand_logo.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -211,18 +212,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
         ),
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: const Color(0xFF073A82),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.account_balance_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
+            const BrandMark(height: 32),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -231,15 +221,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                 children: [
                   Row(
                     children: [
-                      const Text(
-                        'TA’LIM NAZORAT',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.3,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
+                      const BrandWordmark(fontSize: 17),
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -247,7 +229,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                           vertical: 1.5,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF073A82),
+                          color: const Color(0xFF003D88),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -316,7 +298,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                 children: [
                   CircleAvatar(
                     radius: 14,
-                    backgroundColor: const Color(0xFF073A82),
+                    backgroundColor: const Color(0xFF003D88),
                     child: Text(
                       (user?.fullName ?? 'A').substring(0, 1),
                       style: const TextStyle(
@@ -413,7 +395,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
         if (isDrawer)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            color: const Color(0xFF073A82),
+            color: const Color(0xFF003D88),
             child: const Row(
               children: [
                 Icon(Icons.admin_panel_settings, color: Colors.white, size: 28),

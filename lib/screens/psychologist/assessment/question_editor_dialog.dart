@@ -227,12 +227,12 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEEF2FF),
+                        color: const Color(0xFFEAF3FD),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
                         Icons.quiz_rounded,
-                        color: Color(0xFF4F46E5),
+                        color: Color(0xFF0062CC),
                         size: 22,
                       ),
                     ),
@@ -424,7 +424,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                         Icon(
                                           Icons.check_circle_rounded,
                                           size: 16,
-                                          color: Color(0xFF059669),
+                                          color: Color(0xFF12803A),
                                         ),
                                         SizedBox(width: 6),
                                         Expanded(
@@ -528,7 +528,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                     const SizedBox(width: 12),
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
+                        backgroundColor: const Color(0xFF0062CC),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 12,
@@ -625,7 +625,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                     height: 28,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEEF2FF),
+                      color: const Color(0xFFEAF3FD),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -633,7 +633,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF4F46E5),
+                        color: Color(0xFF0062CC),
                       ),
                     ),
                   ),

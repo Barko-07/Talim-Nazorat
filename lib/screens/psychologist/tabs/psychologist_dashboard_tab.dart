@@ -57,7 +57,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                 colors: [
                   Color(0xFF1E1B4B),
                   Color(0xFF312E81),
-                  Color(0xFF4338CA),
+                  Color(0xFF003D88),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -117,7 +117,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.5,
-                                color: Color(0xFFE0E7FF),
+                                color: Color(0xFFD3E6FB),
                               ),
                             ),
                           ),
@@ -149,7 +149,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                         '${user?.institutionName ?? "5-sonli umumiy o‘rta ta’lim maktabi"} • Alohida ta’limiy ehtiyojli bolalar bilan psixokorreksiya va monitoring',
                         style: const TextStyle(
                           fontSize: 12,
-                          color: Color(0xFFE0E7FF),
+                          color: Color(0xFFD3E6FB),
                         ),
                       ),
                     ],
@@ -178,8 +178,8 @@ class PsychologistDashboardTab extends StatelessWidget {
                     value: '${myStudents.length} nafar',
                     subtitle: 'Psixologik hisobda',
                     icon: Icons.people_alt_rounded,
-                    color: const Color(0xFF4F46E5),
-                    bgColor: const Color(0xFFEEF2FF),
+                    color: const Color(0xFF0062CC),
+                    bgColor: const Color(0xFFEAF3FD),
                     width: cardWidth,
                     onTap: () => onNavigateToTab?.call(1),
                   ),
@@ -188,8 +188,8 @@ class PsychologistDashboardTab extends StatelessWidget {
                     value: '${todaySessions.length} ta',
                     subtitle: 'Kun tartibida',
                     icon: Icons.calendar_today_rounded,
-                    color: const Color(0xFF0284C7),
-                    bgColor: const Color(0xFFF0F9FF),
+                    color: const Color(0xFF00808A),
+                    bgColor: const Color(0xFFE8F7F6),
                     width: cardWidth,
                     onTap: () => onNavigateToTab?.call(7),
                   ),
@@ -198,8 +198,8 @@ class PsychologistDashboardTab extends StatelessWidget {
                     value: '${myAssessments.length} ta',
                     subtitle: 'Diagnostika xulosalari',
                     icon: Icons.assignment_turned_in_rounded,
-                    color: const Color(0xFF059669),
-                    bgColor: const Color(0xFFECFDF5),
+                    color: const Color(0xFF12803A),
+                    bgColor: const Color(0xFFEEF9EC),
                     width: cardWidth,
                     onTap: () => onNavigateToTab?.call(2),
                   ),
@@ -252,7 +252,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                       children: [
                         FilledButton.icon(
                           style: FilledButton.styleFrom(
-                            backgroundColor: const Color(0xFF4F46E5),
+                            backgroundColor: const Color(0xFF0062CC),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 14,
                               vertical: 10,
@@ -461,7 +461,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.schedule_rounded,
-                      color: Color(0xFF4F46E5),
+                      color: Color(0xFF0062CC),
                       size: 20,
                     ),
                     SizedBox(width: 8),
@@ -531,7 +531,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B),
+                            color: Color(0xFF1A2A4D),
                           ),
                         ),
                       ),
@@ -568,8 +568,8 @@ class PsychologistDashboardTab extends StatelessWidget {
                         decoration: BoxDecoration(
                           color:
                               s.isCompleted
-                                  ? const Color(0xFFECFDF5)
-                                  : const Color(0xFFEFF6FF),
+                                  ? const Color(0xFFEEF9EC)
+                                  : const Color(0xFFEAF3FD),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -579,8 +579,8 @@ class PsychologistDashboardTab extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color:
                                 s.isCompleted
-                                    ? const Color(0xFF059669)
-                                    : const Color(0xFF0284C7),
+                                    ? const Color(0xFF12803A)
+                                    : const Color(0xFF00808A),
                           ),
                         ),
                       ),
@@ -727,7 +727,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                             '• ${obs.category}',
                             style: const TextStyle(
                               fontSize: 10,
-                              color: Color(0xFF4F46E5),
+                              color: Color(0xFF0062CC),
                               fontWeight: FontWeight.w600,
                             ),
                           ),

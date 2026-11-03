@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/namangan_data.dart';
+import '../../core/widgets/brand_logo.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
@@ -583,8 +584,8 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildBrandHeader() {
     return Column(
       children: [
-        const Icon(LucideIcons.landmark, color: AppColors.primary, size: 38),
-        const SizedBox(height: 14),
+        const BrandLogo(height: 118),
+        const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
@@ -604,17 +605,6 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
         const SizedBox(height: 12),
-        const Text(
-          'TA’LIM NAZORAT',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.5,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 4),
         const Text(
           'Yagona inklyuziv ta’lim va pedagogik monitoring platformasi',
           textAlign: TextAlign.center,
@@ -678,7 +668,7 @@ class _LoginScreenState extends State<LoginScreen>
                 isSelected
                     ? const [
                       BoxShadow(
-                        color: Color(0x0D0F172A),
+                        color: Color(0x0D0A1A3F),
                         blurRadius: 6,
                         offset: Offset(0, 2),
                       ),
@@ -1240,7 +1230,7 @@ class _LoginScreenState extends State<LoginScreen>
                               color:
                                   isSelected
                                       ? AppColors.primary
-                                      : const Color(0xFF1E293B),
+                                      : const Color(0xFF1A2A4D),
                               letterSpacing: -0.05,
                             ),
                           ),
@@ -1581,7 +1571,7 @@ class _LoginScreenState extends State<LoginScreen>
             style: _myGovFont(
               fontSize: 12.5,
               fontWeight: met ? FontWeight.w600 : FontWeight.w500,
-              color: met ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+              color: met ? const Color(0xFF0A1A3F) : const Color(0xFF64748B),
             ),
           ),
         ),

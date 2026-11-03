@@ -124,9 +124,9 @@ class AmbientMeshBackground extends StatelessWidget {
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          const Color(0xFF6366F1)
+                          const Color(0xFF1E7FE0)
                               .withValues(alpha: subtleAlpha * 0.6),
-                          const Color(0xFF6366F1).withValues(alpha: 0.0),
+                          const Color(0xFF1E7FE0).withValues(alpha: 0.0),
                         ],
                       ),
                     ),
@@ -625,7 +625,7 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
         iconColor = AppColors.primary;
         shadow = const [
           BoxShadow(
-            color: Color(0x070F172A),
+            color: Color(0x070A1A3F),
             blurRadius: 6,
             offset: Offset(0, 2),
           ),
@@ -638,7 +638,7 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
         iconColor = AppColors.error;
         shadow = const [
           BoxShadow(
-            color: Color(0x060F172A),
+            color: Color(0x060A1A3F),
             blurRadius: 6,
             offset: Offset(0, 2),
           ),
@@ -914,7 +914,7 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
             boxShadow: widget.isSelected
                 ? const [
                     BoxShadow(
-                      color: Color(0x0D0F172A),
+                      color: Color(0x0D0A1A3F),
                       blurRadius: 6,
                       offset: Offset(0, 2),
                     ),

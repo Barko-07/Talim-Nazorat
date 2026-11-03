@@ -41,7 +41,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEFF6FF),
+                    color: const Color(0xFFEAF3FD),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -110,7 +110,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0F172A),
+                        color: const Color(0xFF0A1A3F),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: SingleChildScrollView(
@@ -146,7 +146,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('$filename mazmuni xotiraga nusxalandi!'),
-                      backgroundColor: const Color(0xFF059669),
+                      backgroundColor: const Color(0xFF12803A),
                     ),
                   );
                 },
@@ -285,7 +285,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
+                color: const Color(0xFFEAF3FD),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFBFDBFE)),
               ),
@@ -293,7 +293,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 children: [
                   const Icon(
                     Icons.shield_outlined,
-                    color: Color(0xFF1E40AF),
+                    color: Color(0xFF003D88),
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -322,8 +322,8 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     value: '${students.length}',
                     subtext: 'Biriktirilgan o‘quvchilar',
                     icon: Icons.people_outline_rounded,
-                    color: const Color(0xFF1E40AF),
-                    bgColor: const Color(0xFFEFF6FF),
+                    color: const Color(0xFF003D88),
+                    bgColor: const Color(0xFFEAF3FD),
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -333,7 +333,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     value: '${assessments.length}',
                     subtext: 'Standartlashtirilgan testlar',
                     icon: Icons.assignment_turned_in_outlined,
-                    color: const Color(0xFF0D9488),
+                    color: const Color(0xFF029C8C),
                     bgColor: const Color(0xFFF0FDFA),
                   ),
                 ),
@@ -344,8 +344,8 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     value: '$completedSessions',
                     subtext: 'Rejadagilar: $scheduledSessions ta',
                     icon: Icons.psychology_outlined,
-                    color: const Color(0xFF059669),
-                    bgColor: const Color(0xFFECFDF5),
+                    color: const Color(0xFF12803A),
+                    bgColor: const Color(0xFFEEF9EC),
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -405,7 +405,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                           label: 'Ijobiy o‘sish (Yaxshilanish)',
                           count: improvingCount,
                           total: assessments.isEmpty ? 1 : assessments.length,
-                          color: const Color(0xFF059669),
+                          color: const Color(0xFF12803A),
                         ),
                         const SizedBox(height: 12),
 
@@ -414,7 +414,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                           label: 'Barqaror (O‘zgarmagan)',
                           count: stableCount,
                           total: assessments.isEmpty ? 1 : assessments.length,
-                          color: const Color(0xFF1E40AF),
+                          color: const Color(0xFF003D88),
                         ),
                         const SizedBox(height: 12),
 
@@ -616,7 +616,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                         ),
                         dataTextStyle: const TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF1E293B),
+                          color: Color(0xFF1A2A4D),
                         ),
                         columns: const [
                           DataColumn(label: Text('O‘quvchi F.I.SH')),
@@ -647,9 +647,9 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                                 trend = studentAssessments.first.trend;
                               }
 
-                              Color trendColor = const Color(0xFF1E40AF);
+                              Color trendColor = const Color(0xFF003D88);
                               if (trend == 'Yaxshilanish')
-                                trendColor = const Color(0xFF059669);
+                                trendColor = const Color(0xFF12803A);
                               if (trend == 'Qo‘shimcha e’tibor talab')
                                 trendColor = const Color(0xFFD97706);
 
@@ -874,7 +874,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: Color(0xFF1A2A4D),
                     ),
                   ),
                   Text(

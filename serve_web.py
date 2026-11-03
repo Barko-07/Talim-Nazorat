@@ -1,4 +1,4 @@
-"""TA'LIM NAZORAT veb-ilovasini (build/web) xavfsiz sozlamalar bilan tarqatish.
+"""Individ veb-ilovasini (build/web) xavfsiz sozlamalar bilan tarqatish.
 
 Mahalliy sinov va ichki tarmoq uchun. Ishlab chiqarishda HTTPS orqasida (nginx/Caddy)
 ishlatiladi — docs/backend/SECURITY.md ga qarang.

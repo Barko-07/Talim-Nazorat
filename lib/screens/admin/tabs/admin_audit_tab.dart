@@ -89,7 +89,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
               ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0F172A),
+                  backgroundColor: const Color(0xFF0A1A3F),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -270,9 +270,9 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                       final isChange = l.action == 'PERMISSION_CHANGE' || l.action == 'ARCHIVE' || l.action == 'DELETE';
 
                       final badgeColor = isLogin
-                          ? const Color(0xFF0284C7)
+                          ? const Color(0xFF00808A)
                           : isCreate
-                              ? const Color(0xFF059669)
+                              ? const Color(0xFF12803A)
                               : isChange
                                   ? const Color(0xFFDC2626)
                                   : const Color(0xFF7C3AED);
@@ -443,7 +443,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Audit jurnali CSV fayli yuklab olindi.'),
-                  backgroundColor: Color(0xFF059669),
+                  backgroundColor: Color(0xFF12803A),
                 ),
               );
             },

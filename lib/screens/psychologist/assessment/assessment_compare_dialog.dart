@@ -87,12 +87,12 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEEF2FF),
+                      color: const Color(0xFFEAF3FD),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.compare_arrows_rounded,
-                      color: Color(0xFF4F46E5),
+                      color: Color(0xFF0062CC),
                       size: 22,
                     ),
                   ),
@@ -171,7 +171,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFEEF2FF),
+                                  color: const Color(0xFFEAF3FD),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Column(
@@ -182,7 +182,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF4F46E5),
+                                        color: Color(0xFF0062CC),
                                       ),
                                     ),
                                     Text(
@@ -295,7 +295,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
             'A Natija',
             '${a.totalScore.toStringAsFixed(1)} / ${a.maxScore.toStringAsFixed(0)}',
             '${a.percentage.toStringAsFixed(0)}%',
-            const Color(0xFF4F46E5),
+            const Color(0xFF0062CC),
           ),
           Column(
             children: [
@@ -307,7 +307,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                 decoration: BoxDecoration(
                   color:
                       isPositive
-                          ? const Color(0xFFECFDF5)
+                          ? const Color(0xFFEEF9EC)
                           : const Color(0xFFFEF2F2),
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -320,7 +320,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                       size: 16,
                       color:
                           isPositive
-                              ? const Color(0xFF059669)
+                              ? const Color(0xFF12803A)
                               : const Color(0xFFDC2626),
                     ),
                     const SizedBox(width: 4),
@@ -331,7 +331,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                         fontWeight: FontWeight.bold,
                         color:
                             isPositive
-                                ? const Color(0xFF059669)
+                                ? const Color(0xFF12803A)
                                 : const Color(0xFFDC2626),
                       ),
                     ),
@@ -352,7 +352,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
             'B Natija',
             '${b.totalScore.toStringAsFixed(1)} / ${b.maxScore.toStringAsFixed(0)}',
             '${b.percentage.toStringAsFixed(0)}%',
-            const Color(0xFF0284C7),
+            const Color(0xFF00808A),
           ),
         ],
       ),
@@ -442,7 +442,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF4F46E5),
+                          color: Color(0xFF0062CC),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -454,7 +454,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0284C7),
+                          color: Color(0xFF00808A),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -468,7 +468,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                           fontWeight: FontWeight.bold,
                           color:
                               isPos
-                                  ? const Color(0xFF059669)
+                                  ? const Color(0xFF12803A)
                                   : const Color(0xFFDC2626),
                         ),
                         textAlign: TextAlign.end,
@@ -504,7 +504,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEEF2FF),
+                  color: const Color(0xFFEAF3FD),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -515,7 +515,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF4F46E5),
+                        color: Color(0xFF0062CC),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -534,7 +534,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF0F9FF),
+                  color: const Color(0xFFE8F7F6),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -545,7 +545,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0284C7),
+                        color: Color(0xFF00808A),
                       ),
                     ),
                     const SizedBox(height: 4),

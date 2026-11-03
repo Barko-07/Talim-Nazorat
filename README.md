@@ -1,6 +1,6 @@
-# TA’LIM NAZORAT — Alohida Ta’lim Ehtiyojlari Bo‘lgan Bolalar Rivojlanish Monitoringi (Flutter Ilovasi)
+# Individ — Alohida Ta’lim Ehtiyojlari Bo‘lgan Bolalar Rivojlanish Monitoringi (Flutter Ilovasi)
 
-**TA’LIM NAZORAT** — bu O‘zbekiston Respublikasining Maktabgacha va maktab ta’limi vazirligi tasarrufidagi inklyuziv hamda ixtisoslashtirilgan ta’lim muassasalarida alohida ta’lim ehtiyojlari bo‘lgan (ATEB) bolalarning rivojlanish jarayonini kompleks, ko‘p tarmoqli va shaffof monitoring qilish uchun mo‘ljallangan **kross-platformali rasmiy Flutter ilovasi (Android, iOS, Windows, Web)**.
+**Individ** — bu O‘zbekiston Respublikasining Maktabgacha va maktab ta’limi vazirligi tasarrufidagi inklyuziv hamda ixtisoslashtirilgan ta’lim muassasalarida alohida ta’lim ehtiyojlari bo‘lgan (ATEB) bolalarning rivojlanish jarayonini kompleks, ko‘p tarmoqli va shaffof monitoring qilish uchun mo‘ljallangan **kross-platformali rasmiy Flutter ilovasi (Android, iOS, Windows, Web)**.
 
 ---
 

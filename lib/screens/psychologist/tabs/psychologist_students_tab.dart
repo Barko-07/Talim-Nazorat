@@ -39,7 +39,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
       case StatusColor.yellow:
         return const Color(0xFFD97706);
       case StatusColor.green:
-        return const Color(0xFF059669);
+        return const Color(0xFF12803A);
     }
   }
 
@@ -50,7 +50,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
       case StatusColor.yellow:
         return const Color(0xFFFFFBEB);
       case StatusColor.green:
-        return const Color(0xFFECFDF5);
+        return const Color(0xFFEEF9EC);
     }
   }
 
@@ -121,11 +121,11 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEEF2FF),
+                          color: const Color(0xFFEAF3FD),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: const Color(
-                              0xFF6366F1,
+                              0xFF1E7FE0,
                             ).withValues(alpha: 0.3),
                           ),
                         ),
@@ -134,7 +134,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF4F46E5),
+                            color: Color(0xFF0062CC),
                           ),
                         ),
                       ),
@@ -313,7 +313,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                   ? Colors.white
                                   : AppColors.primary,
                         ),
-                        selectedColor: const Color(0xFF4F46E5),
+                        selectedColor: const Color(0xFF0062CC),
                         labelStyle: TextStyle(
                           fontSize: 12,
                           color:
@@ -375,14 +375,14 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                           label: Text(
                             '🟢 Yashil (${summary.count(StatusColor.green)})',
                           ),
-                          selectedColor: const Color(0xFF059669),
-                          backgroundColor: const Color(0xFFECFDF5),
+                          selectedColor: const Color(0xFF12803A),
+                          backgroundColor: const Color(0xFFEEF9EC),
                           labelStyle: TextStyle(
                             fontSize: 12,
                             color:
                                 _statusColorFilter == StatusColor.green
                                     ? Colors.white
-                                    : const Color(0xFF059669),
+                                    : const Color(0xFF12803A),
                             fontWeight: FontWeight.w700,
                           ),
                           onSelected:
@@ -479,12 +479,12 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         Row(
                           children: [
                             CircleAvatar(
-                              backgroundColor: stBg ?? const Color(0xFFEEF2FF),
+                              backgroundColor: stBg ?? const Color(0xFFEAF3FD),
                               child: Text(
                                 s.firstName.isNotEmpty ? s.firstName[0] : 'O',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: stColor ?? const Color(0xFF4F46E5),
+                                  color: stColor ?? const Color(0xFF0062CC),
                                 ),
                               ),
                             ),
@@ -563,13 +563,13 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                             vertical: 1,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFECFDF5),
+                                            color: const Color(0xFFEEF9EC),
                                             borderRadius: BorderRadius.circular(
                                               6,
                                             ),
                                             border: Border.all(
                                               color: const Color(
-                                                0xFF059669,
+                                                0xFF12803A,
                                               ).withValues(alpha: 0.3),
                                             ),
                                           ),
@@ -578,7 +578,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                             style: TextStyle(
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
-                                              color: Color(0xFF059669),
+                                              color: Color(0xFF12803A),
                                             ),
                                           ),
                                         ),

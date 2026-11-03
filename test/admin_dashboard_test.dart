@@ -110,7 +110,7 @@ void main() {
 
         // 1. Government header
         expect(
-          find.text('TA’LIM NAZORAT — Milliy va Hududiy Boshqaruv Markazi'),
+          find.text('Individ — Milliy va Hududiy Boshqaruv Markazi'),
           findsOneWidget,
         );
 

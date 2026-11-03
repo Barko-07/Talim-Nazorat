@@ -48,10 +48,10 @@ class AdminReportsTab extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF0F9FF),
+                          color: const Color(0xFFE8F7F6),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFF0284C7).withValues(alpha: 0.2),
+                            color: const Color(0xFF00808A).withValues(alpha: 0.2),
                           ),
                         ),
                         child: const Text(
@@ -59,7 +59,7 @@ class AdminReportsTab extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0284C7),
+                            color: Color(0xFF00808A),
                           ),
                         ),
                       ),
@@ -124,7 +124,7 @@ class AdminReportsTab extends StatelessWidget {
                                 ? '+${avgGrowth.toStringAsFixed(1)} ball'
                                 : '0.0 ball',
                             sub: '${assessments.length} ta baholash asosida',
-                            color: const Color(0xFF059669),
+                            color: const Color(0xFF12803A),
                           ),
                           _buildKpiCard(
                             label: 'Korreksion Mashg‘ulotlar',
@@ -199,7 +199,7 @@ class AdminReportsTab extends StatelessWidget {
                         title: 'Baholashlar dinamikasi CSV',
                         subtitle: '${assessments.length} ta baholash',
                         icon: Icons.assignment_turned_in_rounded,
-                        color: const Color(0xFF059669),
+                        color: const Color(0xFF12803A),
                         onExport: () => app.exportAssessmentsCsv(),
                       ),
                       _buildExportBtn(
@@ -215,7 +215,7 @@ class AdminReportsTab extends StatelessWidget {
                         title: 'Individual ta’lim rejalari (ITR) CSV',
                         subtitle: '${iepPlans.length} ta reja',
                         icon: Icons.menu_book_rounded,
-                        color: const Color(0xFF0284C7),
+                        color: const Color(0xFF00808A),
                         onExport: () => app.exportIepCsv(),
                       ),
                       _buildExportBtn(
@@ -247,7 +247,7 @@ class AdminReportsTab extends StatelessWidget {
                         title: 'Mutaxassislar faolligi CSV',
                         subtitle: '${app.specialists.length} nafar kadr qamrovi',
                         icon: Icons.verified_user_rounded,
-                        color: const Color(0xFF4F46E5),
+                        color: const Color(0xFF0062CC),
                         onExport: () => app.exportSpecialistActivityCsv(),
                       ),
                       _buildExportBtn(
@@ -255,7 +255,7 @@ class AdminReportsTab extends StatelessWidget {
                         title: 'To‘liq ma’lumotlar bazasi (JSON Backup)',
                         subtitle: '18 ta jadval zaxira nusxasi',
                         icon: Icons.storage_rounded,
-                        color: const Color(0xFF1E293B),
+                        color: const Color(0xFF1A2A4D),
                         onExport: () => app.exportDatabaseBackupJson(),
                       ),
                     ],
@@ -355,7 +355,7 @@ class AdminReportsTab extends StatelessWidget {
                                 '${inst['activeIepCount']} faol ITR',
                                 style: const TextStyle(
                                   fontSize: 12,
-                                  color: Color(0xFF059669),
+                                  color: Color(0xFF12803A),
                                 ),
                               ),
                             ),
@@ -474,7 +474,7 @@ class AdminReportsTab extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('$title muvaffaqiyatli yuklab olindi.'),
-                      backgroundColor: const Color(0xFF059669),
+                      backgroundColor: const Color(0xFF12803A),
                     ),
                   );
                 },

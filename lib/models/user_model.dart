@@ -117,21 +117,21 @@ extension UserRoleExtension on UserRole {
   Color get color {
     switch (this) {
       case UserRole.superAdmin:
-        return const Color(0xFF1E293B); // Slate
+        return const Color(0xFF1A2A4D); // Slate
       case UserRole.institutionAdmin:
         return const Color(0xFF0F766E); // Teal
       case UserRole.coordinator:
         return const Color(0xFF7C3AED); // Purple
       case UserRole.psychologist:
-        return const Color(0xFF6366F1); // Indigo
+        return const Color(0xFF1E7FE0); // Indigo
       case UserRole.speechTherapist:
-        return const Color(0xFF0284C7); // Sky Blue
+        return const Color(0xFF00808A); // Sky Blue
       case UserRole.specialEducation:
         return const Color(0xFFD97706); // Amber
       case UserRole.specialEdTeacher:
-        return const Color(0xFF2563EB); // Blue
+        return const Color(0xFF0062CC); // Blue
       case UserRole.teacher:
-        return const Color(0xFF059669); // Emerald
+        return const Color(0xFF12803A); // Emerald
       case UserRole.reviewer:
         return const Color(0xFF64748B); // Slate Muted
       case UserRole.parent:

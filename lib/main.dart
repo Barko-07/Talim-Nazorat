@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'core/theme/app_theme.dart';
+import 'core/constants/app_brand.dart';
 import 'core/constants/app_colors.dart';
+import 'core/widgets/brand_logo.dart';
 import 'providers/auth_provider.dart';
 import 'providers/app_provider.dart';
 import 'models/user_model.dart';
@@ -32,7 +34,7 @@ class TalimNazoratApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TA’LIM NAZORAT',
+      title: AppBrand.name,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: Consumer<AuthProvider>(
@@ -63,30 +65,13 @@ class _AppLoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFF5F8FC),
+    backgroundColor: AppColors.background,
     body: Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.09),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: const Icon(
-              Icons.account_balance_rounded,
-              color: AppColors.primary,
-              size: 30,
-            ),
-          ),
-          const SizedBox(height: 18),
-          const Text(
-            'TA’LIM NAZORAT',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 16),
+          const BrandLogo(height: 110),
+          const SizedBox(height: 22),
           const SizedBox(
             width: 24,
             height: 24,

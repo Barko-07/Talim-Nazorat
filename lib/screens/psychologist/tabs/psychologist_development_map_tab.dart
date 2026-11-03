@@ -173,7 +173,7 @@ class _PsychologistDevelopmentMapTabState
                 children: [
                   CircleAvatar(
                     radius: 32,
-                    backgroundColor: const Color(0xFFEEF2FF),
+                    backgroundColor: const Color(0xFFEAF3FD),
                     child: Text(
                       currentStudent.firstName.isNotEmpty
                           ? currentStudent.firstName[0]
@@ -181,7 +181,7 @@ class _PsychologistDevelopmentMapTabState
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF4F46E5),
+                        color: Color(0xFF0062CC),
                       ),
                     ),
                   ),
@@ -248,12 +248,12 @@ class _PsychologistDevelopmentMapTabState
                       ),
                       decoration: BoxDecoration(
                         color: growthPercent >= 0
-                            ? const Color(0xFFECFDF5)
+                            ? const Color(0xFFEEF9EC)
                             : const Color(0xFFFEF2F2),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: growthPercent >= 0
-                              ? const Color(0xFF059669).withValues(alpha: 0.3)
+                              ? const Color(0xFF12803A).withValues(alpha: 0.3)
                               : const Color(0xFFDC2626).withValues(alpha: 0.3),
                         ),
                       ),
@@ -265,7 +265,7 @@ class _PsychologistDevelopmentMapTabState
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
                               color: growthPercent >= 0
-                                  ? const Color(0xFF059669)
+                                  ? const Color(0xFF12803A)
                                   : const Color(0xFFDC2626),
                             ),
                           ),
@@ -277,7 +277,7 @@ class _PsychologistDevelopmentMapTabState
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                               color: growthPercent >= 0
-                                  ? const Color(0xFF065F46)
+                                  ? const Color(0xFF0E6630)
                                   : const Color(0xFF991B1B),
                             ),
                           ),
@@ -287,7 +287,7 @@ class _PsychologistDevelopmentMapTabState
                   else
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
+                        backgroundColor: const Color(0xFF0062CC),
                       ),
                       icon: const Icon(Icons.add_task_rounded, size: 16),
                       label: const Text('Birinchi baholashni boshlash'),
@@ -364,7 +364,7 @@ class _PsychologistDevelopmentMapTabState
                   const SizedBox(height: 14),
                   FilledButton.icon(
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF4F46E5),
+                      backgroundColor: const Color(0xFF0062CC),
                     ),
                     icon: const Icon(Icons.add_task_rounded, size: 16),
                     label: const Text('Baholash o‘tkazish'),
@@ -391,17 +391,17 @@ class _PsychologistDevelopmentMapTabState
                     final pct = e.value;
                     final normalizedVal = (pct / 100.0).clamp(0.0, 1.0);
 
-                    Color color = const Color(0xFF4F46E5);
+                    Color color = const Color(0xFF0062CC);
                     String statusText = 'Me’yoriy o‘sish dinamikasida';
 
                     if (pct >= 80) {
-                      color = const Color(0xFF059669);
+                      color = const Color(0xFF12803A);
                       statusText = 'Yuqori o‘zlashtirish va barqarorlik';
                     } else if (pct < 50) {
                       color = const Color(0xFFDC2626);
                       statusText = 'Maxsus korreksion yordam talab etiladi';
                     } else {
-                      color = const Color(0xFF0284C7);
+                      color = const Color(0xFF00808A);
                       statusText = 'Rivojlanish bosqichida / Qisman mustaqil';
                     }
 
@@ -443,7 +443,7 @@ class _PsychologistDevelopmentMapTabState
                             Icon(
                               Icons.history_rounded,
                               size: 20,
-                              color: Color(0xFF4F46E5),
+                              color: Color(0xFF0062CC),
                             ),
                             SizedBox(width: 8),
                             Text(
@@ -512,7 +512,7 @@ class _PsychologistDevelopmentMapTabState
                                       vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFEEF2FF),
+                                      color: const Color(0xFFEAF3FD),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
@@ -520,7 +520,7 @@ class _PsychologistDevelopmentMapTabState
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
-                                        color: Color(0xFF4F46E5),
+                                        color: Color(0xFF0062CC),
                                       ),
                                     ),
                                   ),
@@ -553,7 +553,7 @@ class _PsychologistDevelopmentMapTabState
                             Icon(
                               Icons.timeline_rounded,
                               size: 20,
-                              color: Color(0xFF059669),
+                              color: Color(0xFF12803A),
                             ),
                             SizedBox(width: 8),
                             Text(
@@ -583,7 +583,7 @@ class _PsychologistDevelopmentMapTabState
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF1E293B),
+                                        color: Color(0xFF1A2A4D),
                                       ),
                                     ),
                                     const Text(
@@ -612,7 +612,7 @@ class _PsychologistDevelopmentMapTabState
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF1E293B),
+                                        color: Color(0xFF1A2A4D),
                                       ),
                                     ),
                                     const Text(
@@ -632,10 +632,10 @@ class _PsychologistDevelopmentMapTabState
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF0FDF4),
+                            color: const Color(0xFFEEF9EC),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: const Color(0xFF059669)
+                              color: const Color(0xFF12803A)
                                   .withValues(alpha: 0.2),
                             ),
                           ),
@@ -645,7 +645,7 @@ class _PsychologistDevelopmentMapTabState
                                 : 'Psixologik xulosa: Bolaning rivojlanish ko‘rsatkichlari dinamikasi muntazam monitoring asosida tahlil qilinadi.',
                             style: const TextStyle(
                               fontSize: 12,
-                              color: Color(0xFF065F46),
+                              color: Color(0xFF0E6630),
                               height: 1.4,
                             ),
                           ),

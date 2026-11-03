@@ -45,15 +45,15 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
   Color _getDomainColor(String domain) {
     switch (domain) {
       case 'Kognitiv va intellekt':
-        return const Color(0xFF1E40AF);
+        return const Color(0xFF003D88);
       case 'Diqqat va ishchanlik':
-        return const Color(0xFF0D9488);
+        return const Color(0xFF029C8C);
       case 'Xotira jarayonlari':
         return const Color(0xFF7C3AED);
       case 'Emotsional va xavotir':
         return const Color(0xFFD97706);
       case 'Shaxsiyat va moslashuv':
-        return const Color(0xFF059669);
+        return const Color(0xFF12803A);
       default:
         return AppColors.primary;
     }
@@ -153,7 +153,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFF6FF),
+                      color: const Color(0xFFEAF3FD),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: const Color(0xFFBFDBFE)),
                     ),
@@ -163,7 +163,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                         const Icon(
                           Icons.verified_outlined,
                           size: 16,
-                          color: Color(0xFF1E40AF),
+                          color: Color(0xFF003D88),
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -171,7 +171,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF1E40AF),
+                            color: Color(0xFF003D88),
                           ),
                         ),
                       ],
@@ -803,7 +803,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                         const Icon(
                                           Icons.check_circle_outline,
                                           size: 16,
-                                          color: Color(0xFF0D9488),
+                                          color: Color(0xFF029C8C),
                                         ),
                                         const SizedBox(width: 8),
                                         Expanded(
@@ -811,7 +811,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                             s,
                                             style: const TextStyle(
                                               fontSize: 13,
-                                              color: Color(0xFF1E293B),
+                                              color: Color(0xFF1A2A4D),
                                             ),
                                           ),
                                         ),
@@ -854,7 +854,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFEFF6FF),
+                                  color: const Color(0xFFEAF3FD),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -862,7 +862,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                   style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1E40AF),
+                                    color: Color(0xFF003D88),
                                   ),
                                 ),
                               ),

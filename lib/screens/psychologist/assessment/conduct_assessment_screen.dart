@@ -212,12 +212,12 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFECFDF5),
+                              color: const Color(0xFFEEF9EC),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(
                               Icons.task_alt_rounded,
-                              color: Color(0xFF059669),
+                              color: Color(0xFF12803A),
                               size: 22,
                             ),
                           ),
@@ -270,7 +270,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                     _buildMetricBox(
                                       'Javob berildi',
                                       '${evaluatedResponses.length} / ${_responses.length}',
-                                      const Color(0xFF059669),
+                                      const Color(0xFF12803A),
                                     ),
                                     _buildMetricBox(
                                       'O‘tkazib yuborildi',
@@ -283,7 +283,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                       _buildMetricBox(
                                         'Jami ball',
                                         '${totalEarned.toStringAsFixed(1)} / ${totalMax.toStringAsFixed(0)} (${percent.toStringAsFixed(0)}%)',
-                                        const Color(0xFF4F46E5),
+                                        const Color(0xFF0062CC),
                                       ),
                                   ],
                                 ),
@@ -329,7 +329,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                               style: const TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.bold,
-                                                color: Color(0xFF4F46E5),
+                                                color: Color(0xFF0062CC),
                                               ),
                                             ),
                                           ],
@@ -348,7 +348,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                             valueColor:
                                                 const AlwaysStoppedAnimation<
                                                   Color
-                                                >(Color(0xFF4F46E5)),
+                                                >(Color(0xFF0062CC)),
                                           ),
                                         ),
                                       ],
@@ -431,7 +431,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                           const SizedBox(width: 12),
                           FilledButton.icon(
                             style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF059669),
+                              backgroundColor: const Color(0xFF12803A),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 20,
                                 vertical: 12,
@@ -575,7 +575,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
           child: LinearProgressIndicator(
             value: (_currentIndex + 1) / _questions.length,
             backgroundColor: const Color(0xFFE2E8F0),
-            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
+            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF0062CC)),
           ),
         ),
         actions: [
@@ -587,7 +587,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
           const SizedBox(width: 8),
           FilledButton.icon(
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF059669),
+              backgroundColor: const Color(0xFF12803A),
             ),
             icon: const Icon(Icons.checklist_rounded, size: 18),
             label: const Text('Yakunlash'),
@@ -613,7 +613,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF4F46E5),
+                        color: Color(0xFF0062CC),
                       ),
                     ),
                     // Savollar raqamlari qatori
@@ -633,17 +633,17 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                             decoration: BoxDecoration(
                               color:
                                   isCur
-                                      ? const Color(0xFF4F46E5)
+                                      ? const Color(0xFF0062CC)
                                       : isAns
-                                      ? const Color(0xFFECFDF5)
+                                      ? const Color(0xFFEEF9EC)
                                       : const Color(0xFFF1F5F9),
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
                                 color:
                                     isCur
-                                        ? const Color(0xFF4F46E5)
+                                        ? const Color(0xFF0062CC)
                                         : isAns
-                                        ? const Color(0xFF059669)
+                                        ? const Color(0xFF12803A)
                                         : AppColors.border,
                               ),
                             ),
@@ -656,7 +656,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                     isCur
                                         ? Colors.white
                                         : isAns
-                                        ? const Color(0xFF059669)
+                                        ? const Color(0xFF12803A)
                                         : AppColors.textPrimary,
                               ),
                             ),
@@ -689,7 +689,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFEEF2FF),
+                                color: const Color(0xFFEAF3FD),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -697,7 +697,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF4F46E5),
+                                  color: Color(0xFF0062CC),
                                 ),
                               ),
                             ),
@@ -883,7 +883,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                     if (_currentIndex < _questions.length - 1)
                       FilledButton.icon(
                         style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF4F46E5),
+                          backgroundColor: const Color(0xFF0062CC),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
                             vertical: 12,
@@ -896,7 +896,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                     else
                       FilledButton.icon(
                         style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF059669),
+                          backgroundColor: const Color(0xFF12803A),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
                             vertical: 12,
@@ -945,7 +945,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                         color:
                             isSelected
                                 ? (isYes
-                                    ? const Color(0xFFECFDF5)
+                                    ? const Color(0xFFEEF9EC)
                                     : const Color(0xFFFEF2F2))
                                 : const Color(0xFFF8FAFC),
                         borderRadius: BorderRadius.circular(10),
@@ -953,7 +953,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                           color:
                               isSelected
                                   ? (isYes
-                                      ? const Color(0xFF059669)
+                                      ? const Color(0xFF12803A)
                                       : const Color(0xFFDC2626))
                                   : AppColors.border,
                           width: isSelected ? 2 : 1,
@@ -969,7 +969,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                             color:
                                 isSelected
                                     ? (isYes
-                                        ? const Color(0xFF059669)
+                                        ? const Color(0xFF12803A)
                                         : const Color(0xFFDC2626))
                                     : Colors.grey,
                           ),
@@ -982,7 +982,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                               color:
                                   isSelected
                                       ? (isYes
-                                          ? const Color(0xFF059669)
+                                          ? const Color(0xFF12803A)
                                           : const Color(0xFFDC2626))
                                       : AppColors.textPrimary,
                             ),
@@ -995,7 +995,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                               color:
                                   isSelected
                                       ? (isYes
-                                          ? const Color(0xFF059669)
+                                          ? const Color(0xFF12803A)
                                           : const Color(0xFFDC2626))
                                       : AppColors.textMuted,
                             ),
@@ -1017,18 +1017,18 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFFEEF2FF) : Colors.white,
+                  color: isSelected ? const Color(0xFFEAF3FD) : Colors.white,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color:
-                        isSelected ? const Color(0xFF4F46E5) : AppColors.border,
+                        isSelected ? const Color(0xFF0062CC) : AppColors.border,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
                 child: RadioListTile<String>(
                   value: opt.text,
                   groupValue: r.answer,
-                  activeColor: const Color(0xFF4F46E5),
+                  activeColor: const Color(0xFF0062CC),
                   title: Text(
                     opt.text,
                     style: TextStyle(
@@ -1045,7 +1045,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                     decoration: BoxDecoration(
                       color:
                           isSelected
-                              ? const Color(0xFF4F46E5)
+                              ? const Color(0xFF0062CC)
                               : const Color(0xFFF1F5F9),
                       borderRadius: BorderRadius.circular(6),
                     ),
@@ -1094,16 +1094,16 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               decoration: BoxDecoration(
-                color: isChecked ? const Color(0xFFEEF2FF) : Colors.white,
+                color: isChecked ? const Color(0xFFEAF3FD) : Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: isChecked ? const Color(0xFF4F46E5) : AppColors.border,
+                  color: isChecked ? const Color(0xFF0062CC) : AppColors.border,
                   width: isChecked ? 1.5 : 1,
                 ),
               ),
               child: CheckboxListTile(
                 value: isChecked,
-                activeColor: const Color(0xFF4F46E5),
+                activeColor: const Color(0xFF0062CC),
                 title: Text(
                   opt.text,
                   style: TextStyle(
@@ -1119,7 +1119,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                   decoration: BoxDecoration(
                     color:
                         isChecked
-                            ? const Color(0xFF4F46E5)
+                            ? const Color(0xFF0062CC)
                             : const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -1178,7 +1178,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEEF2FF),
+                  color: const Color(0xFFEAF3FD),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -1186,7 +1186,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF4F46E5),
+                    color: Color(0xFF0062CC),
                   ),
                 ),
               ),
@@ -1216,13 +1216,13 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                       decoration: BoxDecoration(
                         color:
                             isSel
-                                ? const Color(0xFF4F46E5)
+                                ? const Color(0xFF0062CC)
                                 : const Color(0xFFF8FAFC),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color:
                               isSel
-                                  ? const Color(0xFF4F46E5)
+                                  ? const Color(0xFF0062CC)
                                   : AppColors.border,
                         ),
                       ),

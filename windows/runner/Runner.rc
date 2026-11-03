@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "uz.talim" "\0"
-            VALUE "FileDescription", "talim_nazorat" "\0"
+            VALUE "FileDescription", "Individ" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "talim_nazorat" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 uz.talim. All rights reserved." "\0"
             VALUE "OriginalFilename", "talim_nazorat.exe" "\0"
-            VALUE "ProductName", "talim_nazorat" "\0"
+            VALUE "ProductName", "Individ" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

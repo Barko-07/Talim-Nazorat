@@ -22,7 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   TextStyle _myGovFont({
     double fontSize = 15,
     FontWeight fontWeight = FontWeight.w500,
-    Color color = const Color(0xFF0F172A),
+    Color color = const Color(0xFF0A1A3F),
     double letterSpacing = -0.1,
     double? height,
   }) {
@@ -86,7 +86,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 border: Border.all(color: const Color(0xFFE2E8F0)),
                 boxShadow: const [
                   BoxShadow(
-                    color: Color(0x080F172A),
+                    color: Color(0x080A1A3F),
                     blurRadius: 14,
                     offset: Offset(0, 4),
                   ),
@@ -111,7 +111,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: _myGovFont(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF1E293B),
+                        color: const Color(0xFF1A2A4D),
                       ),
                     ),
                   ),
@@ -125,7 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: _myGovFont(
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF0F172A),
+                            color: const Color(0xFF0A1A3F),
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -175,7 +175,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 border: Border.all(color: const Color(0xFFE2E8F0)),
                 boxShadow: const [
                   BoxShadow(
-                    color: Color(0x060F172A),
+                    color: Color(0x060A1A3F),
                     blurRadius: 12,
                     offset: Offset(0, 3),
                   ),
@@ -268,7 +268,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'TA’LIM NAZORAT • v1.0.0',
+                    'Individ • v1.0.0',
                     style: _myGovFont(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w500,
@@ -293,7 +293,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: _myGovFont(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF0F172A),
+                  color: const Color(0xFF0A1A3F),
                 ),
               ),
             )
@@ -345,7 +345,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Icon(
                 icon,
                 size: 20,
-                color: const Color(0xFF1E293B),
+                color: const Color(0xFF1A2A4D),
               ),
             ),
             const SizedBox(width: 14),
@@ -358,7 +358,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: _myGovFont(
                       fontSize: 15.5,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF0F172A),
+                      color: const Color(0xFF0A1A3F),
                       letterSpacing: -0.1,
                     ),
                   ),
@@ -387,7 +387,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF22C55E), Color(0xFF2563EB)],
+                    colors: [Color(0xFF3DBE37), Color(0xFF0062CC)],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
@@ -477,7 +477,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       title: 'Ilova haqida',
       rows: const [
-        ('Platforma nomi', 'TA’LIM NAZORAT'),
+        ('Platforma nomi', 'Individ'),
         ('Talqin', '1.0.0'),
         ('Ma’lumotlar bazasi', 'Mahalliy himoyalangan xotira'),
         ('Huquqiy me’yor', 'O‘RQ-547 ("Shaxsga doir ma’lumotlar to‘g‘risida")'),
@@ -540,7 +540,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: _myGovFont(
                         fontSize: 17.5,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF0F172A),
+                        color: const Color(0xFF0A1A3F),
                       ),
                     ),
                     IconButton(
@@ -578,7 +578,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: _myGovFont(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF0F172A),
+                              color: const Color(0xFF0A1A3F),
                               height: 1.35,
                             ),
                           ),

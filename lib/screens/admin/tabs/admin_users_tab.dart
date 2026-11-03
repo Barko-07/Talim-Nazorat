@@ -398,12 +398,12 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: u.isActive
-                                      ? const Color(0xFFECFDF5)
+                                      ? const Color(0xFFEEF9EC)
                                       : const Color(0xFFFEF2F2),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: u.isActive
-                                        ? const Color(0xFFA7F3D0)
+                                        ? const Color(0xFFC3EBBE)
                                         : const Color(0xFFFECACA),
                                   ),
                                 ),
@@ -416,7 +416,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                           : Icons.block_rounded,
                                       size: 14,
                                       color: u.isActive
-                                          ? const Color(0xFF059669)
+                                          ? const Color(0xFF12803A)
                                           : const Color(0xFFDC2626),
                                     ),
                                     const SizedBox(width: 4),
@@ -426,7 +426,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
                                         color: u.isActive
-                                            ? const Color(0xFF059669)
+                                            ? const Color(0xFF12803A)
                                             : const Color(0xFFDC2626),
                                       ),
                                     ),
@@ -522,7 +522,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor:
-                  newStatus ? const Color(0xFF059669) : AppColors.error,
+                  newStatus ? const Color(0xFF12803A) : AppColors.error,
               foregroundColor: Colors.white,
             ),
             onPressed: () async {
@@ -540,7 +540,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                         '${target.fullName} hisobi muvaffaqiyatli ${newStatus ? 'faollashtirildi' : 'bloklandi'}.',
                       ),
                       backgroundColor: newStatus
-                          ? const Color(0xFF059669)
+                          ? const Color(0xFF12803A)
                           : const Color(0xFFDC2626),
                     ),
                   );
@@ -913,7 +913,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                             content: Text(
                               '${newUser.fullName} muvaffaqiyatli yaratildi.',
                             ),
-                            backgroundColor: const Color(0xFF059669),
+                            backgroundColor: const Color(0xFF12803A),
                           ),
                         );
                       }
@@ -1099,7 +1099,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Ma’lumotlar muvaffaqiyatli saqlandi.'),
-                          backgroundColor: Color(0xFF059669),
+                          backgroundColor: Color(0xFF12803A),
                         ),
                       );
                     }

@@ -11,6 +11,7 @@ import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/access_control_service.dart';
 import '../../services/child_status_service.dart';
+import '../../services/monthly_trend.dart';
 import '../assessments/new_assessment_screen.dart';
 import '../iep/iep_list_screen.dart';
 import '../monitoring/monitoring_screen.dart';
@@ -483,8 +484,8 @@ class DashboardScreen extends StatelessWidget {
               ),
               StatusPill(
                 label: '🟢 Ijobiy dinamika: $greenCount nafar',
-                color: const Color(0xFF16A34A),
-                backgroundColor: const Color(0xFFDCFCE7),
+                color: const Color(0xFF12803A),
+                backgroundColor: const Color(0xFFE4F6E1),
               ),
               StatusPill(
                 label: '↗ Faol yo‘naltirishlar: $pendingReferrals ta',
@@ -499,39 +500,12 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildAnalyticsChartCard(AppProvider app) {
-    const months = ['Boshlang‘ich', 'Oraliq 1', 'Oraliq 2', 'Joriy davr'];
-    final assessments = app.assessments;
-    double prevAvg = 58;
-    double currAvg = 72;
-    if (assessments.isNotEmpty) {
-      final currScores =
-          assessments
-              .where((a) => a.maxScore > 0)
-              .map((a) => (a.totalScore / a.maxScore * 100).clamp(0.0, 100.0))
-              .toList();
-      final prevScores =
-          assessments
-              .where((a) => a.previousScore != null && a.maxScore > 0)
-              .map(
-                (a) => (a.previousScore! / a.maxScore * 100).clamp(0.0, 100.0),
-              )
-              .toList();
-      if (currScores.isNotEmpty) {
-        currAvg = currScores.reduce((a, b) => a + b) / currScores.length;
-      }
-      if (prevScores.isNotEmpty) {
-        prevAvg = prevScores.reduce((a, b) => a + b) / prevScores.length;
-      } else {
-        prevAvg = (currAvg - 10).clamp(0.0, 100.0);
-      }
-    }
-    final step1 = prevAvg + (currAvg - prevAvg) * 0.35;
-    final step2 = prevAvg + (currAvg - prevAvg) * 0.70;
+    // Faqat haqiqiy baholashlar: ma'lumot bo'lmasa grafik o'rniga bo'sh holat.
+    final points = monthlyAverages(app.assessments, now: DateTime.now());
+    final months = [for (final p in points) p.shortLabel];
     final dynamicSpots = [
-      FlSpot(0, prevAvg.roundToDouble()),
-      FlSpot(1, step1.roundToDouble()),
-      FlSpot(2, step2.roundToDouble()),
-      FlSpot(3, currAvg.roundToDouble()),
+      for (var i = 0; i < points.length; i++)
+        FlSpot(i.toDouble(), points[i].percent.roundToDouble()),
     ];
 
     return SurfaceCard(
@@ -557,7 +531,7 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'Nutq, kognitiv va ijtimoiy mezonlar kesimida o‘rtacha ballar',
+                    'Yakunlangan baholashlarning oylik o‘rtacha natijasi, %',
                     style: TextStyle(
                       fontSize: 12.5,
                       color: AppColors.textMuted,
@@ -567,7 +541,7 @@ class DashboardScreen extends StatelessWidget {
               );
 
               const pill = StatusPill(
-                label: '2026 o‘quv yili',
+                label: 'So‘nggi 6 oy',
                 color: AppColors.primary,
                 backgroundColor: AppColors.primaryLight,
               );
@@ -590,145 +564,181 @@ class DashboardScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 24),
-          GlassWell(
-            borderRadius: 12,
-            padding: const EdgeInsets.fromLTRB(10, 20, 26, 12),
-            child: SizedBox(
-              height: 205,
-              child: LineChart(
-                LineChartData(
-                  lineTouchData: LineTouchData(
-                    handleBuiltInTouches: true,
-                    touchTooltipData: LineTouchTooltipData(
-                      tooltipBorderRadius: BorderRadius.circular(10),
-                      getTooltipColor: (_) => AppColors.textPrimary,
-                      getTooltipItems: (touchedSpots) {
-                        return touchedSpots.map((spot) {
-                          final idx = spot.x.toInt();
-                          final month =
-                              (idx >= 0 && idx < months.length)
-                                  ? months[idx]
-                                  : '';
-                          return LineTooltipItem(
-                            '$month\n${spot.y.toInt()} ball',
-                            const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              height: 1.35,
-                            ),
-                          );
-                        }).toList();
-                      },
+          if (points.isEmpty)
+            const GlassWell(
+              borderRadius: 12,
+              padding: EdgeInsets.symmetric(horizontal: 18, vertical: 34),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      LucideIcons.chartLine,
+                      color: AppColors.textSubtle,
+                      size: 26,
                     ),
-                  ),
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    horizontalInterval: 25,
-                    getDrawingHorizontalLine:
-                        (_) => FlLine(
-                          color: AppColors.borderSlate.withValues(alpha: 0.7),
-                          strokeWidth: 1,
-                          dashArray: [5, 5],
-                        ),
-                  ),
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 25,
-                        reservedSize: 34,
-                        getTitlesWidget:
-                            (val, _) => Text(
-                              '${val.toInt()}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textMuted,
-                                fontFeatures: [FontFeature.tabularFigures()],
-                              ),
-                            ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Hozircha ma’lumot yo‘q',
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textSecondary,
                       ),
                     ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 1,
-                        reservedSize: 32,
-                        getTitlesWidget: (val, meta) {
-                          final idx = val.toInt();
-                          if (val != idx.toDouble()) {
-                            return const SizedBox.shrink();
-                          }
-                          if (idx >= 0 && idx < months.length) {
-                            return SideTitleWidget(
-                              meta: meta,
-                              space: 10,
-                              fitInside: SideTitleFitInsideData.fromTitleMeta(
-                                meta,
-                                distanceFromEdge: 0,
-                              ),
-                              child: Text(
-                                months[idx],
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                    ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  minX: 0,
-                  maxX: 3,
-                  minY: 0,
-                  maxY: 100,
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: dynamicSpots,
-                      isCurved: true,
-                      curveSmoothness: 0.34,
-                      color: AppColors.primary,
-                      barWidth: 3.2,
-                      isStrokeCapRound: true,
-                      dotData: FlDotData(
-                        show: true,
-                        getDotPainter:
-                            (_, _, _, _) => FlDotCirclePainter(
-                              radius: 5,
-                              color: Colors.white,
-                              strokeWidth: 2.6,
-                              strokeColor: AppColors.primary,
-                            ),
-                      ),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            AppColors.primary.withValues(alpha: 0.24),
-                            AppColors.primary.withValues(alpha: 0.0),
-                          ],
-                        ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Baholashlar yakunlangach, oylik natijalar shu yerda ko‘rinadi.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ],
                 ),
               ),
+            )
+          else
+            GlassWell(
+              borderRadius: 12,
+              padding: const EdgeInsets.fromLTRB(10, 20, 26, 12),
+              child: SizedBox(
+                height: 205,
+                child: LineChart(
+                  LineChartData(
+                    lineTouchData: LineTouchData(
+                      handleBuiltInTouches: true,
+                      touchTooltipData: LineTouchTooltipData(
+                        tooltipBorderRadius: BorderRadius.circular(10),
+                        getTooltipColor: (_) => AppColors.textPrimary,
+                        getTooltipItems: (touchedSpots) {
+                          return touchedSpots.map((spot) {
+                            final idx = spot.x.toInt();
+                            final month =
+                                (idx >= 0 && idx < months.length)
+                                    ? months[idx]
+                                    : '';
+                            return LineTooltipItem(
+                              '$month\n${spot.y.toInt()} ball',
+                              const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                height: 1.35,
+                              ),
+                            );
+                          }).toList();
+                        },
+                      ),
+                    ),
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      horizontalInterval: 25,
+                      getDrawingHorizontalLine:
+                          (_) => FlLine(
+                            color: AppColors.borderSlate.withValues(alpha: 0.7),
+                            strokeWidth: 1,
+                            dashArray: [5, 5],
+                          ),
+                    ),
+                    titlesData: FlTitlesData(
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: 25,
+                          reservedSize: 34,
+                          getTitlesWidget:
+                              (val, _) => Text(
+                                '${val.toInt()}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.textMuted,
+                                  fontFeatures: [FontFeature.tabularFigures()],
+                                ),
+                              ),
+                        ),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: 1,
+                          reservedSize: 32,
+                          getTitlesWidget: (val, meta) {
+                            final idx = val.toInt();
+                            if (val != idx.toDouble()) {
+                              return const SizedBox.shrink();
+                            }
+                            if (idx >= 0 && idx < months.length) {
+                              return SideTitleWidget(
+                                meta: meta,
+                                space: 10,
+                                fitInside: SideTitleFitInsideData.fromTitleMeta(
+                                  meta,
+                                  distanceFromEdge: 0,
+                                ),
+                                child: Text(
+                                  months[idx],
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    // Yarim birlik chekka: bitta nuqta ham, chekka yozuvlar ham sig'adi.
+                    minX: -0.5,
+                    maxX: months.length - 0.5,
+                    minY: 0,
+                    maxY: 100,
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: dynamicSpots,
+                        isCurved: true,
+                        curveSmoothness: 0.34,
+                        color: AppColors.primary,
+                        barWidth: 3.2,
+                        isStrokeCapRound: true,
+                        dotData: FlDotData(
+                          show: true,
+                          getDotPainter:
+                              (_, _, _, _) => FlDotCirclePainter(
+                                radius: 5,
+                                color: Colors.white,
+                                strokeWidth: 2.6,
+                                strokeColor: AppColors.primary,
+                              ),
+                        ),
+                        belowBarData: BarAreaData(
+                          show: true,
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              AppColors.primary.withValues(alpha: 0.24),
+                              AppColors.primary.withValues(alpha: 0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -1085,7 +1095,8 @@ class DashboardScreen extends StatelessWidget {
           },
           {
             'title': 'Dars davomati va mashg‘ulotlar',
-            'desc': 'Inklyuziv o‘quvchilarning darslardagi ishtiroki va davomati',
+            'desc':
+                'Inklyuziv o‘quvchilarning darslardagi ishtiroki va davomati',
             'icon': LucideIcons.clipboardCheck,
             'color': AppColors.info,
             'tabIndex': 3,

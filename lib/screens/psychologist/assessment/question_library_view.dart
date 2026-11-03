@@ -137,12 +137,12 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEEF2FF),
+                      color: const Color(0xFFEAF3FD),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.quiz_rounded,
-                      color: Color(0xFF4F46E5),
+                      color: Color(0xFF0062CC),
                       size: 20,
                     ),
                   ),
@@ -227,7 +227,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                                 const Icon(
                                   Icons.check_circle_outline,
                                   size: 16,
-                                  color: Color(0xFF4F46E5),
+                                  color: Color(0xFF0062CC),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
@@ -242,7 +242,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFEEF2FF),
+                                    color: const Color(0xFFEAF3FD),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
@@ -250,7 +250,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                                     style: const TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF4F46E5),
+                                      color: Color(0xFF0062CC),
                                     ),
                                   ),
                                 ),
@@ -349,7 +349,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                     const SizedBox(width: 12),
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
+                        backgroundColor: const Color(0xFF0062CC),
                       ),
                       icon: const Icon(Icons.add_task_rounded, size: 16),
                       label: const Text('Baholashga qo‘shish'),
@@ -373,11 +373,11 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: isReady ? const Color(0xFFECFDF5) : const Color(0xFFFFFBEB),
+        color: isReady ? const Color(0xFFEEF9EC) : const Color(0xFFFFFBEB),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: isReady
-              ? const Color(0xFF059669).withValues(alpha: 0.3)
+              ? const Color(0xFF12803A).withValues(alpha: 0.3)
               : const Color(0xFFD97706).withValues(alpha: 0.3),
         ),
       ),
@@ -387,7 +387,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
           Icon(
             isReady ? Icons.check_circle_rounded : Icons.pending_outlined,
             size: 12,
-            color: isReady ? const Color(0xFF059669) : const Color(0xFFD97706),
+            color: isReady ? const Color(0xFF12803A) : const Color(0xFFD97706),
           ),
           const SizedBox(width: 4),
           Text(
@@ -395,7 +395,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
             style: TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.bold,
-              color: isReady ? const Color(0xFF059669) : const Color(0xFFD97706),
+              color: isReady ? const Color(0xFF12803A) : const Color(0xFFD97706),
             ),
           ),
         ],
@@ -462,7 +462,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEEF2FF),
+                        color: const Color(0xFFEAF3FD),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -470,7 +470,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF4F46E5),
+                          color: Color(0xFF0062CC),
                         ),
                       ),
                     ),
@@ -485,7 +485,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
             ),
             FilledButton.icon(
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF4F46E5),
+                backgroundColor: const Color(0xFF0062CC),
               ),
               icon: const Icon(Icons.add_rounded, size: 18),
               label: const Text('+ Yangi savol'),
@@ -696,7 +696,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                 const SizedBox(height: 14),
                 FilledButton.icon(
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
+                    backgroundColor: const Color(0xFF0062CC),
                   ),
                   icon: const Icon(Icons.add, size: 16),
                   label: const Text('Yangi savol yaratish'),
@@ -741,12 +741,12 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEEF2FF),
+                      color: const Color(0xFFEAF3FD),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.help_outline_rounded,
-                      color: Color(0xFF4F46E5),
+                      color: Color(0xFF0062CC),
                       size: 18,
                     ),
                   ),
@@ -793,14 +793,14 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                   _buildTag(
                     Icons.category_outlined,
                     q.domain,
-                    const Color(0xFF4F46E5),
-                    const Color(0xFFEEF2FF),
+                    const Color(0xFF0062CC),
+                    const Color(0xFFEAF3FD),
                   ),
                   _buildTag(
                     Icons.tune_rounded,
                     _typeNames[q.questionType] ?? q.questionType,
-                    const Color(0xFF0284C7),
-                    const Color(0xFFF0F9FF),
+                    const Color(0xFF00808A),
+                    const Color(0xFFE8F7F6),
                   ),
                   _buildTag(
                     Icons.school_outlined,
@@ -812,8 +812,8 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                     _buildTag(
                       Icons.star_outline_rounded,
                       'Maks: ${q.maxScore.toStringAsFixed(0)} ball',
-                      const Color(0xFF059669),
-                      const Color(0xFFECFDF5),
+                      const Color(0xFF12803A),
+                      const Color(0xFFEEF9EC),
                     ),
                 ],
               ),

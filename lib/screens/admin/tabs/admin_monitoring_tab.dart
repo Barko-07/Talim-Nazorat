@@ -72,12 +72,12 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                         decoration: BoxDecoration(
                           color: highCount > 0
                               ? const Color(0xFFFEF2F2)
-                              : const Color(0xFFECFDF5),
+                              : const Color(0xFFEEF9EC),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: highCount > 0
                                 ? const Color(0xFFDC2626).withValues(alpha: 0.3)
-                                : const Color(0xFF059669).withValues(alpha: 0.3),
+                                : const Color(0xFF12803A).withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
@@ -89,7 +89,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                             fontWeight: FontWeight.bold,
                             color: highCount > 0
                                 ? const Color(0xFFDC2626)
-                                : const Color(0xFF059669),
+                                : const Color(0xFF12803A),
                           ),
                         ),
                       ),
@@ -145,8 +145,8 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                 child: _buildSeverityBox(
                   title: 'MA’LUMOT UCHUN (LOW)',
                   count: lowCount,
-                  color: const Color(0xFF0284C7),
-                  bgColor: const Color(0xFFF0F9FF),
+                  color: const Color(0xFF00808A),
+                  bgColor: const Color(0xFFE8F7F6),
                   active: _filterSeverity == 'MA’LUMOT',
                   onTap: () {
                     setState(() {
@@ -161,8 +161,8 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                 child: _buildSeverityBox(
                   title: 'BARTARAF ETILGAN',
                   count: resolvedCount,
-                  color: const Color(0xFF059669),
-                  bgColor: const Color(0xFFECFDF5),
+                  color: const Color(0xFF12803A),
+                  bgColor: const Color(0xFFEEF9EC),
                   active: _filterResolved == true,
                   onTap: () {
                     setState(() {
@@ -193,7 +193,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                           Icon(
                             Icons.verified_user_rounded,
                             size: 48,
-                            color: Color(0xFF059669),
+                            color: Color(0xFF12803A),
                           ),
                           SizedBox(height: 12),
                           Text(
@@ -220,7 +220,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                           ? const Color(0xFFDC2626)
                           : isMed
                               ? const Color(0xFFD97706)
-                              : const Color(0xFF0284C7);
+                              : const Color(0xFF00808A);
 
                       return Padding(
                         padding: const EdgeInsets.all(18),
@@ -332,7 +332,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                       '✅ Hal qilindi: ${a.resolvedNotes ?? ''} (${a.resolvedAt != null ? df.format(a.resolvedAt!) : ''})',
                                       style: const TextStyle(
                                         fontSize: 11,
-                                        color: Color(0xFF059669),
+                                        color: Color(0xFF12803A),
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -344,7 +344,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                             if (!a.isResolved)
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF059669),
+                                  backgroundColor: const Color(0xFF12803A),
                                   foregroundColor: Colors.white,
                                   elevation: 0,
                                   padding: const EdgeInsets.symmetric(
@@ -460,7 +460,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF059669),
+              backgroundColor: const Color(0xFF12803A),
               foregroundColor: Colors.white,
             ),
             onPressed: () async {
@@ -477,7 +477,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                       content: Text(
                         'Monitoring signali muvaffaqiyatli hal qilindi deb belgilandi.',
                       ),
-                      backgroundColor: Color(0xFF059669),
+                      backgroundColor: Color(0xFF12803A),
                     ),
                   );
                 }

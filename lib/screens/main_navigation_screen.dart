@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
+import '../core/constants/app_brand.dart';
 import '../core/constants/app_colors.dart';
+import '../core/widgets/brand_logo.dart';
 import '../core/widgets/glass_widgets.dart';
 import '../models/student_model.dart';
 import '../models/user_model.dart';
@@ -378,7 +380,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     showDialog(
       context: context,
-      barrierColor: const Color(0x420F172A),
+      barrierColor: const Color(0x420A1A3F),
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
           final results = app.students.where((s) {
@@ -1186,11 +1188,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     child: Row(
                       children: [
                         if (showMenuIsland) ...[
-                          const Icon(
-                            LucideIcons.landmark,
-                            color: AppColors.primary,
-                            size: 19.5,
-                          ),
+                          const BrandMark(height: 26),
                           const SizedBox(width: 9),
                         ],
                         Expanded(
@@ -1198,17 +1196,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                isDesktop ? currentNav.title : 'TA’LIM NAZORAT',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: isDesktop ? 16 : 13.8,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.3,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
+                              if (isDesktop)
+                                Text(
+                                  currentNav.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.3,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                )
+                              else
+                                const BrandWordmark(fontSize: 15),
                               Text(
                                 user?.institutionName ??
                                     '9-sonli inklyuziv ta’lim tayanch maktabi',
@@ -1436,25 +1437,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   padding: const EdgeInsets.fromLTRB(22, 20, 14, 16),
                   child: Row(
                     children: [
-                      const Icon(
-                        LucideIcons.landmark,
-                        color: AppColors.primary,
-                        size: 24,
-                      ),
+                      const BrandMark(height: 34),
                       const SizedBox(width: 12),
                       const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'TA’LIM NAZORAT',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: -0.2,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
+                            BrandWordmark(fontSize: 18),
                             Text(
                               'Inklyuziv monitoring',
                               style: TextStyle(
@@ -1909,26 +1898,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 children: [
                   const Row(
                     children: [
-                      Icon(
-                        LucideIcons.landmark,
-                        color: AppColors.primary,
-                        size: 22,
-                      ),
+                      BrandMark(height: 32),
                       SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            BrandWordmark(fontSize: 18),
                             Text(
-                              'TA’LIM NAZORAT',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            Text(
-                              'Yagona monitoring tizimi',
+                              AppBrand.tagline,
                               style: TextStyle(
                                 fontSize: 11.5,
                                 color: AppColors.textMuted,
@@ -2052,7 +2030,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 children: [
                   const Expanded(
                     child: Text(
-                      'TA’LIM NAZORAT • v2.6',
+                      '${AppBrand.name} • v1.0.0',
                       style: TextStyle(
                         fontSize: 11.5,
                         color: AppColors.textMuted,
@@ -2170,7 +2148,7 @@ class _ProfileRightDropdownMenu extends StatelessWidget {
             const Divider(
               height: 1,
               thickness: 0.85,
-              color: Color(0x180F172A),
+              color: Color(0x180A1A3F),
               indent: 14,
               endIndent: 0,
             ),

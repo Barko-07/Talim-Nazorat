@@ -354,7 +354,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                                   icon: Icons.assignment_turned_in_rounded,
                                   label:
                                       '$userAssessmentsCount ta baholash o‘tkazilgan',
-                                  color: const Color(0xFF059669),
+                                  color: const Color(0xFF12803A),
                                 ),
                                 _buildMetricPill(
                                   icon: Icons.event_available_rounded,

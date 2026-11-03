@@ -643,12 +643,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               final stColor = switch (childSt.color) {
                                 StatusColor.red => const Color(0xFFDC2626),
                                 StatusColor.yellow => const Color(0xFFD97706),
-                                StatusColor.green => const Color(0xFF059669),
+                                StatusColor.green => const Color(0xFF12803A),
                               };
                               final stBg = switch (childSt.color) {
                                 StatusColor.red => const Color(0xFFFEF2F2),
                                 StatusColor.yellow => const Color(0xFFFFFBEB),
-                                StatusColor.green => const Color(0xFFECFDF5),
+                                StatusColor.green => const Color(0xFFEEF9EC),
                               };
                               return StatusPill(
                                 label:
@@ -1063,8 +1063,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               children: [
                 StatusPill(
                   label: 'O‘zlashtirilgan: ${profile.mastered.length}',
-                  color: const Color(0xFF059669),
-                  backgroundColor: const Color(0xFFECFDF5),
+                  color: const Color(0xFF12803A),
+                  backgroundColor: const Color(0xFFEEF9EC),
                 ),
                 StatusPill(
                   label: 'Jarayonda: ${profile.inProgress.length}',
@@ -1340,7 +1340,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(LucideIcons.award, color: Color(0xFF059669), size: 20),
+                  Icon(LucideIcons.award, color: Color(0xFF12803A), size: 20),
                   SizedBox(width: 10),
                   Text(
                     'Mening Yutuqlar Pasportim',
@@ -1379,10 +1379,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFECFDF5),
+                  color: const Color(0xFFEEF9EC),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFF059669).withValues(alpha: 0.25),
+                    color: const Color(0xFF12803A).withValues(alpha: 0.25),
                   ),
                 ),
                 child: Row(
@@ -1390,7 +1390,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     const Icon(
                       LucideIcons.sparkles,
                       size: 16,
-                      color: Color(0xFF059669),
+                      color: Color(0xFF12803A),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -2089,11 +2089,11 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   static Color _dynamicsColor(DynamicsStatus st) {
     switch (st) {
       case DynamicsStatus.growth:
-        return const Color(0xFF059669);
+        return const Color(0xFF12803A);
       case DynamicsStatus.decline:
         return const Color(0xFFDC2626);
       case DynamicsStatus.stable:
-        return const Color(0xFF2563EB);
+        return const Color(0xFF0062CC);
       case DynamicsStatus.ineffective:
         return const Color(0xFFD97706);
       case DynamicsStatus.insufficientData:
@@ -2104,11 +2104,11 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   static Color _dynamicsBg(DynamicsStatus st) {
     switch (st) {
       case DynamicsStatus.growth:
-        return const Color(0xFFECFDF5);
+        return const Color(0xFFEEF9EC);
       case DynamicsStatus.decline:
         return const Color(0xFFFEF2F2);
       case DynamicsStatus.stable:
-        return const Color(0xFFEFF6FF);
+        return const Color(0xFFEAF3FD);
       case DynamicsStatus.ineffective:
         return const Color(0xFFFFFBEB);
       case DynamicsStatus.insufficientData:
@@ -2838,11 +2838,11 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               color:
                                   hasGap
                                       ? const Color(0xFFD97706)
-                                      : const Color(0xFF059669),
+                                      : const Color(0xFF12803A),
                               backgroundColor:
                                   hasGap
                                       ? const Color(0xFFFEF3C7)
-                                      : const Color(0xFFECFDF5),
+                                      : const Color(0xFFEEF9EC),
                               showDot: true,
                             )
                           else
@@ -3072,7 +3072,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
+                              color: const Color(0xFFEAF3FD),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: const Color(0xFFBFDBFE),
@@ -3083,7 +3083,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               style: const TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF1E40AF),
+                                color: Color(0xFF003D88),
                               ),
                             ),
                           ),

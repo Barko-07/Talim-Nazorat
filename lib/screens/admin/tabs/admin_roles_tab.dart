@@ -377,7 +377,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               color: allowed
-                  ? const Color(0xFFECFDF5)
+                  ? const Color(0xFFEEF9EC)
                   : const Color(0xFFFEF2F2),
               shape: BoxShape.circle,
             ),
@@ -385,7 +385,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
               allowed ? Icons.check : Icons.close,
               size: 14,
               color: allowed
-                  ? const Color(0xFF059669)
+                  ? const Color(0xFF12803A)
                   : const Color(0xFFDC2626),
             ),
           ),
@@ -420,7 +420,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: allowed
-                  ? const Color(0xFF059669)
+                  ? const Color(0xFF12803A)
                   : const Color(0xFFDC2626),
             ),
           ),

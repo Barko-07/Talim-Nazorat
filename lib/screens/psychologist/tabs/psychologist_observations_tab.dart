@@ -239,7 +239,7 @@ class _PsychologistObservationsTabState
               ),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
+                  backgroundColor: const Color(0xFF0062CC),
                 ),
                 icon: const Icon(Icons.check_rounded, size: 16),
                 label: const Text('Kundalikka kiritish'),
@@ -366,7 +366,7 @@ class _PsychologistObservationsTabState
               ),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
+                  backgroundColor: const Color(0xFF0062CC),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
@@ -530,7 +530,7 @@ class _PsychologistObservationsTabState
                                     style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF1E293B),
+                                      color: Color(0xFF1A2A4D),
                                     ),
                                   ),
                                 ),
@@ -550,7 +550,7 @@ class _PsychologistObservationsTabState
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFEEF2FF),
+                                    color: const Color(0xFFEAF3FD),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
@@ -558,7 +558,7 @@ class _PsychologistObservationsTabState
                                     style: const TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF4F46E5),
+                                      color: Color(0xFF0062CC),
                                     ),
                                   ),
                                 ),
@@ -571,7 +571,7 @@ class _PsychologistObservationsTabState
                               ),
                               decoration: BoxDecoration(
                                 color: o.emotionalState.contains('Barqaror')
-                                    ? const Color(0xFFECFDF5)
+                                    ? const Color(0xFFEEF9EC)
                                     : const Color(0xFFFEF3C7),
                                 borderRadius: BorderRadius.circular(6),
                               ),
@@ -581,7 +581,7 @@ class _PsychologistObservationsTabState
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                   color: o.emotionalState.contains('Barqaror')
-                                      ? const Color(0xFF059669)
+                                      ? const Color(0xFF12803A)
                                       : const Color(0xFFB45309),
                                 ),
                               ),
@@ -627,7 +627,7 @@ class _PsychologistObservationsTabState
                                 const Icon(
                                   Icons.lightbulb_outline_rounded,
                                   size: 16,
-                                  color: Color(0xFF059669),
+                                  color: Color(0xFF12803A),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
@@ -635,7 +635,7 @@ class _PsychologistObservationsTabState
                                     'Tavsiya/Chora: ${o.recommendationOrAction}',
                                     style: const TextStyle(
                                       fontSize: 11.5,
-                                      color: Color(0xFF065F46),
+                                      color: Color(0xFF0E6630),
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),

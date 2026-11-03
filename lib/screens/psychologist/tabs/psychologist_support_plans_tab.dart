@@ -57,7 +57,7 @@ class _PsychologistSupportPlansTabState
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF4F46E5),
+                      color: Color(0xFF0062CC),
                     ),
                   ),
                 ],
@@ -67,7 +67,7 @@ class _PsychologistSupportPlansTabState
                 min: 0,
                 max: 100,
                 divisions: 20,
-                activeColor: const Color(0xFF4F46E5),
+                activeColor: const Color(0xFF0062CC),
                 label: '$currentProgress%',
                 onChanged: (v) => setDlgState(() => currentProgress = v.toInt()),
               ),
@@ -281,10 +281,10 @@ class _PsychologistSupportPlansTabState
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEEF2FF),
+                          color: const Color(0xFFEAF3FD),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+                            color: const Color(0xFF0062CC).withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
@@ -292,7 +292,7 @@ class _PsychologistSupportPlansTabState
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF4F46E5),
+                            color: Color(0xFF0062CC),
                           ),
                         ),
                       ),
@@ -472,7 +472,7 @@ class _PsychologistSupportPlansTabState
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w900,
-                                    color: Color(0xFF4F46E5),
+                                    color: Color(0xFF0062CC),
                                   ),
                                 ),
                                 const Text(
@@ -510,7 +510,7 @@ class _PsychologistSupportPlansTabState
                                 'Kutilayotgan uzoq muddatli natija: ${p.longTermGoals}',
                                 style: const TextStyle(
                                   fontSize: 11.5,
-                                  color: Color(0xFF059669),
+                                  color: Color(0xFF12803A),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -574,7 +574,7 @@ class _PsychologistSupportPlansTabState
                                               vertical: 1,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFFEEF2FF),
+                                              color: const Color(0xFFEAF3FD),
                                               borderRadius: BorderRadius.circular(4),
                                             ),
                                             child: Text(
@@ -582,7 +582,7 @@ class _PsychologistSupportPlansTabState
                                               style: const TextStyle(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.bold,
-                                                color: Color(0xFF4F46E5),
+                                                color: Color(0xFF0062CC),
                                               ),
                                             ),
                                           ),
@@ -601,8 +601,8 @@ class _PsychologistSupportPlansTabState
                                         value: obj.progressPercent / 100.0,
                                         backgroundColor: const Color(0xFFE2E8F0),
                                         color: obj.progressPercent >= 80
-                                            ? const Color(0xFF059669)
-                                            : const Color(0xFF4F46E5),
+                                            ? const Color(0xFF12803A)
+                                            : const Color(0xFF0062CC),
                                         minHeight: 6,
                                         borderRadius: BorderRadius.circular(3),
                                       ),

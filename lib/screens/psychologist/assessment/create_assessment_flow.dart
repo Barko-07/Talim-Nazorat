@@ -348,7 +348,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                   ),
                 FilledButton.icon(
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
+                    backgroundColor: const Color(0xFF0062CC),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 12,
@@ -449,16 +449,16 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFEEF2FF),
+              color: const Color(0xFFEAF3FD),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: const Color(0xFF4F46E5).withValues(alpha: 0.2),
+                color: const Color(0xFF0062CC).withValues(alpha: 0.2),
               ),
             ),
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: const Color(0xFF4F46E5),
+                  backgroundColor: const Color(0xFF0062CC),
                   child: Text(
                     _selectedStudent!.firstName.isNotEmpty
                         ? _selectedStudent!.firstName[0]
@@ -567,7 +567,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                   'Tanlandi: ${_selectedQuestions.length} ta savol',
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF4F46E5),
+                    color: Color(0xFF0062CC),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -580,7 +580,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFECFDF5),
+                  color: const Color(0xFFEEF9EC),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -588,14 +588,14 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                     const Icon(
                       Icons.auto_awesome,
                       size: 14,
-                      color: Color(0xFF059669),
+                      color: Color(0xFF12803A),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${_selectedStudent!.grade} uchun tavsiya etilganlar belgilandi',
                       style: const TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF059669),
+                        color: Color(0xFF12803A),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -683,12 +683,12 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
 
               return Card(
                 elevation: 0,
-                color: isSelected ? const Color(0xFFEEF2FF) : Colors.white,
+                color: isSelected ? const Color(0xFFEAF3FD) : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                   side: BorderSide(
                     color:
-                        isSelected ? const Color(0xFF4F46E5) : AppColors.border,
+                        isSelected ? const Color(0xFF0062CC) : AppColors.border,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -702,7 +702,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                       children: [
                         Checkbox(
                           value: isSelected,
-                          activeColor: const Color(0xFF4F46E5),
+                          activeColor: const Color(0xFF0062CC),
                           onChanged: (_) => _toggleQuestion(q),
                         ),
                         const SizedBox(width: 6),
@@ -720,7 +720,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                         fontSize: 13.5,
                                         color:
                                             isSelected
-                                                ? const Color(0xFF4F46E5)
+                                                ? const Color(0xFF0062CC)
                                                 : AppColors.textPrimary,
                                       ),
                                     ),
@@ -732,7 +732,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                         vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFECFDF5),
+                                        color: const Color(0xFFEEF9EC),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: const Text(
@@ -740,7 +740,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                         style: TextStyle(
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF059669),
+                                          color: Color(0xFF12803A),
                                         ),
                                       ),
                                     ),
@@ -782,7 +782,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                     style: const TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF4F46E5),
+                                      color: Color(0xFF0062CC),
                                     ),
                                   ),
                                 ],
@@ -880,14 +880,14 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                     height: 32,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEEF2FF),
+                      color: const Color(0xFFEAF3FD),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       '${i + 1}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF4F46E5),
+                        color: Color(0xFF0062CC),
                       ),
                     ),
                   ),
@@ -931,7 +931,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
   Widget _buildMetricItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, size: 20, color: const Color(0xFF4F46E5)),
+        Icon(icon, size: 20, color: const Color(0xFF0062CC)),
         const SizedBox(height: 4),
         Text(
           value,

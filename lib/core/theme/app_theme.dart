@@ -15,7 +15,9 @@ class AppTheme {
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.background,
       fontFamily: baseFont,
-      textTheme: GoogleFonts.golosTextTextTheme(),
+      // google_fonts 9 o'z TextTheme turini (material_ui) qaytaradi, shuning uchun
+      // shriftni Flutter'ning standart matn mavzusiga qo'llaymiz.
+      textTheme: ThemeData.light().textTheme.apply(fontFamily: baseFont),
       splashFactory: InkRipple.splashFactory,
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
@@ -31,7 +33,7 @@ class AppTheme {
         onPrimary: Colors.white,
         primaryContainer: AppColors.primaryLight,
         onPrimaryContainer: AppColors.primaryDark,
-        secondary: Color(0xFF1E293B),
+        secondary: Color(0xFF1A2A4D),
         surface: Colors.white,
         onSurface: AppColors.textPrimary,
         error: AppColors.error,

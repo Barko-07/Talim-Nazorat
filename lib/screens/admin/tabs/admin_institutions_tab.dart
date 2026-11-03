@@ -327,7 +327,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: iepCount > 0
-                                        ? const Color(0xFF059669)
+                                        ? const Color(0xFF12803A)
                                         : AppColors.textMuted,
                                   ),
                                 ),

@@ -17,7 +17,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  group('TA’LIM NAZORAT Models and Service Tests', () {
+  group('Individ Models and Service Tests', () {
     test('UserModel role conversion and labels in Uzbek', () {
       final user = UserModel(
         id: 'u_1',

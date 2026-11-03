@@ -29,7 +29,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
       case StatusColor.yellow:
         return const Color(0xFFD97706);
       case StatusColor.green:
-        return const Color(0xFF059669);
+        return const Color(0xFF12803A);
     }
   }
 
@@ -40,7 +40,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
       case StatusColor.yellow:
         return const Color(0xFFFFFBEB);
       case StatusColor.green:
-        return const Color(0xFFECFDF5);
+        return const Color(0xFFEEF9EC);
     }
   }
 
@@ -308,8 +308,8 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                         _buildSvetoforCounter(
                           label: '🟢 Yashil (Ijobiy)',
                           count: summary.count(StatusColor.green),
-                          color: const Color(0xFF059669),
-                          bg: const Color(0xFFECFDF5),
+                          color: const Color(0xFF12803A),
+                          bg: const Color(0xFFEEF9EC),
                           selected:
                               _selectedSvetoforFilter == StatusColor.green,
                           onTap:

@@ -19,7 +19,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
   TextStyle _myGovFont({
     double fontSize = 15,
     FontWeight fontWeight = FontWeight.w500,
-    Color color = const Color(0xFF0F172A),
+    Color color = const Color(0xFF0A1A3F),
     double letterSpacing = -0.1,
     double? height,
   }) {
@@ -80,7 +80,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                   border: Border.all(color: const Color(0xFFE2E8F0)),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color(0x080F172A),
+                      color: Color(0x080A1A3F),
                       blurRadius: 14,
                       offset: Offset(0, 4),
                     ),
@@ -105,7 +105,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                         style: _myGovFont(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF1E293B),
+                          color: const Color(0xFF1A2A4D),
                         ),
                       ),
                     ),
@@ -202,7 +202,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                     _buildMyGovRow(
                       icon: LucideIcons.circleAlert,
                       title: 'Ilova haqida',
-                      subtitle: 'TA’LIM NAZORAT v1.0.0 • O‘RQ-547 standarti',
+                      subtitle: 'Individ v1.0.0 • O‘RQ-547 standarti',
                       isLast: true,
                     ),
                   ],
@@ -250,7 +250,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
               child: Icon(
                 icon,
                 size: 20,
-                color: const Color(0xFF1E293B),
+                color: const Color(0xFF1A2A4D),
               ),
             ),
             const SizedBox(width: 14),
@@ -288,7 +288,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                 ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF22C55E), Color(0xFF2563EB)],
+                    colors: [Color(0xFF3DBE37), Color(0xFF0062CC)],
                   ),
                   borderRadius: BorderRadius.circular(999),
                 ),
@@ -398,7 +398,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                   SnackBar(
                     content: Text(res['message'] as String),
                     backgroundColor: res['success'] == true
-                        ? const Color(0xFF059669)
+                        ? const Color(0xFF12803A)
                         : AppColors.error,
                   ),
                 );
