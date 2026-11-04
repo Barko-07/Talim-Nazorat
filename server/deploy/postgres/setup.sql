@@ -1,4 +1,4 @@
--- Run as the postgres superuser:  sudo -u postgres psql -f setup.sql
+-- Run as the postgres superuser:  sudo -u postgres psql < setup.sql
 -- Then set passwords:  \password individ_owner   and   \password individ_app
 --
 -- Two roles, least privilege:
@@ -17,4 +17,4 @@ GRANT CONNECT ON DATABASE individ TO individ_app;
 GRANT USAGE ON SCHEMA public TO individ_app;
 
 -- After init-db has created the tables (run as individ_owner), apply grants:
---   sudo -u postgres psql -d individ -f grants.sql
+--   sudo -u postgres psql -d individ < grants.sql

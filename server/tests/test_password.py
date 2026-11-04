@@ -87,6 +87,15 @@ def test_weak_passwords_rejected(api, app):
         assert r.status_code in (400, 422), weak
 
 
+def test_password_may_not_contain_part_of_the_login():
+    from app.security.passwords import password_problems
+
+    email = "mistaker0908@gmail.com"
+    for pw in ["Mistaker-Kuchli-2026!", "Tog-Yoli-0908-Kuchli!", "Mistaker0908-Kuchli!"]:
+        assert password_problems(pw, email=email), pw
+    assert password_problems("Kuchli-Tog-Yoli-2026!", email=email) == []
+
+
 def test_change_password_needs_current_password_and_emailed_code(api, app):
     add_user(app, "ch@maktab.uz")
     api.login("ch@maktab.uz")

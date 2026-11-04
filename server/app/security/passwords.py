@@ -4,6 +4,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
+import re
 import secrets
 
 from argon2 import PasswordHasher
@@ -87,8 +88,11 @@ def password_problems(password: str, *, email: str = "", full_name: str = "") ->
     lowered = password.lower()
     if lowered in _COMMON:
         p.append("Bu parol juda keng tarqalgan")
+    # The whole login and each word-like part of it (mistaker0908 -> mistaker,
+    # 0908), so a guessable fragment of the email can't be the password's core.
     local = email.split("@")[0].lower()
-    if len(local) >= 4 and local in lowered:
+    parts = {local, *re.findall(r"[^\W\d_]+|\d+", local)}
+    if any(len(part) >= 4 and part in lowered for part in parts):
         p.append("Parolda login (email) bo‘lmasin")
     for part in full_name.lower().split():
         if len(part) >= 4 and part in lowered:
