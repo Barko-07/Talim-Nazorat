@@ -69,7 +69,8 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (AppConfig.serverMode) {
       // Faolsizlik ilovada hisoblanadi: har daqiqalik tekshiruv serverga
       // so'rov yuborsa, serverdagi 30 daqiqalik muddat hech qachon tugamasdi.
-      if (DateTime.now().difference(_lastActivity) > serverIdleTimeout) {
+      if (!_staySignedIn &&
+          DateTime.now().difference(_lastActivity) > serverIdleTimeout) {
         await logout();
       }
       return;
@@ -177,20 +178,26 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     String identifier,
     String password, {
     UserRole? requiredRole,
+    bool remember = false,
   }) async {
     _isLoading = true;
     notifyListeners();
 
     final id = identifier.trim();
     if (id.isEmpty) {
-      return _fail('Telefon raqamingiz yoki elektron pochtangizni kiriting.');
+      return _fail(
+        AppConfig.serverMode
+            ? 'Elektron pochtangizni kiriting.'
+            : 'Telefon raqamingiz yoki elektron pochtangizni kiriting.',
+      );
     }
     if (password.isEmpty) {
       return _fail('Iltimos, parolingizni kiriting.');
     }
+    await _saveRememberedLogin(remember ? id : null);
     if (AppConfig.serverMode) {
       _lastActivity = DateTime.now();
-      return _serverLogin(id.toLowerCase(), password);
+      return _serverLogin(id.toLowerCase(), password, remember);
     }
 
     final user = _db.findUserByEmailOrPhone(id);
@@ -451,6 +458,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     await prefs.remove(AuthSession.prefsKey);
     if (AppConfig.serverMode) {
       _pending = null;
+      _staySignedIn = false;
       try {
         await _authApi.logout();
       } on ApiException catch (_) {
@@ -482,8 +490,28 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   AuthStep? get pendingStep => _pending?.step;
   UserModel? get pendingUser => _pending?.user;
-  bool get canRememberDevice => _pending?.canRememberDevice ?? false;
   int get resendAfter => _pending?.resendAfter ?? 0;
+
+  /// "Eslab qolish" bilan ochilgan sessiya — ilova faolsizlik uchun chiqarmaydi
+  /// (muddatini server belgilaydi: 30 kun).
+  bool _staySignedIn = false;
+
+  static const _rememberedLoginKey = 'remembered_login';
+
+  /// "Eslab qolish" belgilangan bo'lsa — keyingi safar email maydoni to'ldirilgan bo'ladi.
+  Future<String?> rememberedLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_rememberedLoginKey);
+  }
+
+  Future<void> _saveRememberedLogin(String? login) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (login == null) {
+      await prefs.remove(_rememberedLoginKey);
+    } else {
+      await prefs.setString(_rememberedLoginKey, login);
+    }
+  }
 
   Map<String, dynamic> _ok([String message = '', Object? extra]) => {
     'success': true,
@@ -509,6 +537,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (result.step == AuthStep.ok) {
       _db.cacheSignedInUser(result.user);
       _currentUser = result.user;
+      _staySignedIn = result.remembered;
       _pending = null;
     } else {
       _pending = result;
@@ -544,24 +573,26 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  Future<Map<String, dynamic>> _serverLogin(String email, String password) async {
+  Future<Map<String, dynamic>> _serverLogin(
+    String email,
+    String password,
+    bool remember,
+  ) async {
     if (!email.contains('@')) {
       return _fail('Elektron pochtangizni kiriting (masalan: ism@maktab.uz).');
     }
     try {
-      _apply(await _authApi.login(email, password));
+      _apply(await _authApi.login(email, password, remember: remember));
       return _ok('Xush kelibsiz!');
     } on ApiException catch (e) {
       return _apiFail(e);
     }
   }
 
-  Future<Map<String, dynamic>> verifyEmailCode(
-    String code, {
-    bool remember = false,
-  }) async {
+  /// Faqat administratorlar: emailga kelgan kirish kodi.
+  Future<Map<String, dynamic>> verifyEmailCode(String code) async {
     try {
-      _apply(await _authApi.verifyEmailCode(code, remember: remember));
+      _apply(await _authApi.verifyEmailCode(code));
       return _ok();
     } on ApiException catch (e) {
       return _apiFail(e);

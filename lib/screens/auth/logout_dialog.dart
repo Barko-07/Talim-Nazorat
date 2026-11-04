@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
-import 'login_screen.dart';
 
 /// Profildan chiqishdan oldin tasdiq so'raydi. Tasdiqlansa — tizimdan chiqadi va
 /// navigatsiya tarixini tozalab, kirish sahifasiga qaytaradi (orqaga tugmasi bilan
@@ -37,11 +36,9 @@ Future<void> confirmLogout(BuildContext context) async {
   );
   if (confirmed != true || !context.mounted) return;
 
-  await context.read<AuthProvider>().logout();
-  if (context.mounted) {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-      (route) => false,
-    );
-  }
+  // Ochiq oynalar yopiladi; ildiz oynasi (main.dart) chiqib ketgan foydalanuvchiga
+  // saytda landing sahifani, ilovada "Xush kelibsiz" ekranini ko'rsatadi.
+  final auth = context.read<AuthProvider>();
+  Navigator.of(context).popUntil((route) => route.isFirst);
+  await auth.logout();
 }

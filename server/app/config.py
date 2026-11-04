@@ -56,8 +56,8 @@ class Settings:
     code_max_attempts: int = 5
     code_resend_seconds: int = 60  # minimum gap between two emailed codes
 
-    # "Remember this device" for the emailed login code (never for admin roles)
-    trusted_device_days: int = 30
+    # "Eslab qolish" on the login page keeps a non-admin signed in this long
+    remember_me_days: int = 30
 
     # Roles that must also set up an authenticator app. Empty by default: every
     # login (admins included) is confirmed with a code emailed to the account.
@@ -126,7 +126,7 @@ def load_settings() -> Settings:
         code_ttl_minutes=_int("CODE_TTL_MINUTES", 10),
         code_max_attempts=_int("CODE_MAX_ATTEMPTS", 5),
         code_resend_seconds=_int("CODE_RESEND_SECONDS", 60),
-        trusted_device_days=_int("TRUSTED_DEVICE_DAYS", 30),
+        remember_me_days=_int("REMEMBER_ME_DAYS", 30),
         mfa_required_roles=_list("MFA_REQUIRED_ROLES"),
         admin_ip_allowlist=_list("ADMIN_IP_ALLOWLIST"),
         trusted_proxies=_list("TRUSTED_PROXIES") or ["127.0.0.1", "::1"],

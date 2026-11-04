@@ -55,9 +55,10 @@ def _user_out(ctx: AppContext, p_session, user: User, **extra) -> dict:
             "institution_id": user.institution_id,
             "phone": user.phone,
             "mfa_enabled": user.mfa_enabled,
-            "can_remember_device": sessions.may_remember_device(ctx.settings, user),
+            "can_stay_signed_in": sessions.may_stay_signed_in(ctx.settings, user),
             "profile": profile_of(user),
         },
+        "remembered": bool(p_session.remember),
         **extra,
     }
 
@@ -131,10 +132,13 @@ def login(
         user.password_hash = passwords.hash_password(body.password)
     db.commit()
 
-    if not user.mfa_enabled and sessions.trusted_device(db, s, user, request):
-        sess = sessions.issue(db, s, user, request, response, mfa_verified=True, ip=ip, factor="device")
+    if not sessions.needs_second_factor(s, user):
+        # Teachers and specialists sign in with the password alone; "Eslab
+        # qolish" keeps them signed in on this device for REMEMBER_ME_DAYS.
+        sess = sessions.issue(db, s, user, request, response, mfa_verified=True, ip=ip,
+                              factor="password", remember=body.remember)
         audit.record(db, "LOGIN_OK", user_id=user.id, subject=audit.mask_login(email), ip=ip,
-                     detail="password + remembered device")
+                     detail="password, remembered" if sess.remember else "password")
         return _user_out(ctx, sess, user)
 
     sess = sessions.issue(db, s, user, request, response, mfa_verified=False, ip=ip)
@@ -177,9 +181,6 @@ def email_code_verify(body: EmailCodeIn, request: Request, response: Response,
     db.commit()
     sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=p.ip,
                           factor="email")
-    if body.remember_device and sessions.may_remember_device(ctx.settings, user):
-        sessions.remember_device(db, ctx.settings, user, request, response)
-        audit.record(db, "DEVICE_REMEMBERED", user_id=user.id, ip=p.ip)
     audit.record(db, "LOGIN_OK", user_id=user.id, ip=p.ip, detail="password + email code")
     return _user_out(ctx, sess, user)
 
@@ -305,7 +306,6 @@ def mfa_enable(body: CodeIn, request: Request, response: Response,
         db.add(RecoveryCode(user_id=user.id,
                             code_hash=keyed_hash(f"recovery:{user.id}:{mfa.normalize_recovery_code(code)}")))
     db.commit()
-    sessions.forget_devices(db, user.id)  # from now on the authenticator is always asked
     sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=p.ip,
                           factor="totp")
     sessions.revoke_all(db, user.id, except_id=sess.id)
@@ -408,7 +408,6 @@ def _set_password(db: Session, ctx: AppContext, user: User, new_password: str) -
     user.failed_logins = 0
     user.locked_until = None
     db.commit()
-    sessions.forget_devices(db, user.id)  # a new password re-asks the emailed code everywhere
 
 
 # ------------------------------------------------------------------ change password (logged in)
@@ -439,11 +438,11 @@ def password_change(body: PasswordChangeIn, request: Request, response: Response
     if not forced and not (body.code and _consume_code(db, ctx, user, "password_change", body.code, p.ip)):
         raise ApiError(401, "invalid_credentials", "Joriy parol yoki kod noto‘g‘ri")
     _set_password(db, ctx, user, body.new_password)
-    mfa_ok, factor = p.session.mfa_verified, p.session.factor
+    mfa_ok, factor, remember = p.session.mfa_verified, p.session.factor, p.session.remember
     p.session.revoked = True
     db.commit()
     sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=mfa_ok, ip=p.ip,
-                          factor=factor)
+                          factor=factor, remember=remember)
     sessions.revoke_all(db, user.id, except_id=sess.id)  # sign out every other device
     audit.record(db, "PASSWORD_CHANGED", user_id=user.id, ip=p.ip)
     ctx.mailer.send(user.email, "Individ: parol o‘zgartirildi",

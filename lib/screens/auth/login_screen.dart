@@ -13,7 +13,6 @@ import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/auth_api.dart';
-import '../main_navigation_screen.dart';
 import 'verification_screens.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -33,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen>
   final _loginIdentifierCtrl = TextEditingController();
   final _loginPasswordCtrl = TextEditingController();
   bool _loginObscure = true;
+  bool _rememberMe = false;
 
   // --- SIGN UP STEP MANAGEMENT ---
   int _signUpStep = 0;
@@ -78,6 +78,22 @@ class _LoginScreenState extends State<LoginScreen>
     if (initialSchools.isNotEmpty) {
       _institutionCtrl.text = initialSchools.first;
     }
+    // "Eslab qolish" avval belgilangan bo'lsa — email tayyor turadi.
+    context.read<AuthProvider>().rememberedLogin().then((saved) {
+      if (!mounted || saved == null || _loginIdentifierCtrl.text.isNotEmpty) {
+        return;
+      }
+      setState(() {
+        _loginIdentifierCtrl.text = saved;
+        _rememberMe = true;
+      });
+    });
+  }
+
+  /// Kirish tugadi: ildiz oynasiga qaytamiz — u rolga qarab administrator
+  /// portalini yoki asosiy sahifani ko'rsatadi (main.dart).
+  void _openApp() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   @override
@@ -185,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen>
                           onChanged:
                               (val) => setModalState(() => searchQuery = val),
                           decoration: const InputDecoration(
-                            hintText: 'Maktab raqami yoki nomini qidiring...',
+                            hintText: 'Maktabni qidirish',
                             prefixIcon: Icon(
                               LucideIcons.search,
                               size: 18,
@@ -300,19 +316,18 @@ class _LoginScreenState extends State<LoginScreen>
     final result = await auth.login(
       _loginIdentifierCtrl.text.trim(),
       _loginPasswordCtrl.text.trim(),
+      remember: _rememberMe,
     );
 
     if (mounted) {
       if (result['success'] == true && !auth.isAuthenticated) {
-        // Server rejimi: parol to'g'ri — endi emailga kelgan kod yoki Authenticator.
+        // Administrator: parol to'g'ri — endi emailga kelgan kod.
         _loginPasswordCtrl.clear();
         await Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const SecondFactorScreen()),
         );
       } else if (result['success'] == true) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-        );
+        _openApp();
       } else {
         setState(() {
           _errorMessage = result['message'] as String?;
@@ -464,9 +479,7 @@ class _LoginScreenState extends State<LoginScreen>
             backgroundColor: AppColors.success,
           ),
         );
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-        );
+        _openApp();
       } else {
         setState(() {
           _errorMessage = result['message'] as String?;
@@ -537,6 +550,15 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    if (Navigator.of(context).canPop())
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          tooltip: 'Orqaga',
+                          icon: const Icon(LucideIcons.arrowLeft),
+                          onPressed: () => Navigator.of(context).maybePop(),
+                        ),
+                      ),
                     _buildBrandHeader()
                         .animate()
                         .fadeIn(duration: 220.ms, curve: Curves.easeOutCubic)
@@ -548,8 +570,6 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                     const SizedBox(height: 24),
 
-                    _buildSegmentedTabs(),
-                    const SizedBox(height: 18),
 
                     if (_errorMessage != null) ...[
                       Container(
@@ -690,110 +710,24 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildSegmentedTabs() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEFF1F5),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border, width: 0.9),
-      ),
-      child: Row(
-        children: [
-          _buildSegmentButton(
-            index: 0,
-            icon: LucideIcons.logIn,
-            label: 'Kirish',
-          ),
-          _buildSegmentButton(
-            index: 1,
-            icon: LucideIcons.userPlus,
-            label: 'Ro‘yxatdan o‘tish',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSegmentButton({
-    required int index,
-    required IconData icon,
-    required String label,
-  }) {
-    final isSelected = _tabController.index == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => _tabController.animateTo(index),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(9),
-            border: Border.all(
-              color:
-                  isSelected ? AppColors.glassWhiteBorder : Colors.transparent,
-              width: 0.85,
-            ),
-            boxShadow:
-                isSelected
-                    ? const [
-                      BoxShadow(
-                        color: Color(0x0D0A1A3F),
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
-                      ),
-                    ]
-                    : null,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 16,
-                color: isSelected ? AppColors.primary : AppColors.textMuted,
-              ),
-              const SizedBox(width: 7),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                    color:
-                        isSelected
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildLoginView(AuthProvider auth) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Shaxsiy kabinetga kirish',
+          'Kirish',
           style: _myGovFont(
-            fontSize: 18,
+            fontSize: 22,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
-            letterSpacing: -0.25,
+            letterSpacing: -0.3,
           ),
         ),
         const SizedBox(height: 5),
         Text(
-          'Telefon raqamingiz yoki elektron pochtangiz orqali kiring.',
+          AppConfig.serverMode
+              ? 'Email va parolingizni kiriting.'
+              : 'Email yoki telefon raqamingiz va parolingizni kiriting.',
           style: _myGovFont(
             fontSize: 13.5,
             fontWeight: FontWeight.w500,
@@ -801,46 +735,22 @@ class _LoginScreenState extends State<LoginScreen>
             height: 1.35,
           ),
         ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(11),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF7E6),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFF2D48A)),
-          ),
-          child: const Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                Icons.info_outline_rounded,
-                size: 17,
-                color: Color(0xFF9A6700),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Bu versiyada ma’lumotlar faqat ushbu qurilma yoki brauzerda saqlanadi. Haqiqiy bolalar ma’lumotlarini kiritmang.',
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    height: 1.35,
-                    color: Color(0xFF704D00),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
+        if (AppConfig.demoMode) ...[
+          const SizedBox(height: 12),
+          _buildDemoNotice(),
+        ],
+        const SizedBox(height: 20),
 
         TextField(
           controller: _loginIdentifierCtrl,
           keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            labelText: 'Telefon raqam yoki Email',
-            hintText: '+998 90 123 45 67 yoki login@talim.uz',
-            prefixIcon: Icon(
-              LucideIcons.user,
+          textInputAction: TextInputAction.next,
+          autofillHints: const [AutofillHints.email],
+          decoration: InputDecoration(
+            labelText: AppConfig.serverMode ? 'Email' : 'Email yoki telefon',
+            hintText: 'ism@maktab.uz',
+            prefixIcon: const Icon(
+              LucideIcons.mail,
               size: 18,
               color: AppColors.primary,
             ),
@@ -851,6 +761,7 @@ class _LoginScreenState extends State<LoginScreen>
         TextField(
           controller: _loginPasswordCtrl,
           obscureText: _loginObscure,
+          autofillHints: const [AutofillHints.password],
           onSubmitted: (_) => _handleLogin(),
           decoration: InputDecoration(
             labelText: 'Parol',
@@ -860,6 +771,7 @@ class _LoginScreenState extends State<LoginScreen>
               color: AppColors.primary,
             ),
             suffixIcon: IconButton(
+              tooltip: _loginObscure ? 'Parolni ko‘rsatish' : 'Parolni yashirish',
               icon: Icon(
                 _loginObscure ? LucideIcons.eyeOff : LucideIcons.eye,
                 size: 18,
@@ -869,10 +781,59 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 6),
+
+        // "Eslab qolish" — har safar email va parol kiritilmasin
+        InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () => setState(() => _rememberMe = !_rememberMe),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: Checkbox(
+                    value: _rememberMe,
+                    onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Eslab qolish',
+                  style: _myGovFont(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: () => _showPasswordRecoveryDialog(context),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+            ),
+            child: Text(
+              'Parolni unutdingizmi?',
+              style: _myGovFont(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
 
         SizedBox(
-          height: 48,
+          height: 50,
           child: FilledButton(
             onPressed: auth.isLoading ? null : _handleLogin,
             child:
@@ -885,55 +846,91 @@ class _LoginScreenState extends State<LoginScreen>
                         color: Colors.white,
                       ),
                     )
-                    : const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Tizimga kirish',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Icon(LucideIcons.arrowRight, size: 17),
-                      ],
+                    : const Text(
+                      'Kirish',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 14),
+        _buildSwitchModeLink(
+          question: 'Akkauntingiz yo‘qmi?',
+          action: 'Ro‘yxatdan o‘tish',
+          onTap: () => _switchMode(signUp: true),
+        ),
+      ],
+    );
+  }
 
-        Center(
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 12,
-            children: [
-              TextButton(
-                onPressed: () => _tabController.animateTo(1),
-                child: Text(
-                  'Yangi hisob ochish (Ro‘yxatdan o‘tish)',
-                  style: _myGovFont(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () => _showPasswordRecoveryDialog(context),
-                child: Text(
-                  'Parolni unutdingizmi?',
-                  style: _myGovFont(
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12.5,
-                  ),
-                ),
-              ),
-            ],
+  /// "Akkauntingiz bormi? Kirish" — savol oddiy matn, amal alohida havola.
+  Widget _buildSwitchModeLink({
+    required String question,
+    required String action,
+    required VoidCallback onTap,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          question,
+          style: _myGovFont(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF475569),
+          ),
+        ),
+        TextButton(
+          onPressed: onTap,
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            minimumSize: const Size(0, 36),
+          ),
+          child: Text(
+            action,
+            style: _myGovFont(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
           ),
         ),
       ],
+    );
+  }
+
+  void _switchMode({required bool signUp}) {
+    setState(() => _errorMessage = null);
+    _tabController.animateTo(signUp ? 1 : 0);
+  }
+
+  Widget _buildDemoNotice() {
+    return Container(
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7E6),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFF2D48A)),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline_rounded, size: 17, color: Color(0xFF9A6700)),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Bu namunaviy versiya: ma’lumotlar faqat shu brauzerda saqlanadi. Haqiqiy bolalar ma’lumotlarini kiritmang.',
+              style: TextStyle(
+                fontSize: 11.5,
+                height: 1.35,
+                color: Color(0xFF704D00),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1036,18 +1033,10 @@ class _LoginScreenState extends State<LoginScreen>
         const SizedBox(height: 20),
         _buildStepActionButtons(auth),
         const SizedBox(height: 8),
-        Center(
-          child: TextButton(
-            onPressed: () => _tabController.animateTo(0),
-            child: Text(
-              'Allaqachon hisobingiz bormi? Kirish',
-              style: _myGovFont(
-                color: const Color(0xFF475569),
-                fontWeight: FontWeight.w500,
-                fontSize: 13,
-              ),
-            ),
-          ),
+        _buildSwitchModeLink(
+          question: 'Akkauntingiz bormi?',
+          action: 'Kirish',
+          onTap: () => _switchMode(signUp: false),
         ),
       ],
     );
@@ -1160,8 +1149,8 @@ class _LoginScreenState extends State<LoginScreen>
             textCapitalization: TextCapitalization.words,
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: const InputDecoration(
-              labelText: 'Ismingiz *',
-              hintText: 'Masalan: Dilnoza',
+              labelText: 'Ism',
+              hintText: 'Dilnoza',
               prefixIcon: Icon(
                 LucideIcons.user,
                 size: 18,
@@ -1175,8 +1164,8 @@ class _LoginScreenState extends State<LoginScreen>
             textCapitalization: TextCapitalization.words,
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: const InputDecoration(
-              labelText: 'Familiyangiz *',
-              hintText: 'Masalan: Qodirova',
+              labelText: 'Familiya',
+              hintText: 'Qodirova',
               prefixIcon: Icon(
                 LucideIcons.idCard,
                 size: 18,
@@ -1446,7 +1435,7 @@ class _LoginScreenState extends State<LoginScreen>
             keyboardType: TextInputType.phone,
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: const InputDecoration(
-              labelText: 'Telefon raqam *',
+              labelText: 'Telefon',
               hintText: '+998 90 123 45 67',
               prefixIcon: Icon(
                 LucideIcons.phone,
@@ -1461,8 +1450,8 @@ class _LoginScreenState extends State<LoginScreen>
             keyboardType: TextInputType.emailAddress,
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: const InputDecoration(
-              labelText: 'Elektron pochta (Ixtiyoriy)',
-              hintText: 'mutaxassis@talim.uz',
+              labelText: AppConfig.serverMode ? 'Email' : 'Email (ixtiyoriy)',
+              hintText: 'ism@maktab.uz',
               prefixIcon: Icon(
                 LucideIcons.mail,
                 size: 18,
@@ -1507,8 +1496,7 @@ class _LoginScreenState extends State<LoginScreen>
             onChanged: (_) => setState(() => _errorMessage = null),
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: InputDecoration(
-              labelText: 'Parol *',
-              hintText: 'Masalan: Talim2026',
+              labelText: 'Parol',
               prefixIcon: const Icon(
                 LucideIcons.lock,
                 size: 18,
@@ -1534,7 +1522,7 @@ class _LoginScreenState extends State<LoginScreen>
             onChanged: (_) => setState(() => _errorMessage = null),
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: InputDecoration(
-              labelText: 'Parolni tasdiqlang *',
+              labelText: 'Parolni takrorlang',
               prefixIcon: const Icon(
                 LucideIcons.shieldCheck,
                 size: 18,

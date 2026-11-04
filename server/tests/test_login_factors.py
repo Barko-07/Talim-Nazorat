@@ -1,5 +1,7 @@
-"""Second factor on every login (emailed code / authenticator / recovery code),
-"remember this device", and sign-up with an emailed confirmation code."""
+"""Login rules: teachers and specialists sign in with their password ("Eslab
+qolish" keeps them signed in); admins also confirm every login with an emailed
+code (or the authenticator, with recovery codes). Sign-up confirms the email."""
+import re
 from datetime import timedelta
 
 from fastapi.testclient import TestClient
@@ -22,24 +24,97 @@ from conftest import (
 NEW = "Yangi-Mustahkam-Parol-77"
 
 
-# ------------------------------------------------------------------ emailed login code
+def _live_session(app) -> AuthSession:
+    with db_session(app) as db:
+        return db.scalars(select(AuthSession).where(AuthSession.revoked.is_(False))).one()
 
-def test_every_login_needs_the_emailed_code(api, app):
-    add_user(app, "t@maktab.uz")
+
+# ------------------------------------------------------------------ password only for non-admins
+
+def test_teachers_sign_in_with_the_password_alone(api, app):
+    add_user(app, "t@maktab.uz", Role.TEACHER)
     r = api.login("t@maktab.uz", email_code=False)
-    assert r.status_code == 200 and r.json()["state"] == "email_code_required"
-    assert "kirish kodi" in app.state.ctx.mailer.outbox[-1].subject
-    assert api.get("/api/students").status_code == 403  # password alone opens nothing
+    assert r.status_code == 200 and r.json()["state"] == "ok"
+    assert r.json()["user"]["can_stay_signed_in"] is True
+    assert app.state.ctx.mailer.outbox == []  # no code mailed
+    assert api.get("/api/auth/me").status_code == 200
 
-    code = last_code_for(app, "t@maktab.uz")
-    assert api.post("/api/auth/email-code/verify", {"code": "000000" if code != "000000" else "111111"}).status_code == 401
+
+def test_without_eslab_qolish_the_session_ends_after_30_idle_minutes(api, app):
+    add_user(app, "short@maktab.uz")
+    api.login("short@maktab.uz")
+    assert _live_session(app).remember is False
+    with db_session(app) as db:
+        db.execute(update(AuthSession).values(last_seen_at=utcnow() - timedelta(minutes=31)))
+        db.commit()
+    assert api.get("/api/auth/me").status_code == 401
+
+
+def test_eslab_qolish_keeps_a_teacher_signed_in_for_30_days(api, app, client):
+    add_user(app, "long@maktab.uz")
+    r = api.login("long@maktab.uz", remember=True)
+    assert r.json()["state"] == "ok"
+    assert "max-age=2592000" in r.headers["set-cookie"].lower()  # 30 days
+    assert _live_session(app).remember is True
+    with db_session(app) as db:  # a week without opening the app
+        db.execute(update(AuthSession).values(last_seen_at=utcnow() - timedelta(days=7),
+                                              created_at=utcnow() - timedelta(days=7)))
+        db.commit()
+    assert api.get("/api/auth/me").status_code == 200
+    with db_session(app) as db:
+        db.execute(update(AuthSession).values(created_at=utcnow() - timedelta(days=31)))
+        db.commit()
+    assert api.get("/api/auth/me").status_code == 401
+
+
+def test_password_change_keeps_eslab_qolish_but_signs_out_other_devices(api, app, client):
+    add_user(app, "keep@maktab.uz")
+    other = Api(type(client)(app))
+    other.login("keep@maktab.uz")
+    api.login("keep@maktab.uz", remember=True)
+    api.post("/api/auth/password/change/request")
+    code = last_code_for(app, "keep@maktab.uz")
+    assert api.post("/api/auth/password/change",
+                    {"current_password": PASSWORD, "code": code, "new_password": NEW}).status_code == 200
+    assert other.get("/api/auth/me").status_code == 401
+    assert _live_session(app).remember is True
+
+
+# ------------------------------------------------------------------ admins: emailed code every time
+
+def test_admin_login_needs_the_emailed_code(api, app):
+    add_user(app, "boss@maktab.uz", Role.SUPER_ADMIN)
+    r = api.login("boss@maktab.uz", email_code=False)
+    assert r.status_code == 200 and r.json()["state"] == "email_code_required"
+    assert r.json()["user"]["can_stay_signed_in"] is False
+    assert "kirish kodi" in app.state.ctx.mailer.outbox[-1].subject
+    assert api.get("/api/admin/users").status_code == 403  # password alone opens nothing
+
+    code = last_code_for(app, "boss@maktab.uz")
+    wrong = "000000" if code != "000000" else "111111"
+    assert api.post("/api/auth/email-code/verify", {"code": wrong}).status_code == 401
     r = api.post("/api/auth/email-code/verify", {"code": code})
     assert r.status_code == 200 and r.json()["state"] == "ok"
     assert api.post("/api/auth/email-code/verify", {"code": code}).status_code == 403  # already done
 
 
+def test_admin_cannot_use_eslab_qolish(api, app):
+    add_user(app, "boss@maktab.uz", Role.SUPER_ADMIN)
+    r = api.login("boss@maktab.uz", remember=True)
+    assert r.json()["state"] == "ok"
+    assert _live_session(app).remember is False
+    api.post("/api/auth/logout")
+    assert api.login("boss@maktab.uz", email_code=False).json()["state"] == "email_code_required"
+
+
+def test_school_director_also_confirms_with_the_code(api, app):
+    inst = add_institution(app)
+    add_user(app, "dir@maktab.uz", Role.INSTITUTION_ADMIN, inst)
+    assert api.login("dir@maktab.uz", email_code=False).json()["state"] == "email_code_required"
+
+
 def test_login_code_is_single_use_and_attempts_are_limited(api, app):
-    add_user(app, "a@maktab.uz")
+    add_user(app, "a@maktab.uz", Role.SUPER_ADMIN)
     api.login("a@maktab.uz", email_code=False)
     code = last_code_for(app, "a@maktab.uz")
     wrong = "000000" if code != "000000" else "111111"
@@ -51,25 +126,19 @@ def test_login_code_is_single_use_and_attempts_are_limited(api, app):
 
 def test_each_code_email_has_its_own_subject(api, app):
     # Same subject = one Gmail conversation; the code in the subject keeps them apart.
-    add_user(app, "s@maktab.uz")
+    add_user(app, "s@maktab.uz", Role.SUPER_ADMIN)
     api.login("s@maktab.uz", email_code=False)
     api.post("/api/auth/email-code/send")
-    first, second = [m for m in app.state.ctx.mailer.outbox if m.to == "s@maktab.uz"][-2:]
-    for mail in (first, second):
-        assert mail.subject.startswith(last_code_for_mail(mail))
-    assert first.subject != second.subject or first.body == second.body
-
-
-def last_code_for_mail(mail) -> str:
-    import re
-
-    return re.search(r"\b(\d{6})\b", mail.body).group(1)
+    mails = [m for m in app.state.ctx.mailer.outbox if m.to == "s@maktab.uz"][-2:]
+    for mail in mails:
+        code = re.search(r"\b(\d{6})\b", mail.body).group(1)
+        assert mail.subject.startswith(code)
 
 
 def test_resend_waits_a_minute_between_codes():
     app = create_app(make_settings(code_resend_seconds=60))
     api = Api(TestClient(app))
-    add_user(app, "w@maktab.uz")
+    add_user(app, "w@maktab.uz", Role.SUPER_ADMIN)
     r = api.login("w@maktab.uz", email_code=False)
     assert r.json()["resend_after"] == 60
     r = api.post("/api/auth/email-code/send")
@@ -85,46 +154,6 @@ def test_resend_waits_a_minute_between_codes():
     if first != second:  # the old code stops working once a new one is sent
         assert api.post("/api/auth/email-code/verify", {"code": first}).status_code == 401
     assert api.post("/api/auth/email-code/verify", {"code": second}).json()["state"] == "ok"
-
-
-# ------------------------------------------------------------------ remember this device
-
-def test_remembered_device_skips_the_code_until_password_changes(api, app):
-    add_user(app, "d@maktab.uz")
-    api.login("d@maktab.uz", remember=True)
-    api.post("/api/auth/logout")
-
-    sent = len(app.state.ctx.mailer.outbox)
-    r = api.login("d@maktab.uz", email_code=False)
-    assert r.json()["state"] == "ok"
-    assert len(app.state.ctx.mailer.outbox) == sent  # no code mailed
-    with db_session(app) as db:
-        live = db.scalars(select(AuthSession).where(AuthSession.revoked.is_(False))).one()
-        assert live.factor == "device"
-
-    api.post("/api/auth/password/change/request")
-    code = last_code_for(app, "d@maktab.uz")
-    assert api.post("/api/auth/password/change",
-                    {"current_password": PASSWORD, "code": code, "new_password": NEW}).status_code == 200
-    api.post("/api/auth/logout")
-    assert api.login("d@maktab.uz", NEW, email_code=False).json()["state"] == "email_code_required"
-
-
-def test_device_remembered_for_one_user_does_not_help_another(api, app):
-    add_user(app, "one@maktab.uz")
-    add_user(app, "two@maktab.uz")
-    api.login("one@maktab.uz", remember=True)
-    api.post("/api/auth/logout")
-    assert api.login("two@maktab.uz", email_code=False).json()["state"] == "email_code_required"
-
-
-def test_admins_cannot_skip_the_second_factor(api, app):
-    add_user(app, "boss@maktab.uz", Role.SUPER_ADMIN)
-    r = api.login("boss@maktab.uz", remember=True)
-    assert r.json()["user"]["can_remember_device"] is False
-    assert r.json()["state"] == "ok"
-    api.post("/api/auth/logout")
-    assert api.login("boss@maktab.uz", email_code=False).json()["state"] == "email_code_required"
 
 
 # ------------------------------------------------------------------ authenticator + recovery codes

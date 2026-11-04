@@ -43,6 +43,7 @@ class Strict(BaseModel):
 class LoginIn(Strict):
     email: EmailStr = Field(max_length=254)
     password: str = Field(min_length=1, max_length=128)
+    remember: bool = False  # "Eslab qolish" (ignored for admin roles)
 
 
 class CodeIn(Strict):
@@ -55,7 +56,6 @@ class PasswordConfirmIn(Strict):
 
 class EmailCodeIn(Strict):
     code: str = Field(pattern=r"^\d{6}$")
-    remember_device: bool = False
 
 
 class RecoveryCodeIn(Strict):

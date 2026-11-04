@@ -38,7 +38,12 @@ AuthStep _stepOf(String? state) {
 class AuthResult {
   final AuthStep step;
   final UserModel user;
-  final bool canRememberDevice;
+
+  /// "Eslab qolish" bu hisob uchun ishlaydimi (administratorlarda yo'q).
+  final bool canStaySignedIn;
+
+  /// Sessiya "Eslab qolish" bilan ochilgan — ilova faolsizlik uchun chiqarmaydi.
+  final bool remembered;
 
   /// Emailga keyingi kodni necha soniyadan keyin so'rash mumkin.
   final int resendAfter;
@@ -52,7 +57,8 @@ class AuthResult {
   const AuthResult({
     required this.step,
     required this.user,
-    this.canRememberDevice = false,
+    this.canStaySignedIn = false,
+    this.remembered = false,
     this.resendAfter = 0,
     this.recoveryCodes = const [],
     this.recoveryCodesLeft,
@@ -63,7 +69,8 @@ class AuthResult {
     return AuthResult(
       step: _stepOf(json['state'] as String?),
       user: userFromServer(u),
-      canRememberDevice: u['can_remember_device'] == true,
+      canStaySignedIn: u['can_stay_signed_in'] == true,
+      remembered: json['remembered'] == true,
       resendAfter: (json['resend_after'] as num?)?.toInt() ?? 0,
       recoveryCodes:
           (json['recovery_codes'] as List?)?.cast<String>() ?? const [],
@@ -115,13 +122,17 @@ class AuthApi {
 
   final ApiClient _api;
 
-  Future<AuthResult> login(String email, String password) async =>
-      AuthResult.fromJson(
-        await _api.post('/api/auth/login', {
-          'email': email,
-          'password': password,
-        }),
-      );
+  Future<AuthResult> login(
+    String email,
+    String password, {
+    bool remember = false,
+  }) async => AuthResult.fromJson(
+    await _api.post('/api/auth/login', {
+      'email': email,
+      'password': password,
+      'remember': remember,
+    }),
+  );
 
   /// Joriy sessiya (ilova qayta ochilganda). Sessiya yo'q bo'lsa — null.
   Future<AuthResult?> me() async {
@@ -133,13 +144,9 @@ class AuthApi {
     }
   }
 
-  Future<AuthResult> verifyEmailCode(String code, {bool remember = false}) async =>
-      AuthResult.fromJson(
-        await _api.post('/api/auth/email-code/verify', {
-          'code': code,
-          'remember_device': remember,
-        }),
-      );
+  Future<AuthResult> verifyEmailCode(String code) async => AuthResult.fromJson(
+    await _api.post('/api/auth/email-code/verify', {'code': code}),
+  );
 
   /// Yangi kirish kodi. Qaytaradi: keyingisini necha soniyadan so'rash mumkin.
   Future<int> resendEmailCode() async =>
@@ -245,7 +252,7 @@ class AuthApi {
     try {
       await _api.post('/api/auth/logout');
     } finally {
-      _api.clearSession();
+      await _api.clearSession();
     }
   }
 }

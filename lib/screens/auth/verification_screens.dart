@@ -516,7 +516,6 @@ class _EmailCodeStep extends StatefulWidget {
 
 class _EmailCodeStepState extends State<_EmailCodeStep> {
   final _code = TextEditingController();
-  bool _remember = false;
   bool _busy = false;
   String? _error;
 
@@ -535,10 +534,7 @@ class _EmailCodeStepState extends State<_EmailCodeStep> {
       _busy = true;
       _error = null;
     });
-    final res = await context.read<AuthProvider>().verifyEmailCode(
-      _code.text,
-      remember: _remember,
-    );
+    final res = await context.read<AuthProvider>().verifyEmailCode(_code.text);
     if (!mounted) return;
     setState(() => _busy = false);
     if (res['success'] != true) {
@@ -553,30 +549,16 @@ class _EmailCodeStepState extends State<_EmailCodeStep> {
     final email = auth.pendingUser?.email ?? '';
     return _AuthShell(
       icon: LucideIcons.mailCheck,
-      title: 'Emailga kod yuborildi',
+      title: 'Kirishni tasdiqlang',
       subtitle:
-          '${_maskEmail(email)} manziliga 6 xonali kirish kodi yuborildi. '
-          'Kod 10 daqiqa amal qiladi. Xat ko‘rinmasa, “Spam” papkasini ham tekshiring.',
+          'Administrator hisobi xavfsizligi uchun ${_maskEmail(email)} manziliga '
+          '6 xonali kod yuborildi. Kod 10 daqiqa amal qiladi. Xat ko‘rinmasa, '
+          '“Spam” papkasini ham tekshiring.',
       onBack: widget.onBack,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CodeField(controller: _code, onCompleted: (_) => _submit()),
-          if (auth.canRememberDevice) ...[
-            const SizedBox(height: 8),
-            CheckboxListTile(
-              value: _remember,
-              onChanged: (v) => setState(() => _remember = v ?? false),
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-              title: const Text('Bu qurilmani 30 kun eslab qol'),
-              subtitle: const Text(
-                'Faqat shaxsiy qurilmangizda belgilang. Umumiy kompyuterda belgilamang.',
-                style: TextStyle(fontSize: 12),
-              ),
-            ),
-          ],
           _ErrorText(_error),
           const SizedBox(height: 16),
           _PrimaryButton(label: 'Tasdiqlash', busy: _busy, onPressed: _submit),

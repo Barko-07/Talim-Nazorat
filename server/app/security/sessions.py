@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from ..config import Settings
 from ..crypto import keyed_hash
-from ..models import AuthSession, TrustedDevice, User, _tz, utcnow
+from ..models import AuthSession, User, _tz, utcnow
 
 TOUCH_EVERY = timedelta(seconds=60)
 
@@ -31,10 +31,13 @@ def issue(
     mfa_verified: bool,
     ip: str,
     factor: str = "",
+    remember: bool = False,
 ) -> AuthSession:
     """Creates a fresh session (new random token) and sets the cookie.
     Called on login and on every privilege change, so a token known before
-    login (session fixation) is never upgraded."""
+    login (session fixation) is never upgraded. `remember` ("Eslab qolish")
+    keeps it for REMEMBER_ME_DAYS instead of the short idle/absolute limits."""
+    remember = remember and may_stay_signed_in(settings, user)
     old = request.cookies.get(cookie_name(settings))
     if old:
         db.execute(
@@ -46,6 +49,7 @@ def issue(
         user_id=user.id,
         mfa_verified=mfa_verified,
         factor=factor if mfa_verified else "",
+        remember=remember,
         ip=ip,
         user_agent=(request.headers.get("user-agent") or "")[:300],
     )
@@ -54,7 +58,7 @@ def issue(
     response.set_cookie(
         cookie_name(settings),
         token,
-        max_age=settings.session_absolute_hours * 3600,
+        max_age=settings.remember_me_days * 86400 if remember else settings.session_absolute_hours * 3600,
         path="/",
         secure=settings.cookie_secure,
         httponly=True,  # JavaScript (and so XSS) cannot read it
@@ -77,8 +81,11 @@ def load(db: Session, settings: Settings, request: Request) -> AuthSession | Non
     if s is None or s.revoked:
         return None
     now = utcnow()
-    idle_limit = _tz(s.last_seen_at) + timedelta(minutes=settings.session_idle_minutes)
-    abs_limit = _tz(s.created_at) + timedelta(hours=settings.session_absolute_hours)
+    if s.remember:
+        idle_limit = abs_limit = _tz(s.created_at) + timedelta(days=settings.remember_me_days)
+    else:
+        idle_limit = _tz(s.last_seen_at) + timedelta(minutes=settings.session_idle_minutes)
+        abs_limit = _tz(s.created_at) + timedelta(hours=settings.session_absolute_hours)
     if now > idle_limit or now > abs_limit:
         s.revoked = True
         db.commit()
@@ -97,62 +104,20 @@ def revoke_all(db: Session, user_id: str, *, except_id: str | None = None) -> No
     db.commit()
 
 
-# ------------------------------------------------------------------ remembered devices
+# ------------------------------------------------------------------ who confirms logins
 
-def device_cookie_name(settings: Settings) -> str:
-    return "__Host-individ_device" if settings.cookie_secure else "individ_device"
-
-
-# Accounts that manage others confirm every single login, on every device.
+# Accounts that manage others confirm every login with a code emailed to the
+# account, and are never kept signed in for long.
 ADMIN_ROLES = {"SUPER_ADMIN", "INSTITUTION_ADMIN"}
 
 
-def may_remember_device(settings: Settings, user: User) -> bool:
-    return (
-        user.role not in ADMIN_ROLES
-        and user.role not in settings.mfa_required_roles
-        and not user.mfa_enabled
-    )
+def needs_second_factor(settings: Settings, user: User) -> bool:
+    return user.mfa_enabled or user.role in ADMIN_ROLES or user.role in settings.mfa_required_roles
 
 
-def remember_device(db: Session, settings: Settings, user: User, request: Request,
-                    response: Response) -> None:
-    token = secrets.token_urlsafe(32)
-    db.add(TrustedDevice(
-        user_id=user.id,
-        token_hash=keyed_hash("device:" + token),
-        expires_at=utcnow() + timedelta(days=settings.trusted_device_days),
-        user_agent=(request.headers.get("user-agent") or "")[:300],
-    ))
-    db.commit()
-    response.set_cookie(
-        device_cookie_name(settings), token,
-        max_age=settings.trusted_device_days * 86400, path="/",
-        secure=settings.cookie_secure, httponly=True, samesite="strict",
-    )
-
-
-def trusted_device(db: Session, settings: Settings, user: User, request: Request) -> bool:
-    """True when this browser/phone was remembered by this user, the promise has
-    not expired, and the password has not changed since."""
-    if not may_remember_device(settings, user):
-        return False
-    token = request.cookies.get(device_cookie_name(settings))
-    if not token or len(token) > 100:
-        return False
-    d = db.scalar(select(TrustedDevice).where(TrustedDevice.token_hash == keyed_hash("device:" + token)))
-    return (
-        d is not None
-        and not d.revoked
-        and d.user_id == user.id
-        and _tz(d.expires_at) > utcnow()
-        and _tz(d.created_at) >= _tz(user.password_changed_at)
-    )
-
-
-def forget_devices(db: Session, user_id: str) -> None:
-    db.execute(update(TrustedDevice).where(TrustedDevice.user_id == user_id).values(revoked=True))
-    db.commit()
+def may_stay_signed_in(settings: Settings, user: User) -> bool:
+    """"Eslab qolish": a password-only account may keep its session for days."""
+    return not needs_second_factor(settings, user)
 
 
 def csrf_token(session: AuthSession) -> str:
@@ -160,9 +125,9 @@ def csrf_token(session: AuthSession) -> str:
 
 
 def session_state(settings: Settings, s: AuthSession) -> str:
-    """Every login needs a second factor: the authenticator app once it is set
-    up, otherwise a code emailed to the account. Admin roles without 2FA yet
-    prove their email first and then must set up the authenticator."""
+    """Admin logins need a second factor (the code emailed to the account, or
+    the authenticator once enabled); other accounts sign in with the password
+    and get a session that is already complete (see routes/auth.login)."""
     u = s.user
     if not s.mfa_verified:
         return "mfa_required" if u.mfa_enabled else "email_code_required"

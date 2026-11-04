@@ -107,6 +107,7 @@ class AuthSession(Base):
     # code or a remembered device); `factor` says which, for the audit trail.
     mfa_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     factor: Mapped[str] = mapped_column(String(16), default="")
+    remember: Mapped[bool] = mapped_column(Boolean, default=False)  # "Eslab qolish"
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     ip: Mapped[str] = mapped_column(String(64), default="")
@@ -140,21 +141,6 @@ class RecoveryCode(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     code_hash: Mapped[str] = mapped_column(String(64))
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-
-
-class TrustedDevice(Base):
-    """"Remember this device": lets a non-admin skip the emailed login code on
-    one browser/phone for a limited time. The device holds a random token in an
-    HttpOnly cookie; the DB keeps its HMAC. Void after a password change."""
-
-    __tablename__ = "trusted_devices"
-    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
-    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
-    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    user_agent: Mapped[str] = mapped_column(String(300), default="")
-    revoked: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class PendingRegistration(Base):

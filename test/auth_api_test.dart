@@ -16,7 +16,7 @@ Map<String, dynamic> _user({String role = 'PSYCHOLOGIST'}) => {
   'institution_id': null,
   'phone': '+998901112233',
   'mfa_enabled': false,
-  'can_remember_device': true,
+  'can_stay_signed_in': role != 'SUPER_ADMIN',
   'profile': {
     'institution_name': '14-sonli maktab',
     'district': 'Chortoq tumani',
@@ -33,7 +33,36 @@ http.Response _json(int status, Map<String, dynamic> body, {Map<String, String>?
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  test('login maps the server state and user; headers carry CSRF protections', () async {
+  test('teacher login with "Eslab qolish" is complete in one step', () async {
+    late http.Request sent;
+    final client = MockClient((req) async {
+      sent = req;
+      return _json(200, {
+        'state': 'ok',
+        'csrf_token': 'tok-1',
+        'remembered': true,
+        'user': _user(),
+      });
+    });
+    final api = AuthApi(ApiClient(client: client, baseUrl: 'https://individ.uz'));
+
+    final r = await api.login('dilnoza@maktab.uz', 'Kuchli-Tog-Yoli-2026', remember: true);
+    expect(r.step, AuthStep.ok);
+    expect(r.remembered, isTrue);
+    expect(r.canStaySignedIn, isTrue);
+    expect(r.user.role, UserRole.psychologist);
+    expect(r.user.institutionName, '14-sonli maktab');
+    expect(r.user.experienceYears, 4);
+    expect(r.user.password, isNull);
+    expect(sent.headers['X-Requested-With'], 'XMLHttpRequest');
+    expect(jsonDecode(sent.body), {
+      'email': 'dilnoza@maktab.uz',
+      'password': 'Kuchli-Tog-Yoli-2026',
+      'remember': true,
+    });
+  });
+
+  test('admin login asks for the emailed code; the CSRF token is reused', () async {
     final seen = <http.BaseRequest>[];
     final client = MockClient((req) async {
       seen.add(req);
@@ -42,30 +71,26 @@ void main() {
           'state': 'email_code_required',
           'csrf_token': 'tok-1',
           'resend_after': 60,
-          'user': _user(),
+          'user': _user(role: 'SUPER_ADMIN'),
         });
       }
-      return _json(200, {'state': 'ok', 'csrf_token': 'tok-2', 'user': _user()});
+      return _json(200, {
+        'state': 'ok',
+        'csrf_token': 'tok-2',
+        'user': _user(role: 'SUPER_ADMIN'),
+      });
     });
     final api = AuthApi(ApiClient(client: client, baseUrl: 'https://individ.uz'));
 
-    final r = await api.login('dilnoza@maktab.uz', 'Kuchli-Tog-Yoli-2026');
+    final r = await api.login('boss@maktab.uz', 'Kuchli-Tog-Yoli-2026');
     expect(r.step, AuthStep.emailCode);
     expect(r.resendAfter, 60);
-    expect(r.canRememberDevice, isTrue);
-    expect(r.user.role, UserRole.psychologist);
-    expect(r.user.institutionName, '14-sonli maktab');
-    expect(r.user.experienceYears, 4);
-    expect(r.user.password, isNull);
+    expect(r.canStaySignedIn, isFalse);
 
-    final done = await api.verifyEmailCode('123456', remember: true);
+    final done = await api.verifyEmailCode('123456');
     expect(done.step, AuthStep.ok);
-    expect(seen.last.headers['X-Requested-With'], 'XMLHttpRequest');
     expect(seen.last.headers['X-CSRF-Token'], 'tok-1'); // token from the previous answer
-    expect(jsonDecode((seen.last as http.Request).body), {
-      'code': '123456',
-      'remember_device': true,
-    });
+    expect(jsonDecode((seen.last as http.Request).body), {'code': '123456'});
   });
 
   test('server errors become readable ApiExceptions with retry_after', () async {
@@ -96,40 +121,36 @@ void main() {
     );
   });
 
-  test('mobile: session cookie is sent back; remembered-device cookie survives logout', () async {
+  test('mobile: the session cookie is kept across app restarts until logout', () async {
     final cookiesSent = <String?>[];
-    final client = MockClient((req) async {
+    MockClient server() => MockClient((req) async {
       cookiesSent.add(req.headers['Cookie']);
-      switch (req.url.path) {
-        case '/api/auth/email-code/verify':
-          return _json(
-            200,
-            {'state': 'ok', 'csrf_token': 't', 'user': _user()},
-            headers: {
-              'set-cookie':
-                  'individ_session=S2; HttpOnly; Path=/; SameSite=strict,individ_device=D1; expires=Wed, 04 Dec 2026 10:00:00 GMT; HttpOnly; Path=/',
-            },
-          );
-        case '/api/auth/logout':
-          return _json(200, {'ok': true}, headers: {
-            'set-cookie': 'individ_session=""; Max-Age=0; Path=/',
-          });
+      if (req.url.path == '/api/auth/logout') {
+        return _json(200, {'ok': true}, headers: {
+          'set-cookie': 'individ_session=""; Max-Age=0; Path=/',
+        });
       }
-      return _json(200, {'state': 'email_code_required', 'csrf_token': 't', 'user': _user()},
-          headers: {'set-cookie': 'individ_session=S1; HttpOnly; Path=/'});
+      return _json(
+        200,
+        {'state': 'ok', 'csrf_token': 't', 'remembered': true, 'user': _user()},
+        headers: {
+          'set-cookie':
+              'individ_session=S1; expires=Wed, 04 Dec 2026 10:00:00 GMT; Max-Age=2592000; HttpOnly; Path=/',
+        },
+      );
     });
-    final api = AuthApi(ApiClient(client: client, baseUrl: 'https://individ.uz'));
 
-    await api.login('dilnoza@maktab.uz', 'p');
-    await api.verifyEmailCode('123456', remember: true);
-    await api.logout();
-    await api.login('dilnoza@maktab.uz', 'p');
-
-    expect(cookiesSent[0], isNull);
-    expect(cookiesSent[1], 'individ_session=S1');
-    expect(cookiesSent[2], allOf(contains('individ_session=S2'), contains('individ_device=D1')));
-    expect(cookiesSent[3], 'individ_device=D1'); // session gone, device remembered
+    await AuthApi(ApiClient(client: server(), baseUrl: 'https://individ.uz'))
+        .login('dilnoza@maktab.uz', 'p', remember: true);
     final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getString('api_device_cookie'), 'individ_device=D1');
+    expect(prefs.getString('api_session_cookie'), 'individ_session=S1');
+
+    // The app is closed and opened again: a fresh client finds the saved session.
+    final reopened = AuthApi(ApiClient(client: server(), baseUrl: 'https://individ.uz'));
+    await reopened.me();
+    expect(cookiesSent[1], 'individ_session=S1');
+
+    await reopened.logout();
+    expect(prefs.getString('api_session_cookie'), isNull);
   });
 }

@@ -31,8 +31,9 @@ class ApiException implements Exception {
 ///
 /// Sessiya HttpOnly cookie'da. Brauzerda uni brauzerning o'zi saqlaydi va
 /// yuboradi (JavaScript, demak XSS ham, uni o'qiy olmaydi). Telefon ilovasida
-/// cookie'larni shu sinf o'zi boshqaradi: sessiya faqat xotirada turadi,
-/// "qurilmani eslab qolish" belgisi esa ilovaning shaxsiy xotirasida saqlanadi.
+/// cookie'ni shu sinf boshqaradi va ilovaning shaxsiy xotirasida saqlaydi —
+/// "Eslab qolish" ilova qayta ochilganda ham ishlashi uchun. Muddati serverda
+/// tekshiriladi. (Play Market'dan oldin: flutter_secure_storage'ga o'tkazish.)
 class ApiClient {
   ApiClient({http.Client? client, String? baseUrl})
     : _client = client ?? http.Client(),
@@ -44,7 +45,7 @@ class ApiClient {
   static final ApiClient instance = ApiClient();
 
   static const _timeout = Duration(seconds: 20);
-  static const _deviceCookiePrefs = 'api_device_cookie';
+  static const _sessionCookiePrefs = 'api_session_cookie';
 
   final http.Client _client;
   final String _baseUrl;
@@ -154,7 +155,7 @@ class ApiClient {
     if (kIsWeb || _cookiesLoaded) return;
     _cookiesLoaded = true;
     final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString(_deviceCookiePrefs);
+    final saved = prefs.getString(_sessionCookiePrefs);
     final eq = saved?.indexOf('=') ?? -1;
     if (saved != null && eq > 0) {
       _cookies[saved.substring(0, eq)] = saved.substring(eq + 1);
@@ -181,21 +182,24 @@ class ApiClient {
       } else {
         _cookies[name] = value;
       }
-      if (name.endsWith('individ_device')) {
+      if (name.endsWith('individ_session')) {
         final prefs = await SharedPreferences.getInstance();
         if (deleted) {
-          await prefs.remove(_deviceCookiePrefs);
+          await prefs.remove(_sessionCookiePrefs);
         } else {
-          await prefs.setString(_deviceCookiePrefs, '$name=$value');
+          await prefs.setString(_sessionCookiePrefs, '$name=$value');
         }
       }
     }
   }
 
-  /// Tizimdan chiqqanda: sessiya cookie'si va CSRF tokeni unutiladi
-  /// ("eslab qolingan qurilma" belgisi saqlanib qoladi).
-  void clearSession() {
+  /// Tizimdan chiqqanda: sessiya cookie'si va CSRF tokeni unutiladi.
+  Future<void> clearSession() async {
     _csrfToken = '';
-    _cookies.removeWhere((name, _) => !name.endsWith('individ_device'));
+    _cookies.clear();
+    if (!kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_sessionCookiePrefs);
+    }
   }
 }

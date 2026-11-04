@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,7 +9,9 @@ import 'core/widgets/brand_logo.dart';
 import 'providers/auth_provider.dart';
 import 'providers/app_provider.dart';
 import 'models/user_model.dart';
-import 'screens/auth/login_screen.dart';
+import 'screens/entry/intro_screen.dart';
+import 'screens/entry/landing_screen.dart';
+import 'screens/entry/welcome_screen.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/admin/admin_portal_screen.dart';
 
@@ -37,28 +40,46 @@ class TalimNazoratApp extends StatelessWidget {
       title: AppBrand.name,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: Consumer<AuthProvider>(
-        builder: (context, auth, _) {
-          // Faqat ilova ochilayotganda. Kirish tugmasi bosilganda ham yuklanish
-          // ekrani ko'rsatilsa, kirish sahifasi yopilib, kod oynasi ochilmay qoladi.
-          if (auth.isInitializing) {
-            return const _AppLoadingScreen();
-          }
-          if (auth.initializationError != null) {
-            return _InitializationErrorScreen(
-              onRetry: auth.retryInitialization,
-            );
-          }
-          if (auth.isAuthenticated) {
-            if (auth.currentUser?.role == UserRole.superAdmin) {
-              return const AdminPortalScreen();
-            }
-            return const MainNavigationScreen();
-          }
-          return const LoginScreen();
-        },
-      ),
+      home: const AppEntry(),
     );
+  }
+}
+
+/// Ilovaning ildiz oynasi. Saytda: kirmagan mehmonga landing sahifa.
+/// Telefon/desktop ilovasida: avval qisqa animatsiya, keyin "Xush kelibsiz"
+/// ekrani. Kirgan foydalanuvchiga — rolga mos bosh sahifa.
+class AppEntry extends StatefulWidget {
+  const AppEntry({super.key});
+
+  @override
+  State<AppEntry> createState() => _AppEntryState();
+}
+
+class _AppEntryState extends State<AppEntry> {
+  // Animatsiya faqat ilovada va faqat ochilishda bir marta.
+  bool _introDone = kIsWeb;
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    if (!_introDone) {
+      return IntroScreen(onDone: () => setState(() => _introDone = true));
+    }
+    // Faqat ilova ochilayotganda. Kirish tugmasi bosilganda ham yuklanish
+    // ekrani ko'rsatilsa, kirish sahifasi yopilib, kod oynasi ochilmay qoladi.
+    if (auth.isInitializing) {
+      return const _AppLoadingScreen();
+    }
+    if (auth.initializationError != null) {
+      return _InitializationErrorScreen(onRetry: auth.retryInitialization);
+    }
+    if (auth.isAuthenticated) {
+      if (auth.currentUser?.role == UserRole.superAdmin) {
+        return const AdminPortalScreen();
+      }
+      return const MainNavigationScreen();
+    }
+    return kIsWeb ? const LandingScreen() : const WelcomeScreen();
   }
 }
 
