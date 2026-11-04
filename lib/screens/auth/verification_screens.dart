@@ -106,7 +106,7 @@ class _AuthShell extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(22),
                         border: Border.all(color: AppColors.border),
                         boxShadow: [
@@ -135,7 +135,7 @@ class _AuthShell extends StatelessWidget {
                           Text(
                             title,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 19,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -145,7 +145,7 @@ class _AuthShell extends StatelessWidget {
                           Text(
                             subtitle,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13.5,
                               height: 1.45,
                               color: AppColors.textSecondary,
@@ -191,13 +191,13 @@ class CodeField extends StatelessWidget {
       maxLength: 6,
       autofillHints: const [AutofillHints.oneTimeCode],
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 28,
         letterSpacing: 12,
         fontWeight: FontWeight.w700,
         color: AppColors.textPrimary,
       ),
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         counterText: '',
         hintText: '••••••',
         hintStyle: TextStyle(letterSpacing: 12, color: AppColors.textMuted),
@@ -337,7 +337,7 @@ class _ErrorText extends StatelessWidget {
       child: Text(
         message!,
         textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.error, fontSize: 13),
+        style: TextStyle(color: AppColors.error, fontSize: 13),
       ),
     );
   }
@@ -774,7 +774,7 @@ class _TotpSetupStepState extends State<_TotpSetupStep> {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.border),
               ),
@@ -782,7 +782,7 @@ class _TotpSetupStepState extends State<_TotpSetupStep> {
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
+          Text(
             'Skanerlab bo‘lmasa, kalitni qo‘lda kiriting:',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
@@ -833,7 +833,7 @@ class _TotpSetupStepState extends State<_TotpSetupStep> {
                 for (final c in _recoveryCodes)
                   SelectableText(
                     c,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'monospace',
                       fontSize: 16,
                       fontWeight: FontWeight.w700,

@@ -21,13 +21,13 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppColors.primaryLight, Colors.white],
+            colors: [AppColors.primaryLight, AppColors.surface],
           ),
         ),
         child: SafeArea(
@@ -42,19 +42,19 @@ class WelcomeScreen extends StatelessWidget {
                     const Spacer(flex: 2),
                     const Center(child: BrandMark(height: 96)),
                     const SizedBox(height: 28),
-                    const Text(
+                    Text(
                       'Individga xush kelibsiz',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 28,
                         height: 1.15,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: -0.6,
                         color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Alohida ta’lim ehtiyojli bolalarning rivojlanishini kuzatish, baholash va '
                       'individual reja tuzish — bir ilovada.',
                       textAlign: TextAlign.center,
@@ -89,7 +89,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    const Text(
+                    Text(
                       '${AppBrand.name} • ${AppBrand.tagline}',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 12, color: AppColors.textMuted),
@@ -127,7 +127,7 @@ class _Highlights extends StatelessWidget {
                 const SizedBox(width: 10),
                 Text(
                   text,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,

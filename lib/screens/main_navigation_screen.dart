@@ -329,7 +329,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
     if (_isPsychologist) {
       final psychScreen = _buildPsychologistScreen();
-      if (psychScreen != null) return psychScreen;
+      if (psychScreen != null) {
+        // Psixolog kabineti sahifalari umumiy sahifa konteyneridan foydalanmaydi —
+        // ular ustki va pastki suzuvchi panellar ostida qolmasin.
+        final width = MediaQuery.sizeOf(context).width;
+        return Padding(
+          key: psychScreen.key,
+          padding: EdgeInsets.only(
+            top: MediaQuery.paddingOf(context).top + (width >= 920 ? 82 : 74),
+            bottom: width < 920 ? 84 : 0,
+          ),
+          child: psychScreen,
+        );
+      }
     }
     switch (_selectedIndex) {
       case 0:
@@ -415,7 +427,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       decoration: InputDecoration(
                         hintText:
                             'O‘quvchi F.I.Sh., sinfi yoki yo‘nalishini qidiring...',
-                        prefixIcon: const Icon(
+                        prefixIcon: Icon(
                           LucideIcons.search,
                           size: 18,
                           color: AppColors.primary,
@@ -427,12 +439,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 6),
                       child: Text(
                         'TEZKOR NATIJALAR',
                         style: TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.8,
                           color: AppColors.textMuted,
@@ -442,7 +454,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     const SizedBox(height: 10),
                     Flexible(
                       child: results.isEmpty
-                          ? const Padding(
+                          ? Padding(
                               padding: EdgeInsets.symmetric(vertical: 34),
                               child: Center(
                                 child: Text(
@@ -480,7 +492,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                   },
                                   child: Row(
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         LucideIcons.userRound,
                                         size: 19,
                                         color: AppColors.primary,
@@ -495,7 +507,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                               s.fullName,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 13.5,
                                                 fontWeight: FontWeight.w700,
                                                 color: AppColors.textPrimary,
@@ -506,7 +518,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                               '${s.grade}-sinf • ${s.primaryNeed}',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 12,
                                                 color: AppColors.textMuted,
                                               ),
@@ -514,7 +526,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                           ],
                                         ),
                                       ),
-                                      const Icon(
+                                      Icon(
                                         LucideIcons.chevronRight,
                                         size: 16,
                                         color: AppColors.textSubtle,
@@ -565,18 +577,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 const SizedBox(height: 18),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       LucideIcons.layoutGrid,
                       size: 20,
                       color: AppColors.primary,
                     ),
                     const SizedBox(width: 10),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Barcha tizim bo‘limlari',
                         style: TextStyle(
                           fontSize: 17.5,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
                           letterSpacing: -0.3,
                         ),
@@ -634,7 +646,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight:
-                                    isSel ? FontWeight.w800 : FontWeight.w600,
+                                    isSel ? FontWeight.w700 : FontWeight.w600,
                                 color: isSel
                                     ? AppColors.primary
                                     : AppColors.textPrimary,
@@ -657,7 +669,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                               child: Text(
                                 '$badge',
                                 style: TextStyle(
-                                  fontSize: 10.5,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                   color: item.index == 5
                                       ? AppColors.error
@@ -791,16 +803,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               LucideIcons.bellRing,
                               color: AppColors.primary,
                               size: 20,
                             ),
                             const SizedBox(width: 10),
-                            const Text(
+                            Text(
                               'Bildirishnomalar',
                               style: TextStyle(
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w700,
                                 fontSize: 17,
                                 letterSpacing: -0.3,
                                 color: AppColors.textPrimary,
@@ -839,7 +851,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     const SizedBox(height: 10),
                     Expanded(
                       child: notifications.isEmpty
-                          ? const Center(
+                          ? Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -931,7 +943,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                                     style: TextStyle(
                                                       fontWeight: notif.isRead
                                                           ? FontWeight.w600
-                                                          : FontWeight.w800,
+                                                          : FontWeight.w700,
                                                       fontSize: 13.5,
                                                       color:
                                                           AppColors.textPrimary,
@@ -952,7 +964,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                             const SizedBox(height: 4),
                                             Text(
                                               notif.body,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 12.5,
                                                 color: AppColors.textSecondary,
                                                 height: 1.4,
@@ -961,7 +973,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                             const SizedBox(height: 5),
                                             Text(
                                               df.format(notif.createdAt),
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 11,
                                                 color: AppColors.textMuted,
                                                 fontFeatures: [
@@ -1145,7 +1157,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             18,
                             0,
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Tooltip(
                               message: 'Menyu',
                               child: Icon(
@@ -1194,9 +1206,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                   currentNav.title,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w700,
                                     letterSpacing: -0.3,
                                     color: AppColors.textPrimary,
                                   ),
@@ -1208,7 +1220,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                     '9-sonli inklyuziv ta’lim tayanch maktabi',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   color: AppColors.textMuted,
                                   fontWeight: FontWeight.w500,
@@ -1237,7 +1249,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                     width: 1.0,
                                   ),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
@@ -1299,8 +1311,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 9.5,
-                                        fontWeight: FontWeight.w800,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
                                         fontFeatures: [
                                           FontFeature.tabularFigures(),
                                         ],
@@ -1337,9 +1349,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                   backgroundColor: AppColors.primaryLight,
                                   child: Text(
                                     (user?.fullName ?? 'U').substring(0, 1),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.primary,
-                                      fontWeight: FontWeight.w800,
+                                      fontWeight: FontWeight.w700,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -1360,7 +1372,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                           user?.fullName ?? '',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w700,
                                             color: AppColors.textPrimary,
@@ -1370,8 +1382,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                           user?.role.label ?? '',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 10.5,
+                                          style: TextStyle(
+                                            fontSize: 11,
                                             color: AppColors.textMuted,
                                           ),
                                         ),
@@ -1379,7 +1391,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 5),
-                                  const Icon(
+                                  Icon(
                                     LucideIcons.chevronDown,
                                     size: 14,
                                     color: AppColors.textMuted,
@@ -1432,7 +1444,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     children: [
                       const BrandMark(height: 34),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1475,8 +1487,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                               padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                               child: Text(
                                 entry.key,
-                                style: const TextStyle(
-                                  fontSize: 10,
+                                style: TextStyle(
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 0.9,
                                   color: AppColors.textSubtle,
@@ -1534,7 +1546,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 fontWeight: isSelected
-                                                    ? FontWeight.w800
+                                                    ? FontWeight.w700
                                                     : FontWeight.w600,
                                                 color: isSelected
                                                     ? AppColors.primary
@@ -1566,7 +1578,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                               child: Text(
                                                 '$badge',
                                                 style: TextStyle(
-                                                  fontSize: 10.5,
+                                                  fontSize: 11,
                                                   fontWeight: FontWeight.w700,
                                                   fontFeatures: const [
                                                     FontFeature
@@ -1602,7 +1614,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   borderRadius: 12,
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         LucideIcons.shieldCheck,
                         size: 19,
                         color: AppColors.success,
@@ -1616,16 +1628,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                               user?.district ?? 'Chortoq tumani',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                            const Text(
+                            Text(
                               'Himoyalangan tizim',
                               style: TextStyle(
-                                fontSize: 10.5,
+                                fontSize: 11,
                                 color: AppColors.textMuted,
                               ),
                             ),
@@ -1738,7 +1750,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                             item.shortLabel,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 12.5,
                                               fontWeight: FontWeight.w700,
                                               color: AppColors.primary,
@@ -1822,7 +1834,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                         _currentNavItem.shortLabel,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 12.5,
                                           fontWeight: FontWeight.w700,
                                           color: AppColors.primary,
@@ -1836,7 +1848,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                   child: Stack(
                                     clipBehavior: Clip.none,
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         LucideIcons.layoutGrid,
                                         size: 20,
                                         color: AppColors.textPrimary,
@@ -1848,7 +1860,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                           child: Container(
                                             width: 6,
                                             height: 6,
-                                            decoration: const BoxDecoration(
+                                            decoration: BoxDecoration(
                                               color: AppColors.error,
                                               shape: BoxShape.circle,
                                             ),
@@ -1889,7 +1901,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       BrandMark(height: 32),
                       SizedBox(width: 10),
@@ -1922,9 +1934,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           backgroundColor: AppColors.primaryLight,
                           child: Text(
                             (user?.fullName ?? 'U').substring(0, 1),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.primary,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               fontSize: 13.5,
                             ),
                           ),
@@ -1938,8 +1950,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                 user?.fullName ?? 'Mutaxassis',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
                                   fontSize: 13,
                                   color: AppColors.textPrimary,
                                 ),
@@ -1949,7 +1961,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                 user?.role.label ?? '',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.primary,
@@ -1993,7 +2005,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         item.title,
                         style: TextStyle(
                           fontWeight:
-                              isSel ? FontWeight.w800 : FontWeight.w600,
+                              isSel ? FontWeight.w700 : FontWeight.w600,
                           color: isSel
                               ? AppColors.primary
                               : AppColors.textPrimary,
@@ -2021,7 +2033,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       '${AppBrand.name} • v1.0.0',
                       style: TextStyle(
@@ -2033,12 +2045,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   ),
                   TextButton.icon(
                     onPressed: () => confirmLogout(context),
-                    icon: const Icon(
+                    icon: Icon(
                       LucideIcons.logOut,
                       size: 15,
                       color: AppColors.error,
                     ),
-                    label: const Text(
+                    label: Text(
                       'Chiqish',
                       style: TextStyle(
                         color: AppColors.error,
@@ -2107,7 +2119,7 @@ class _ProfileRightDropdownMenu extends StatelessWidget {
                     user?.fullName ?? 'Mutaxassis',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -2120,7 +2132,7 @@ class _ProfileRightDropdownMenu extends StatelessWidget {
                     user?.role.label ?? '',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11.5,
                       color: AppColors.textMuted,
                       fontWeight: FontWeight.w500,

@@ -64,11 +64,11 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Foydalanuvchilar Boshqaruvi',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -87,9 +87,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                         ),
                         child: Text(
                           '${filteredUsers.length} ta xodim',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.primary,
                           ),
                         ),
@@ -97,7 +97,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Tizim xodimlarini ro‘yxatga olish, rollarini belgilash, ma’lumotlarini tahrirlash va hisoblarini faollashtirish/bloklash',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -128,7 +128,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -149,13 +149,13 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(
+                              borderSide: BorderSide(
                                 color: AppColors.border,
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(
+                              borderSide: BorderSide(
                                 color: AppColors.border,
                               ),
                             ),
@@ -240,7 +240,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                             _filterActive = null;
                             _filterDistrict = null;
                           }),
-                          icon: const Icon(Icons.clear, color: AppColors.error),
+                          icon: Icon(Icons.clear, color: AppColors.error),
                         ),
                       ],
                     ],
@@ -256,10 +256,10 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: filteredUsers.isEmpty
-                ? const Padding(
+                ? Padding(
                     padding: EdgeInsets.all(40),
                     child: Center(
                       child: Column(
@@ -275,7 +275,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                             'Mos keluvchi foydalanuvchilar topilmadi',
                             style: TextStyle(
                               color: AppColors.textSecondary,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -309,8 +309,8 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                           children: [
                             Text(
                               u.fullName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
                                 fontSize: 14,
                                 color: AppColors.textPrimary,
                               ),
@@ -326,11 +326,11 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                   color: AppColors.primaryLight,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'Siz',
                                   style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
                                     color: AppColors.primary,
                                   ),
                                 ),
@@ -348,7 +348,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                             children: [
                               Text(
                                 '📧 ${u.email}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondary,
                                 ),
@@ -356,21 +356,21 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               if (u.phone != null)
                                 Text(
                                   '📞 ${u.phone}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textSecondary,
                                   ),
                                 ),
                               Text(
                                 '🏛️ ${u.institutionName ?? 'Muassasa yo‘q'}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textMuted,
                                 ),
                               ),
                               Text(
                                 '🎖️ ${u.qualificationCategory ?? 'Mutaxassis'} (${u.experienceYears} yil staj)',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textMuted,
                                 ),
@@ -398,13 +398,13 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: u.isActive
-                                      ? const Color(0xFFEEF9EC)
-                                      : const Color(0xFFFEF2F2),
+                                      ? AppColors.successBg
+                                      : AppColors.errorBg,
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: u.isActive
-                                        ? const Color(0xFFC3EBBE)
-                                        : const Color(0xFFFECACA),
+                                        ? AppColors.successBorder
+                                        : AppColors.errorBorder,
                                   ),
                                 ),
                                 child: Row(
@@ -416,18 +416,18 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                           : Icons.block_rounded,
                                       size: 14,
                                       color: u.isActive
-                                          ? const Color(0xFF12803A)
-                                          : const Color(0xFFDC2626),
+                                          ? AppColors.success
+                                          : AppColors.error,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       u.isActive ? 'Faol' : 'Bloklangan',
                                       style: TextStyle(
                                         fontSize: 11,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                         color: u.isActive
-                                            ? const Color(0xFF12803A)
-                                            : const Color(0xFFDC2626),
+                                            ? AppColors.success
+                                            : AppColors.error,
                                       ),
                                     ),
                                   ],
@@ -438,7 +438,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
 
                             // TAHRIRLASH
                             IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.edit_outlined,
                                 size: 18,
                                 color: AppColors.primary,
@@ -454,7 +454,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                             // O'CHIRISH (Super admindan tashqari)
                             if (!isCurrent && u.role != UserRole.superAdmin)
                               IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.delete_outline_rounded,
                                   size: 18,
                                   color: AppColors.error,
@@ -490,7 +490,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
         style: TextStyle(
           color: role.color,
           fontSize: 11,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -522,7 +522,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor:
-                  newStatus ? const Color(0xFF12803A) : AppColors.error,
+                  newStatus ? AppColors.success : AppColors.error,
               foregroundColor: Colors.white,
             ),
             onPressed: () async {
@@ -540,8 +540,8 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                         '${target.fullName} hisobi muvaffaqiyatli ${newStatus ? 'faollashtirildi' : 'bloklandi'}.',
                       ),
                       backgroundColor: newStatus
-                          ? const Color(0xFF12803A)
-                          : const Color(0xFFDC2626),
+                          ? AppColors.success
+                          : AppColors.error,
                     ),
                   );
                 }
@@ -647,7 +647,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
           return AlertDialog(
             title: const Text(
               'Yangi Foydalanuvchi / Xodim Yaratish',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             ),
             content: SizedBox(
               width: 520,
@@ -913,7 +913,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                             content: Text(
                               '${newUser.fullName} muvaffaqiyatli yaratildi.',
                             ),
-                            backgroundColor: const Color(0xFF12803A),
+                            backgroundColor: AppColors.success,
                           ),
                         );
                       }
@@ -960,7 +960,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
         builder: (context, setDlgState) => AlertDialog(
           title: Text(
             '${target.fullName} ma’lumotlarini tahrirlash',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           ),
           content: SizedBox(
             width: 480,
@@ -1097,9 +1097,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                     if (context.mounted) {
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                        SnackBar(
                           content: Text('Ma’lumotlar muvaffaqiyatli saqlandi.'),
-                          backgroundColor: Color(0xFF12803A),
+                          backgroundColor: AppColors.success,
                         ),
                       );
                     }

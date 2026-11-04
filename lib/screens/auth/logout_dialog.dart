@@ -13,7 +13,7 @@ Future<void> confirmLogout(BuildContext context) async {
     context: context,
     builder:
         (ctx) => AlertDialog(
-          icon: const Icon(LucideIcons.logOut, color: AppColors.error),
+          icon: Icon(LucideIcons.logOut, color: AppColors.error),
           title: const Text('Profildan chiqish'),
           content: const Text(
             'Profilingizdan chiqib ketishga ishonchingiz komilmi?',

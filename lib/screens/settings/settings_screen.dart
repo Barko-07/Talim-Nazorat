@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../../core/config/app_config.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
+import '../../core/widgets/theme_picker.dart';
+import '../../providers/theme_provider.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/logout_dialog.dart';
@@ -24,14 +26,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   TextStyle _myGovFont({
     double fontSize = 15,
     FontWeight fontWeight = FontWeight.w500,
-    Color color = const Color(0xFF0A1A3F),
+    Color? color,
     double letterSpacing = -0.1,
     double? height,
   }) {
     return GoogleFonts.golosText(
       fontSize: fontSize,
       fontWeight: fontWeight,
-      color: color,
+      color: color ?? AppColors.textPrimary,
       letterSpacing: letterSpacing,
       height: height,
     );
@@ -83,9 +85,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: AppColors.border),
                 boxShadow: const [
                   BoxShadow(
                     color: Color(0x080A1A3F),
@@ -101,9 +103,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     height: 52,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFFF1F5F9),
+                      color: AppColors.surfaceMuted,
                       border: Border.all(
-                        color: const Color(0xFFCBD5E1),
+                        color: AppColors.borderSlate,
                         width: 1.4,
                       ),
                     ),
@@ -113,7 +115,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: _myGovFont(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF1A2A4D),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -127,7 +129,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: _myGovFont(
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF0A1A3F),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -136,7 +138,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: _myGovFont(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w500,
-                            color: const Color(0xFF475569),
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ],
@@ -152,16 +154,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: Icon(
                       _hideSensitiveInfo ? LucideIcons.eyeOff : LucideIcons.eye,
                       size: 21,
-                      color: const Color(0xFF334155),
+                      color: AppColors.textSecondary,
                     ),
                   ),
                   IconButton(
                     tooltip: 'Xavfsizlik sozlamalari',
                     onPressed: () => _showChangePasswordSheet(context),
-                    icon: const Icon(
+                    icon: Icon(
                       LucideIcons.settings,
                       size: 21,
-                      color: Color(0xFF334155),
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -172,9 +174,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // 2. MY.GOV.UZ USLUBIDAGI PROFIL VA SOZLAMALAR RO'YXATI
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: AppColors.border),
                 boxShadow: const [
                   BoxShadow(
                     color: Color(0x060A1A3F),
@@ -214,8 +216,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildMyGovMenuItem(
                     icon: LucideIcons.paintbrush,
                     title: 'Ilova mavzusi',
-                    trailingValue: 'Tizimli',
-                    showChevron: false,
+                    trailingValue: context.watch<ThemeProvider>().choice.label,
+                    onTap: () => showThemePicker(context),
                   ),
                   _buildMyGovMenuItem(
                     icon: LucideIcons.languages,
@@ -256,7 +258,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: _myGovFont(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF64748B),
+                      color: AppColors.textMuted,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -265,7 +267,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: _myGovFont(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF94A3B8),
+                      color: AppColors.textSubtle,
                     ),
                   ),
                 ],
@@ -286,7 +288,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: _myGovFont(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF0A1A3F),
+                  color: AppColors.textPrimary,
                 ),
               ),
             )
@@ -316,9 +318,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         decoration: BoxDecoration(
           border: isLast
               ? null
-              : const Border(
+              : Border(
                   bottom: BorderSide(
-                    color: Color(0xFFF1F5F9),
+                    color: AppColors.surfaceMuted,
                     width: 1.0,
                   ),
                 ),
@@ -330,15 +332,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: AppColors.surfaceMuted,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: AppColors.border),
               ),
               alignment: Alignment.center,
               child: Icon(
                 icon,
                 size: 20,
-                color: const Color(0xFF1A2A4D),
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(width: 14),
@@ -351,7 +353,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: _myGovFont(
                       fontSize: 15.5,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF0A1A3F),
+                      color: AppColors.textPrimary,
                       letterSpacing: -0.1,
                     ),
                   ),
@@ -364,7 +366,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: _myGovFont(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF64748B),
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ],
@@ -379,8 +381,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   vertical: 4.5,
                 ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF3DBE37), Color(0xFF0062CC)],
+                  gradient: LinearGradient(
+                    colors: [AppColors.brandGreen, AppColors.primary],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
@@ -403,16 +405,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: _myGovFont(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF64748B),
+                  color: AppColors.textMuted,
                 ),
               ),
             ],
             if (showChevron) ...[
               const SizedBox(width: 8),
-              const Icon(
+              Icon(
                 LucideIcons.chevronRight,
                 size: 18,
-                color: Color(0xFF64748B),
+                color: AppColors.textMuted,
               ),
             ],
           ],
@@ -502,7 +504,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
@@ -519,7 +521,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFCBD5E1),
+                      color: AppColors.borderSlate,
                       borderRadius: BorderRadius.circular(999),
                     ),
                   ),
@@ -533,7 +535,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: _myGovFont(
                         fontSize: 17.5,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF0A1A3F),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     IconButton(
@@ -546,9 +548,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ...rows.map(
                   (item) => Container(
                     padding: const EdgeInsets.symmetric(vertical: 11),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(color: Color(0xFFF1F5F9)),
+                        bottom: BorderSide(color: AppColors.surfaceMuted),
                       ),
                     ),
                     child: Row(
@@ -561,7 +563,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: _myGovFont(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF64748B),
+                              color: AppColors.textMuted,
                             ),
                           ),
                         ),
@@ -571,7 +573,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: _myGovFont(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF0A1A3F),
+                              color: AppColors.textPrimary,
                               height: 1.35,
                             ),
                           ),
@@ -646,7 +648,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: _myGovFont(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF64748B),
+                color: AppColors.textMuted,
               ),
             ),
           ),

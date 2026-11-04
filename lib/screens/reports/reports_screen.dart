@@ -20,7 +20,7 @@ class ReportsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
             Icon(
               LucideIcons.fileSpreadsheet,
@@ -31,7 +31,7 @@ class ReportsScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 'Excel / CSV formatida eksport',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
             ),
           ],
@@ -43,7 +43,7 @@ class ReportsScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Qaysi toifadagi hisobotni eksport qilmoqchisiz? Barcha ma’lumotlar UTF-8 BOM bilan rasmiylashtiriladi (Excel o‘zbekcha harflarni to‘g‘ri ochadi).',
                   style: TextStyle(
                     fontSize: 12.5,
@@ -184,14 +184,14 @@ class ReportsScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
               ),
             ),
-            const Icon(
+            Icon(
               LucideIcons.chevronRight,
               size: 16,
               color: AppColors.textSubtle,
@@ -212,7 +212,7 @@ class ReportsScreen extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         title: Text(
           'CSV fayli tayyor: $filename',
-          style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800),
+          style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700),
         ),
         content: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 520),
@@ -220,7 +220,7 @@ class ReportsScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Fayl mazmuni muvaffaqiyatli shakllantirildi. Ma’lumotlarni xotiraga nusxalab Excel dasturida ochishingiz mumkin:',
                 style: TextStyle(
                   fontSize: 12.5,
@@ -354,7 +354,7 @@ class ReportsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Icon(
                         LucideIcons.bookOpenCheck,
@@ -366,7 +366,7 @@ class ReportsScreen extends StatelessWidget {
                         child: Text(
                           'Individual ta’lim rejalari (ITR) monitoring hisoboti',
                           style: TextStyle(
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                             fontSize: 16,
                             color: AppColors.textPrimary,
                           ),
@@ -376,7 +376,7 @@ class ReportsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   if (plans.isEmpty)
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(vertical: 18),
                       child: Text(
                         'ITR rejalari mavjud emas.',
@@ -413,8 +413,8 @@ class ReportsScreen extends StatelessWidget {
                                   Expanded(
                                     child: Text(
                                       '${p.studentName} (${p.studentGrade})',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
                                         fontSize: 14,
                                         color: AppColors.textPrimary,
                                       ),
@@ -481,7 +481,7 @@ class ReportsScreen extends StatelessWidget {
                   label,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textMuted,
@@ -498,7 +498,7 @@ class ReportsScreen extends StatelessWidget {
             value,
             style: TextStyle(
               fontSize: 30,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
               color: accent,
               letterSpacing: -0.8,
               height: 1.05,
@@ -510,7 +510,7 @@ class ReportsScreen extends StatelessWidget {
             caption,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
@@ -538,7 +538,7 @@ class ReportsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(LucideIcons.activity, size: 20, color: AppColors.primary),
               SizedBox(width: 10),
@@ -546,7 +546,7 @@ class ReportsScreen extends StatelessWidget {
                 child: Text(
                   'Svetofor holati va rivojlanish dinamikasi hisoboti (oxirgi 30 kun)',
                   style: TextStyle(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     fontSize: 16,
                     color: AppColors.textPrimary,
                   ),
@@ -561,18 +561,18 @@ class ReportsScreen extends StatelessWidget {
             children: [
               StatusPill(
                 label: '🔴 Qizil (Ishlanmagan): $redCount ta',
-                color: const Color(0xFFDC2626),
-                backgroundColor: const Color(0xFFFEE2E2),
+                color: AppColors.error,
+                backgroundColor: AppColors.errorBg,
               ),
               StatusPill(
                 label: '🟡 Sariq (E’tibor talab): $yellowCount ta',
-                color: const Color(0xFFD97706),
-                backgroundColor: const Color(0xFFFEF3C7),
+                color: AppColors.warning,
+                backgroundColor: AppColors.warningBg,
               ),
               StatusPill(
                 label: '🟢 Yashil (Ijobiy natija): $greenCount ta',
-                color: const Color(0xFF12803A),
-                backgroundColor: const Color(0xFFE4F6E1),
+                color: AppColors.success,
+                backgroundColor: AppColors.successBg,
               ),
               StatusPill(
                 label: '📈 O‘sish: $growthCount',
@@ -594,18 +594,18 @@ class ReportsScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF2F2),
+                color: AppColors.errorBg,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFFDC2626).withValues(alpha: 0.35),
+                  color: AppColors.error.withValues(alpha: 0.35),
                 ),
               ),
               child: Text(
                 '🔴 Oxirgi 30 kunda hech qanday ish qayd etilmagan o‘quvchilar (${report.notWorkedWithNames.length} nafar): ${report.notWorkedWithNames.join(", ")}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFFB91C1C),
+                  color: AppColors.error,
                 ),
               ),
             ),
@@ -622,7 +622,7 @@ class ReportsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(LucideIcons.userCheck, size: 20, color: AppColors.primary),
               SizedBox(width: 10),
@@ -630,7 +630,7 @@ class ReportsScreen extends StatelessWidget {
                 child: Text(
                   'Mutaxassislar faolligi va qamrov jadvali',
                   style: TextStyle(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     fontSize: 16,
                     color: AppColors.textPrimary,
                   ),
@@ -640,7 +640,7 @@ class ReportsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           if (report.specialists.isEmpty)
-            const Text(
+            Text(
               'Mutaxassislar ma’lumotlari topilmadi.',
               style: TextStyle(color: AppColors.textMuted),
             )
@@ -663,8 +663,8 @@ class ReportsScreen extends StatelessWidget {
                           children: [
                             Text(
                               sp.fullName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
                                 fontSize: 13.5,
                                 color: AppColors.textPrimary,
                               ),
@@ -672,7 +672,7 @@ class ReportsScreen extends StatelessWidget {
                             const SizedBox(height: 3),
                             Text(
                               '${sp.role} • Biriktirilgan: ${sp.childrenAssigned} nafar • Ishlangan: ${sp.childrenWorkedWith} nafar • Jami yozuvlar: ${sp.totalRecords} ta',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
                               ),

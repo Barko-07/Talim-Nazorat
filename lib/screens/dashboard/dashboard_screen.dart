@@ -88,9 +88,9 @@ class DashboardScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Diqqat talab holatlar (${alerts.length} ta)',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
                             ),
                           ),
@@ -99,7 +99,7 @@ class DashboardScreen extends StatelessWidget {
                             alerts.first.message,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12.5,
                               color: AppColors.textSecondary,
                               height: 1.35,
@@ -115,7 +115,7 @@ class DashboardScreen extends StatelessWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Padding(
+                                Padding(
                                   padding: EdgeInsets.only(top: 2),
                                   child: Icon(
                                     LucideIcons.triangleAlert,
@@ -128,10 +128,10 @@ class DashboardScreen extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 10),
-                            const StatusPill(
+                            StatusPill(
                               label: 'Monitoringni ko‘rish',
                               color: AppColors.warning,
-                              backgroundColor: Colors.white,
+                              backgroundColor: AppColors.surface,
                               icon: LucideIcons.arrowUpRight,
                             ),
                           ],
@@ -140,7 +140,7 @@ class DashboardScreen extends StatelessWidget {
 
                       return Row(
                         children: [
-                          const Icon(
+                          Icon(
                             LucideIcons.triangleAlert,
                             color: AppColors.warning,
                             size: 22,
@@ -148,7 +148,7 @@ class DashboardScreen extends StatelessWidget {
                           const SizedBox(width: 14),
                           Expanded(child: textCol),
                           const SizedBox(width: 12),
-                          const StatusPill(
+                          StatusPill(
                             label: 'Ko‘rish',
                             color: AppColors.warning,
                             backgroundColor: Colors.white,
@@ -336,7 +336,7 @@ class DashboardScreen extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 initials,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primary,
@@ -356,7 +356,7 @@ class DashboardScreen extends StatelessWidget {
                   children: [
                     Text(
                       fullName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -375,7 +375,7 @@ class DashboardScreen extends StatelessWidget {
                   institutionName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.5,
                     color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
@@ -437,18 +437,18 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 LucideIcons.activity,
                 size: 19,
                 color: AppColors.primary,
               ),
               const SizedBox(width: 9),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Bolalar bilan ishlash holati (Svetofor nazorati)',
                   style: TextStyle(
                     fontSize: 14.5,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -456,7 +456,7 @@ class DashboardScreen extends StatelessWidget {
               InkWell(
                 onTap:
                     () => _openModule(context, 1, const StudentsListScreen()),
-                child: const Text(
+                child: Text(
                   'Ro‘yxatni ochish →',
                   style: TextStyle(
                     fontSize: 12,
@@ -474,18 +474,18 @@ class DashboardScreen extends StatelessWidget {
             children: [
               StatusPill(
                 label: '🔴 Ishlanmagan / kechikkan: $redCount nafar',
-                color: const Color(0xFFDC2626),
-                backgroundColor: const Color(0xFFFEE2E2),
+                color: AppColors.error,
+                backgroundColor: AppColors.errorBg,
               ),
               StatusPill(
                 label: '🟡 E’tibor talab: $yellowCount nafar',
-                color: const Color(0xFFD97706),
-                backgroundColor: const Color(0xFFFEF3C7),
+                color: AppColors.warning,
+                backgroundColor: AppColors.warningBg,
               ),
               StatusPill(
                 label: '🟢 Ijobiy dinamika: $greenCount nafar',
-                color: const Color(0xFF12803A),
-                backgroundColor: const Color(0xFFE4F6E1),
+                color: AppColors.success,
+                backgroundColor: AppColors.successBg,
               ),
               StatusPill(
                 label: '↗ Faol yo‘naltirishlar: $pendingReferrals ta',
@@ -517,7 +517,7 @@ class DashboardScreen extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               final isNarrow = constraints.maxWidth < 460;
-              const titleCol = Column(
+              final titleCol = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -540,20 +540,20 @@ class DashboardScreen extends StatelessWidget {
                 ],
               );
 
-              const pill = StatusPill(
+              final pill = StatusPill(
                 label: 'So‘nggi 6 oy',
                 color: AppColors.primary,
                 backgroundColor: AppColors.primaryLight,
               );
 
               if (isNarrow) {
-                return const Column(
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [titleCol, SizedBox(height: 10), pill],
                 );
               }
 
-              return const Row(
+              return Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(child: titleCol),
@@ -565,7 +565,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           if (points.isEmpty)
-            const GlassWell(
+            GlassWell(
               borderRadius: 12,
               padding: EdgeInsets.symmetric(horizontal: 18, vertical: 34),
               child: Center(
@@ -651,7 +651,7 @@ class DashboardScreen extends StatelessWidget {
                           getTitlesWidget:
                               (val, _) => Text(
                                 '${val.toInt()}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   color: AppColors.textMuted,
                                   fontFeatures: [FontFeature.tabularFigures()],
@@ -679,7 +679,7 @@ class DashboardScreen extends StatelessWidget {
                                 ),
                                 child: Text(
                                   months[idx],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 11.5,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.textSecondary,
@@ -753,7 +753,7 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'So‘nggi baholashlar',
                   style: TextStyle(
@@ -768,7 +768,7 @@ class DashboardScreen extends StatelessWidget {
                 InkWell(
                   borderRadius: BorderRadius.circular(999),
                   onTap: () => onNavigateTab!(2),
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Text(
                       'Barchasi',
@@ -784,7 +784,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           if (assessments.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Text(
                 'Hozircha baholashlar yo‘q',
@@ -823,7 +823,7 @@ class DashboardScreen extends StatelessWidget {
                               a.studentName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 13.5,
                                 color: AppColors.textPrimary,
@@ -834,7 +834,7 @@ class DashboardScreen extends StatelessWidget {
                               '${a.title} • ${a.specialistRole}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textMuted,
                               ),
@@ -867,7 +867,7 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Kutilayotgan mashg‘ulotlar',
                   style: TextStyle(
@@ -882,7 +882,7 @@ class DashboardScreen extends StatelessWidget {
                 InkWell(
                   borderRadius: BorderRadius.circular(999),
                   onTap: () => onNavigateTab!(3),
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Text(
                       'Jadval',
@@ -898,7 +898,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           if (sessions.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Text(
                 'Rejalashtirilgan darslar yo‘q',
@@ -940,7 +940,7 @@ class DashboardScreen extends StatelessWidget {
                               s.studentName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 13.5,
                                 color: AppColors.textPrimary,
@@ -951,7 +951,7 @@ class DashboardScreen extends StatelessWidget {
                               s.topic,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textMuted,
                               ),
@@ -1161,7 +1161,7 @@ class DashboardScreen extends StatelessWidget {
             children: [
               Text(
                 sectionTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16.5,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -1171,7 +1171,7 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 2.5),
               Text(
                 sectionSubtitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12.5,
                   color: AppColors.textMuted,
                   height: 1.35,
@@ -1227,9 +1227,9 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 Text(
                   act['title'] as String,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -1238,7 +1238,7 @@ class DashboardScreen extends StatelessWidget {
                   act['desc'] as String,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textMuted,
                     height: 1.35,
@@ -1248,7 +1248,7 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 6),
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 2),
             child: Icon(
               LucideIcons.chevronRight,
@@ -1285,7 +1285,7 @@ class DashboardScreen extends StatelessWidget {
                   title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textSecondary,
@@ -1305,9 +1305,9 @@ class DashboardScreen extends StatelessWidget {
                 value,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 26,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                   letterSpacing: -0.7,
                   fontFeatures: [FontFeature.tabularFigures()],
@@ -1318,7 +1318,7 @@ class DashboardScreen extends StatelessWidget {
                 subtitle,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11.5,
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w500,

@@ -35,22 +35,22 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
   static Color _colorFor(StatusColor c) {
     switch (c) {
       case StatusColor.red:
-        return const Color(0xFFDC2626);
+        return AppColors.error;
       case StatusColor.yellow:
-        return const Color(0xFFD97706);
+        return AppColors.warning;
       case StatusColor.green:
-        return const Color(0xFF12803A);
+        return AppColors.success;
     }
   }
 
   static Color _bgFor(StatusColor c) {
     switch (c) {
       case StatusColor.red:
-        return const Color(0xFFFEF2F2);
+        return AppColors.errorBg;
       case StatusColor.yellow:
-        return const Color(0xFFFFFBEB);
+        return AppColors.warningBg;
       case StatusColor.green:
-        return const Color(0xFFEEF9EC);
+        return AppColors.successBg;
     }
   }
 
@@ -106,11 +106,11 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Psixologik hisobdagi o‘quvchilar',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -121,7 +121,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEAF3FD),
+                          color: AppColors.primaryLight,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: const Color(
@@ -131,17 +131,17 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         ),
                         child: Text(
                           '${filtered.length} nafar bola',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0062CC),
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Kasbiy psixologik diagnostika va korreksiya uchun biriktirilgan o‘quvchilar reyestri',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -154,11 +154,11 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: AppColors.surfaceMuted,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: AppColors.border),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Icon(
                       Icons.lock_outline_rounded,
@@ -185,7 +185,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -313,7 +313,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                   ? Colors.white
                                   : AppColors.primary,
                         ),
-                        selectedColor: const Color(0xFF0062CC),
+                        selectedColor: AppColors.primary,
                         labelStyle: TextStyle(
                           fontSize: 12,
                           color:
@@ -331,14 +331,14 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                           label: Text(
                             '🔴 Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
                           ),
-                          selectedColor: const Color(0xFFDC2626),
-                          backgroundColor: const Color(0xFFFEF2F2),
+                          selectedColor: AppColors.error,
+                          backgroundColor: AppColors.errorBg,
                           labelStyle: TextStyle(
                             fontSize: 12,
                             color:
                                 _statusColorFilter == StatusColor.red
                                     ? Colors.white
-                                    : const Color(0xFFDC2626),
+                                    : AppColors.error,
                             fontWeight: FontWeight.w700,
                           ),
                           onSelected:
@@ -353,14 +353,14 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                           label: Text(
                             '🟡 Sariq (${summary.count(StatusColor.yellow)})',
                           ),
-                          selectedColor: const Color(0xFFD97706),
-                          backgroundColor: const Color(0xFFFFFBEB),
+                          selectedColor: AppColors.warning,
+                          backgroundColor: AppColors.warningBg,
                           labelStyle: TextStyle(
                             fontSize: 12,
                             color:
                                 _statusColorFilter == StatusColor.yellow
                                     ? Colors.white
-                                    : const Color(0xFFD97706),
+                                    : AppColors.warning,
                             fontWeight: FontWeight.w700,
                           ),
                           onSelected:
@@ -375,14 +375,14 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                           label: Text(
                             '🟢 Yashil (${summary.count(StatusColor.green)})',
                           ),
-                          selectedColor: const Color(0xFF12803A),
-                          backgroundColor: const Color(0xFFEEF9EC),
+                          selectedColor: AppColors.success,
+                          backgroundColor: AppColors.successBg,
                           labelStyle: TextStyle(
                             fontSize: 12,
                             color:
                                 _statusColorFilter == StatusColor.green
                                     ? Colors.white
-                                    : const Color(0xFF12803A),
+                                    : AppColors.success,
                             fontWeight: FontWeight.w700,
                           ),
                           onSelected:
@@ -421,7 +421,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
             Container(
               padding: const EdgeInsets.all(40),
               alignment: Alignment.center,
-              child: const Column(
+              child: Column(
                 children: [
                   Icon(
                     Icons.search_off_rounded,
@@ -431,7 +431,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                   SizedBox(height: 12),
                   Text(
                     'Mos keluvchi o‘quvchilar topilmadi',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: 4),
                   Text(
@@ -460,7 +460,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
 
                 return Card(
                   elevation: 0,
-                  color: isRed ? const Color(0xFFFFF5F5) : Colors.white,
+                  color: isRed ? AppColors.errorBg : Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
@@ -479,12 +479,12 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         Row(
                           children: [
                             CircleAvatar(
-                              backgroundColor: stBg ?? const Color(0xFFEAF3FD),
+                              backgroundColor: stBg ?? AppColors.primaryLight,
                               child: Text(
                                 s.firstName.isNotEmpty ? s.firstName[0] : 'O',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: stColor ?? const Color(0xFF0062CC),
+                                  fontWeight: FontWeight.w600,
+                                  color: stColor ?? AppColors.primary,
                                 ),
                               ),
                             ),
@@ -501,8 +501,8 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                     children: [
                                       Text(
                                         s.fullName,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
                                           fontSize: 15,
                                           color: AppColors.textPrimary,
                                         ),
@@ -513,7 +513,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                           vertical: 1,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFF1F5F9),
+                                          color: AppColors.surfaceMuted,
                                           borderRadius: BorderRadius.circular(
                                             6,
                                           ),
@@ -550,8 +550,8 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                                 ? "E’tibor talab"
                                                 : "Ijobiy"}',
                                             style: TextStyle(
-                                              fontSize: 10.5,
-                                              fontWeight: FontWeight.bold,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
                                               color: stColor,
                                             ),
                                           ),
@@ -563,7 +563,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                             vertical: 1,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFEEF9EC),
+                                            color: AppColors.successBg,
                                             borderRadius: BorderRadius.circular(
                                               6,
                                             ),
@@ -573,12 +573,12 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                               ).withValues(alpha: 0.3),
                                             ),
                                           ),
-                                          child: const Text(
+                                          child: Text(
                                             'Sizga biriktirilgan',
                                             style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                              color: Color(0xFF12803A),
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.success,
                                             ),
                                           ),
                                         ),
@@ -587,7 +587,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                   const SizedBox(height: 4),
                                   Text(
                                     'Ehtiyoj: ${s.primaryNeed} • ${s.supportLevel}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textSecondary,
                                     ),

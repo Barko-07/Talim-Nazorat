@@ -58,11 +58,11 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Ta’lim Muassasalari Reyestri',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -73,25 +73,25 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF0FDFA),
+                          color: AppColors.infoBg,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFF0F766E).withValues(alpha: 0.2),
+                            color: AppColors.info.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
                           '${filtered.length} ta muassasa',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F766E),
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.info,
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Namangan viloyati bo‘yicha umumta’lim maktablari, inklyuziv tayanch markazlari va ixtisoslashtirilgan maktab-internatlar',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -106,7 +106,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -231,7 +231,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: AppColors.border),
+                  side: BorderSide(color: AppColors.border),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
@@ -241,15 +241,15 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF0FDFA),
+                          color: AppColors.infoBg,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFF0F766E).withValues(alpha: 0.2),
+                            color: AppColors.info.withValues(alpha: 0.2),
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.apartment_rounded,
-                          color: Color(0xFF0F766E),
+                          color: AppColors.info,
                           size: 26,
                         ),
                       ),
@@ -262,8 +262,8 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                               children: [
                                 Text(
                                   name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
                                     fontSize: 15,
                                     color: AppColors.textPrimary,
                                   ),
@@ -280,9 +280,9 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                                   ),
                                   child: Text(
                                     type,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: AppColors.primary,
                                     ),
                                   ),
@@ -292,7 +292,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                             const SizedBox(height: 4),
                             Text(
                               '📍 $district • Namangan viloyati',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
                               ),
@@ -317,7 +317,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: specialistsCount > 0
-                                        ? const Color(0xFF7C3AED)
+                                        ? AppColors.purple
                                         : AppColors.textMuted,
                                   ),
                                 ),
@@ -327,7 +327,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: iepCount > 0
-                                        ? const Color(0xFF12803A)
+                                        ? AppColors.success
                                         : AppColors.textMuted,
                                   ),
                                 ),
@@ -339,10 +339,10 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                       const SizedBox(width: 16),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF8FAFC),
+                          backgroundColor: AppColors.surfaceMuted,
                           foregroundColor: AppColors.textPrimary,
                           elevation: 0,
-                          side: const BorderSide(color: AppColors.border),
+                          side: BorderSide(color: AppColors.border),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -384,7 +384,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
       builder: (ctx) => AlertDialog(
         title: Text(
           name,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         content: SizedBox(
           width: 560,
@@ -394,7 +394,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
             children: [
               Text(
                 'Hudud: $district • Turi: $type',
-                style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                style: TextStyle(fontSize: 12, color: AppColors.textMuted),
               ),
               const Divider(height: 20),
               Expanded(
@@ -417,7 +417,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                           children: [
                             // O'quvchilar
                             students.isEmpty
-                                ? const Center(
+                                ? Center(
                                     child: Text(
                                       'Bu muassasada hozircha o‘quvchi ro‘yxatga olinmagan',
                                       style: TextStyle(
@@ -436,7 +436,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                                         title: Text(
                                           st.fullName,
                                           style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                         subtitle: Text(
@@ -444,7 +444,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                                         ),
                                         trailing: Text(
                                           st.supportLevel,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 11,
                                             color: AppColors.primary,
                                             fontWeight: FontWeight.w600,
@@ -456,7 +456,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
 
                             // Kadrlar
                             staff.isEmpty
-                                ? const Center(
+                                ? Center(
                                     child: Text(
                                       'Bu muassasaga hozircha kadr biriktirilmagan',
                                       style: TextStyle(
@@ -475,7 +475,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                                         title: Text(
                                           u.fullName,
                                           style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                         subtitle: Text(
@@ -484,9 +484,9 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                                         trailing: Text(
                                           u.qualificationCategory ??
                                               'Mutaxassis',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 11,
-                                            color: Color(0xFF7C3AED),
+                                            color: AppColors.purple,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),

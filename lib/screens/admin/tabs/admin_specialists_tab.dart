@@ -65,11 +65,11 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Mutaxassislar va Pedagogik Kadrlar',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -80,7 +80,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF5F3FF),
+                          color: AppColors.purpleBg,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: const Color(
@@ -90,17 +90,17 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                         ),
                         child: Text(
                           '${filtered.length} ta mutaxassis',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF7C3AED),
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.purple,
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Inklyuziv va maxsus ta’lim bo‘yicha psixologlar, logopedlar, defektologlar va o‘qituvchilar hisobi',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -115,7 +115,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -253,7 +253,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: AppColors.border),
+                  side: BorderSide(color: AppColors.border),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
@@ -278,8 +278,8 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                               children: [
                                 Text(
                                   sp.fullName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
                                     fontSize: 15,
                                     color: AppColors.textPrimary,
                                   ),
@@ -299,7 +299,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                                     style: TextStyle(
                                       color: sp.role.color,
                                       fontSize: 11,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ),
@@ -310,12 +310,12 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF1F5F9),
+                                    color: AppColors.surfaceMuted,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     sp.qualificationCategory ?? 'Mutaxassis',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textSecondary,
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
@@ -327,7 +327,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                             const SizedBox(height: 6),
                             Text(
                               'Mutaxassislik: ${sp.specialization ?? sp.role.professionTitle} • Ish staji: ${sp.experienceYears} yil',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
                               ),
@@ -335,7 +335,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                             const SizedBox(height: 4),
                             Text(
                               '🏛️ ${sp.institutionName ?? 'Muassasa belgilanmagan'} (${sp.district ?? 'Namangan viloyati'})',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textMuted,
                               ),
@@ -354,13 +354,13 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                                   icon: Icons.assignment_turned_in_rounded,
                                   label:
                                       '$userAssessmentsCount ta baholash o‘tkazilgan',
-                                  color: const Color(0xFF12803A),
+                                  color: AppColors.success,
                                 ),
                                 _buildMetricPill(
                                   icon: Icons.event_available_rounded,
                                   label:
                                       '$userSessionsCount ta korreksion mashg‘ulot',
-                                  color: const Color(0xFFD97706),
+                                  color: AppColors.warning,
                                 ),
                               ],
                             ),
@@ -384,7 +384,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                             label: const Text('O‘quvchilar ro‘yxati'),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.primary,
-                              side: const BorderSide(color: AppColors.primary),
+                              side: BorderSide(color: AppColors.primary),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -459,7 +459,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                   '${specialist.fullName}ga biriktirilgan o‘quvchilar',
                   style: const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 content: SizedBox(
@@ -470,7 +470,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                     children: [
                       Text(
                         'Lavozimi: ${specialist.role.label} • Muassasa: ${specialist.institutionName}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textMuted,
                         ),
@@ -482,7 +482,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                           Text(
                             'Joriy o‘quvchilar (${assigned.length}):',
                             style: const TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               fontSize: 13,
                             ),
                           ),
@@ -508,7 +508,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                       Expanded(
                         child:
                             assigned.isEmpty
-                                ? const Center(
+                                ? Center(
                                   child: Text(
                                     'Hozircha o‘quvchi biriktirilmagan',
                                     style: TextStyle(
@@ -530,10 +530,10 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                                         backgroundColor: AppColors.primaryLight,
                                         child: Text(
                                           '${idx + 1}',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 11,
                                             color: AppColors.primary,
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       ),

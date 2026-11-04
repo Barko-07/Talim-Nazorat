@@ -25,22 +25,22 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
   static Color _colorFor(StatusColor c) {
     switch (c) {
       case StatusColor.red:
-        return const Color(0xFFDC2626);
+        return AppColors.error;
       case StatusColor.yellow:
-        return const Color(0xFFD97706);
+        return AppColors.warning;
       case StatusColor.green:
-        return const Color(0xFF12803A);
+        return AppColors.success;
     }
   }
 
   static Color _bgFor(StatusColor c) {
     switch (c) {
       case StatusColor.red:
-        return const Color(0xFFFEF2F2);
+        return AppColors.errorBg;
       case StatusColor.yellow:
-        return const Color(0xFFFFFBEB);
+        return AppColors.warningBg;
       case StatusColor.green:
-        return const Color(0xFFEEF9EC);
+        return AppColors.successBg;
     }
   }
 
@@ -76,7 +76,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                         const SizedBox(height: 4),
                         Text(
                           alert.ruleTitle,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12.5,
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
@@ -85,7 +85,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                         const SizedBox(height: 6),
                         Text(
                           alert.message,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12.5,
                             color: AppColors.textSecondary,
                           ),
@@ -240,16 +240,16 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Bolalar bilan ishlash holati (Svetofor monitoringi)',
                       style: TextStyle(
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         fontSize: 15.5,
                         color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       'Qizil: bola bilan ishlanmagan yoki 30+ kun yozuv kiritilmagan • Sariq: pasayish/samarasiz yoki to‘liq ishlanmagan • Yashil: ijobiy dinamika',
                       style: TextStyle(
                         fontSize: 12,
@@ -275,8 +275,8 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                         _buildSvetoforCounter(
                           label: '🔴 Qizil (Ishlanmagan)',
                           count: summary.count(StatusColor.red),
-                          color: const Color(0xFFDC2626),
-                          bg: const Color(0xFFFEF2F2),
+                          color: AppColors.error,
+                          bg: AppColors.errorBg,
                           selected: _selectedSvetoforFilter == StatusColor.red,
                           onTap:
                               () => setState(
@@ -291,8 +291,8 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                         _buildSvetoforCounter(
                           label: '🟡 Sariq (E’tibor talab)',
                           count: summary.count(StatusColor.yellow),
-                          color: const Color(0xFFD97706),
-                          bg: const Color(0xFFFFFBEB),
+                          color: AppColors.warning,
+                          bg: AppColors.warningBg,
                           selected:
                               _selectedSvetoforFilter == StatusColor.yellow,
                           onTap:
@@ -308,8 +308,8 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                         _buildSvetoforCounter(
                           label: '🟢 Yashil (Ijobiy)',
                           count: summary.count(StatusColor.green),
-                          color: const Color(0xFF12803A),
-                          bg: const Color(0xFFEEF9EC),
+                          color: AppColors.success,
+                          bg: AppColors.successBg,
                           selected:
                               _selectedSvetoforFilter == StatusColor.green,
                           onTap:
@@ -341,10 +341,10 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     '6 ta doimiy ishlovchi avtomatik nazorat algoritmi',
                     style: TextStyle(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       fontSize: 15.5,
                       color: AppColors.textPrimary,
                     ),
@@ -367,8 +367,8 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
 
             Text(
               'Aniqlangan signallar (${alerts.length} ta)',
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
                 fontSize: 16,
                 color: AppColors.textPrimary,
               ),
@@ -382,7 +382,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                   vertical: 38,
                   horizontal: 24,
                 ),
-                child: const Center(
+                child: Center(
                   child: Column(
                     children: [
                       Icon(
@@ -395,7 +395,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                         'Ochiq monitoring signallari yo‘q',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           fontSize: 15.5,
                           color: AppColors.textPrimary,
                         ),
@@ -474,7 +474,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 '$count',
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                   color: selected ? Colors.white : color,
                 ),
               ),
@@ -506,7 +506,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: isRed ? const Color(0xFFFFF5F5) : const Color(0xFFF9FAFC),
+            color: isRed ? AppColors.errorBg : AppColors.surfaceMuted,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: c.withValues(alpha: isRed ? 0.55 : 0.3),
@@ -524,7 +524,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                       ? st.student.firstName[0]
                       : '?',
                   style: TextStyle(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     color: c,
                     fontSize: 14,
                   ),
@@ -542,9 +542,9 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                       children: [
                         Text(
                           st.student.fullName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -589,7 +589,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                           if (st.specialistsNotStarted.isNotEmpty)
                             'Ish boshlamagan: ${st.specialistsNotStarted.join(", ")}',
                         ].join(' • '),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11.5,
                           color: AppColors.textMuted,
                         ),
@@ -597,7 +597,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                     ],
                     if (st.specialistWorkStatuses.isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Mutaxassislar bo‘yicha ish holati',
                         style: TextStyle(
                           fontSize: 11,
@@ -645,7 +645,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: color,
-                                      fontSize: 10.5,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -657,7 +657,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 LucideIcons.chevronRight,
                 size: 16,
                 color: AppColors.textSubtle,
@@ -688,9 +688,9 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                     height: 1.3,
                   ),
@@ -698,7 +698,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 const SizedBox(height: 4),
                 Text(
                   condition,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textMuted,
                     height: 1.35,
@@ -749,7 +749,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 ),
                 Text(
                   df.format(alt.createdAt),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
@@ -762,8 +762,8 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
           const SizedBox(height: 10),
           Text(
             alt.ruleTitle,
-            style: const TextStyle(
-              fontWeight: FontWeight.w800,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
               fontSize: 15.5,
               color: AppColors.textPrimary,
               letterSpacing: -0.25,
@@ -777,7 +777,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
             children: [
               Text(
                 'O‘quvchi: ${alt.studentName} (${alt.studentGrade})',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -786,7 +786,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               if (alt.responsiblePersonName != null)
                 Text(
                   'Mas’ul: ${alt.responsiblePersonName!}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.5,
                     color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
@@ -797,7 +797,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
           const SizedBox(height: 8),
           Text(
             alt.message,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppColors.textSecondary,
               height: 1.45,
@@ -812,7 +812,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 1),
                   child: Icon(
                     LucideIcons.lightbulb,
@@ -824,7 +824,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 Expanded(
                   child: Text(
                     'Tavsiya: ${alt.suggestedAction}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.primaryDark,
@@ -876,7 +876,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               borderColor: AppColors.successBorder,
               child: Text(
                 'Yechim bayonnomasi: ${alt.resolvedNotes!}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12.5,
                   color: AppColors.success,
                   fontWeight: FontWeight.w700,

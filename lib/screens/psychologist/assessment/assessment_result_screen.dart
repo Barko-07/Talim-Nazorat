@@ -53,7 +53,7 @@ class AssessmentResultScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Baholash natijalari'),
-        bottom: const PreferredSize(
+        bottom: PreferredSize(
           preferredSize: Size.fromHeight(1.0),
           child: Divider(height: 1, thickness: 1, color: AppColors.border),
         ),
@@ -61,16 +61,16 @@ class AssessmentResultScreen extends StatelessWidget {
           if (comparableAssessments.isNotEmpty)
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFF0062CC)),
+                side: BorderSide(color: AppColors.primary),
               ),
-              icon: const Icon(
+              icon: Icon(
                 Icons.compare_arrows_rounded,
                 size: 18,
-                color: Color(0xFF0062CC),
+                color: AppColors.primary,
               ),
-              label: const Text(
+              label: Text(
                 'Taqqoslash',
-                style: TextStyle(color: Color(0xFF0062CC)),
+                style: TextStyle(color: AppColors.primary),
               ),
               onPressed: () {
                 AssessmentCompareDialog.show(
@@ -96,7 +96,7 @@ class AssessmentResultScreen extends StatelessWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(color: AppColors.border),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -106,10 +106,10 @@ class AssessmentResultScreen extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 28,
-                              backgroundColor: const Color(0xFFEAF3FD),
-                              child: const Icon(
+                              backgroundColor: AppColors.primaryLight,
+                              child: Icon(
                                 Icons.psychology_rounded,
-                                color: Color(0xFF0062CC),
+                                color: AppColors.primary,
                                 size: 30,
                               ),
                             ),
@@ -122,9 +122,9 @@ class AssessmentResultScreen extends StatelessWidget {
                                     children: [
                                       Text(
                                         assessment.studentName,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w600,
                                           color: AppColors.textPrimary,
                                         ),
                                       ),
@@ -135,7 +135,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                           vertical: 3,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFEEF9EC),
+                                          color: AppColors.successBg,
                                           borderRadius: BorderRadius.circular(
                                             6,
                                           ),
@@ -144,10 +144,10 @@ class AssessmentResultScreen extends StatelessWidget {
                                           assessment.status == 'completed'
                                               ? 'Yakunlangan'
                                               : 'Qoralama',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF12803A),
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.success,
                                           ),
                                         ),
                                       ),
@@ -156,7 +156,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     '${assessment.title} • ${assessment.category}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
                                       color: AppColors.textSecondary,
                                     ),
@@ -164,7 +164,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     'O‘tkazilgan sana: ${df.format(assessment.assessmentDate)} • Mutaxassis: ${assessment.specialistName}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
                                       color: AppColors.textMuted,
                                     ),
@@ -179,17 +179,17 @@ class AssessmentResultScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     '${assessment.percentage.toStringAsFixed(0)}%',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 28,
-                                      fontWeight: FontWeight.w900,
-                                      color: Color(0xFF0062CC),
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.primary,
                                     ),
                                   ),
                                   Text(
                                     '${assessment.totalScore.toStringAsFixed(1)} / ${assessment.maxScore.toStringAsFixed(0)} ball',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: AppColors.textSecondary,
                                     ),
                                   ),
@@ -201,15 +201,15 @@ class AssessmentResultScreen extends StatelessWidget {
                                         vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFEEF9EC),
+                                        color: AppColors.successBg,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
                                         assessment.trend,
-                                        style: const TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF12803A),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.success,
                                         ),
                                       ),
                                     ),
@@ -255,10 +255,10 @@ class AssessmentResultScreen extends StatelessWidget {
                 // qiluvchi xizmatni mutaxassis o‘zi tanlaydi.
                 Card(
                   elevation: 0,
-                  color: const Color(0xFFF8FAFC),
+                  color: AppColors.surfaceMuted,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(color: AppColors.border),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -309,11 +309,11 @@ class AssessmentResultScreen extends StatelessWidget {
                 // YONALISHLAR BO'YICHA TAQSIMOT
                 if (assessment.domainScores != null &&
                     assessment.domainScores!.isNotEmpty) ...[
-                  const Text(
+                  Text(
                     'Baholash Yo‘nalishlari Bo‘yicha Natijalar',
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -322,7 +322,7 @@ class AssessmentResultScreen extends StatelessWidget {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: const BorderSide(color: AppColors.border),
+                      side: BorderSide(color: AppColors.border),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(18),
@@ -350,10 +350,10 @@ class AssessmentResultScreen extends StatelessWidget {
                                         ),
                                         Text(
                                           '${pct.toStringAsFixed(0)}%',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF0062CC),
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.primary,
                                           ),
                                         ),
                                       ],
@@ -368,8 +368,8 @@ class AssessmentResultScreen extends StatelessWidget {
                                           0xFFE2E8F0,
                                         ),
                                         valueColor:
-                                            const AlwaysStoppedAnimation<Color>(
-                                              Color(0xFF0062CC),
+                                            AlwaysStoppedAnimation<Color>(
+                                              AppColors.primary,
                                             ),
                                       ),
                                     ),
@@ -388,7 +388,7 @@ class AssessmentResultScreen extends StatelessWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(color: AppColors.border),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -397,17 +397,17 @@ class AssessmentResultScreen extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.psychology_alt_outlined,
-                              color: Color(0xFF0062CC),
+                              color: AppColors.primary,
                               size: 20,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               '${assessment.specialistRole} xulosasi',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 15,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -420,7 +420,7 @@ class AssessmentResultScreen extends StatelessWidget {
                               : (assessment.notes.isNotEmpty
                                   ? assessment.notes
                                   : 'Xulosa kiritilmagan'),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13.5,
                             color: AppColors.textSecondary,
                             height: 1.4,
@@ -430,11 +430,11 @@ class AssessmentResultScreen extends StatelessWidget {
                           const SizedBox(height: 16),
                           const Divider(height: 1),
                           const SizedBox(height: 12),
-                          const Row(
+                          Row(
                             children: [
                               Icon(
                                 Icons.lightbulb_outline,
-                                color: Color(0xFF12803A),
+                                color: AppColors.success,
                                 size: 18,
                               ),
                               SizedBox(width: 8),
@@ -442,8 +442,8 @@ class AssessmentResultScreen extends StatelessWidget {
                                 'Keyingi ish bo‘yicha tavsiyalar:',
                                 style: TextStyle(
                                   fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF12803A),
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.success,
                                 ),
                               ),
                             ],
@@ -451,9 +451,9 @@ class AssessmentResultScreen extends StatelessWidget {
                           const SizedBox(height: 6),
                           Text(
                             assessment.recommendations,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
-                              color: Color(0xFF0E6630),
+                              color: AppColors.success,
                               height: 1.4,
                             ),
                           ),
@@ -469,17 +469,17 @@ class AssessmentResultScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Ishlatilgan Savollar va Javoblar Protokoli',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
                       Text(
                         '${assessment.responses.length} ta topshiriq',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textMuted,
                         ),
@@ -495,7 +495,7 @@ class AssessmentResultScreen extends StatelessWidget {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.border),
                       ),
@@ -511,15 +511,15 @@ class AssessmentResultScreen extends StatelessWidget {
                                   height: 26,
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFEAF3FD),
+                                    color: AppColors.primaryLight,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     '${idx + 1}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0062CC),
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primary,
                                     ),
                                   ),
                                 ),
@@ -531,7 +531,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                         ? r.questionTitle!
                                         : r.questionText,
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 13.5,
                                     ),
                                   ),
@@ -543,7 +543,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFFFFBEB),
+                                      color: AppColors.warningBg,
                                       borderRadius: BorderRadius.circular(4),
                                       border: Border.all(
                                         color: const Color(
@@ -551,12 +551,12 @@ class AssessmentResultScreen extends StatelessWidget {
                                         ).withValues(alpha: 0.3),
                                       ),
                                     ),
-                                    child: const Text(
+                                    child: Text(
                                       'Baholanmadi',
                                       style: TextStyle(
-                                        fontSize: 10.5,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFFD97706),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.warning,
                                       ),
                                     ),
                                   )
@@ -567,15 +567,15 @@ class AssessmentResultScreen extends StatelessWidget {
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFEEF9EC),
+                                      color: AppColors.successBg,
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       '${(r.score ?? 0.0).toStringAsFixed((r.score ?? 0.0).truncateToDouble() == (r.score ?? 0.0) ? 0 : 1)} / ${(r.maxScore ?? 0.0).toStringAsFixed(0)} ball',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF12803A),
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.success,
                                       ),
                                     ),
                                   ),
@@ -584,7 +584,7 @@ class AssessmentResultScreen extends StatelessWidget {
                             const SizedBox(height: 8),
                             Text(
                               r.questionText,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 color: AppColors.textSecondary,
                               ),
@@ -596,17 +596,17 @@ class AssessmentResultScreen extends StatelessWidget {
                               width: double.infinity,
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF8FAFC),
+                                color: AppColors.surfaceMuted,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Berilgan javob / Natija: ',
                                     style: TextStyle(
                                       fontSize: 11.5,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: AppColors.textMuted,
                                     ),
                                   ),
@@ -638,18 +638,18 @@ class AssessmentResultScreen extends StatelessWidget {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.comment_outlined,
                                     size: 14,
-                                    color: Color(0xFF64748B),
+                                    color: AppColors.textMuted,
                                   ),
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
                                       'Psixolog kuzatuvi: ${r.psychologistNotes!}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 11.5,
-                                        color: Color(0xFF64748B),
+                                        color: AppColors.textMuted,
                                         fontStyle: FontStyle.italic,
                                       ),
                                     ),
@@ -663,11 +663,11 @@ class AssessmentResultScreen extends StatelessWidget {
                     );
                   }),
                 ] else if (assessment.criteria.isNotEmpty) ...[
-                  const Text(
+                  Text(
                     'Baholangan mezonlar',
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -685,7 +685,7 @@ class AssessmentResultScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: AppColors.border),
+                        side: BorderSide(color: AppColors.border),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(14),
@@ -704,9 +704,9 @@ class AssessmentResultScreen extends StatelessWidget {
                                 ),
                                 Text(
                                   '${criterion.score.toStringAsFixed(1)} / ${criterion.maxScore.toStringAsFixed(1)} ball',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w700,
-                                    color: Color(0xFF0062CC),
+                                    color: AppColors.primary,
                                   ),
                                 ),
                               ],
@@ -717,7 +717,7 @@ class AssessmentResultScreen extends StatelessWidget {
                               const SizedBox(height: 8),
                               Text(
                                 criterion.notes!,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12.5,
                                   color: AppColors.textSecondary,
                                 ),
@@ -736,18 +736,18 @@ class AssessmentResultScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFBEB),
+                    color: AppColors.warningBg,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                      color: AppColors.warning.withValues(alpha: 0.3),
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
                       Icon(
                         Icons.shield_outlined,
                         size: 20,
-                        color: Color(0xFFD97706),
+                        color: AppColors.warning,
                       ),
                       SizedBox(width: 10),
                       Expanded(
@@ -755,7 +755,7 @@ class AssessmentResultScreen extends StatelessWidget {
                           AssessmentTemplates.disclaimerNotice,
                           style: TextStyle(
                             fontSize: 11,
-                            color: Color(0xFF92400E),
+                            color: AppColors.warning,
                           ),
                         ),
                       ),
@@ -774,15 +774,15 @@ class AssessmentResultScreen extends StatelessWidget {
   Widget _buildSummaryItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, size: 18, color: const Color(0xFF0062CC)),
+        Icon(icon, size: 18, color: AppColors.primary),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         ),
         Text(
           label,
-          style: const TextStyle(fontSize: 10.5, color: AppColors.textMuted),
+          style: TextStyle(fontSize: 11, color: AppColors.textMuted),
         ),
       ],
     );

@@ -53,19 +53,11 @@ class PsychologistDashboardTab extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF1E1B4B),
-                  Color(0xFF312E81),
-                  Color(0xFF003D88),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              gradient: AppColors.brandGradient,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF312E81).withValues(alpha: 0.25),
+                  color: AppColors.purple.withValues(alpha: 0.25),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),
@@ -95,38 +87,38 @@ class PsychologistDashboardTab extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF818CF8,
-                              ).withValues(alpha: 0.25),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: const Color(
-                                  0xFF818CF8,
-                                ).withValues(alpha: 0.4),
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
                               ),
-                            ),
-                            child: const Text(
-                              'MAKTAB PSIXOLOGIK XIZMATI • KASBIY ISH JOYI',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                                color: Color(0xFFD3E6FB),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.16),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.28),
+                                ),
+                              ),
+                              child: Text(
+                                'MAKTAB PSIXOLOGIK XIZMATI',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
+                                  color: Colors.white.withValues(alpha: 0.88),
+                                ),
                               ),
                             ),
                           ),
-                          const Spacer(),
+                          const SizedBox(width: 8),
                           Text(
                             df.format(now),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: Color(0xFFC7D2FE),
+                              color: Colors.white.withValues(alpha: 0.88),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -139,7 +131,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                             : 'Psixolog ish stoli',
                         style: const TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           color: Colors.white,
                           letterSpacing: -0.2,
                         ),
@@ -147,9 +139,9 @@ class PsychologistDashboardTab extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         '${user?.institutionName ?? "5-sonli umumiy o‘rta ta’lim maktabi"} • Alohida ta’limiy ehtiyojli bolalar bilan psixokorreksiya va monitoring',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFFD3E6FB),
+                          color: Colors.white.withValues(alpha: 0.88),
                         ),
                       ),
                     ],
@@ -178,8 +170,8 @@ class PsychologistDashboardTab extends StatelessWidget {
                     value: '${myStudents.length} nafar',
                     subtitle: 'Psixologik hisobda',
                     icon: Icons.people_alt_rounded,
-                    color: const Color(0xFF0062CC),
-                    bgColor: const Color(0xFFEAF3FD),
+                    color: AppColors.primary,
+                    bgColor: AppColors.primaryLight,
                     width: cardWidth,
                     onTap: () => onNavigateToTab?.call(1),
                   ),
@@ -188,8 +180,8 @@ class PsychologistDashboardTab extends StatelessWidget {
                     value: '${todaySessions.length} ta',
                     subtitle: 'Kun tartibida',
                     icon: Icons.calendar_today_rounded,
-                    color: const Color(0xFF00808A),
-                    bgColor: const Color(0xFFE8F7F6),
+                    color: AppColors.info,
+                    bgColor: AppColors.infoBg,
                     width: cardWidth,
                     onTap: () => onNavigateToTab?.call(7),
                   ),
@@ -198,8 +190,8 @@ class PsychologistDashboardTab extends StatelessWidget {
                     value: '${myAssessments.length} ta',
                     subtitle: 'Diagnostika xulosalari',
                     icon: Icons.assignment_turned_in_rounded,
-                    color: const Color(0xFF12803A),
-                    bgColor: const Color(0xFFEEF9EC),
+                    color: AppColors.success,
+                    bgColor: AppColors.successBg,
                     width: cardWidth,
                     onTap: () => onNavigateToTab?.call(2),
                   ),
@@ -208,8 +200,8 @@ class PsychologistDashboardTab extends StatelessWidget {
                     value: '${myObservations.length} ta qayd',
                     subtitle: 'Dinamik o‘zgarishlar',
                     icon: Icons.auto_stories_rounded,
-                    color: const Color(0xFFD97706),
-                    bgColor: const Color(0xFFFFFBEB),
+                    color: AppColors.warning,
+                    bgColor: AppColors.warningBg,
                     width: cardWidth,
                     onTap: () => onNavigateToTab?.call(3),
                   ),
@@ -219,100 +211,60 @@ class PsychologistDashboardTab extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // 3. TEZKOR HARAKATLAR PANELI
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-              side: const BorderSide(color: AppColors.border),
+          // 3. TEZKOR AMALLAR — ilova uslubidagi plitkalar
+          Text(
+            'Tezkor amallar',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-              child: Row(
+          ),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 720 ? 4 : 2;
+              const gap = 12.0;
+              final tileWidth =
+                  (constraints.maxWidth - gap * (columns - 1)) / columns;
+              final actions = [
+                (
+                  Icons.edit_note_rounded,
+                  'Yangi kuzatuv',
+                  onNewObservation ?? () => onNavigateToTab?.call(3),
+                ),
+                (
+                  Icons.psychology_outlined,
+                  'Diagnostika',
+                  onNewAssessment ?? () => onNavigateToTab?.call(2),
+                ),
+                (
+                  Icons.event_available_outlined,
+                  'Mashg‘ulot',
+                  onNewSession ?? () => onNavigateToTab?.call(7),
+                ),
+                (
+                  Icons.bar_chart_rounded,
+                  'Hisobotlar',
+                  () => onNavigateToTab?.call(8),
+                ),
+              ];
+              return Wrap(
+                spacing: gap,
+                runSpacing: gap,
                 children: [
-                  const Icon(
-                    Icons.flash_on_rounded,
-                    color: Color(0xFFD97706),
-                    size: 22,
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Tezkor amallar:',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      color: AppColors.textPrimary,
+                  for (final (icon, label, onTap) in actions)
+                    SizedBox(
+                      width: tileWidth,
+                      child: _QuickActionTile(
+                        icon: icon,
+                        label: label,
+                        onTap: onTap,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Wrap(
-                      spacing: 10,
-                      runSpacing: 8,
-                      children: [
-                        FilledButton.icon(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: const Color(0xFF0062CC),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                          ),
-                          onPressed: onNewObservation,
-                          icon: const Icon(Icons.edit_note_rounded, size: 16),
-                          label: const Text(
-                            '+ Yangi kuzatuv qayd etish',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                          ),
-                          onPressed: onNewAssessment,
-                          icon: const Icon(Icons.psychology_outlined, size: 16),
-                          label: const Text(
-                            'Diagnostika o‘tkazish',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                          ),
-                          onPressed: onNewSession,
-                          icon: const Icon(Icons.alarm_add_rounded, size: 16),
-                          label: const Text(
-                            'Mashg‘ulot rejalashtirish',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                          ),
-                          onPressed: () => onNavigateToTab?.call(8),
-                          icon: const Icon(Icons.bar_chart_rounded, size: 16),
-                          label: const Text(
-                            'Hisobotlar',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
-              ),
-            ),
+              );
+            },
           ),
           const SizedBox(height: 24),
 
@@ -374,7 +326,7 @@ class PsychologistDashboardTab extends StatelessWidget {
         width: width,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.border),
           boxShadow: [
@@ -403,7 +355,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColors.textMuted,
                       fontWeight: FontWeight.w500,
@@ -414,9 +366,9 @@ class PsychologistDashboardTab extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -424,7 +376,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 11,
                       color: color,
                       fontWeight: FontWeight.w600,
                     ),
@@ -447,7 +399,7 @@ class PsychologistDashboardTab extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -457,11 +409,11 @@ class PsychologistDashboardTab extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(
                       Icons.schedule_rounded,
-                      color: Color(0xFF0062CC),
+                      color: AppColors.primary,
                       size: 20,
                     ),
                     SizedBox(width: 8),
@@ -469,7 +421,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                       'Bugungi uchrashuv va darslar',
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -497,7 +449,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                       color: Colors.grey.shade300,
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Bugunga rejalashtirilgan mashg‘ulotlar yo‘q',
                       style: TextStyle(
                         fontSize: 12,
@@ -523,15 +475,15 @@ class PsychologistDashboardTab extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
+                          color: AppColors.surfaceMuted,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           timeFormat.format(s.scheduledAt),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1A2A4D),
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -542,15 +494,15 @@ class PsychologistDashboardTab extends StatelessWidget {
                           children: [
                             Text(
                               s.studentName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
                             ),
                             Text(
                               '${s.sessionType} • ${s.topic}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textMuted,
                               ),
@@ -568,19 +520,19 @@ class PsychologistDashboardTab extends StatelessWidget {
                         decoration: BoxDecoration(
                           color:
                               s.isCompleted
-                                  ? const Color(0xFFEEF9EC)
-                                  : const Color(0xFFEAF3FD),
+                                  ? AppColors.successBg
+                                  : AppColors.primaryLight,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           s.status,
                           style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
                             color:
                                 s.isCompleted
-                                    ? const Color(0xFF12803A)
-                                    : const Color(0xFF00808A),
+                                    ? AppColors.success
+                                    : AppColors.info,
                           ),
                         ),
                       ),
@@ -603,7 +555,7 @@ class PsychologistDashboardTab extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -613,11 +565,11 @@ class PsychologistDashboardTab extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(
                       Icons.visibility_outlined,
-                      color: Color(0xFFD97706),
+                      color: AppColors.warning,
                       size: 20,
                     ),
                     SizedBox(width: 8),
@@ -625,7 +577,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                       'Muhim psixologik kuzatuvlar',
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -650,7 +602,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                       color: Colors.grey.shade300,
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Hozircha kuzatuvlar kiritilmagan',
                       style: TextStyle(
                         fontSize: 12,
@@ -676,9 +628,9 @@ class PsychologistDashboardTab extends StatelessWidget {
                         children: [
                           Text(
                             '${obs.studentName} (${obs.studentGrade})',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                             ),
                           ),
@@ -688,15 +640,15 @@ class PsychologistDashboardTab extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFEF3C7),
+                              color: AppColors.warningBg,
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               obs.emotionalState,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF92400E),
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.warning,
                               ),
                             ),
                           ),
@@ -705,7 +657,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         obs.observationText,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textSecondary,
                         ),
@@ -717,17 +669,17 @@ class PsychologistDashboardTab extends StatelessWidget {
                         children: [
                           Text(
                             df.format(obs.date),
-                            style: const TextStyle(
-                              fontSize: 10,
+                            style: TextStyle(
+                              fontSize: 11,
                               color: AppColors.textMuted,
                             ),
                           ),
                           const SizedBox(width: 8),
                           Text(
                             '• ${obs.category}',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Color(0xFF0062CC),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -738,6 +690,57 @@ class PsychologistDashboardTab extends StatelessWidget {
                 },
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Tezkor amal plitkasi: chapda matn, o'ngda chiziqli ikona (davlat xizmatlari
+/// ilovalaridagi "sohalar" plitkalari uslubida).
+class _QuickActionTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _QuickActionTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          height: 72,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 2,
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(icon, size: 26, color: AppColors.primary),
+            ],
+          ),
         ),
       ),
     );

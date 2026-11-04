@@ -50,11 +50,11 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Tizim Davlat Audit Jurnali',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -65,15 +65,15 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
+                          color: AppColors.surfaceMuted,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: AppColors.border),
                         ),
                         child: Text(
                           '${filtered.length} ta yozuv',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -81,7 +81,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Barcha ma’muriy o‘zgarishlar, tizimga kirishlar, ma’lumotlarni tahrirlash va xavfsizlik hodisalari to‘liq qaydnomasi',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -89,7 +89,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
               ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0A1A3F),
+                  backgroundColor: AppColors.textPrimary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -115,7 +115,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -249,7 +249,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: filtered.isEmpty
                 ? const Padding(
@@ -270,12 +270,12 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                       final isChange = l.action == 'PERMISSION_CHANGE' || l.action == 'ARCHIVE' || l.action == 'DELETE';
 
                       final badgeColor = isLogin
-                          ? const Color(0xFF00808A)
+                          ? AppColors.info
                           : isCreate
-                              ? const Color(0xFF12803A)
+                              ? AppColors.success
                               : isChange
-                                  ? const Color(0xFFDC2626)
-                                  : const Color(0xFF7C3AED);
+                                  ? AppColors.error
+                                  : AppColors.purple;
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(
@@ -301,7 +301,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                                 l.action,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   color: badgeColor,
                                 ),
                               ),
@@ -316,8 +316,8 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                                     children: [
                                       Text(
                                         l.userFullName,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
                                           fontSize: 13,
                                           color: AppColors.textPrimary,
                                         ),
@@ -329,14 +329,14 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                                           vertical: 1,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFF1F5F9),
+                                          color: AppColors.surfaceMuted,
                                           borderRadius:
                                               BorderRadius.circular(4),
                                         ),
                                         child: Text(
                                           l.userRole,
-                                          style: const TextStyle(
-                                            fontSize: 10,
+                                          style: TextStyle(
+                                            fontSize: 11,
                                             fontWeight: FontWeight.w600,
                                             color: AppColors.textSecondary,
                                           ),
@@ -347,7 +347,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                                   const SizedBox(height: 3),
                                   Text(
                                     l.details,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textSecondary,
                                     ),
@@ -362,23 +362,23 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF8FAFC),
+                                color: AppColors.surfaceMuted,
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(color: AppColors.border),
                               ),
                               child: Text(
                                 l.entity,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   color: AppColors.textMuted,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 14),
                             Text(
                               df.format(l.timestamp),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textMuted,
                                 fontFamily: 'monospace',
@@ -414,7 +414,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: AppColors.surfaceMuted,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -441,9 +441,9 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
             onPressed: () {
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text('Audit jurnali CSV fayli yuklab olindi.'),
-                  backgroundColor: Color(0xFF12803A),
+                  backgroundColor: AppColors.success,
                 ),
               );
             },

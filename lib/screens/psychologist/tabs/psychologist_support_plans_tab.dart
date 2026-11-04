@@ -45,7 +45,7 @@ class _PsychologistSupportPlansTabState
             children: [
               Text(
                 'Maqsad: ${objective.title}',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Row(
@@ -54,10 +54,10 @@ class _PsychologistSupportPlansTabState
                   const Text('Bajarilish darajasi:', style: TextStyle(fontSize: 12)),
                   Text(
                     '$currentProgress%',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0062CC),
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
                     ),
                   ),
                 ],
@@ -67,7 +67,7 @@ class _PsychologistSupportPlansTabState
                 min: 0,
                 max: 100,
                 divisions: 20,
-                activeColor: const Color(0xFF0062CC),
+                activeColor: AppColors.primary,
                 label: '$currentProgress%',
                 onChanged: (v) => setDlgState(() => currentProgress = v.toInt()),
               ),
@@ -99,7 +99,7 @@ class _PsychologistSupportPlansTabState
                 if (dlgCtx.mounted) Navigator.pop(dlgCtx);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text('Maqsad progressi yangilandi!'),
                       backgroundColor: AppColors.success,
                     ),
@@ -219,7 +219,7 @@ class _PsychologistSupportPlansTabState
                   if (dlgCtx.mounted) Navigator.pop(dlgCtx);
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text('Yangi psixologik maqsad rejaga kiritildi!'),
                         backgroundColor: AppColors.success,
                       ),
@@ -266,11 +266,11 @@ class _PsychologistSupportPlansTabState
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Psixologik Yordam Rejalari (ITR)',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -281,25 +281,25 @@ class _PsychologistSupportPlansTabState
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEAF3FD),
+                          color: AppColors.primaryLight,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: const Color(0xFF0062CC).withValues(alpha: 0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
                           '${filteredPlans.length} ta reja',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0062CC),
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Bolaning kognitiv, emotsional va xulq-atvor maqsadlari, korreksion ishlar va erishilgan natijalar',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -314,7 +314,7 @@ class _PsychologistSupportPlansTabState
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -385,13 +385,13 @@ class _PsychologistSupportPlansTabState
             Container(
               padding: const EdgeInsets.all(40),
               alignment: Alignment.center,
-              child: const Column(
+              child: Column(
                 children: [
                   Icon(Icons.assignment_outlined, size: 48, color: AppColors.textMuted),
                   SizedBox(height: 12),
                   Text(
                     'Yordam rejalari topilmadi',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -410,7 +410,7 @@ class _PsychologistSupportPlansTabState
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(color: AppColors.border),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -428,9 +428,9 @@ class _PsychologistSupportPlansTabState
                                   children: [
                                     Text(
                                       p.studentName,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
@@ -441,7 +441,7 @@ class _PsychologistSupportPlansTabState
                                         vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFF1F5F9),
+                                        color: AppColors.surfaceMuted,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
@@ -457,7 +457,7 @@ class _PsychologistSupportPlansTabState
                                 const SizedBox(height: 4),
                                 Text(
                                   p.title,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13,
                                     color: AppColors.textSecondary,
                                   ),
@@ -469,16 +469,16 @@ class _PsychologistSupportPlansTabState
                               children: [
                                 Text(
                                   '$avgProgress%',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFF0062CC),
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
                                   ),
                                 ),
-                                const Text(
+                                Text(
                                   'Umumiy o‘zlashtirish',
                                   style: TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 11,
                                     color: AppColors.textMuted,
                                   ),
                                 ),
@@ -492,7 +492,7 @@ class _PsychologistSupportPlansTabState
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
+                            color: AppColors.surfaceMuted,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Column(
@@ -500,7 +500,7 @@ class _PsychologistSupportPlansTabState
                             children: [
                               Text(
                                 'Dastlabki holat (Baseline): ${p.baselineSummary}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11.5,
                                   color: AppColors.textPrimary,
                                 ),
@@ -508,9 +508,9 @@ class _PsychologistSupportPlansTabState
                               const SizedBox(height: 4),
                               Text(
                                 'Kutilayotgan uzoq muddatli natija: ${p.longTermGoals}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11.5,
-                                  color: Color(0xFF12803A),
+                                  color: AppColors.success,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -525,9 +525,9 @@ class _PsychologistSupportPlansTabState
                           children: [
                             Text(
                               'Psixologik korreksion vazifalar (${p.objectives.length} ta):',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -548,7 +548,7 @@ class _PsychologistSupportPlansTabState
                             margin: const EdgeInsets.only(bottom: 8),
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.surface,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: AppColors.border),
                             ),
@@ -563,7 +563,7 @@ class _PsychologistSupportPlansTabState
                                           Text(
                                             obj.title,
                                             style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                              fontWeight: FontWeight.w600,
                                               fontSize: 13,
                                             ),
                                           ),
@@ -574,15 +574,15 @@ class _PsychologistSupportPlansTabState
                                               vertical: 1,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFFEAF3FD),
+                                              color: AppColors.primaryLight,
                                               borderRadius: BorderRadius.circular(4),
                                             ),
                                             child: Text(
                                               obj.domain,
-                                              style: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                                color: Color(0xFF0062CC),
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.primary,
                                               ),
                                             ),
                                           ),
@@ -591,7 +591,7 @@ class _PsychologistSupportPlansTabState
                                       const SizedBox(height: 4),
                                       Text(
                                         'Mezon: ${obj.measurementCriteria ?? "Mustaqil bajarish"} • Muddat: ${df.format(obj.targetDate)}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11,
                                           color: AppColors.textMuted,
                                         ),
@@ -599,10 +599,10 @@ class _PsychologistSupportPlansTabState
                                       const SizedBox(height: 6),
                                       LinearProgressIndicator(
                                         value: obj.progressPercent / 100.0,
-                                        backgroundColor: const Color(0xFFE2E8F0),
+                                        backgroundColor: AppColors.border,
                                         color: obj.progressPercent >= 80
-                                            ? const Color(0xFF12803A)
-                                            : const Color(0xFF0062CC),
+                                            ? AppColors.success
+                                            : AppColors.primary,
                                         minHeight: 6,
                                         borderRadius: BorderRadius.circular(3),
                                       ),
@@ -616,7 +616,7 @@ class _PsychologistSupportPlansTabState
                                     Text(
                                       '${obj.progressPercent}%',
                                       style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                         fontSize: 13,
                                       ),
                                     ),

@@ -109,7 +109,7 @@ class SpecialistsScreen extends StatelessWidget {
               onPressed: () async {
                 if (nameCtrl.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
                         'Iltimos, xodimning to‘liq ismini kiriting!',
                       ),
@@ -248,7 +248,7 @@ class SpecialistsScreen extends StatelessWidget {
                                     Text(
                                       staff.fullName,
                                       style: TextStyle(
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w700,
                                         fontSize: 15.5,
                                         color: isActive
                                             ? AppColors.textPrimary
@@ -257,7 +257,7 @@ class SpecialistsScreen extends StatelessWidget {
                                       ),
                                     ),
                                     if (!isActive)
-                                      const StatusPill(
+                                      StatusPill(
                                         label: 'Bloklangan',
                                         color: AppColors.error,
                                         backgroundColor: AppColors.errorBg,
@@ -281,7 +281,7 @@ class SpecialistsScreen extends StatelessWidget {
                                   '${staff.institutionName ?? 'Belgilanmagan'}${staff.phone != null && staff.phone!.isNotEmpty ? ' • ${staff.phone}' : ''}',
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textMuted,
                                     height: 1.35,
@@ -368,8 +368,8 @@ class SpecialistsScreen extends StatelessWidget {
                                   children: [
                                     Text(
                                       '$assignedCount',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
                                         fontSize: 17,
                                         color: AppColors.primary,
                                         fontFeatures: [
@@ -377,7 +377,7 @@ class SpecialistsScreen extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                    const Text(
+                                    Text(
                                       'o‘quvchi',
                                       style: TextStyle(
                                         fontSize: 11,

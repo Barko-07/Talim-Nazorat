@@ -55,11 +55,11 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Avtomatlashtirilgan Monitoring Tizimi',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -71,13 +71,13 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                         ),
                         decoration: BoxDecoration(
                           color: highCount > 0
-                              ? const Color(0xFFFEF2F2)
-                              : const Color(0xFFEEF9EC),
+                              ? AppColors.errorBg
+                              : AppColors.successBg,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: highCount > 0
-                                ? const Color(0xFFDC2626).withValues(alpha: 0.3)
-                                : const Color(0xFF12803A).withValues(alpha: 0.3),
+                                ? AppColors.error.withValues(alpha: 0.3)
+                                : AppColors.success.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
@@ -86,17 +86,17 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                               : 'Tizim xatarsiz',
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: highCount > 0
-                                ? const Color(0xFFDC2626)
-                                : const Color(0xFF12803A),
+                                ? AppColors.error
+                                : AppColors.success,
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     '6 ta rasmiy pedagogik-metodik qoida bo‘yicha jarayonlar, qoldirilgan darslar va orqada qolish signallari',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -113,8 +113,8 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                 child: _buildSeverityBox(
                   title: 'YUQORI XAVF (CRITICAL)',
                   count: highCount,
-                  color: const Color(0xFFDC2626),
-                  bgColor: const Color(0xFFFEF2F2),
+                  color: AppColors.error,
+                  bgColor: AppColors.errorBg,
                   active: _filterSeverity == 'XAVF',
                   onTap: () {
                     setState(() {
@@ -129,8 +129,8 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                 child: _buildSeverityBox(
                   title: 'DIQQAT TALAB (MEDIUM)',
                   count: mediumCount,
-                  color: const Color(0xFFD97706),
-                  bgColor: const Color(0xFFFFFBEB),
+                  color: AppColors.warning,
+                  bgColor: AppColors.warningBg,
                   active: _filterSeverity == 'DIQQAT',
                   onTap: () {
                     setState(() {
@@ -145,8 +145,8 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                 child: _buildSeverityBox(
                   title: 'MA’LUMOT UCHUN (LOW)',
                   count: lowCount,
-                  color: const Color(0xFF00808A),
-                  bgColor: const Color(0xFFE8F7F6),
+                  color: AppColors.info,
+                  bgColor: AppColors.infoBg,
                   active: _filterSeverity == 'MA’LUMOT',
                   onTap: () {
                     setState(() {
@@ -161,8 +161,8 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                 child: _buildSeverityBox(
                   title: 'BARTARAF ETILGAN',
                   count: resolvedCount,
-                  color: const Color(0xFF12803A),
-                  bgColor: const Color(0xFFEEF9EC),
+                  color: AppColors.success,
+                  bgColor: AppColors.successBg,
                   active: _filterResolved == true,
                   onTap: () {
                     setState(() {
@@ -181,10 +181,10 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: filtered.isEmpty
-                ? const Padding(
+                ? Padding(
                     padding: EdgeInsets.all(40),
                     child: Center(
                       child: Column(
@@ -193,14 +193,14 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                           Icon(
                             Icons.verified_user_rounded,
                             size: 48,
-                            color: Color(0xFF12803A),
+                            color: AppColors.success,
                           ),
                           SizedBox(height: 12),
                           Text(
                             'Tanlangan mezon bo‘yicha faol monitoring signallari mavjud emas',
                             style: TextStyle(
                               color: AppColors.textSecondary,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -217,10 +217,10 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                       final isHigh = a.severity == 'XAVF';
                       final isMed = a.severity == 'DIQQAT';
                       final color = isHigh
-                          ? const Color(0xFFDC2626)
+                          ? AppColors.error
                           : isMed
-                              ? const Color(0xFFD97706)
-                              : const Color(0xFF00808A);
+                              ? AppColors.warning
+                              : AppColors.info;
 
                       return Padding(
                         padding: const EdgeInsets.all(18),
@@ -261,8 +261,8 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                         child: Text(
                                           a.severity,
                                           style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
                                             color: color,
                                           ),
                                         ),
@@ -270,8 +270,8 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                       const SizedBox(width: 8),
                                       Text(
                                         a.ruleTitle,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
                                           fontSize: 14,
                                           color: AppColors.textPrimary,
                                         ),
@@ -281,7 +281,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                   const SizedBox(height: 6),
                                   Text(
                                     a.message,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
                                       color: AppColors.textPrimary,
                                     ),
@@ -293,13 +293,13 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                       vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF8FAFC),
+                                      color: AppColors.surfaceMuted,
                                       borderRadius: BorderRadius.circular(6),
                                       border: Border.all(color: AppColors.border),
                                     ),
                                     child: Row(
                                       children: [
-                                        const Icon(
+                                        Icon(
                                           Icons.lightbulb_outline_rounded,
                                           size: 14,
                                           color: AppColors.primary,
@@ -308,7 +308,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                         Expanded(
                                           child: Text(
                                             'Tavsiya etilgan ma’muriy chora: ${a.suggestedAction}',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 11,
                                               color: AppColors.textSecondary,
                                               fontWeight: FontWeight.w500,
@@ -321,7 +321,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                   const SizedBox(height: 8),
                                   Text(
                                     '🧒 O‘quvchi: ${a.studentName} (${a.studentGrade}) • Aniqlangan vaqt: ${df.format(a.createdAt)}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
                                       color: AppColors.textMuted,
                                     ),
@@ -330,9 +330,9 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                     const SizedBox(height: 4),
                                     Text(
                                       '✅ Hal qilindi: ${a.resolvedNotes ?? ''} (${a.resolvedAt != null ? df.format(a.resolvedAt!) : ''})',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 11,
-                                        color: Color(0xFF12803A),
+                                        color: AppColors.success,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -344,7 +344,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                             if (!a.isResolved)
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF12803A),
+                                  backgroundColor: AppColors.success,
                                   foregroundColor: Colors.white,
                                   elevation: 0,
                                   padding: const EdgeInsets.symmetric(
@@ -401,8 +401,8 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
             Text(
               title,
               style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
                 color: color,
               ),
             ),
@@ -411,7 +411,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
               '$count',
               style: TextStyle(
                 fontSize: 22,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: color,
               ),
             ),
@@ -441,7 +441,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
           children: [
             Text(
               'Signal: ${alert.ruleTitle}\nO‘quvchi: ${alert.studentName}',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -460,7 +460,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF12803A),
+              backgroundColor: AppColors.success,
               foregroundColor: Colors.white,
             ),
             onPressed: () async {
@@ -473,11 +473,11 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                 );
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
                         'Monitoring signali muvaffaqiyatli hal qilindi deb belgilandi.',
                       ),
-                      backgroundColor: Color(0xFF12803A),
+                      backgroundColor: AppColors.success,
                     ),
                   );
                 }

@@ -34,11 +34,11 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Rollar va Ruxsatlar Boshqaruvi (RBAC)',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -55,11 +55,11 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                             color: AppColors.primary.withValues(alpha: 0.2),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           '9 ta tizim roli',
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.primary,
                           ),
                         ),
@@ -67,7 +67,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Davlat axborot xavfsizligi va minimal imtiyozlar (Least Privilege) talablariga muvofiq rollar huquqlari matritsasi',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -88,14 +88,14 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(color: AppColors.border),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 6,
@@ -103,7 +103,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                           child: Text(
                             'Tizim Rollari',
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               fontSize: 13,
                               color: AppColors.textMuted,
                             ),
@@ -152,7 +152,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: isSelected
-                                            ? FontWeight.bold
+                                            ? FontWeight.w600
                                             : FontWeight.w500,
                                         color: isSelected
                                             ? AppColors.primary
@@ -168,14 +168,14 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? AppColors.primary
-                                          : const Color(0xFFF1F5F9),
+                                          : AppColors.surfaceMuted,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(
                                       '$count',
                                       style: TextStyle(
                                         fontSize: 11,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                         color: isSelected
                                             ? Colors.white
                                             : AppColors.textSecondary,
@@ -200,7 +200,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(color: AppColors.border),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -227,15 +227,15 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                                 children: [
                                   Text(
                                     _selectedRole.label,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: AppColors.textPrimary,
                                     ),
                                   ),
                                   Text(
                                     'Tizim kodi: ${_selectedRole.code} • Kasbiy yo‘nalish: ${_selectedRole.professionTitle}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textMuted,
                                     ),
@@ -249,13 +249,13 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
+                            color: AppColors.surfaceMuted,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: AppColors.border),
                           ),
                           child: Text(
                             _selectedRole.domainDescription,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
                               height: 1.4,
@@ -265,11 +265,11 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                         const SizedBox(height: 20),
 
                         // RUXSATLAR MATRITSASI
-                        const Text(
+                        Text(
                           'Funksional Ruxsatlar va Vakolatlar',
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -377,16 +377,16 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               color: allowed
-                  ? const Color(0xFFEEF9EC)
-                  : const Color(0xFFFEF2F2),
+                  ? AppColors.successBg
+                  : AppColors.errorBg,
               shape: BoxShape.circle,
             ),
             child: Icon(
               allowed ? Icons.check : Icons.close,
               size: 14,
               color: allowed
-                  ? const Color(0xFF12803A)
-                  : const Color(0xFFDC2626),
+                  ? AppColors.success
+                  : AppColors.error,
             ),
           ),
           const SizedBox(width: 12),
@@ -406,7 +406,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                 ),
                 Text(
                   description,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColors.textMuted,
                   ),
@@ -418,10 +418,10 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
             allowed ? 'Ruxsat etilgan' : 'Taqiqlangan',
             style: TextStyle(
               fontSize: 11,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: allowed
-                  ? const Color(0xFF12803A)
-                  : const Color(0xFFDC2626),
+                  ? AppColors.success
+                  : AppColors.error,
             ),
           ),
         ],

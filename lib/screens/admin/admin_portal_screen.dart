@@ -204,9 +204,9 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         titleSpacing: 16,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
-        bottom: const PreferredSize(
+        bottom: PreferredSize(
           preferredSize: Size.fromHeight(1.0),
           child: Divider(height: 1, thickness: 1, color: AppColors.border),
         ),
@@ -229,15 +229,15 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                           vertical: 1.5,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF003D88),
+                          color: AppColors.primaryDark,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           roleTag,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -246,7 +246,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                   ),
                   Text(
                     portalSubtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textMuted,
                       fontWeight: FontWeight.w500,
@@ -260,28 +260,47 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
           ],
         ),
         actions: [
-          // MUTAXASSIS KO'RINISHIGA O'TISH
-          TextButton.icon(
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              backgroundColor: AppColors.primaryLight,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          // MUTAXASSIS KO'RINISHIGA O'TISH (telefonda faqat ikona — sarlavha sig'sin)
+          if (MediaQuery.sizeOf(context).width < 700)
+            IconButton(
+              tooltip: 'Mutaxassis interfeysi',
+              icon: Icon(Icons.swap_horiz_rounded, color: AppColors.primary),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MainNavigationScreen(),
+                  ),
+                );
+              },
+            )
+          else
+            TextButton.icon(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                backgroundColor: AppColors.primaryLight,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MainNavigationScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.swap_horiz_rounded, size: 18),
+              label: const Text(
+                'Mutaxassis interfeysi',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
               ),
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-              );
-            },
-            icon: const Icon(Icons.swap_horiz_rounded, size: 18),
-            label: const Text(
-              'Mutaxassis interfeysi',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
-          ),
           const SizedBox(width: 10),
 
           // FOYDALANUVCHI PROFILI
@@ -290,7 +309,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: AppColors.surfaceMuted,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: AppColors.border),
               ),
@@ -298,40 +317,42 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                 children: [
                   CircleAvatar(
                     radius: 14,
-                    backgroundColor: const Color(0xFF003D88),
+                    backgroundColor: AppColors.primaryDark,
                     child: Text(
                       (user?.fullName ?? 'A').substring(0, 1),
                       style: const TextStyle(
                         fontSize: 11,
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        user?.fullName ?? 'Administrator',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          height: 1.0,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                  if (MediaQuery.sizeOf(context).width >= 700) ...[
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          user?.fullName ?? 'Administrator',
+                          style: TextStyle(
+                            fontSize: 12,
+                            height: 1.0,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
-                      ),
-                      Text(
-                        user?.role.label ?? 'Tizim administratori',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          height: 1.0,
-                          color: AppColors.textMuted,
+                        Text(
+                          user?.role.label ?? 'Tizim administratori',
+                          style: TextStyle(
+                            fontSize: 11,
+                            height: 1.0,
+                            color: AppColors.textMuted,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -340,11 +361,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
 
           // CHIQISH (LOGOUT)
           IconButton(
-            icon: const Icon(
-              Icons.logout_rounded,
-              color: AppColors.error,
-              size: 20,
-            ),
+            icon: Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
             tooltip: 'Tizimdan chiqish',
             onPressed: () => confirmLogout(context),
           ),
@@ -369,8 +386,8 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
             SizedBox(
               width: 260,
               child: Material(
-                color: Colors.white,
-                shape: const Border(right: BorderSide(color: AppColors.border)),
+                color: AppColors.surface,
+                shape: Border(right: BorderSide(color: AppColors.border)),
                 child: _buildSidebarContent(
                   context,
                   unresolvedAlertsCount,
@@ -395,7 +412,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
         if (isDrawer)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            color: const Color(0xFF003D88),
+            color: AppColors.primaryDark,
             child: const Row(
               children: [
                 Icon(Icons.admin_panel_settings, color: Colors.white, size: 28),
@@ -404,7 +421,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                   'ADMINISTRATOR MENYUSI',
                   style: TextStyle(
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     fontSize: 13,
                     letterSpacing: 0.5,
                   ),
@@ -430,9 +447,9 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                     ),
                     child: Text(
                       cat.title,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textMuted,
                         letterSpacing: 0.8,
                       ),
@@ -474,7 +491,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                               fontSize: 12.5,
                               fontWeight:
                                   isSelected
-                                      ? FontWeight.bold
+                                      ? FontWeight.w600
                                       : FontWeight.w500,
                               color:
                                   isSelected
@@ -497,8 +514,8 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                                       '$alertCount',
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   )

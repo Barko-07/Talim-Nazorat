@@ -28,22 +28,22 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
   static Color _colorFor(StatusColor c) {
     switch (c) {
       case StatusColor.red:
-        return const Color(0xFFDC2626);
+        return AppColors.error;
       case StatusColor.yellow:
-        return const Color(0xFFD97706);
+        return AppColors.warning;
       case StatusColor.green:
-        return const Color(0xFF12803A);
+        return AppColors.success;
     }
   }
 
   static Color _bgFor(StatusColor c) {
     switch (c) {
       case StatusColor.red:
-        return const Color(0xFFFEF2F2);
+        return AppColors.errorBg;
       case StatusColor.yellow:
-        return const Color(0xFFFFFBEB);
+        return AppColors.warningBg;
       case StatusColor.green:
-        return const Color(0xFFEEF9EC);
+        return AppColors.successBg;
     }
   }
 
@@ -94,11 +94,11 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Alohida Ehtiyojli Bolalar Reyestri',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -109,25 +109,25 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEEF9EC),
+                          color: AppColors.successBg,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFF12803A).withValues(alpha: 0.2),
+                            color: AppColors.success.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
                           '${filtered.length} nafar o‘quvchi',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF12803A),
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.success,
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Viloyat va muassasalar kesimida ATEB bolalar hisobi, ta’limiy ehtiyojlari va individual profillari',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -165,7 +165,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -276,14 +276,14 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                   label: Text(
                     '🔴 Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
                   ),
-                  selectedColor: const Color(0xFFDC2626),
-                  backgroundColor: const Color(0xFFFEF2F2),
+                  selectedColor: AppColors.error,
+                  backgroundColor: AppColors.errorBg,
                   labelStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: _filterColor == StatusColor.red
                         ? Colors.white
-                        : const Color(0xFFDC2626),
+                        : AppColors.error,
                   ),
                   onSelected: (v) => setState(
                     () => _filterColor = v ? StatusColor.red : null,
@@ -294,14 +294,14 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                   label: Text(
                     '🟡 Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
                   ),
-                  selectedColor: const Color(0xFFD97706),
-                  backgroundColor: const Color(0xFFFFFBEB),
+                  selectedColor: AppColors.warning,
+                  backgroundColor: AppColors.warningBg,
                   labelStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: _filterColor == StatusColor.yellow
                         ? Colors.white
-                        : const Color(0xFFD97706),
+                        : AppColors.warning,
                   ),
                   onSelected: (v) => setState(
                     () => _filterColor = v ? StatusColor.yellow : null,
@@ -312,14 +312,14 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                   label: Text(
                     '🟢 Yashil — Ijobiy (${summary.count(StatusColor.green)})',
                   ),
-                  selectedColor: const Color(0xFF12803A),
-                  backgroundColor: const Color(0xFFEEF9EC),
+                  selectedColor: AppColors.success,
+                  backgroundColor: AppColors.successBg,
                   labelStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: _filterColor == StatusColor.green
                         ? Colors.white
-                        : const Color(0xFF12803A),
+                        : AppColors.success,
                   ),
                   onSelected: (v) => setState(
                     () => _filterColor = v ? StatusColor.green : null,
@@ -346,7 +346,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
 
               return Card(
                 elevation: 0,
-                color: isRed ? const Color(0xFFFFF5F5) : Colors.white,
+                color: isRed ? AppColors.errorBg : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(
@@ -371,7 +371,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                             color: isArchived
                                 ? AppColors.textMuted
                                 : (stColor ?? AppColors.primary),
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             fontSize: 18,
                           ),
                         ),
@@ -389,7 +389,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                 Text(
                                   s.fullName,
                                   style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w600,
                                     fontSize: 14,
                                     color: isArchived
                                         ? AppColors.textMuted
@@ -407,9 +407,9 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                   ),
                                   child: Text(
                                     s.grade,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: AppColors.primary,
                                     ),
                                   ),
@@ -431,8 +431,8 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                     child: Text(
                                       '${st.color.label}: ${st.color == StatusColor.red ? "Ishlanmagan" : st.color == StatusColor.yellow ? "E’tibor talab" : "Ijobiy"}',
                                       style: TextStyle(
-                                        fontSize: 10.5,
-                                        fontWeight: FontWeight.bold,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
                                         color: stColor,
                                       ),
                                     ),
@@ -442,7 +442,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                             const SizedBox(height: 4),
                             Text(
                               'Ehtiyoj toifasi: ${s.primaryNeed} • Qo‘llab-quvvatlash: ${s.supportLevel}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
                               ),
@@ -463,7 +463,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                             const SizedBox(height: 3),
                             Text(
                               '🏛️ ${s.institutionName} • Tug‘ilgan: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textMuted,
                               ),
@@ -481,13 +481,13 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFC),
+                              color: AppColors.surfaceMuted,
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(color: AppColors.border),
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.badge_outlined,
                                   size: 14,
                                   color: AppColors.textSecondary,
@@ -495,7 +495,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                 const SizedBox(width: 4),
                                 Text(
                                   '${s.assignedSpecialistIds.length} mutaxassis',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 11,
                                     color: AppColors.textSecondary,
                                   ),
@@ -531,14 +531,14 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                               'Profilni ochish',
                               style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
                           if (!isArchived) ...[
                             const SizedBox(width: 6),
                             IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.archive_outlined,
                                 size: 18,
                                 color: AppColors.warning,
@@ -569,22 +569,22 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: isArchived ? const Color(0xFFFEF2F2) : const Color(0xFFEEF9EC),
+        color: isArchived ? AppColors.errorBg : AppColors.successBg,
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: isArchived
-              ? const Color(0xFFFECACA)
-              : const Color(0xFFC3EBBE),
+              ? AppColors.errorBorder
+              : AppColors.successBorder,
         ),
       ),
       child: Text(
         status,
         style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
           color: isArchived
-              ? const Color(0xFFDC2626)
-              : const Color(0xFF12803A),
+              ? AppColors.error
+              : AppColors.success,
         ),
       ),
     );

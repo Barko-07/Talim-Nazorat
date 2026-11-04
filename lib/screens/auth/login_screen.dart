@@ -163,11 +163,11 @@ class _LoginScreenState extends State<LoginScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Ta’lim muassasasini tanlash',
                                     style: TextStyle(
                                       fontSize: 17.5,
-                                      fontWeight: FontWeight.w800,
+                                      fontWeight: FontWeight.w700,
                                       color: AppColors.textPrimary,
                                       letterSpacing: -0.3,
                                     ),
@@ -175,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   const SizedBox(height: 2),
                                   Text(
                                     'Namangan viloyati • Chortoq tumani (${allSchools.length} ta maktab)',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textMuted,
                                     ),
@@ -185,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                             IconButton(
                               onPressed: () => Navigator.of(sheetContext).pop(),
-                              icon: const Icon(
+                              icon: Icon(
                                 LucideIcons.x,
                                 size: 18,
                                 color: AppColors.textMuted,
@@ -200,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen>
                         child: TextField(
                           onChanged:
                               (val) => setModalState(() => searchQuery = val),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'Maktabni qidirish',
                             prefixIcon: Icon(
                               LucideIcons.search,
@@ -214,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen>
                       Expanded(
                         child:
                             filteredSchools.isEmpty
-                                ? const Center(
+                                ? Center(
                                   child: Text(
                                     'Bunday maktab topilmadi',
                                     style: TextStyle(
@@ -287,7 +287,7 @@ class _LoginScreenState extends State<LoginScreen>
                                             ),
                                           ),
                                           if (isSelected)
-                                            const Icon(
+                                            Icon(
                                               LucideIcons.circleCheck,
                                               color: AppColors.primary,
                                               size: 18,
@@ -390,14 +390,14 @@ class _LoginScreenState extends State<LoginScreen>
   TextStyle _myGovFont({
     double fontSize = 14,
     FontWeight fontWeight = FontWeight.w500,
-    Color color = AppColors.textPrimary,
+    Color? color,
     double letterSpacing = -0.1,
     double? height,
   }) {
     return GoogleFonts.golosText(
       fontSize: fontSize,
       fontWeight: fontWeight,
-      color: color,
+      color: color ?? AppColors.textPrimary,
       letterSpacing: letterSpacing,
       height: height,
     );
@@ -587,7 +587,7 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               LucideIcons.circleAlert,
                               color: AppColors.error,
                               size: 18,
@@ -596,7 +596,7 @@ class _LoginScreenState extends State<LoginScreen>
                             Expanded(
                               child: Text(
                                 _errorMessage!,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.error,
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
@@ -652,7 +652,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                     const SizedBox(height: 24),
 
-                    const Center(
+                    Center(
                       child: Text(
                         'O‘zbekiston Respublikasi Maktabgacha va maktab ta’limi vazirligi © 2026',
                         textAlign: TextAlign.center,
@@ -681,23 +681,23 @@ class _LoginScreenState extends State<LoginScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppColors.border, width: 1.0),
           ),
-          child: const Text(
+          child: Text(
             'MAKTABGACHA VA MAKTAB TA’LIMI VAZIRLIGI',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
               letterSpacing: 0.75,
               color: AppColors.textSecondary,
             ),
           ),
         ),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           'Yagona inklyuziv ta’lim va pedagogik monitoring platformasi',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -731,7 +731,7 @@ class _LoginScreenState extends State<LoginScreen>
           style: _myGovFont(
             fontSize: 13.5,
             fontWeight: FontWeight.w500,
-            color: const Color(0xFF475569),
+            color: AppColors.textSecondary,
             height: 1.35,
           ),
         ),
@@ -749,7 +749,7 @@ class _LoginScreenState extends State<LoginScreen>
           decoration: InputDecoration(
             labelText: AppConfig.serverMode ? 'Email' : 'Email yoki telefon',
             hintText: 'ism@maktab.uz',
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               LucideIcons.mail,
               size: 18,
               color: AppColors.primary,
@@ -765,7 +765,7 @@ class _LoginScreenState extends State<LoginScreen>
           onSubmitted: (_) => _handleLogin(),
           decoration: InputDecoration(
             labelText: 'Parol',
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               LucideIcons.lock,
               size: 18,
               color: AppColors.primary,
@@ -879,7 +879,7 @@ class _LoginScreenState extends State<LoginScreen>
           style: _myGovFont(
             fontSize: 13.5,
             fontWeight: FontWeight.w500,
-            color: const Color(0xFF475569),
+            color: AppColors.textSecondary,
           ),
         ),
         TextButton(
@@ -910,14 +910,14 @@ class _LoginScreenState extends State<LoginScreen>
     return Container(
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF7E6),
+        color: AppColors.warningBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFF2D48A)),
+        border: Border.all(color: AppColors.warningBorder),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline_rounded, size: 17, color: Color(0xFF9A6700)),
+          Icon(Icons.info_outline_rounded, size: 17, color: AppColors.warning),
           SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -925,7 +925,7 @@ class _LoginScreenState extends State<LoginScreen>
               style: TextStyle(
                 fontSize: 11.5,
                 height: 1.35,
-                color: Color(0xFF704D00),
+                color: AppColors.warning,
               ),
             ),
           ),
@@ -958,7 +958,7 @@ class _LoginScreenState extends State<LoginScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Telefon raqamingiz yoki elektron pochtangizni kiriting. Muassasa yoki tizim administratoriga parolni tiklash so‘rovi yuboriladi va sizga vaqtinchalik parol taqdim etiladi.',
                     style: TextStyle(
                       fontSize: 12.5,
@@ -969,7 +969,7 @@ class _LoginScreenState extends State<LoginScreen>
                   const SizedBox(height: 14),
                   TextField(
                     controller: ctrl,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Telefon raqam yoki Email *',
                       hintText: '+998 90 123 45 67 yoki login@talim.uz',
                       prefixIcon: Icon(
@@ -1081,7 +1081,7 @@ class _LoginScreenState extends State<LoginScreen>
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.4,
-                  color: const Color(0xFF64748B),
+                  color: AppColors.textMuted,
                 ),
               ),
               Flexible(
@@ -1139,7 +1139,7 @@ class _LoginScreenState extends State<LoginScreen>
             style: _myGovFont(
               fontSize: 13.5,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF475569),
+              color: AppColors.textSecondary,
               height: 1.4,
             ),
           ),
@@ -1148,7 +1148,7 @@ class _LoginScreenState extends State<LoginScreen>
             controller: _firstNameCtrl,
             textCapitalization: TextCapitalization.words,
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Ism',
               hintText: 'Dilnoza',
               prefixIcon: Icon(
@@ -1163,7 +1163,7 @@ class _LoginScreenState extends State<LoginScreen>
             controller: _lastNameCtrl,
             textCapitalization: TextCapitalization.words,
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Familiya',
               hintText: 'Qodirova',
               prefixIcon: Icon(
@@ -1211,7 +1211,7 @@ class _LoginScreenState extends State<LoginScreen>
             style: _myGovFont(
               fontSize: 13.5,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF475569),
+              color: AppColors.textSecondary,
               height: 1.4,
             ),
           ),
@@ -1245,7 +1245,7 @@ class _LoginScreenState extends State<LoginScreen>
                     backgroundColor:
                         isSelected
                             ? AppColors.primaryLight
-                            : const Color(0xFFF8FAFC),
+                            : AppColors.surfaceMuted,
                     borderColor:
                         isSelected
                             ? AppColors.primary.withValues(alpha: 0.55)
@@ -1274,7 +1274,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       ? AppColors.primary.withValues(
                                         alpha: 0.35,
                                       )
-                                      : const Color(0xFFE2E8F0),
+                                      : AppColors.border,
                             ),
                           ),
                           alignment: Alignment.center,
@@ -1284,7 +1284,7 @@ class _LoginScreenState extends State<LoginScreen>
                             color:
                                 isSelected
                                     ? AppColors.primary
-                                    : const Color(0xFF334155),
+                                    : AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(width: 9),
@@ -1302,14 +1302,14 @@ class _LoginScreenState extends State<LoginScreen>
                               color:
                                   isSelected
                                       ? AppColors.primary
-                                      : const Color(0xFF1A2A4D),
+                                      : AppColors.textPrimary,
                               letterSpacing: -0.05,
                             ),
                           ),
                         ),
                         if (isSelected) ...[
                           const SizedBox(width: 6),
-                          const Icon(
+                          Icon(
                             LucideIcons.circleCheck,
                             color: AppColors.primary,
                             size: 15,
@@ -1333,7 +1333,7 @@ class _LoginScreenState extends State<LoginScreen>
           DropdownButtonFormField<String>(
             initialValue: _selectedDistrict,
             isExpanded: true,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               prefixIcon: Icon(
                 LucideIcons.mapPin,
                 size: 18,
@@ -1367,12 +1367,12 @@ class _LoginScreenState extends State<LoginScreen>
             elevated: false,
             borderRadius: 12,
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
-            backgroundColor: const Color(0xFFF8FAFC),
+            backgroundColor: AppColors.surfaceMuted,
             borderColor: AppColors.border,
             onTap: () => _showIosSchoolPickerModal(context),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   LucideIcons.school,
                   color: AppColors.primary,
                   size: 19,
@@ -1391,7 +1391,7 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 ),
                 const SizedBox(width: 8),
-                const StatusPill(
+                StatusPill(
                   label: 'Tanlash',
                   color: AppColors.primary,
                   backgroundColor: AppColors.primaryLight,
@@ -1425,7 +1425,7 @@ class _LoginScreenState extends State<LoginScreen>
             style: _myGovFont(
               fontSize: 13.5,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF475569),
+              color: AppColors.textSecondary,
               height: 1.4,
             ),
           ),
@@ -1434,7 +1434,7 @@ class _LoginScreenState extends State<LoginScreen>
             controller: _phoneCtrl,
             keyboardType: TextInputType.phone,
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Telefon',
               hintText: '+998 90 123 45 67',
               prefixIcon: Icon(
@@ -1449,7 +1449,7 @@ class _LoginScreenState extends State<LoginScreen>
             controller: _emailCtrl,
             keyboardType: TextInputType.emailAddress,
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: AppConfig.serverMode ? 'Email' : 'Email (ixtiyoriy)',
               hintText: 'ism@maktab.uz',
               prefixIcon: Icon(
@@ -1485,7 +1485,7 @@ class _LoginScreenState extends State<LoginScreen>
             style: _myGovFont(
               fontSize: 13.5,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF475569),
+              color: AppColors.textSecondary,
               height: 1.4,
             ),
           ),
@@ -1497,7 +1497,7 @@ class _LoginScreenState extends State<LoginScreen>
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: InputDecoration(
               labelText: 'Parol',
-              prefixIcon: const Icon(
+              prefixIcon: Icon(
                 LucideIcons.lock,
                 size: 18,
                 color: AppColors.primary,
@@ -1523,7 +1523,7 @@ class _LoginScreenState extends State<LoginScreen>
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: InputDecoration(
               labelText: 'Parolni takrorlang',
-              prefixIcon: const Icon(
+              prefixIcon: Icon(
                 LucideIcons.shieldCheck,
                 size: 18,
                 color: AppColors.primary,
@@ -1552,7 +1552,7 @@ class _LoginScreenState extends State<LoginScreen>
         score <= 1
             ? AppColors.error
             : score == 2
-            ? const Color(0xFFD97706)
+            ? AppColors.warning
             : score == 3
             ? AppColors.primary
             : AppColors.success;
@@ -1570,9 +1570,9 @@ class _LoginScreenState extends State<LoginScreen>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceMuted,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1585,7 +1585,7 @@ class _LoginScreenState extends State<LoginScreen>
                 style: _myGovFont(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: score == 0 ? const Color(0xFF334155) : activeColor,
+                  color: score == 0 ? AppColors.textSecondary : activeColor,
                 ),
               ),
               Text(
@@ -1593,7 +1593,7 @@ class _LoginScreenState extends State<LoginScreen>
                 style: _myGovFont(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF64748B),
+                  color: AppColors.textMuted,
                 ),
               ),
             ],
@@ -1607,7 +1607,7 @@ class _LoginScreenState extends State<LoginScreen>
                   height: 4.5,
                   margin: EdgeInsets.only(right: index == 3 ? 0 : 5),
                   decoration: BoxDecoration(
-                    color: passed ? activeColor : const Color(0xFFE2E8F0),
+                    color: passed ? activeColor : AppColors.border,
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
@@ -1636,7 +1636,7 @@ class _LoginScreenState extends State<LoginScreen>
         Icon(
           met ? LucideIcons.circleCheck : LucideIcons.circle,
           size: 15,
-          color: met ? AppColors.success : const Color(0xFF94A3B8),
+          color: met ? AppColors.success : AppColors.textSubtle,
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -1645,7 +1645,7 @@ class _LoginScreenState extends State<LoginScreen>
             style: _myGovFont(
               fontSize: 12.5,
               fontWeight: met ? FontWeight.w600 : FontWeight.w500,
-              color: met ? const Color(0xFF0A1A3F) : const Color(0xFF64748B),
+              color: met ? AppColors.textPrimary : AppColors.textMuted,
             ),
           ),
         ),

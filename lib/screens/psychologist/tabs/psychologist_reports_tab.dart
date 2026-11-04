@@ -41,10 +41,10 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEAF3FD),
+                    color: AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.download_rounded,
                     color: AppColors.primary,
                   ),
@@ -58,12 +58,12 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                         title,
                         style: const TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
                         filename,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textSecondary,
                         ),
@@ -82,10 +82,10 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
+                      color: AppColors.surfaceMuted,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         Icon(
                           Icons.shield_outlined,
@@ -110,16 +110,16 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0A1A3F),
+                        color: AppColors.textPrimary,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: SingleChildScrollView(
                         child: Text(
                           csvData,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'monospace',
                             fontSize: 11,
-                            color: Color(0xFFE2E8F0),
+                            color: AppColors.border,
                           ),
                         ),
                       ),
@@ -146,7 +146,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('$filename mazmuni xotiraga nusxalandi!'),
-                      backgroundColor: const Color(0xFF12803A),
+                      backgroundColor: AppColors.success,
                     ),
                   );
                 },
@@ -184,7 +184,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
             : '0';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.surfaceMuted,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -194,7 +194,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
                 boxShadow: [
@@ -214,7 +214,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                       color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.bar_chart_rounded,
                       color: AppColors.primary,
                       size: 28,
@@ -225,11 +225,11 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Psixologik faoliyat va rivojlanish monitoringi hisobotlari',
                           style: TextStyle(
                             fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -249,7 +249,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
+                      color: AppColors.surfaceMuted,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: AppColors.border),
                     ),
@@ -285,15 +285,15 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFFEAF3FD),
+                color: AppColors.primaryLight,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFBFDBFE)),
+                border: Border.all(color: AppColors.primaryTint),
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.shield_outlined,
-                    color: Color(0xFF003D88),
+                    color: AppColors.primaryDark,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -301,9 +301,9 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     child: Text(
                       'Maxfiylik: bolalarning psixologik baholash va kuzatuv ma’lumotlari faqat bolaga biriktirilgan '
                       'mutaxassislarga ochiq. Maxfiy kuzatuvlarni faqat psixologlar ko‘radi.',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF1E3A8A),
+                        color: AppColors.primaryDark,
                         height: 1.4,
                       ),
                     ),
@@ -322,8 +322,8 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     value: '${students.length}',
                     subtext: 'Biriktirilgan o‘quvchilar',
                     icon: Icons.people_outline_rounded,
-                    color: const Color(0xFF003D88),
-                    bgColor: const Color(0xFFEAF3FD),
+                    color: AppColors.primaryDark,
+                    bgColor: AppColors.primaryLight,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -333,8 +333,8 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     value: '${assessments.length}',
                     subtext: 'Standartlashtirilgan testlar',
                     icon: Icons.assignment_turned_in_outlined,
-                    color: const Color(0xFF029C8C),
-                    bgColor: const Color(0xFFF0FDFA),
+                    color: AppColors.brandTeal,
+                    bgColor: AppColors.infoBg,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -344,8 +344,8 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     value: '$completedSessions',
                     subtext: 'Rejadagilar: $scheduledSessions ta',
                     icon: Icons.psychology_outlined,
-                    color: const Color(0xFF12803A),
-                    bgColor: const Color(0xFFEEF9EC),
+                    color: AppColors.success,
+                    bgColor: AppColors.successBg,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -355,8 +355,8 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     value: '$positiveDynamicsPercent%',
                     subtext: '$improvingCount ta o‘quvchida o‘sish',
                     icon: Icons.trending_up_rounded,
-                    color: const Color(0xFF7C3AED),
-                    bgColor: const Color(0xFFF5F3FF),
+                    color: AppColors.purple,
+                    bgColor: AppColors.purpleBg,
                   ),
                 ),
               ],
@@ -373,14 +373,14 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
                             Icon(
                               Icons.pie_chart_outline_rounded,
@@ -392,7 +392,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                               'Psixologik dinamika taqsimoti',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -405,7 +405,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                           label: 'Ijobiy o‘sish (Yaxshilanish)',
                           count: improvingCount,
                           total: assessments.isEmpty ? 1 : assessments.length,
-                          color: const Color(0xFF12803A),
+                          color: AppColors.success,
                         ),
                         const SizedBox(height: 12),
 
@@ -414,7 +414,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                           label: 'Barqaror (O‘zgarmagan)',
                           count: stableCount,
                           total: assessments.isEmpty ? 1 : assessments.length,
-                          color: const Color(0xFF003D88),
+                          color: AppColors.primaryDark,
                         ),
                         const SizedBox(height: 12),
 
@@ -423,7 +423,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                           label: 'Qo‘shimcha korreksiya talab etiladi',
                           count: needsAttentionCount,
                           total: assessments.isEmpty ? 1 : assessments.length,
-                          color: const Color(0xFFD97706),
+                          color: AppColors.warning,
                         ),
                         const SizedBox(height: 20),
 
@@ -431,17 +431,17 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
+                            color: AppColors.surfaceMuted,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Text(
                             'Kuzatuv davrida jami ${assessments.length} ta psixologik diagnostika va ${observations.length} ta xulq-atvor kuzatuvi amalga oshirildi. '
                             'O‘tkazilgan korreksion mashg‘ulotlar natijasida bolalarning $positiveDynamicsPercent% qismida barqaror va ijobiy o‘sish dinamikasi qayd etildi.',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               height: 1.5,
-                              color: Color(0xFF334155),
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ),
@@ -457,14 +457,14 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
                             Icon(
                               Icons.file_download_outlined,
@@ -476,14 +476,14 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                               'Hisobotlarni yuklab olish',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 6),
-                        const Text(
+                        Text(
                           'Excel (CSV UTF-8 BOM) formatida rasmiy ma’lumotlarni eksport qilish:',
                           style: TextStyle(
                             fontSize: 12,
@@ -559,7 +559,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
               ),
@@ -568,24 +568,24 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 children: [
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.table_chart_outlined,
                         size: 20,
                         color: AppColors.primary,
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'O‘quvchilar kesimida umumiy psixologik ko‘rsatkichlar',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
                       const Spacer(),
                       Text(
                         'Jami: ${students.length} nafar o‘quvchi',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textSecondary,
@@ -607,16 +607,16 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                       scrollDirection: Axis.horizontal,
                       child: DataTable(
                         headingRowColor: MaterialStateProperty.all(
-                          const Color(0xFFF8FAFC),
+                          AppColors.surfaceMuted,
                         ),
-                        headingTextStyle: const TextStyle(
+                        headingTextStyle: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF334155),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
                         ),
-                        dataTextStyle: const TextStyle(
+                        dataTextStyle: TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF1A2A4D),
+                          color: AppColors.textPrimary,
                         ),
                         columns: const [
                           DataColumn(label: Text('O‘quvchi F.I.SH')),
@@ -647,11 +647,11 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                                 trend = studentAssessments.first.trend;
                               }
 
-                              Color trendColor = const Color(0xFF003D88);
+                              Color trendColor = AppColors.primaryDark;
                               if (trend == 'Yaxshilanish')
-                                trendColor = const Color(0xFF12803A);
+                                trendColor = AppColors.success;
                               if (trend == 'Qo‘shimcha e’tibor talab')
-                                trendColor = const Color(0xFFD97706);
+                                trendColor = AppColors.warning;
 
                               return DataRow(
                                 cells: [
@@ -666,9 +666,9 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                                             s.fullName.isNotEmpty
                                                 ? s.fullName[0]
                                                 : 'O',
-                                            style: const TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
                                               color: AppColors.primary,
                                             ),
                                           ),
@@ -709,7 +709,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                                         trend,
                                         style: TextStyle(
                                           fontSize: 11,
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w600,
                                           color: trendColor,
                                         ),
                                       ),
@@ -740,7 +740,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border),
       ),
@@ -763,22 +763,22 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                   value,
                   style: TextStyle(
                     fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: color,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 Text(
                   subtext,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColors.textSecondary,
                   ),
@@ -808,17 +808,17 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF334155),
+                color: AppColors.textSecondary,
               ),
             ),
             Text(
               '$count ta ($pctStr%)',
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: color,
               ),
             ),
@@ -829,7 +829,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: pct,
-            backgroundColor: const Color(0xFFF1F5F9),
+            backgroundColor: AppColors.surfaceMuted,
             valueColor: AlwaysStoppedAnimation<Color>(color),
             minHeight: 8,
           ),
@@ -850,9 +850,9 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: AppColors.surfaceMuted,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: AppColors.border),
         ),
         child: Row(
           children: [
@@ -871,15 +871,15 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A2A4D),
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary,
                     ),
@@ -887,7 +887,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios_rounded,
               size: 14,
               color: AppColors.textSecondary,

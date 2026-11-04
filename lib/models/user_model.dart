@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/constants/app_colors.dart';
 
 enum UserRole {
   superAdmin,
@@ -117,23 +118,23 @@ extension UserRoleExtension on UserRole {
   Color get color {
     switch (this) {
       case UserRole.superAdmin:
-        return const Color(0xFF1A2A4D); // Slate
+        return AppColors.textPrimary; // Slate
       case UserRole.institutionAdmin:
-        return const Color(0xFF0F766E); // Teal
+        return AppColors.info; // Teal
       case UserRole.coordinator:
-        return const Color(0xFF7C3AED); // Purple
+        return AppColors.purple; // Purple
       case UserRole.psychologist:
-        return const Color(0xFF1E7FE0); // Indigo
+        return AppColors.primary; // Indigo
       case UserRole.speechTherapist:
-        return const Color(0xFF00808A); // Sky Blue
+        return AppColors.info; // Sky Blue
       case UserRole.specialEducation:
-        return const Color(0xFFD97706); // Amber
+        return AppColors.warning; // Amber
       case UserRole.specialEdTeacher:
-        return const Color(0xFF0062CC); // Blue
+        return AppColors.primary; // Blue
       case UserRole.teacher:
-        return const Color(0xFF12803A); // Emerald
+        return AppColors.success; // Emerald
       case UserRole.reviewer:
-        return const Color(0xFF64748B); // Slate Muted
+        return AppColors.textMuted; // Slate Muted
       case UserRole.parent:
         return const Color(0xFFEA580C); // Orange
     }

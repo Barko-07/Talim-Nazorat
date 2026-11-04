@@ -227,12 +227,12 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEAF3FD),
+                        color: AppColors.primaryLight,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.quiz_rounded,
-                        color: Color(0xFF0062CC),
+                        color: AppColors.primary,
                         size: 22,
                       ),
                     ),
@@ -245,9 +245,9 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                             isNew
                                 ? 'Yangi Psixologik Savol Yaratish'
                                 : 'Savolni Tahrirlash',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                             ),
                           ),
@@ -255,7 +255,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                             isNew
                                 ? 'Kutubxonaga yangi diagnostika savoli qo‘shish'
                                 : 'Savol matni va baholash mezonlarini yangilash',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               color: AppColors.textMuted,
                             ),
@@ -416,7 +416,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                     size: 20,
                                   ),
                                 ),
-                                items: const [
+                                items: [
                                   DropdownMenuItem(
                                     value: 'ready',
                                     child: Row(
@@ -424,7 +424,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                         Icon(
                                           Icons.check_circle_rounded,
                                           size: 16,
-                                          color: Color(0xFF12803A),
+                                          color: AppColors.success,
                                         ),
                                         SizedBox(width: 6),
                                         Expanded(
@@ -444,7 +444,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                         Icon(
                                           Icons.pending_outlined,
                                           size: 16,
-                                          color: Color(0xFFD97706),
+                                          color: AppColors.warning,
                                         ),
                                         SizedBox(width: 6),
                                         Expanded(
@@ -528,7 +528,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                     const SizedBox(width: 12),
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF0062CC),
+                        backgroundColor: AppColors.primary,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 12,
@@ -555,13 +555,13 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
       return Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: AppColors.surfaceMuted,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColors.border),
         ),
-        child: const Row(
+        child: Row(
           children: [
-            Icon(Icons.notes_rounded, color: Color(0xFF64748B), size: 22),
+            Icon(Icons.notes_rounded, color: AppColors.textMuted, size: 22),
             SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -580,7 +580,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceMuted,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
@@ -594,9 +594,9 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                 isScale
                     ? '1–5 shkala mezonlari (Darajalar)'
                     : 'Javob variantlari va ballar (${_options.length} ta):',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                 ),
               ),
@@ -625,15 +625,15 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                     height: 28,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEAF3FD),
+                      color: AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       '${idx + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0062CC),
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),

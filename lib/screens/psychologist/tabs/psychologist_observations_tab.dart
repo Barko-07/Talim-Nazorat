@@ -49,7 +49,7 @@ class _PsychologistObservationsTabState
 
     if (students.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Kuzatuv qayd etish uchun birorta o‘quvchi mavjud emas.'),
           backgroundColor: AppColors.warning,
         ),
@@ -79,12 +79,12 @@ class _PsychologistObservationsTabState
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
+                    color: AppColors.warningBg,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.edit_note_rounded,
-                    color: Color(0xFFD97706),
+                    color: AppColors.warning,
                     size: 20,
                   ),
                 ),
@@ -92,7 +92,7 @@ class _PsychologistObservationsTabState
                 const Expanded(
                   child: Text(
                     'Kuzatuv Kundaligiga Yangi Qayd',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -239,7 +239,7 @@ class _PsychologistObservationsTabState
               ),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF0062CC),
+                  backgroundColor: AppColors.primary,
                 ),
                 icon: const Icon(Icons.check_rounded, size: 16),
                 label: const Text('Kundalikka kiritish'),
@@ -325,11 +325,11 @@ class _PsychologistObservationsTabState
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Psixologik Kuzatuv Jurnali',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -340,25 +340,25 @@ class _PsychologistObservationsTabState
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFEF3C7),
+                          color: AppColors.warningBg,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: const Color(0xFFD97706).withValues(alpha: 0.3),
+                            color: AppColors.warning.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
                           '${filtered.length} ta qayd',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF92400E),
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.warning,
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Bolaning darsdagi xulq-atvori, hissiy holati va dinamik o‘zgarishlari xronologik daftari',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -366,7 +366,7 @@ class _PsychologistObservationsTabState
               ),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF0062CC),
+                  backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
@@ -385,7 +385,7 @@ class _PsychologistObservationsTabState
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -475,13 +475,13 @@ class _PsychologistObservationsTabState
             Container(
               padding: const EdgeInsets.all(40),
               alignment: Alignment.center,
-              child: const Column(
+              child: Column(
                 children: [
                   Icon(Icons.notes_rounded, size: 48, color: AppColors.textMuted),
                   SizedBox(height: 12),
                   Text(
                     'Kuzatuvlar topilmadi',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: 4),
                   Text(
@@ -504,7 +504,7 @@ class _PsychologistObservationsTabState
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(color: AppColors.border),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(18),
@@ -522,23 +522,23 @@ class _PsychologistObservationsTabState
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF1F5F9),
+                                    color: AppColors.surfaceMuted,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     df.format(o.date),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF1A2A4D),
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textPrimary,
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
                                   '${o.studentName} (${o.studentGrade})',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
                                     fontSize: 15,
                                     color: AppColors.textPrimary,
                                   ),
@@ -550,15 +550,15 @@ class _PsychologistObservationsTabState
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFEAF3FD),
+                                    color: AppColors.primaryLight,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     o.category,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF0062CC),
+                                      color: AppColors.primary,
                                     ),
                                   ),
                                 ),
@@ -571,18 +571,18 @@ class _PsychologistObservationsTabState
                               ),
                               decoration: BoxDecoration(
                                 color: o.emotionalState.contains('Barqaror')
-                                    ? const Color(0xFFEEF9EC)
-                                    : const Color(0xFFFEF3C7),
+                                    ? AppColors.successBg
+                                    : AppColors.warningBg,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 o.emotionalState,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   color: o.emotionalState.contains('Barqaror')
-                                      ? const Color(0xFF12803A)
-                                      : const Color(0xFFB45309),
+                                      ? AppColors.success
+                                      : AppColors.warning,
                                 ),
                               ),
                             ),
@@ -593,17 +593,17 @@ class _PsychologistObservationsTabState
                           const SizedBox(height: 8),
                           Text(
                             'Vaziyat: ${o.triggerOrContext}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               fontStyle: FontStyle.italic,
-                              color: Color(0xFF64748B),
+                              color: AppColors.textMuted,
                             ),
                           ),
                         ],
                         const SizedBox(height: 8),
                         Text(
                           o.observationText,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             color: AppColors.textPrimary,
                             height: 1.4,
@@ -615,7 +615,7 @@ class _PsychologistObservationsTabState
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFC),
+                              color: AppColors.surfaceMuted,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: AppColors.border.withValues(alpha: 0.6),
@@ -624,18 +624,18 @@ class _PsychologistObservationsTabState
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.lightbulb_outline_rounded,
                                   size: 16,
-                                  color: Color(0xFF12803A),
+                                  color: AppColors.success,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     'Tavsiya/Chora: ${o.recommendationOrAction}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11.5,
-                                      color: Color(0xFF0E6630),
+                                      color: AppColors.success,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),

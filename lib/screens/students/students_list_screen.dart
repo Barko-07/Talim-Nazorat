@@ -43,22 +43,22 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
   static Color _colorFor(StatusColor c) {
     switch (c) {
       case StatusColor.red:
-        return const Color(0xFFDC2626);
+        return AppColors.error;
       case StatusColor.yellow:
-        return const Color(0xFFD97706);
+        return AppColors.warning;
       case StatusColor.green:
-        return const Color(0xFF12803A);
+        return AppColors.success;
     }
   }
 
   static Color _bgFor(StatusColor c) {
     switch (c) {
       case StatusColor.red:
-        return const Color(0xFFFEF2F2);
+        return AppColors.errorBg;
       case StatusColor.yellow:
-        return const Color(0xFFFFFBEB);
+        return AppColors.warningBg;
       case StatusColor.green:
-        return const Color(0xFFEEF9EC);
+        return AppColors.successBg;
     }
   }
 
@@ -127,12 +127,12 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                   decoration: InputDecoration(
                     hintText:
                         'F.I.Sh. yoki ta’lim ehtiyoji bo‘yicha qidirish...',
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       LucideIcons.search,
                       size: 18,
                       color: AppColors.primary,
                     ),
-                    fillColor: const Color(0xFFF9FAFC),
+                    fillColor: AppColors.surfaceMuted,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 15,
                       vertical: 13,
@@ -152,7 +152,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     height: 45,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF9FAFC),
+                      color: AppColors.surfaceMuted,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AppColors.border, width: 1.0),
                     ),
@@ -163,7 +163,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                       isExpanded: isCompact,
                       borderRadius: BorderRadius.circular(14),
                       dropdownColor: Colors.white,
-                      icon: const Padding(
+                      icon: Padding(
                         padding: EdgeInsets.only(left: 6),
                         child: Icon(
                           LucideIcons.chevronDown,
@@ -171,7 +171,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                           color: AppColors.textMuted,
                         ),
                       ),
-                      hint: const Text(
+                      hint: Text(
                         'Barcha sinflar',
                         style: TextStyle(
                           fontSize: 13,
@@ -241,8 +241,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                             _buildStatusFilterChip(
                               label:
                                   '🔴 Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
-                              color: const Color(0xFFDC2626),
-                              bg: const Color(0xFFFEF2F2),
+                              color: AppColors.error,
+                              bg: AppColors.errorBg,
                               selected:
                                   _selectedStatusColor == StatusColor.red,
                               onTap: () => setState(
@@ -256,8 +256,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                             _buildStatusFilterChip(
                               label:
                                   '🟡 Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
-                              color: const Color(0xFFD97706),
-                              bg: const Color(0xFFFFFBEB),
+                              color: AppColors.warning,
+                              bg: AppColors.warningBg,
                               selected:
                                   _selectedStatusColor == StatusColor.yellow,
                               onTap: () => setState(
@@ -271,8 +271,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                             _buildStatusFilterChip(
                               label:
                                   '🟢 Yashil — Ijobiy (${summary.count(StatusColor.green)})',
-                              color: const Color(0xFF12803A),
-                              bg: const Color(0xFFEEF9EC),
+                              color: AppColors.success,
+                              bg: AppColors.successBg,
                               selected:
                                   _selectedStatusColor == StatusColor.green,
                               onTap: () => setState(
@@ -303,7 +303,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                         horizontal: 30,
                         vertical: 34,
                       ),
-                      child: const Column(
+                      child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
@@ -316,7 +316,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                             'O‘quvchilar topilmadi',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
                             ),
                           ),
@@ -412,7 +412,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
     return SurfaceCard(
       borderRadius: 26,
       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-      backgroundColor: isRed ? const Color(0xFFFFF5F5) : null,
+      backgroundColor: isRed ? AppColors.errorBg : null,
       borderColor: statusColor != null
           ? statusColor.withValues(alpha: isRed ? 0.55 : 0.32)
           : null,
@@ -434,7 +434,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
               s.firstName.isNotEmpty ? s.firstName.substring(0, 1) : '?',
               style: TextStyle(
                 color: statusColor ?? AppColors.primary,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
                 fontSize: 17,
               ),
             ),
@@ -452,9 +452,9 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                         s.fullName,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15.5,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
                           letterSpacing: -0.25,
                         ),
@@ -482,7 +482,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                   s.primaryNeed,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
@@ -547,7 +547,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                       '${s.age} yosh • $guardianText',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textMuted,
                         fontWeight: FontWeight.w500,
@@ -559,7 +559,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 4),
             child: Icon(
               LucideIcons.chevronRight,

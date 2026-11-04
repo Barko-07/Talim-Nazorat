@@ -73,7 +73,7 @@ class _IepListScreenState extends State<IepListScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'O‘quvchini tanlang *',
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
@@ -219,7 +219,7 @@ class _IepListScreenState extends State<IepListScreen> {
                         const SizedBox(height: 16),
                         const Divider(),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'Birinchi o‘lchanadigan oraliq maqsad:',
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
@@ -676,23 +676,23 @@ class _IepListScreenState extends State<IepListScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             LucideIcons.bookOpen,
                             size: 34,
                             color: AppColors.primary,
                           ),
                           const SizedBox(height: 14),
-                          const Text(
+                          Text(
                             'Tanlangan filtr bo‘yicha ITR rejalari topilmadi',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               fontSize: 15.5,
                               color: AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 5),
-                          const Text(
+                          Text(
                             'O‘quvchi uchun yangi individual ta’lim rejasini shakllantirishingiz mumkin.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -790,7 +790,7 @@ class _IepListScreenState extends State<IepListScreen> {
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primaryDark,
               backgroundColor: Colors.white,
-              side: const BorderSide(color: AppColors.border, width: 1.0),
+              side: BorderSide(color: AppColors.border, width: 1.0),
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             ),
             icon: const Icon(LucideIcons.printer, size: 15),
@@ -818,8 +818,8 @@ class _IepListScreenState extends State<IepListScreen> {
                 children: [
                   Text(
                     p.title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w800,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
                       fontSize: 16.5,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
@@ -851,7 +851,7 @@ class _IepListScreenState extends State<IepListScreen> {
                     },
                     child: Text(
                       '${p.studentName} (${p.studentGrade}-sinf)',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
@@ -860,7 +860,7 @@ class _IepListScreenState extends State<IepListScreen> {
                   ),
                   Text(
                     'O‘quv yili: ${p.academicYear}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12.5,
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,
@@ -868,14 +868,14 @@ class _IepListScreenState extends State<IepListScreen> {
                   ),
                   Text(
                     'Mas’ul: ${p.responsibleTeacherName}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12.5,
                       color: AppColors.textMuted,
                     ),
                   ),
                   Text(
                     '${df.format(p.startDate)} — ${df.format(p.reviewDate)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColors.textMuted,
                       fontFeatures: [FontFeature.tabularFigures()],
@@ -913,13 +913,13 @@ class _IepListScreenState extends State<IepListScreen> {
                   children: [
                     RichText(
                       text: TextSpan(
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           height: 1.45,
                           color: AppColors.textSecondary,
                         ),
                         children: [
-                          const TextSpan(
+                          TextSpan(
                             text: 'Boshlang‘ich holat (Baseline): ',
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
@@ -933,7 +933,7 @@ class _IepListScreenState extends State<IepListScreen> {
                     const SizedBox(height: 8),
                     RichText(
                       text: TextSpan(
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           height: 1.45,
                           color: AppColors.primaryDark,
@@ -955,7 +955,7 @@ class _IepListScreenState extends State<IepListScreen> {
                       const SizedBox(height: 8),
                       Text(
                         'Qo‘llab-quvvatlash: ${p.supportStrategies!}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12.5,
                           color: AppColors.textMuted,
                           height: 1.4,
@@ -977,7 +977,7 @@ class _IepListScreenState extends State<IepListScreen> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         LucideIcons.target,
                         size: 16,
                         color: AppColors.primary,
@@ -986,8 +986,8 @@ class _IepListScreenState extends State<IepListScreen> {
                       Flexible(
                         child: Text(
                           'O‘lchanadigan maqsadlar (${p.completedObjectivesCount}/${p.totalObjectivesCount} bajarildi)',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w800,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
                             fontSize: 13.5,
                             color: AppColors.textPrimary,
                           ),
@@ -1068,7 +1068,7 @@ class _IepListScreenState extends State<IepListScreen> {
                       child: Text(
                         '$objPercent%',
                         style: TextStyle(
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           fontSize: 13,
                           color: objColor,
                           fontFeatures: const [FontFeature.tabularFigures()],
@@ -1083,7 +1083,7 @@ class _IepListScreenState extends State<IepListScreen> {
                   children: [
                     Text(
                       obj.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -1093,7 +1093,7 @@ class _IepListScreenState extends State<IepListScreen> {
                     const SizedBox(height: 3),
                     Text(
                       '${obj.domain} • Mezon: ${obj.measurementCriteria ?? obj.successCriteria ?? ''}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textMuted,
                         height: 1.35,

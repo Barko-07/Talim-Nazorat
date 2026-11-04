@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../../../core/config/app_config.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/theme_picker.dart';
+import '../../../providers/theme_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../auth/verification_screens.dart';
 
@@ -21,14 +23,14 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
   TextStyle _myGovFont({
     double fontSize = 15,
     FontWeight fontWeight = FontWeight.w500,
-    Color color = const Color(0xFF0A1A3F),
+    Color? color,
     double letterSpacing = -0.1,
     double? height,
   }) {
     return GoogleFonts.golosText(
       fontSize: fontSize,
       fontWeight: fontWeight,
-      color: color,
+      color: color ?? AppColors.textPrimary,
       letterSpacing: letterSpacing,
       height: height,
     );
@@ -77,9 +79,9 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: AppColors.border),
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0x080A1A3F),
@@ -95,9 +97,9 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                       height: 52,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: const Color(0xFFF1F5F9),
+                        color: AppColors.surfaceMuted,
                         border: Border.all(
-                          color: const Color(0xFFCBD5E1),
+                          color: AppColors.borderSlate,
                           width: 1.4,
                         ),
                       ),
@@ -107,7 +109,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                         style: _myGovFont(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF1A2A4D),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ),
@@ -129,7 +131,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                             style: _myGovFont(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF475569),
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -146,15 +148,15 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                             ? LucideIcons.eyeOff
                             : LucideIcons.eye,
                         size: 21,
-                        color: const Color(0xFF334155),
+                        color: AppColors.textSecondary,
                       ),
                     ),
                     IconButton(
                       onPressed: () => _showChangePasswordDialog(context),
-                      icon: const Icon(
+                      icon: Icon(
                         LucideIcons.settings,
                         size: 21,
-                        color: Color(0xFF334155),
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -165,9 +167,9 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
               // 2. MY.GOV.UZ RO'YXAT ELEMENTLARI
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: AppColors.border),
                 ),
                 child: Column(
                   children: [
@@ -192,8 +194,8 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                     _buildMyGovRow(
                       icon: LucideIcons.paintbrush,
                       title: 'Ilova mavzusi',
-                      trailingValue: 'Tizimli',
-                      showChevron: false,
+                      trailingValue: context.watch<ThemeProvider>().choice.label,
+                      onTap: () => showThemePicker(context),
                     ),
                     _buildMyGovRow(
                       icon: LucideIcons.languages,
@@ -234,8 +236,8 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
         decoration: BoxDecoration(
           border: isLast
               ? null
-              : const Border(
-                  bottom: BorderSide(color: Color(0xFFF1F5F9)),
+              : Border(
+                  bottom: BorderSide(color: AppColors.surfaceMuted),
                 ),
         ),
         child: Row(
@@ -244,15 +246,15 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: AppColors.surfaceMuted,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: AppColors.border),
               ),
               alignment: Alignment.center,
               child: Icon(
                 icon,
                 size: 20,
-                color: const Color(0xFF1A2A4D),
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(width: 14),
@@ -274,7 +276,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                       style: _myGovFont(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF64748B),
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ],
@@ -289,8 +291,8 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                   vertical: 4.5,
                 ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF3DBE37), Color(0xFF0062CC)],
+                  gradient: LinearGradient(
+                    colors: [AppColors.brandGreen, AppColors.primary],
                   ),
                   borderRadius: BorderRadius.circular(999),
                 ),
@@ -311,16 +313,16 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                 style: _myGovFont(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF64748B),
+                  color: AppColors.textMuted,
                 ),
               ),
             ],
             if (showChevron) ...[
               const SizedBox(width: 8),
-              const Icon(
+              Icon(
                 LucideIcons.chevronRight,
                 size: 18,
-                color: Color(0xFF64748B),
+                color: AppColors.textMuted,
               ),
             ],
           ],
@@ -385,7 +387,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
             onPressed: () async {
               if (newPassCtrl.text.trim() != confirmPassCtrl.text.trim()) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('Yangi parollar bir-biriga mos kelmadi.'),
                     backgroundColor: AppColors.error,
                   ),
@@ -404,7 +406,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                   SnackBar(
                     content: Text(res['message'] as String),
                     backgroundColor: res['success'] == true
-                        ? const Color(0xFF12803A)
+                        ? AppColors.success
                         : AppColors.error,
                   ),
                 );

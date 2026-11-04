@@ -76,7 +76,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                       );
                     },
                   )
-                : const StatusPill(
+                : StatusPill(
                     label: 'Ko‘rish rejimi',
                     color: AppColors.textMuted,
                     backgroundColor: Colors.white,
@@ -102,7 +102,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                         horizontal: 30,
                         vertical: 36,
                       ),
-                      child: const Column(
+                      child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
@@ -116,7 +116,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 15.5,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
                             ),
                           ),
@@ -194,7 +194,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(top: 2),
                     child: Icon(
                       LucideIcons.clipboardCheck,
@@ -211,8 +211,8 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                           a.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w800,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
                             fontSize: 15,
                             color: AppColors.textPrimary,
                             letterSpacing: -0.25,
@@ -227,7 +227,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                           children: [
                             Text(
                               '${a.studentName} • ${df.format(a.assessmentDate)}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12.5,
                                 color: AppColors.textMuted,
                                 fontWeight: FontWeight.w500,
@@ -255,7 +255,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                   children: [
                     Text(
                       a.notes,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         height: 1.45,
                         color: AppColors.textPrimary,
@@ -265,7 +265,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                       const SizedBox(height: 8),
                       Text(
                         'Tavsiya: ${a.recommendations}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12.5,
                           color: AppColors.primaryDark,
                           fontWeight: FontWeight.w600,
@@ -284,7 +284,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                       '${a.specialistName} • ${a.specialistRole}',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textMuted,
                         fontWeight: FontWeight.w600,

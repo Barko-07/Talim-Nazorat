@@ -207,7 +207,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 15.5,
                   color: AppColors.textPrimary,
@@ -218,7 +218,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12.3,
                   color: AppColors.textMuted,
                   height: 1.35,
@@ -264,7 +264,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                             const SizedBox(height: 20),
                             TextFormField(
                               controller: _lastNameCtrl,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Familiyasi *',
                                 prefixIcon: Icon(
                                   LucideIcons.user,
@@ -279,7 +279,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                             const SizedBox(height: 14),
                             TextFormField(
                               controller: _firstNameCtrl,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Ismi *',
                                 prefixIcon: Icon(
                                   LucideIcons.user,
@@ -294,7 +294,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                             const SizedBox(height: 14),
                             TextFormField(
                               controller: _middleNameCtrl,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Otasining ismi',
                                 prefixIcon: Icon(
                                   LucideIcons.user,
@@ -352,7 +352,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               onTap: _pickDateOfBirth,
                               borderRadius: BorderRadius.circular(12),
                               child: InputDecorator(
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   labelText: 'Tug‘ilgan sanasi *',
                                   prefixIcon: Icon(
                                     LucideIcons.calendar,
@@ -500,7 +500,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                             const SizedBox(height: 20),
                             TextFormField(
                               controller: _guardianNameCtrl,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Vasiy to‘liq F.I.Sh.',
                                 prefixIcon: Icon(
                                   LucideIcons.userCheck,
@@ -537,7 +537,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               const SizedBox(height: 14),
                               TextFormField(
                                 controller: _guardianPhoneCtrl,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   labelText: 'Telefon raqami',
                                   hintText: '+998 90 123-45-67',
                                   prefixIcon: Icon(
@@ -580,7 +580,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                   Expanded(
                                     child: TextFormField(
                                       controller: _guardianPhoneCtrl,
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                         labelText: 'Telefon raqami',
                                         hintText: '+998 90 123-45-67',
                                         prefixIcon: Icon(
@@ -596,7 +596,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                             const SizedBox(height: 14),
                             TextFormField(
                               controller: _addressCtrl,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Yashash manzili',
                                 prefixIcon: Icon(
                                   LucideIcons.mapPin,

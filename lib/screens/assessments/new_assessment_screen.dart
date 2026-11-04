@@ -111,7 +111,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
     if (_formKey.currentState!.validate()) {
       if (_criteriaList.any((criterion) => criterion['rated'] != true)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Saqlashdan oldin har bir mezonni baholang.'),
             backgroundColor: AppColors.warning,
           ),
@@ -125,7 +125,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
 
       if (_selectedStudentId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Iltimos, o‘quvchini tanlang!'),
             backgroundColor: AppColors.error,
           ),
@@ -252,7 +252,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       LucideIcons.shieldAlert,
                       size: 40,
                       color: AppColors.warning,
@@ -261,14 +261,14 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                     Text(
                       '${role.label} hisobida baholash kiritish huquqi yo‘q',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 17,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Kuzatuvchi va metodistlar tizimda faqat o‘qish va monitoring hisobotlarini tahlil qilish vakolatiga ega.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -354,7 +354,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                   ),
                                   Text(
                                     user?.fullName ?? '',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13.5,
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.textPrimary,
@@ -363,7 +363,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                 ],
                               ),
                               const SizedBox(height: 7),
-                              const Text(
+                              Text(
                                 'Ushbu baholash faqat sizning kasbiy sohangiz doirasida rasmiylashtiriladi.',
                                 style: TextStyle(
                                   fontSize: 12.5,
@@ -388,7 +388,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                     ),
                     tintColor: AppColors.infoBg,
                     borderColor: AppColors.infoBorder,
-                    child: const Row(
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
@@ -422,7 +422,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
                             Icon(
                               LucideIcons.userRoundCheck,
@@ -434,7 +434,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                               child: Text(
                                 'Baholanayotgan O‘quvchi',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                   color: AppColors.textPrimary,
                                 ),
@@ -541,11 +541,11 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                   color: role.color,
                                 ),
                                 const SizedBox(width: 10),
-                                const Flexible(
+                                Flexible(
                                   child: Text(
                                     'Kasbiy Rubrika Mezonlari',
                                     style: TextStyle(
-                                      fontWeight: FontWeight.w800,
+                                      fontWeight: FontWeight.w700,
                                       fontSize: 16,
                                       color: AppColors.textPrimary,
                                     ),
@@ -565,7 +565,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'Har bir mezon bo‘yicha bolaning haqiqiy o‘zlashtirish darajasini belgilang:',
                           style: TextStyle(
                             fontSize: 12.5,
@@ -574,7 +574,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        const Text(
+                        Text(
                           'Bu ichki pedagogik kuzatuv rubrikasi; standartlashtirilgan test yoki tibbiy tashxis o‘rnini bosmaydi. Faqat o‘tkazilgan kuzatuv natijalarini kiriting.',
                           style: TextStyle(
                             fontSize: 11.5,
@@ -605,7 +605,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                     Expanded(
                                       child: Text(
                                         '${index + 1}. $name',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontWeight: FontWeight.w700,
                                           fontSize: 13.5,
                                           color: AppColors.textPrimary,
@@ -620,7 +620,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color: AppColors.surface,
                                         borderRadius: BorderRadius.circular(8),
                                         border: Border.all(
                                           color: AppColors.border,
@@ -632,7 +632,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                             ? '${score.toInt()} / ${max.toInt()} ball'
                                             : 'Baholanmagan',
                                         style: TextStyle(
-                                          fontWeight: FontWeight.w800,
+                                          fontWeight: FontWeight.w700,
                                           fontSize: 11.5,
                                           color: role.color,
                                           fontFeatures: const [
@@ -688,7 +688,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
                             Icon(
                               LucideIcons.sparkles,
@@ -700,7 +700,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                               child: Text(
                                 'Mutaxassis Xulosasi va Pedagogik Tavsiyalar',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                   color: AppColors.textPrimary,
                                 ),

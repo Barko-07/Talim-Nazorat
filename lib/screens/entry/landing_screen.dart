@@ -23,7 +23,7 @@ class LandingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= 900;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: _TopBar(wide: wide)),
@@ -118,7 +118,7 @@ class _Hero extends StatelessWidget {
             color: AppColors.primaryLight,
             borderRadius: BorderRadius.circular(999),
           ),
-          child: const Text(
+          child: Text(
             'Inklyuziv ta’lim uchun yagona platforma',
             style: TextStyle(
               fontSize: 12.5,
@@ -134,7 +134,7 @@ class _Hero extends StatelessWidget {
           style: TextStyle(
             fontSize: wide ? 48 : 32,
             height: 1.1,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
             letterSpacing: -1,
             color: AppColors.textPrimary,
           ),
@@ -144,7 +144,7 @@ class _Hero extends StatelessWidget {
           'Psixolog, logoped, defektolog va o‘qituvchilar alohida ta’lim ehtiyojli '
           'bolalarni birgalikda baholaydi, kuzatadi va individual ta’lim rejasini tuzadi.',
           textAlign: wide ? TextAlign.start : TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 17,
             height: 1.55,
             color: AppColors.textSecondary,
@@ -193,7 +193,7 @@ class _Hero extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(28),
           ),
           child: BrandMark(height: wide ? 150 : 96),
@@ -247,15 +247,15 @@ class _Features extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Section(
-      color: const Color(0xFFF6F9FE),
+      color: AppColors.surfaceMuted,
       child: Column(
         children: [
-          const Text(
+          Text(
             'Nimalar qila olasiz',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 28,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
               letterSpacing: -0.5,
               color: AppColors.textPrimary,
             ),
@@ -297,7 +297,7 @@ class _FeatureCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.border),
       ),
@@ -316,7 +316,7 @@ class _FeatureCard extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16.5,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -325,7 +325,7 @@ class _FeatureCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             body,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               height: 1.5,
               color: AppColors.textSecondary,
@@ -353,18 +353,18 @@ class _Audience extends StatelessWidget {
     return _Section(
       child: Column(
         children: [
-          const Text(
+          Text(
             'Kimlar uchun',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 28,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
               letterSpacing: -0.5,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
+          Text(
             'Har bir mutaxassis o‘z sohasiga mos ish joyini oladi.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 15.5, color: AppColors.textSecondary),
@@ -379,7 +379,7 @@ class _Audience extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(color: AppColors.border),
                   ),
@@ -390,7 +390,7 @@ class _Audience extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         label,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -427,7 +427,7 @@ class _CallToAction extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 26,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
                 color: Colors.white,
               ),
             ),
@@ -466,7 +466,7 @@ class _Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     return _Section(
       padding: const EdgeInsets.symmetric(vertical: 24),
-      color: const Color(0xFFF6F9FE),
+      color: AppColors.surfaceMuted,
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,
         crossAxisAlignment: WrapCrossAlignment.center,
@@ -475,9 +475,9 @@ class _Footer extends StatelessWidget {
         children: [
           Text(
             '© 2026 ${AppBrand.name} — ${AppBrand.tagline}',
-            style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+            style: TextStyle(fontSize: 13, color: AppColors.textMuted),
           ),
-          const Text(
+          Text(
             'individ.uz',
             style: TextStyle(fontSize: 13, color: AppColors.textMuted),
           ),

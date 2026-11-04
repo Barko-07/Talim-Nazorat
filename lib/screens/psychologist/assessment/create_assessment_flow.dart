@@ -107,7 +107,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
   Future<void> _saveAsDraft() async {
     if (_selectedStudent == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
             'Iltimos, avval baholash o‘tkaziladigan bolani tanlang.',
           ),
@@ -178,7 +178,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
   void _startAssessment() {
     if (_selectedStudent == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
             'Iltimos, avval baholash o‘tkaziladigan bolani tanlang.',
           ),
@@ -190,7 +190,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
 
     if (_selectedQuestions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Iltimos, kutubxonadan kamida 1 ta savol tanlang.'),
           backgroundColor: AppColors.warning,
         ),
@@ -262,7 +262,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Yangi Baholash Yaratish'),
-        bottom: const PreferredSize(
+        bottom: PreferredSize(
           preferredSize: Size.fromHeight(1.0),
           child: Divider(height: 1, thickness: 1, color: AppColors.border),
         ),
@@ -288,7 +288,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
           if (_currentStep == 0) {
             if (_selectedStudent == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text(
                     'Iltimos, baholash o‘tkaziladigan bolani tanlang.',
                   ),
@@ -305,7 +305,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
           } else if (_currentStep == 1) {
             if (_selectedQuestions.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text(
                     'Iltimos, kutubxonadan kamida 1 ta savol tanlang.',
                   ),
@@ -348,7 +348,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                   ),
                 FilledButton.icon(
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF0062CC),
+                    backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 12,
@@ -402,10 +402,10 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
       children: [
         const Text(
           '1-bosqich: Baholash o‘tkaziladigan o‘quvchi va umumiy ma’lumotlar',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           'Bolani tanlang va ushbu diagnostika seansiga mos sarlavhani belgilang',
           style: TextStyle(fontSize: 12, color: AppColors.textMuted),
         ),
@@ -449,16 +449,16 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF3FD),
+              color: AppColors.primaryLight,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: const Color(0xFF0062CC).withValues(alpha: 0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
               ),
             ),
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: const Color(0xFF0062CC),
+                  backgroundColor: AppColors.primary,
                   child: Text(
                     _selectedStudent!.firstName.isNotEmpty
                         ? _selectedStudent!.firstName[0]
@@ -474,20 +474,20 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                       Text(
                         _selectedStudent!.fullName,
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
                       ),
                       Text(
                         '${_selectedStudent!.grade} sinf • ${_selectedStudent!.age} yosh • Ehtiyoj: ${_selectedStudent!.primaryNeed}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
                         ),
                       ),
                       Text(
                         'Muassasa: ${_selectedStudent!.institutionName}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textMuted,
                         ),
@@ -561,14 +561,14 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
               children: [
                 const Text(
                   '2-bosqich: Savollar kutubxonasidan savollarni tanlang',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 Text(
                   'Tanlandi: ${_selectedQuestions.length} ta savol',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF0062CC),
-                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -580,22 +580,22 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEEF9EC),
+                  color: AppColors.successBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.auto_awesome,
                       size: 14,
-                      color: Color(0xFF12803A),
+                      color: AppColors.success,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${_selectedStudent!.grade} uchun tavsiya etilganlar belgilandi',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF12803A),
+                        color: AppColors.success,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -683,12 +683,12 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
 
               return Card(
                 elevation: 0,
-                color: isSelected ? const Color(0xFFEAF3FD) : Colors.white,
+                color: isSelected ? AppColors.primaryLight : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                   side: BorderSide(
                     color:
-                        isSelected ? const Color(0xFF0062CC) : AppColors.border,
+                        isSelected ? AppColors.primary : AppColors.border,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -702,7 +702,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                       children: [
                         Checkbox(
                           value: isSelected,
-                          activeColor: const Color(0xFF0062CC),
+                          activeColor: AppColors.primary,
                           onChanged: (_) => _toggleQuestion(q),
                         ),
                         const SizedBox(width: 6),
@@ -716,11 +716,11 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                     child: Text(
                                       q.questionTitle,
                                       style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                         fontSize: 13.5,
                                         color:
                                             isSelected
-                                                ? const Color(0xFF0062CC)
+                                                ? AppColors.primary
                                                 : AppColors.textPrimary,
                                       ),
                                     ),
@@ -732,15 +732,15 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                         vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFEEF9EC),
+                                        color: AppColors.successBg,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         'Tavsiya',
                                         style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF12803A),
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.success,
                                         ),
                                       ),
                                     ),
@@ -751,7 +751,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                 q.questionText,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondary,
                                 ),
@@ -761,17 +761,17 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                 children: [
                                   Text(
                                     q.domain,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      color: Color(0xFF64748B),
+                                      color: AppColors.textMuted,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     '• ${q.safeAgeRange}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      color: Color(0xFF64748B),
+                                      color: AppColors.textMuted,
                                     ),
                                   ),
                                   const Spacer(),
@@ -779,10 +779,10 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                     q.questionType == 'open_text'
                                         ? 'Sifat tahlili'
                                         : 'Maks: ${q.maxScore.toStringAsFixed(0)} b',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0062CC),
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primary,
                                     ),
                                   ),
                                 ],
@@ -808,10 +808,10 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
       children: [
         const Text(
           '3-bosqich: Tanlangan savollarni tekshirish va tartibini belgilash',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           'Savollar ketma-ketligini o‘zgartirishingiz yoki ortiqcha savollarni ro‘yxatdan chiqarishingiz mumkin',
           style: TextStyle(fontSize: 12, color: AppColors.textMuted),
         ),
@@ -821,7 +821,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: AppColors.surfaceMuted,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: AppColors.border),
           ),
@@ -848,11 +848,11 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
         ),
         const SizedBox(height: 16),
 
-        const Text(
+        Text(
           'Savollar ketma-ketligi (Tartibni almashtirish uchun suring):',
           style: TextStyle(
             fontSize: 13,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
@@ -871,7 +871,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
-                  side: const BorderSide(color: AppColors.border),
+                  side: BorderSide(color: AppColors.border),
                 ),
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
@@ -880,21 +880,21 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                     height: 32,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEAF3FD),
+                      color: AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       '${i + 1}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0062CC),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
                   title: Text(
                     q.questionTitle,
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
                   ),
@@ -931,15 +931,15 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
   Widget _buildMetricItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, size: 20, color: const Color(0xFF0062CC)),
+        Icon(icon, size: 20, color: AppColors.primary),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         ),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+          style: TextStyle(fontSize: 11, color: AppColors.textMuted),
         ),
       ],
     );

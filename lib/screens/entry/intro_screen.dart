@@ -53,13 +53,13 @@ class _IntroScreenState extends State<IntroScreen> {
       behavior: HitTestBehavior.opaque,
       onTap: _finish,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         body: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: RadialGradient(
               center: Alignment(0, -0.2),
               radius: 1.1,
-              colors: [Colors.white, AppColors.primaryLight],
+              colors: [AppColors.surface, AppColors.primaryLight],
             ),
           ),
           child: Center(
@@ -85,7 +85,7 @@ class _IntroScreenState extends State<IntroScreen> {
                 const SizedBox(height: 10),
                 Text(
                       AppBrand.tagline,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                         color: AppColors.textSecondary,

@@ -87,17 +87,17 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEAF3FD),
+                      color: AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.compare_arrows_rounded,
-                      color: Color(0xFF0062CC),
+                      color: AppColors.primary,
                       size: 22,
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -105,7 +105,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                           'Baholash Natijalarini Taqqoslash',
                           style: TextStyle(
                             fontSize: 17,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -133,7 +133,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.query_builder_rounded,
                           size: 48,
                           color: AppColors.textMuted,
@@ -143,13 +143,13 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                           'Taqqoslovchi boshqa yakunlangan baholash mavjud emas',
                           style: TextStyle(
                             fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           '${widget.currentAssessment.studentName} uchun kamida 2 ta yakunlangan baholash bo‘lishi lozim.',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textMuted,
                           ),
@@ -171,32 +171,32 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFEAF3FD),
+                                  color: AppColors.primaryLight,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'A-Baholash (Asosiy):',
                                       style: TextStyle(
                                         fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF0062CC),
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primary,
                                       ),
                                     ),
                                     Text(
                                       _assessmentA.title,
                                       style: const TextStyle(
                                         fontSize: 13,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
                                       '${df.format(_assessmentA.assessmentDate)} • ${_assessmentA.percentage.toStringAsFixed(0)}%',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 11,
                                         color: AppColors.textSecondary,
                                       ),
@@ -205,12 +205,12 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                                 ),
                               ),
                             ),
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Icon(
                                 Icons.swap_horiz_rounded,
                                 size: 28,
-                                color: Color(0xFF64748B),
+                                color: AppColors.textMuted,
                               ),
                             ),
                             Expanded(
@@ -284,7 +284,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceMuted,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
@@ -295,7 +295,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
             'A Natija',
             '${a.totalScore.toStringAsFixed(1)} / ${a.maxScore.toStringAsFixed(0)}',
             '${a.percentage.toStringAsFixed(0)}%',
-            const Color(0xFF0062CC),
+            AppColors.primary,
           ),
           Column(
             children: [
@@ -307,8 +307,8 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                 decoration: BoxDecoration(
                   color:
                       isPositive
-                          ? const Color(0xFFEEF9EC)
-                          : const Color(0xFFFEF2F2),
+                          ? AppColors.successBg
+                          : AppColors.errorBg,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -320,19 +320,19 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                       size: 16,
                       color:
                           isPositive
-                              ? const Color(0xFF12803A)
-                              : const Color(0xFFDC2626),
+                              ? AppColors.success
+                              : AppColors.error,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${isPositive ? "+" : ""}${diff.toStringAsFixed(1)}%',
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color:
                             isPositive
-                                ? const Color(0xFF12803A)
-                                : const Color(0xFFDC2626),
+                                ? AppColors.success
+                                : AppColors.error,
                       ),
                     ),
                   ],
@@ -341,8 +341,8 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
               const SizedBox(height: 4),
               Text(
                 isPositive ? 'Ijobiy o‘sish' : 'Pasayish / Regressiya',
-                style: const TextStyle(
-                  fontSize: 10.5,
+                style: TextStyle(
+                  fontSize: 11,
                   color: AppColors.textMuted,
                 ),
               ),
@@ -352,7 +352,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
             'B Natija',
             '${b.totalScore.toStringAsFixed(1)} / ${b.maxScore.toStringAsFixed(0)}',
             '${b.percentage.toStringAsFixed(0)}%',
-            const Color(0xFF00808A),
+            AppColors.info,
           ),
         ],
       ),
@@ -369,20 +369,20 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+          style: TextStyle(fontSize: 11, color: AppColors.textMuted),
         ),
         const SizedBox(height: 2),
         Text(
           percent,
           style: TextStyle(
             fontSize: 22,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w700,
             color: color,
           ),
         ),
         Text(
           points,
-          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
         ),
       ],
     );
@@ -401,18 +401,18 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Yo‘nalishlar bo‘yicha o‘zgarish dinamikasi:',
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -439,10 +439,10 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                       flex: 2,
                       child: Text(
                         'A: ${scoreA.toStringAsFixed(0)}%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0062CC),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -451,10 +451,10 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                       flex: 2,
                       child: Text(
                         'B: ${scoreB.toStringAsFixed(0)}%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF00808A),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.info,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -465,11 +465,11 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                         '${isPos ? "+" : ""}${diff.toStringAsFixed(0)}%',
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color:
                               isPos
-                                  ? const Color(0xFF12803A)
-                                  : const Color(0xFFDC2626),
+                                  ? AppColors.success
+                                  : AppColors.error,
                         ),
                         textAlign: TextAlign.end,
                       ),
@@ -488,11 +488,11 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Psixolog xulosalari taqqoslashi:',
           style: TextStyle(
             fontSize: 13,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
@@ -504,18 +504,18 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEAF3FD),
+                  color: AppColors.primaryLight,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'A-Baholash Xulosasi:',
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0062CC),
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -534,18 +534,18 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE8F7F6),
+                  color: AppColors.infoBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'B-Baholash Xulosasi:',
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF00808A),
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.info,
                       ),
                     ),
                     const SizedBox(height: 4),

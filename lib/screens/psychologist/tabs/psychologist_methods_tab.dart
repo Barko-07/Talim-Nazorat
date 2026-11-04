@@ -45,15 +45,15 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
   Color _getDomainColor(String domain) {
     switch (domain) {
       case 'Kognitiv va intellekt':
-        return const Color(0xFF003D88);
+        return AppColors.primaryDark;
       case 'Diqqat va ishchanlik':
-        return const Color(0xFF029C8C);
+        return AppColors.brandTeal;
       case 'Xotira jarayonlari':
-        return const Color(0xFF7C3AED);
+        return AppColors.purple;
       case 'Emotsional va xavotir':
-        return const Color(0xFFD97706);
+        return AppColors.warning;
       case 'Shaxsiyat va moslashuv':
-        return const Color(0xFF12803A);
+        return AppColors.success;
       default:
         return AppColors.primary;
     }
@@ -86,7 +86,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
         }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.surfaceMuted,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -96,7 +96,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
                 boxShadow: [
@@ -116,7 +116,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                       color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.menu_book_rounded,
                       color: AppColors.primary,
                       size: 28,
@@ -127,11 +127,11 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Psixologik metodikalar va vositalar to‘plami',
                           style: TextStyle(
                             fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -153,25 +153,25 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEAF3FD),
+                      color: AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFBFDBFE)),
+                      border: Border.all(color: AppColors.primaryTint),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.verified_outlined,
                           size: 16,
-                          color: Color(0xFF003D88),
+                          color: AppColors.primaryDark,
                         ),
                         const SizedBox(width: 6),
                         Text(
                           '${allMethods.length} ta tasdiqlangan metodika',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF003D88),
+                            color: AppColors.primaryDark,
                           ),
                         ),
                       ],
@@ -186,7 +186,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
               ),
@@ -204,7 +204,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                     decoration: InputDecoration(
                       hintText:
                           'Metodika nomi, kodi (RAVEN, LANDOLT...), muallifi bo‘yicha qidiring...',
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.search,
                         color: AppColors.textSecondary,
                       ),
@@ -221,18 +221,18 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                               )
                               : null,
                       filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
+                      fillColor: AppColors.surfaceMuted,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.border),
+                        borderSide: BorderSide(color: AppColors.border),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.border),
+                        borderSide: BorderSide(color: AppColors.border),
                       ),
                     ),
                   ),
@@ -260,12 +260,12 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                 selectedColor: AppColors.primary.withOpacity(
                                   0.12,
                                 ),
-                                backgroundColor: const Color(0xFFF1F5F9),
+                                backgroundColor: AppColors.surfaceMuted,
                                 labelStyle: TextStyle(
                                   fontSize: 12,
                                   fontWeight:
                                       isSelected
-                                          ? FontWeight.bold
+                                          ? FontWeight.w600
                                           : FontWeight.normal,
                                   color:
                                       isSelected
@@ -294,19 +294,19 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(40),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Column(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.search_off_rounded,
                       size: 54,
                       color: AppColors.textSecondary,
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Bunday parametr bo‘yicha metodika topilmadi',
                       style: TextStyle(
                         fontSize: 15,
@@ -315,7 +315,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
+                    Text(
                       'Qidiruv so‘zini o‘zgartiring yoki filtrlarni tozalang.',
                       style: TextStyle(
                         fontSize: 13,
@@ -378,7 +378,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
         boxShadow: [
@@ -406,7 +406,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                   m.code,
                   style: TextStyle(
                     fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: domainColor,
                   ),
                 ),
@@ -415,7 +415,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: AppColors.surfaceMuted,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
@@ -425,7 +425,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                     const SizedBox(width: 4),
                     Text(
                       m.domain,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColors.textSecondary,
                       ),
@@ -437,7 +437,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.timer_outlined,
                     size: 14,
                     color: AppColors.textSecondary,
@@ -445,7 +445,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                   const SizedBox(width: 4),
                   Text(
                     '~${m.durationMinutes} daq',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary,
                     ),
@@ -459,9 +459,9 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           // Nomi va muallifi
           Text(
             m.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
               height: 1.3,
             ),
@@ -469,7 +469,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.person_pin_outlined,
                 size: 14,
                 color: AppColors.textSecondary,
@@ -477,13 +477,13 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
               const SizedBox(width: 4),
               Text(
                 'Muallif: ${m.author}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
                 ),
               ),
               const SizedBox(width: 12),
-              const Icon(
+              Icon(
                 Icons.cake_outlined,
                 size: 14,
                 color: AppColors.textSecondary,
@@ -491,7 +491,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
               const SizedBox(width: 4),
               Text(
                 m.targetAge,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
                 ),
@@ -505,9 +505,9 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
             m.purpose,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: Color(0xFF475569),
+              color: AppColors.textSecondary,
               height: 1.4,
             ),
           ),
@@ -516,28 +516,28 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFFBEB),
+                color: AppColors.warningBg,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: const Color(0xFFD97706).withValues(alpha: 0.4),
+                  color: AppColors.warning.withValues(alpha: 0.4),
                 ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.warning_amber_rounded,
                     size: 15,
-                    color: Color(0xFFD97706),
+                    color: AppColors.warning,
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       '⚠ Litsenziyalangan test: ${m.licenseNote ?? "Rasmiy litsenziyalangan qo‘llanma asosida talqin qilinadi."}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFFB45309),
+                        color: AppColors.warning,
                         height: 1.3,
                       ),
                     ),
@@ -552,9 +552,9 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: AppColors.surfaceMuted,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: AppColors.border),
             ),
             child: Row(
               children: [
@@ -562,16 +562,16 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                 const SizedBox(width: 6),
                 Text(
                   '${m.subscales.length} ta parametr / shkala',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF334155),
+                    color: AppColors.textSecondary,
                   ),
                 ),
                 const Spacer(),
                 Text(
                   'Maksimal ball: ${m.maxScore.toInt()}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColors.textSecondary,
                   ),
@@ -679,7 +679,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                   m.code,
                                   style: TextStyle(
                                     fontSize: 11,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w600,
                                     color: domainColor,
                                   ),
                                 ),
@@ -687,7 +687,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                               const SizedBox(width: 8),
                               Text(
                                 m.domain,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondary,
                                 ),
@@ -697,15 +697,15 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           const SizedBox(height: 4),
                           Text(
                             m.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                             ),
                           ),
                           Text(
                             'Muallif: ${m.author} • Yosh guruhi: ${m.targetAge} • Vaqt: ~${m.durationMinutes} daqiqa',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
                             ),
@@ -736,16 +736,16 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
+                            color: AppColors.surfaceMuted,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Text(
                             m.purpose,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               height: 1.5,
-                              color: Color(0xFF334155),
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ),
@@ -760,16 +760,16 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
+                            color: AppColors.surfaceMuted,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Text(
                             m.instructions,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               height: 1.5,
-                              color: Color(0xFF334155),
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ),
@@ -784,9 +784,9 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
+                            color: AppColors.surfaceMuted,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -803,15 +803,15 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                         const Icon(
                                           Icons.check_circle_outline,
                                           size: 16,
-                                          color: Color(0xFF029C8C),
+                                          color: AppColors.brandTeal,
                                         ),
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
                                             s,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 13,
-                                              color: Color(0xFF1A2A4D),
+                                              color: AppColors.textPrimary,
                                             ),
                                           ),
                                         ),
@@ -832,19 +832,19 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
+                            color: AppColors.surfaceMuted,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 m.scoringGuide,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
                                   height: 1.5,
-                                  color: Color(0xFF334155),
+                                  color: AppColors.textSecondary,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -854,15 +854,15 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFEAF3FD),
+                                  color: AppColors.primaryLight,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
                                   'Maksimal natija: ${m.maxScore.toInt()} ball',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF003D88),
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryDark,
                                   ),
                                 ),
                               ),
@@ -880,16 +880,16 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFEF3C7).withOpacity(0.3),
+                            color: AppColors.warningBg.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFFFCD34D)),
+                            border: Border.all(color: AppColors.warningBorder),
                           ),
                           child: Text(
                             m.normCriteria,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               height: 1.6,
-                              color: Color(0xFF78350F),
+                              color: AppColors.warning,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -900,10 +900,10 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
+                            color: AppColors.surfaceMuted,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
                               Icon(
                                 Icons.shield_outlined,
@@ -969,9 +969,9 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           const SizedBox(width: 6),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),

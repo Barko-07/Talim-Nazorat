@@ -49,7 +49,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
 
     if (students.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Yo‘naltirish uchun o‘quvchilar mavjud emas.'),
           backgroundColor: AppColors.warning,
         ),
@@ -209,7 +209,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                         if (toService == null ||
                             reasonCtrl.text.trim().isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
                                 'Qabul qiluvchi mutaxassis va yo‘naltirish sababini tanlang yoki kiriting.',
                               ),
@@ -245,7 +245,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                         if (ctx.mounted) {
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
                                 'Yo‘naltirish muvaffaqiyatli jo‘natildi!',
                               ),
@@ -295,7 +295,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                     const SizedBox(height: 4),
                     Text(
                       'Sabab: ${referral.reason}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12.5,
                         color: AppColors.textSecondary,
                       ),
@@ -335,7 +335,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                 onPressed: () async {
                   if (outcomeCtrl.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
                           'Iltimos, tekshiruv xulosasini kiriting!',
                         ),
@@ -359,7 +359,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                   if (ctx.mounted) {
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
                           'Yo‘naltirish muvaffaqiyatli yakunlandi!',
                         ),
@@ -430,7 +430,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                           horizontal: 30,
                           vertical: 36,
                         ),
-                        child: const Column(
+                        child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
@@ -443,7 +443,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                               'Ushbu holatda yo‘naltirishlar mavjud emas',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w700,
                                 fontSize: 15.5,
                                 color: AppColors.textPrimary,
                               ),
@@ -517,7 +517,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                     ),
                                     Text(
                                       df.format(ref.createdAt),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
                                         color: AppColors.textMuted,
                                         fontWeight: FontWeight.w500,
@@ -532,8 +532,8 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                               const SizedBox(height: 10),
                               Text(
                                 ref.toSpecialistType,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
                                   fontSize: 15.5,
                                   color: AppColors.textPrimary,
                                   letterSpacing: -0.25,
@@ -549,16 +549,16 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                   children: [
                                     Text(
                                       'O‘quvchi: ${ref.studentName}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 13.5,
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w700,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
                                       'Sababi: ${ref.reason}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 13,
                                         color: AppColors.textSecondary,
                                         height: 1.45,
@@ -571,7 +571,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                       const SizedBox(height: 6),
                                       Text(
                                         'Kuzatuvlar: ${ref.supportingObservations}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 12.5,
                                           color: AppColors.textMuted,
                                           height: 1.4,
@@ -582,7 +582,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                       const SizedBox(height: 8),
                                       Text(
                                         'Bog‘langan baholash ID: ${ref.sourceAssessmentId}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11.5,
                                           color: AppColors.textMuted,
                                         ),
@@ -594,7 +594,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                               const SizedBox(height: 10),
                               Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     LucideIcons.userCheck,
                                     size: 14.5,
                                     color: AppColors.textMuted,
@@ -605,7 +605,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                       'Yuborgan: ${ref.fromSpecialistName} (${ref.fromSpecialistRole ?? 'Mutaxassis'})',
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
                                         color: AppColors.textMuted,
                                         fontWeight: FontWeight.w500,
@@ -624,7 +624,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                   borderColor: AppColors.successBorder,
                                   child: Text(
                                     'Yakuniy xulosa: ${ref.outcomeNotes}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12.5,
                                       color: AppColors.success,
                                       fontWeight: FontWeight.w700,

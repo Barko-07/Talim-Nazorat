@@ -504,24 +504,19 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF003D88), Color(0xFF0A4DA2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppColors.brandGradient,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF003D88).withValues(alpha: 0.25),
+            color: AppColors.primaryDark.withValues(alpha: 0.25),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final icon = Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.15),
@@ -531,106 +526,95 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
             child: const Icon(
               Icons.account_balance_rounded,
               color: Colors.white,
-              size: 34,
+              size: 30,
             ),
-          ),
-          const SizedBox(width: 18),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          );
+          final status = Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3DBE37).withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: const Color(0xFF3DBE37).withValues(alpha: 0.4),
-                    ),
-                  ),
-                  child: Text(
-                    badgeText,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
+                CircleAvatar(radius: 4, backgroundColor: AppColors.brandGreen),
+                SizedBox(width: 6),
                 Text(
-                  titleText,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitleText,
+                  'Tizim faol',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.88),
+                    color: Colors.white,
                     fontSize: 12,
-                    height: 1.35,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          );
+          final texts = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
+              Text(
+                badgeText,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.85),
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.4,
                 ),
-                decoration: BoxDecoration(
+              ),
+              const SizedBox(height: 8),
+              Text(
+                titleText,
+                style: const TextStyle(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF3DBE37),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    const Text(
-                      'Tizim faol: Oflayn DB',
-                      style: TextStyle(
-                        color: Color(0xFF0A1A3F),
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  height: 1.25,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
+                subtitleText,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontSize: 13.5,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
                 'Mas’ul: ${user?.fullName ?? 'Administrator'}',
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.85),
-                  fontSize: 11,
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ],
-          ),
-        ],
+          );
+          if (constraints.maxWidth < 640) {
+            // Telefon: belgi va holat tepada, matn butun kenglikda
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [icon, const Spacer(), status]),
+                const SizedBox(height: 16),
+                texts,
+              ],
+            );
+          }
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              icon,
+              const SizedBox(width: 18),
+              Expanded(child: texts),
+              const SizedBox(width: 16),
+              status,
+            ],
+          );
+        },
       ),
     );
   }
@@ -648,7 +632,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -660,13 +644,13 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               children: [
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.filter_list_rounded,
                       color: AppColors.primary,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
-                    const Text(
+                    Text(
                       'Global Boshqaruv Filtrlari',
                       style: TextStyle(
                         fontSize: 14.5,
@@ -687,9 +671,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         ),
                         child: Text(
                           '$activeFiltersCount ta filtr faol',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.primary,
                           ),
                         ),
@@ -1022,8 +1006,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               value: '$totalChildren nafar',
               subtitle: 'Filtr bo‘yicha hisoblangan ATEB o‘quvchilar',
               icon: Icons.groups_rounded,
-              color: const Color(0xFF0052CC),
-              bgColor: const Color(0xFFEAF3FD),
+              color: AppColors.primary,
+              bgColor: AppColors.primaryLight,
               onTap: () => widget.onNavigateTab(3), // O'quvchilar tabi
             ),
 
@@ -1033,8 +1017,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               value: '$activeSpecialistsCount nafar',
               subtitle: 'Psixolog, logoped, defektolog va o‘qituvchilar',
               icon: Icons.psychology_rounded,
-              color: const Color(0xFF7C3AED),
-              bgColor: const Color(0xFFF5F3FF),
+              color: AppColors.purple,
+              bgColor: AppColors.purpleBg,
               onTap: () => widget.onNavigateTab(2), // Mutaxassislar tabi
             ),
 
@@ -1045,8 +1029,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               subtitle:
                   'Zudlik bilan mutaxassis biriktirish va faoliyat talab etiladi',
               icon: Icons.warning_rounded,
-              color: const Color(0xFFDC2626),
-              bgColor: const Color(0xFFFEF2F2),
+              color: AppColors.error,
+              bgColor: AppColors.errorBg,
               onTap: () => widget.onNavigateTab(8), // Monitoring tabi
             ),
 
@@ -1057,8 +1041,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               subtitle:
                   'Boshlang‘ich diagnostika o‘tkazilmagan yoki qoralamalar',
               icon: Icons.assignment_late_outlined,
-              color: const Color(0xFFD97706),
-              bgColor: const Color(0xFFFFFBEB),
+              color: AppColors.warning,
+              bgColor: AppColors.warningBg,
               onTap: () => widget.onNavigateTab(8), // Monitoring tabi
             ),
 
@@ -1069,8 +1053,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               subtitle:
                   'Tasdiqlangan individual ta’lim va rivojlanish rejalari',
               icon: Icons.menu_book_rounded,
-              color: const Color(0xFF12803A),
-              bgColor: const Color(0xFFEEF9EC),
+              color: AppColors.success,
+              bgColor: AppColors.successBg,
               onTap: () => widget.onNavigateTab(7), // Hisobotlar tabi
             ),
 
@@ -1081,8 +1065,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               subtitle:
                   'Mutaxassislar ko‘rib chiqishi kutilayotgan yo‘llanmalar',
               icon: Icons.alt_route_rounded,
-              color: const Color(0xFF00808A),
-              bgColor: const Color(0xFFE8F7F6),
+              color: AppColors.info,
+              bgColor: AppColors.infoBg,
               onTap: () => widget.onNavigateTab(11), // Yo'naltirishlar tabi
             ),
           ],
@@ -1102,7 +1086,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -1114,34 +1098,34 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               runSpacing: 6,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Svetofor statusi:',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     fontSize: 13,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 _buildBadge(
                   label: '🔴 Qizil (Ishlanmagan): $redCount',
-                  color: const Color(0xFFDC2626),
-                  bgColor: const Color(0xFFFEE2E2),
+                  color: AppColors.error,
+                  bgColor: AppColors.errorBg,
                 ),
                 _buildBadge(
                   label: '🟡 Sariq (E’tibor talab): $yellowCount',
-                  color: const Color(0xFFD97706),
-                  bgColor: const Color(0xFFFEF3C7),
+                  color: AppColors.warning,
+                  bgColor: AppColors.warningBg,
                 ),
                 _buildBadge(
                   label: '🟢 Yashil (Faol / Ijobiy): $greenCount',
-                  color: const Color(0xFF12803A),
-                  bgColor: const Color(0xFFE4F6E1),
+                  color: AppColors.success,
+                  bgColor: AppColors.successBg,
                 ),
                 if (unassignedCount > 0)
                   _buildBadge(
                     label: '⚠ Mutaxassis biriktirilmagan: $unassignedCount',
-                    color: const Color(0xFF7C3AED),
-                    bgColor: const Color(0xFFF5F3FF),
+                    color: AppColors.purple,
+                    bgColor: AppColors.purpleBg,
                   ),
               ],
             ),
@@ -1151,7 +1135,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 onPressed: () => widget.onNavigateTab(3),
                 child: const Text(
                   'Barcha o‘quvchilar →',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -1176,7 +1160,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1192,12 +1176,12 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFDC2626).withValues(alpha: 0.1),
+                          color: AppColors.error.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.error_outline_rounded,
-                          color: Color(0xFFDC2626),
+                          color: AppColors.error,
                           size: 22,
                         ),
                       ),
@@ -1208,14 +1192,14 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                           children: [
                             Row(
                               children: [
-                                const Flexible(
+                                Flexible(
                                   child: Text(
                                     'E’tibor Talab Etiladigan O‘quvchilar va Kechikkan Amallar',
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 15,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: AppColors.textPrimary,
                                     ),
                                   ),
@@ -1227,7 +1211,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFDC2626),
+                                    color: AppColors.error,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
@@ -1235,14 +1219,14 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 11,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 2),
-                            const Text(
+                            Text(
                               'Faoliyat kiritilmagan, 30 kundan ortiq kechikkan yoki testlari to‘liq bo‘lmagan bolalar',
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -1270,7 +1254,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                           : 'Barchasini ko‘rish (${attentionCases.length})',
                       style: const TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -1282,18 +1266,18 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 padding: const EdgeInsets.all(24),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEEF9EC),
+                  color: AppColors.successBg,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: const Color(0xFF3DBE37).withValues(alpha: 0.2),
+                    color: AppColors.brandGreen.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(
                       Icons.check_circle_rounded,
-                      color: Color(0xFF3DBE37),
+                      color: AppColors.brandGreen,
                       size: 24,
                     ),
                     SizedBox(width: 10),
@@ -1302,7 +1286,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF0E6630),
+                        color: AppColors.success,
                       ),
                     ),
                   ],
@@ -1321,15 +1305,12 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   return Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color:
-                          isRed
-                              ? const Color(0xFFFEF2F2)
-                              : const Color(0xFFFFFBEB),
+                      color: isRed ? AppColors.errorBg : AppColors.warningBg,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color:
                             isRed
-                                ? const Color(0xFFDC2626).withValues(alpha: 0.2)
+                                ? AppColors.error.withValues(alpha: 0.2)
                                 : const Color(
                                   0xFFD97706,
                                 ).withValues(alpha: 0.2),
@@ -1341,17 +1322,12 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         CircleAvatar(
                           radius: 18,
                           backgroundColor:
-                              isRed
-                                  ? const Color(0xFFFEE2E2)
-                                  : const Color(0xFFFEF3C7),
+                              isRed ? AppColors.errorBg : AppColors.warningBg,
                           child: Icon(
                             isRed
                                 ? Icons.priority_high_rounded
                                 : Icons.schedule_rounded,
-                            color:
-                                isRed
-                                    ? const Color(0xFFDC2626)
-                                    : const Color(0xFFD97706),
+                            color: isRed ? AppColors.error : AppColors.warning,
                             size: 18,
                           ),
                         ),
@@ -1367,8 +1343,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                 children: [
                                   Text(
                                     item.student.fullName,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 14,
                                       color: AppColors.textPrimary,
                                     ),
@@ -1379,7 +1355,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                       vertical: 1.5,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: AppColors.surface,
                                       borderRadius: BorderRadius.circular(4),
                                       border: Border.all(
                                         color: AppColors.border,
@@ -1387,8 +1363,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                     ),
                                     child: Text(
                                       '${item.student.grade} • ${item.student.institutionName}',
-                                      style: const TextStyle(
-                                        fontSize: 10.5,
+                                      style: TextStyle(
+                                        fontSize: 11,
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
@@ -1397,8 +1373,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                     label: item.delayLabel,
                                     color:
                                         isRed
-                                            ? const Color(0xFFDC2626)
-                                            : const Color(0xFFD97706),
+                                            ? AppColors.error
+                                            : AppColors.warning,
                                     bgColor: Colors.white,
                                   ),
                                 ],
@@ -1407,7 +1383,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Yetishmayotgan faoliyat: ',
                                     style: TextStyle(
                                       fontSize: 11.5,
@@ -1420,11 +1396,11 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                       item.missingActivity,
                                       style: TextStyle(
                                         fontSize: 11.5,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                         color:
                                             isRed
-                                                ? const Color(0xFF991B1B)
-                                                : const Color(0xFF92400E),
+                                                ? AppColors.error
+                                                : AppColors.warning,
                                       ),
                                     ),
                                   ),
@@ -1433,7 +1409,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                               const SizedBox(height: 4),
                               Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.person_pin_outlined,
                                     size: 14,
                                     color: AppColors.textMuted,
@@ -1444,7 +1420,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                       'Mas’ul mutaxassis: ${item.specialistName}',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 11,
                                         color: AppColors.textSecondary,
                                       ),
@@ -1460,9 +1436,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor:
-                                isRed
-                                    ? const Color(0xFFDC2626)
-                                    : const Color(0xFFD97706),
+                                isRed ? AppColors.error : AppColors.warning,
                             elevation: 0,
                             side: BorderSide(
                               color:
@@ -1501,7 +1475,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                             'Bolani ochish',
                             style: TextStyle(
                               fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -1529,7 +1503,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1538,18 +1512,14 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
           children: [
             Row(
               children: [
-                const Icon(
-                  Icons.shield_outlined,
-                  color: AppColors.primary,
-                  size: 22,
-                ),
+                Icon(Icons.shield_outlined, color: AppColors.primary, size: 22),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Avtomatlashtirilgan Monitoring Markazi',
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -1558,7 +1528,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   onPressed: () => widget.onNavigateTab(8), // Monitoring tabi
                   child: const Text(
                     'To‘liq monitoring paneli →',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -1586,8 +1556,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       value: '$regressionCount nafar',
                       description:
                           'Oldingi davrga nisbatan orqaga ketish qayd etilgan',
-                      color: const Color(0xFFDC2626),
-                      bgColor: const Color(0xFFFEF2F2),
+                      color: AppColors.error,
+                      bgColor: AppColors.errorBg,
                       icon: Icons.trending_down_rounded,
                       onTap: () => widget.onNavigateTab(8),
                     ),
@@ -1596,8 +1566,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       value: '$stagnantCount nafar',
                       description:
                           'Kamida 30 kun davomida ko‘rsatkichlar o‘zgarmagan',
-                      color: const Color(0xFFD97706),
-                      bgColor: const Color(0xFFFFFBEB),
+                      color: AppColors.warning,
+                      bgColor: AppColors.warningBg,
                       icon: Icons.pause_circle_outline_rounded,
                       onTap: () => widget.onNavigateTab(8),
                     ),
@@ -1606,8 +1576,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       value: '$missingAssessmentsCount nafar',
                       description:
                           'Boshlang‘ich yoki diagnostik test topshirmagan',
-                      color: const Color(0xFF7C3AED),
-                      bgColor: const Color(0xFFF5F3FF),
+                      color: AppColors.purple,
+                      bgColor: AppColors.purpleBg,
                       icon: Icons.help_outline_rounded,
                       onTap: () => widget.onNavigateTab(8),
                     ),
@@ -1616,8 +1586,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       value: '$overdue30DaysActivitiesCount nafar',
                       description:
                           'Oxirgi 30 kunda birorta ham mashg‘ulot o‘tkazilmagan',
-                      color: const Color(0xFFB91C1C),
-                      bgColor: const Color(0xFFFEE2E2),
+                      color: AppColors.error,
+                      bgColor: AppColors.errorBg,
                       icon: Icons.history_toggle_off_rounded,
                       onTap: () => widget.onNavigateTab(8),
                     ),
@@ -1626,8 +1596,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       value: '$incompleteIepObjectivesCount ta',
                       description:
                           'Belgilangan muddatda erishilmagan reja maqsadlari',
-                      color: const Color(0xFF00808A),
-                      bgColor: const Color(0xFFE8F7F6),
+                      color: AppColors.info,
+                      bgColor: AppColors.infoBg,
                       icon: Icons.assignment_turned_in_outlined,
                       onTap: () => widget.onNavigateTab(7),
                     ),
@@ -1636,8 +1606,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       value: '$pendingReferralsCount ta',
                       description:
                           'Mutaxassis tomonidan javob berilmagan yo‘llanmalar',
-                      color: const Color(0xFF029C8C),
-                      bgColor: const Color(0xFFF0FDFA),
+                      color: AppColors.brandTeal,
+                      bgColor: AppColors.infoBg,
                       icon: Icons.alt_route_rounded,
                       onTap: () => widget.onNavigateTab(11),
                     ),
@@ -1669,7 +1639,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1678,20 +1648,20 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.analytics_outlined,
                   color: AppColors.primary,
                   size: 22,
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Rivojlanish Yo‘nalishlari Tahlili va Tarixiy Qiyoslash',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -1700,7 +1670,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   onPressed: () => widget.onNavigateTab(7), // Hisobotlar
                   child: const Text(
                     'Batafsil tahlil →',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -1711,7 +1681,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: AppColors.surfaceMuted,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: AppColors.border),
               ),
@@ -1722,20 +1692,20 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                     spacing: 14,
                     runSpacing: 4,
                     children: [
-                      const Text(
+                      Text(
                         'Davrlararo Rivojlanish Dinamikasi (Oxirgi 30 kun oldingi davr bilan solishtirilganda):',
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
                       Text(
                         'Ijobiy o‘sish: $growthPercent%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF12803A),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.success,
                         ),
                       ),
                     ],
@@ -1749,22 +1719,16 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                           flex: (growthCount * 10).clamp(1, 100),
                           child: Container(
                             height: 8,
-                            color: const Color(0xFF3DBE37),
+                            color: AppColors.brandGreen,
                           ),
                         ),
                         Expanded(
                           flex: (stableCount * 10).clamp(1, 100),
-                          child: Container(
-                            height: 8,
-                            color: const Color(0xFFF59E0B),
-                          ),
+                          child: Container(height: 8, color: AppColors.warning),
                         ),
                         Expanded(
                           flex: (declineCount * 10).clamp(1, 100),
-                          child: Container(
-                            height: 8,
-                            color: const Color(0xFFEF4444),
-                          ),
+                          child: Container(height: 8, color: AppColors.error),
                         ),
                       ],
                     ),
@@ -1776,21 +1740,21 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                     children: [
                       Text(
                         '🟢 O‘sish: $growthCount ta ko‘rsatkich',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textMuted,
                         ),
                       ),
                       Text(
                         '🟡 Barqaror: $stableCount ta ko‘rsatkich',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textMuted,
                         ),
                       ),
                       Text(
                         '🔴 Pasayish: $declineCount ta ko‘rsatkich',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textMuted,
                         ),
@@ -1826,14 +1790,14 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       sub:
                           '$speechAssessmentsCount ta nutq tekshiruvi o‘tkazilgan',
                       icon: Icons.record_voice_over_outlined,
-                      color: const Color(0xFF00808A),
+                      color: AppColors.info,
                     ),
                     _buildDomainCard(
                       title: 'Kognitiv va Intellekt',
                       metric: '$cognitiveAssessmentsCount ta kognitiv test',
                       sub: 'Fikrlash, idrok va analiz ko‘nikmalari',
                       icon: Icons.lightbulb_outline_rounded,
-                      color: const Color(0xFF7C3AED),
+                      color: AppColors.purple,
                     ),
                     _buildDomainCard(
                       title: 'Diqqat va Xotira',
@@ -1841,28 +1805,28 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                           '$attentionMeasurementsCount ta qayd etilgan o‘lchov',
                       sub: 'Diqqat barqarorligi va so‘z eslab qolish',
                       icon: Icons.psychology_alt_outlined,
-                      color: const Color(0xFF029C8C),
+                      color: AppColors.brandTeal,
                     ),
                     _buildDomainCard(
                       title: 'Ijtimoiy-Hissiy Moslashuv',
                       metric: '$socialMeasurementsCount ta ijtimoiy ko‘nikma',
                       sub: 'Tengdoshlar muloqoti va ijtimoiy faollik',
                       icon: Icons.diversity_3_outlined,
-                      color: const Color(0xFF12803A),
+                      color: AppColors.success,
                     ),
                     _buildDomainCard(
                       title: 'O‘quv va DTS Standartlari',
                       metric: '$educationalTasksCount ta bajarilgan topshiriq',
                       sub: 'Matematika va Ona tili individual darajalari',
                       icon: Icons.auto_stories_outlined,
-                      color: const Color(0xFFD97706),
+                      color: AppColors.warning,
                     ),
                     _buildDomainCard(
                       title: 'Psixologik Kuzatuvlar',
                       metric: '$observationsCount ta kuzatuv jurnali qaydi',
                       sub: 'Emotsional holat, xavotir va xulq-atvor',
                       icon: Icons.visibility_outlined,
-                      color: const Color(0xFF475569),
+                      color: AppColors.textSecondary,
                     ),
                   ],
                 );
@@ -1885,7 +1849,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1896,7 +1860,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               builder: (context, constraints) {
                 final heading = Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.badge_outlined,
                       color: AppColors.primary,
                       size: 22,
@@ -1910,13 +1874,13 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                             crossAxisAlignment: WrapCrossAlignment.center,
                             spacing: 8,
                             children: [
-                              const Text(
+                              Text(
                                 'Pedagog-Mutaxassislar Ish Yuklamasi va Faolligi',
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 15,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
@@ -1931,9 +1895,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                 ),
                                 child: Text(
                                   '${filteredSpecialists.length} nafar',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 11,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w600,
                                     color: AppColors.primary,
                                   ),
                                 ),
@@ -1941,7 +1905,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                             ],
                           ),
                           const SizedBox(height: 2),
-                          const Text(
+                          Text(
                             'Biriktirilgan bolalar, o‘tkazilgan mashg‘ulotlar, ochiq yo‘llanmalar va qamrov ko‘rsatkichi',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -1959,7 +1923,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   onPressed: () => widget.onNavigateTab(2),
                   child: const Text(
                     'Barcha mutaxassislar →',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                 );
                 if (constraints.maxWidth < 720) {
@@ -1989,7 +1953,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
                   headingRowColor: WidgetStateProperty.all(
-                    const Color(0xFFF8FAFC),
+                    AppColors.surfaceMuted,
                   ),
                   dataRowMinHeight: 48,
                   dataRowMaxHeight: 56,
@@ -1998,7 +1962,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       label: Text(
                         'Mutaxassis F.I.Sh.',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
                       ),
@@ -2007,7 +1971,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       label: Text(
                         'Lavozimi / Ixtisosligi',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
                       ),
@@ -2016,7 +1980,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       label: Text(
                         'Muassasasi',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
                       ),
@@ -2025,7 +1989,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       label: Text(
                         'Biriktirilgan',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
                       ),
@@ -2034,7 +1998,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       label: Text(
                         'Bajarilgan ishlar',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
                       ),
@@ -2043,7 +2007,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       label: Text(
                         'Kutilayotgan',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
                       ),
@@ -2052,7 +2016,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       label: Text(
                         'Qamrov %',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
                       ),
@@ -2061,7 +2025,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       label: Text(
                         'Holati',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
                       ),
@@ -2141,9 +2105,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                       sp.fullName.isNotEmpty
                                           ? sp.fullName.substring(0, 1)
                                           : 'M',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 11,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                         color: AppColors.primary,
                                       ),
                                     ),
@@ -2168,7 +2132,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                             DataCell(
                               Text(
                                 sp.institutionName ?? 'Muassasa ko‘rsatilmagan',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11.5,
                                   color: AppColors.textSecondary,
                                 ),
@@ -2177,8 +2141,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                             DataCell(
                               Text(
                                 '$assignedCount nafar',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                   color: AppColors.primary,
                                 ),
@@ -2187,10 +2151,10 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                             DataCell(
                               Text(
                                 '$totalCompleted ta',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 12,
-                                  color: Color(0xFF12803A),
+                                  color: AppColors.success,
                                 ),
                               ),
                             ),
@@ -2198,11 +2162,11 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                               Text(
                                 '$pendingReferrals ta yo‘llanma',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                   color:
                                       pendingReferrals > 0
-                                          ? const Color(0xFFD97706)
+                                          ? AppColors.warning
                                           : AppColors.textMuted,
                                 ),
                               ),
@@ -2216,14 +2180,14 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                     child: Text(
                                       '$coveragePercent%',
                                       style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                         fontSize: 12,
                                         color:
                                             coveragePercent >= 80
-                                                ? const Color(0xFF12803A)
+                                                ? AppColors.success
                                                 : coveragePercent >= 50
-                                                ? const Color(0xFFD97706)
-                                                : const Color(0xFFDC2626),
+                                                ? AppColors.warning
+                                                : AppColors.error,
                                       ),
                                     ),
                                   ),
@@ -2238,10 +2202,10 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                         backgroundColor: AppColors.border,
                                         valueColor: AlwaysStoppedAnimation(
                                           coveragePercent >= 80
-                                              ? const Color(0xFF12803A)
+                                              ? AppColors.success
                                               : coveragePercent >= 50
-                                              ? const Color(0xFFD97706)
-                                              : const Color(0xFFDC2626),
+                                              ? AppColors.warning
+                                              : AppColors.error,
                                         ),
                                       ),
                                     ),
@@ -2254,12 +2218,12 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                 label: sp.isActive ? 'Faol' : 'Nofaol',
                                 color:
                                     sp.isActive
-                                        ? const Color(0xFF12803A)
-                                        : const Color(0xFFDC2626),
+                                        ? AppColors.success
+                                        : AppColors.error,
                                 bgColor:
                                     sp.isActive
-                                        ? const Color(0xFFEEF9EC)
-                                        : const Color(0xFFFEF2F2),
+                                        ? AppColors.successBg
+                                        : AppColors.errorBg,
                               ),
                             ),
                           ],
@@ -2279,14 +2243,14 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
                 Icon(Icons.tune_rounded, color: AppColors.primary, size: 22),
                 SizedBox(width: 10),
@@ -2294,7 +2258,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   'Tizim Boshqaruvi va Ma’muriy Funksiyalar',
                   style: TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -2322,56 +2286,56 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       title: 'Ta’lim Muassasalari',
                       desc: 'Maktab, internat va markazlar',
                       icon: Icons.apartment_rounded,
-                      color: const Color(0xFF0F766E),
+                      color: AppColors.info,
                       onTap: () => widget.onNavigateTab(4),
                     ),
                     _buildManagementTile(
                       title: 'Foydalanuvchilar',
                       desc: 'Hisoblar, qabul va faollashtirish',
                       icon: Icons.manage_accounts_rounded,
-                      color: const Color(0xFF0052CC),
+                      color: AppColors.primary,
                       onTap: () => widget.onNavigateTab(1),
                     ),
                     _buildManagementTile(
                       title: 'Rollar va Ruxsatlar',
                       desc: '8 ta rol matritsasi va huquqlar',
                       icon: Icons.security_rounded,
-                      color: const Color(0xFF7C3AED),
+                      color: AppColors.purple,
                       onTap: () => widget.onNavigateTab(6),
                     ),
                     _buildManagementTile(
                       title: 'Mutaxassislarni Biriktirish',
                       desc: 'Pedagoglar va bolalar bog‘lanishi',
                       icon: Icons.assignment_ind_rounded,
-                      color: const Color(0xFFD97706),
+                      color: AppColors.warning,
                       onTap: () => widget.onNavigateTab(2),
                     ),
                     _buildManagementTile(
                       title: 'Yo‘naltirishlar Jurnali',
                       desc: 'Logoped, psixolog va tibbiyot',
                       icon: Icons.alt_route_rounded,
-                      color: const Color(0xFF00808A),
+                      color: AppColors.info,
                       onTap: () => widget.onNavigateTab(11),
                     ),
                     _buildManagementTile(
                       title: 'Tizim Audit Jurnali',
                       desc: 'Xavfsizlik va o‘zgarishlar tarixi',
                       icon: Icons.history_edu_rounded,
-                      color: const Color(0xFF475569),
+                      color: AppColors.textSecondary,
                       onTap: () => widget.onNavigateTab(10),
                     ),
                     _buildManagementTile(
                       title: 'Tizim Sozlamalari',
                       desc: 'DTS parametrlari va siyosat',
                       icon: Icons.settings_suggest_rounded,
-                      color: const Color(0xFF64748B),
+                      color: AppColors.textMuted,
                       onTap: () => widget.onNavigateTab(9),
                     ),
                     _buildManagementTile(
                       title: 'Hisobotlar va Zaxira',
                       desc: 'Viloyat CSV va JSON backup',
                       icon: Icons.file_download_outlined,
-                      color: const Color(0xFF12803A),
+                      color: AppColors.success,
                       onTap: () => widget.onNavigateTab(7),
                     ),
                   ],
@@ -2395,7 +2359,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -2406,7 +2370,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  children: const [
+                  children: [
                     Icon(
                       Icons.history_rounded,
                       color: AppColors.primary,
@@ -2417,7 +2381,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       'So‘nggi Tizim Faolligi va Audit Qaydlari',
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -2427,7 +2391,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   onPressed: () => widget.onNavigateTab(10), // Audit jurnali
                   child: const Text(
                     'Barcha yozuvlar →',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -2464,9 +2428,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                           ),
                           child: Text(
                             log.action,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
                               color: AppColors.primary,
                             ),
                           ),
@@ -2481,14 +2445,14 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                   Text(
                                     log.userFullName,
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 12,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     df.format(log.timestamp),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
                                       color: AppColors.textMuted,
                                     ),
@@ -2498,7 +2462,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                               const SizedBox(height: 2),
                               Text(
                                 log.details,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondary,
                                 ),
@@ -2533,7 +2497,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.border),
         ),
@@ -2556,9 +2520,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textMuted,
                       letterSpacing: 0.5,
                     ),
@@ -2568,16 +2532,16 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   const SizedBox(height: 2),
                   Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 1),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary,
                     ),
@@ -2587,11 +2551,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: AppColors.textMuted,
-              size: 18,
-            ),
+            Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
           ],
         ),
       ),
@@ -2629,7 +2589,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       fontSize: 12,
                       color: color,
                     ),
@@ -2637,18 +2597,15 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   const SizedBox(height: 1),
                   Text(
                     value,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
                       fontSize: 16,
                       color: AppColors.textPrimary,
                     ),
                   ),
                   Text(
                     description,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -2671,7 +2628,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.border),
       ),
@@ -2693,9 +2650,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -2704,16 +2661,13 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   metric,
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: color,
                   ),
                 ),
                 Text(
                   sub,
-                  style: const TextStyle(
-                    fontSize: 10.5,
-                    color: AppColors.textMuted,
-                  ),
+                  style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -2762,17 +2716,14 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                     title,
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: color,
                     ),
                   ),
                   const SizedBox(height: 1),
                   Text(
                     desc,
-                    style: const TextStyle(
-                      fontSize: 10.5,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

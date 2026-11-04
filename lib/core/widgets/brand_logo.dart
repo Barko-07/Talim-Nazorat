@@ -29,9 +29,10 @@ class BrandWordmark extends StatelessWidget {
   Widget build(BuildContext context) {
     final base = TextStyle(
       fontSize: fontSize,
-      fontWeight: FontWeight.w800,
+      fontWeight: FontWeight.w700,
       letterSpacing: -0.3,
-      color: AppColors.brandNavy,
+      // Qorong'i fonda logodagi to'q siyoh o'rniga oq
+      color: AppColors.isDark ? AppColors.textPrimary : AppColors.brandNavy,
       height: 1.1,
     );
     const green = TextStyle(color: AppColors.brandGreen);
@@ -59,11 +60,28 @@ class BrandLogo extends StatelessWidget {
   final double height;
 
   @override
-  Widget build(BuildContext context) => Image.asset(
-    AppBrand.logoAsset,
-    height: height,
-    fit: BoxFit.contain,
-    filterQuality: FilterQuality.medium,
-    semanticLabel: AppBrand.name,
-  );
+  Widget build(BuildContext context) {
+    if (AppColors.isDark) {
+      // Rasmdagi "Individ" yozuvi to'q siyoh rangda — qorong'i fonda
+      // belgi va oq so'z belgisi alohida chiziladi.
+      return SizedBox(
+        height: height,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BrandMark(height: height * 0.6),
+            SizedBox(height: height * 0.06),
+            BrandWordmark(fontSize: height * 0.22),
+          ],
+        ),
+      );
+    }
+    return Image.asset(
+      AppBrand.logoAsset,
+      height: height,
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.medium,
+      semanticLabel: AppBrand.name,
+    );
+  }
 }

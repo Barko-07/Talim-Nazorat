@@ -92,7 +92,7 @@ class _PsychologistAssessmentsTabState
               await context.read<AppProvider>().deleteAssessment(a.id);
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('Baholash protokoli o‘chirildi.'),
                     backgroundColor: AppColors.textSecondary,
                   ),
@@ -152,11 +152,11 @@ class _PsychologistAssessmentsTabState
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Psixologik Baholash Tizimi',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -167,19 +167,19 @@ class _PsychologistAssessmentsTabState
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEEF9EC),
+                          color: AppColors.successBg,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: const Color(0xFF12803A)
+                            color: AppColors.success
                                 .withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
                           '$completedCount ta yakunlangan',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF12803A),
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.success,
                           ),
                         ),
                       ),
@@ -191,19 +191,19 @@ class _PsychologistAssessmentsTabState
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFFBEB),
+                            color: AppColors.warningBg,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: const Color(0xFFD97706)
+                              color: AppColors.warning
                                   .withValues(alpha: 0.3),
                             ),
                           ),
                           child: Text(
                             '$draftCount ta qoralama',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFFD97706),
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.warning,
                             ),
                           ),
                         ),
@@ -211,7 +211,7 @@ class _PsychologistAssessmentsTabState
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Kutubxona savollari asosida psixologik diagnostika va monitoring o‘tkazish',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -219,7 +219,7 @@ class _PsychologistAssessmentsTabState
               ),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF0062CC),
+                  backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 18,
                     vertical: 12,
@@ -264,7 +264,7 @@ class _PsychologistAssessmentsTabState
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: const BorderSide(color: AppColors.border),
+                side: BorderSide(color: AppColors.border),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -437,7 +437,7 @@ class _PsychologistAssessmentsTabState
                 alignment: Alignment.center,
                 child: Column(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.assignment_late_outlined,
                       size: 48,
                       color: AppColors.textMuted,
@@ -445,17 +445,17 @@ class _PsychologistAssessmentsTabState
                     const SizedBox(height: 12),
                     const Text(
                       'Mos keluvchi baholashlar topilmadi',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       'Yangi baholash boshlash uchun yuqoridagi tugmadan foydalaning',
                       style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                     ),
                     const SizedBox(height: 16),
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF0062CC),
+                        backgroundColor: AppColors.primary,
                       ),
                       icon: const Icon(Icons.add, size: 16),
                       label: const Text('Yangi baholash boshlash'),
@@ -483,7 +483,7 @@ class _PsychologistAssessmentsTabState
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
                         color: isDraft
-                            ? const Color(0xFFF59E0B).withValues(alpha: 0.5)
+                            ? AppColors.warning.withValues(alpha: 0.5)
                             : AppColors.border,
                       ),
                     ),
@@ -501,8 +501,8 @@ class _PsychologistAssessmentsTabState
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
                                       color: isDraft
-                                          ? const Color(0xFFFFFBEB)
-                                          : const Color(0xFFEAF3FD),
+                                          ? AppColors.warningBg
+                                          : AppColors.primaryLight,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
@@ -510,8 +510,8 @@ class _PsychologistAssessmentsTabState
                                           ? Icons.edit_calendar_rounded
                                           : Icons.psychology_rounded,
                                       color: isDraft
-                                          ? const Color(0xFFD97706)
-                                          : const Color(0xFF0062CC),
+                                          ? AppColors.warning
+                                          : AppColors.primary,
                                       size: 20,
                                     ),
                                   ),
@@ -524,8 +524,8 @@ class _PsychologistAssessmentsTabState
                                         children: [
                                           Text(
                                             a.studentName,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
                                               fontSize: 15,
                                               color: AppColors.textPrimary,
                                             ),
@@ -538,26 +538,26 @@ class _PsychologistAssessmentsTabState
                                             ),
                                             decoration: BoxDecoration(
                                               color: isDraft
-                                                  ? const Color(0xFFFFFBEB)
-                                                  : const Color(0xFFEEF9EC),
+                                                  ? AppColors.warningBg
+                                                  : AppColors.successBg,
                                               borderRadius:
                                                   BorderRadius.circular(4),
                                               border: Border.all(
                                                 color: isDraft
-                                                    ? const Color(0xFFD97706)
+                                                    ? AppColors.warning
                                                         .withValues(alpha: 0.3)
-                                                    : const Color(0xFF12803A)
+                                                    : AppColors.success
                                                         .withValues(alpha: 0.3),
                                               ),
                                             ),
                                             child: Text(
                                               isDraft ? 'Qoralama' : 'Yakunlangan',
                                               style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
                                                 color: isDraft
-                                                    ? const Color(0xFFD97706)
-                                                    : const Color(0xFF12803A),
+                                                    ? AppColors.warning
+                                                    : AppColors.success,
                                               ),
                                             ),
                                           ),
@@ -565,7 +565,7 @@ class _PsychologistAssessmentsTabState
                                       ),
                                       Text(
                                         '${a.title} • ${a.category}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 12,
                                           color: AppColors.textMuted,
                                         ),
@@ -580,10 +580,10 @@ class _PsychologistAssessmentsTabState
                                   children: [
                                     Text(
                                       '${a.totalScore.toStringAsFixed(1)} / ${a.maxScore.toStringAsFixed(0)} ball',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
                                         fontSize: 15,
-                                        color: Color(0xFF0062CC),
+                                        color: AppColors.primary,
                                       ),
                                     ),
                                     Container(
@@ -592,15 +592,15 @@ class _PsychologistAssessmentsTabState
                                         vertical: 1,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFEEF9EC),
+                                        color: AppColors.successBg,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
                                         a.trend,
-                                        style: const TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF12803A),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.success,
                                         ),
                                       ),
                                     ),
@@ -613,15 +613,15 @@ class _PsychologistAssessmentsTabState
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFFFBEB),
+                                    color: AppColors.warningBg,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     '${a.responses.where((r) => r.isEvaluated).length}/${a.responses.length} ta savol kiritilgan',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFFD97706),
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.warning,
                                     ),
                                   ),
                                 ),
@@ -636,17 +636,17 @@ class _PsychologistAssessmentsTabState
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF8FAFC),
+                                color: AppColors.surfaceMuted,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Psixolog xulosasi:',
                                     style: TextStyle(
                                       fontSize: 11,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: AppColors.textMuted,
                                     ),
                                   ),
@@ -658,7 +658,7 @@ class _PsychologistAssessmentsTabState
                                         : a.notes,
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textSecondary,
                                     ),
@@ -674,7 +674,7 @@ class _PsychologistAssessmentsTabState
                             children: [
                               Text(
                                 'Sana: ${df.format(a.assessmentDate)} • Mutaxassis: ${a.specialistName}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   color: AppColors.textMuted,
                                 ),
@@ -685,7 +685,7 @@ class _PsychologistAssessmentsTabState
                                     FilledButton.icon(
                                       style: FilledButton.styleFrom(
                                         backgroundColor:
-                                            const Color(0xFFD97706),
+                                            AppColors.warning,
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 12,
                                           vertical: 8,
@@ -704,10 +704,10 @@ class _PsychologistAssessmentsTabState
                                   else ...[
                                     if (childAssessments.length > 1)
                                       IconButton(
-                                        icon: const Icon(
+                                        icon: Icon(
                                           Icons.compare_arrows_rounded,
                                           size: 18,
-                                          color: Color(0xFF0062CC),
+                                          color: AppColors.primary,
                                         ),
                                         tooltip: 'Taqqoslash',
                                         onPressed: () {
@@ -722,7 +722,7 @@ class _PsychologistAssessmentsTabState
                                     FilledButton.icon(
                                       style: FilledButton.styleFrom(
                                         backgroundColor:
-                                            const Color(0xFF0062CC),
+                                            AppColors.primary,
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 12,
                                           vertical: 8,

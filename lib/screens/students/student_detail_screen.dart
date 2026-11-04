@@ -86,7 +86,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               children: [
                 Text(
                   '${student.fullName} anketasini faol ro‘yxatdan arxivga o‘tkazmoqchimisiz? Barcha tarixiy yozuvlar (baholashlar, ITR, mashg‘ulotlar) to‘liq saqlanadi.',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                     height: 1.4,
@@ -209,7 +209,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               width: 430,
               child:
                   availableSpecialists.isEmpty
-                      ? const Padding(
+                      ? Padding(
                         padding: EdgeInsets.all(16),
                         child: Text(
                           'Barcha mutaxassislar allaqachon biriktirilgan yoki mutaxassislar ro‘yxati bo‘sh.',
@@ -246,7 +246,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     children: [
                                       Text(
                                         sp.fullName,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontWeight: FontWeight.w700,
                                           fontSize: 13.5,
                                           color: AppColors.textPrimary,
@@ -256,7 +256,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                         '${sp.role.label} • ${sp.institutionName ?? ''}',
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11.5,
                                           color: AppColors.textMuted,
                                         ),
@@ -265,7 +265,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     LucideIcons.userPlus,
                                     color: AppColors.primary,
                                     size: 18,
@@ -348,7 +348,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
         title: Text(
           student.fullName,
           style: const TextStyle(
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
             fontSize: 16,
             letterSpacing: -0.25,
           ),
@@ -358,7 +358,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             Padding(
               padding: const EdgeInsets.only(right: 8),
               child: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   LucideIcons.archive,
                   color: AppColors.warning,
                   size: 19,
@@ -372,7 +372,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             Padding(
               padding: const EdgeInsets.only(right: 8),
               child: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   LucideIcons.archiveRestore,
                   color: AppColors.success,
                   size: 19,
@@ -441,8 +441,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
                   fontSize: 16,
                   color: AppColors.textPrimary,
                 ),
@@ -452,7 +452,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 Text(
                   subtitle,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textMuted,
                     height: 1.4,
@@ -502,7 +502,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 borderColor: AppColors.warningBorder,
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       LucideIcons.archive,
                       color: AppColors.warning,
                       size: 24,
@@ -512,10 +512,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Ushbu o‘quvchi anketasi arxivlangan',
                             style: TextStyle(
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               fontSize: 14,
                               color: AppColors.textPrimary,
                             ),
@@ -523,7 +523,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           const SizedBox(height: 2),
                           Text(
                             'Sababi: ${s.deactivationReason ?? 'Ko‘rsatilmagan'} • Sana: ${s.deactivatedAt != null ? df.format(s.deactivatedAt!) : 'Noma’lum'}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12.5,
                               color: AppColors.textSecondary,
                             ),
@@ -601,7 +601,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       const SizedBox(height: 4),
                       Text(
                         '${s.institutionName} • ${s.grade}-sinf',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textSecondary,
@@ -610,7 +610,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       const SizedBox(height: 3),
                       Text(
                         'Tug‘ilgan kuni: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12.3,
                           color: AppColors.textMuted,
                         ),
@@ -626,7 +626,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 isArchived
                                     ? AppColors.warning
                                     : AppColors.success,
-                            backgroundColor: Colors.white.withValues(
+                            backgroundColor: AppColors.surface.withValues(
                               alpha: 0.86,
                             ),
                             showDot: true,
@@ -641,14 +641,14 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 return const SizedBox.shrink();
                               }
                               final stColor = switch (childSt.color) {
-                                StatusColor.red => const Color(0xFFDC2626),
-                                StatusColor.yellow => const Color(0xFFD97706),
-                                StatusColor.green => const Color(0xFF12803A),
+                                StatusColor.red => AppColors.error,
+                                StatusColor.yellow => AppColors.warning,
+                                StatusColor.green => AppColors.success,
                               };
                               final stBg = switch (childSt.color) {
-                                StatusColor.red => const Color(0xFFFEF2F2),
-                                StatusColor.yellow => const Color(0xFFFFFBEB),
-                                StatusColor.green => const Color(0xFFEEF9EC),
+                                StatusColor.red => AppColors.errorBg,
+                                StatusColor.yellow => AppColors.warningBg,
+                                StatusColor.green => AppColors.successBg,
                               };
                               return StatusPill(
                                 label:
@@ -663,7 +663,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             StatusPill(
                               label: 'Koordinator: ${s.coordinatorName}',
                               color: AppColors.info,
-                              backgroundColor: Colors.white.withValues(
+                              backgroundColor: AppColors.surface.withValues(
                                 alpha: 0.86,
                               ),
                               icon: LucideIcons.shieldCheck,
@@ -701,10 +701,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Ta’limiy Ehtiyoj va Qo‘llab-quvvatlash Darajasi',
                     style: TextStyle(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       fontSize: 16,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
@@ -734,7 +734,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(top: 2),
                         child: Icon(
                           LucideIcons.stethoscope,
@@ -747,7 +747,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Tibbiy xulosa va tavsiyalar',
                               style: TextStyle(
                                 fontSize: 12,
@@ -760,7 +760,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               Text(
                                 s.medicalNotes ??
                                     'Tibbiy ma’lumot kiritilmagan',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textPrimary,
@@ -768,7 +768,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 ),
                               )
                             else
-                              const GlassWell(
+                              GlassWell(
                                 borderRadius: 12,
                                 padding: EdgeInsets.all(12),
                                 child: Row(
@@ -814,10 +814,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     alignment: WrapAlignment.spaceBetween,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'Mas’ul Mutaxassislar Jamoasi',
                         style: TextStyle(
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           fontSize: 16,
                           color: AppColors.textPrimary,
                           letterSpacing: -0.25,
@@ -848,7 +848,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   ),
                   const SizedBox(height: 14),
                   if (assignedStaff.isEmpty)
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(vertical: 6),
                       child: Text(
                         'Ushbu o‘quvchiga hali maxsus mutaxassis biriktirilmagan',
@@ -878,7 +878,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 children: [
                                   Text(
                                     staff.fullName,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 14,
                                       color: AppColors.textPrimary,
@@ -887,7 +887,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   const SizedBox(height: 2),
                                   Text(
                                     '${staff.role.label} • Tel: ${staff.phone ?? 'Mavjud emas'}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textMuted,
                                     ),
@@ -911,10 +911,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Ota-ona yoki Qonuniy Vasiylar',
                     style: TextStyle(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       fontSize: 16,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
@@ -922,7 +922,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   ),
                   const SizedBox(height: 14),
                   if (s.guardians.isEmpty)
-                    const Text(
+                    Text(
                       'Vasiy ma’lumotlari kiritilmagan',
                       style: TextStyle(color: AppColors.textMuted),
                     )
@@ -935,7 +935,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(top: 2),
                               child: Icon(
                                 LucideIcons.usersRound,
@@ -950,7 +950,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 children: [
                                   Text(
                                     g.fullName,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 14,
                                       color: AppColors.textPrimary,
@@ -959,7 +959,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   const SizedBox(height: 2),
                                   Text(
                                     '${g.relationship} • Tel: ${g.phone}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12.5,
                                       color: AppColors.textSecondary,
                                     ),
@@ -967,7 +967,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   const SizedBox(height: 2),
                                   Text(
                                     'Manzil: ${g.address ?? 'Ko‘rsatilmagan'}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textMuted,
                                     ),
@@ -1020,7 +1020,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Row(
+              Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(LucideIcons.mic, color: AppColors.primary, size: 20),
@@ -1028,7 +1028,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   Text(
                     'Logopedik Tovushlar Xaritasi',
                     style: TextStyle(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       fontSize: 16,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
@@ -1052,7 +1052,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           ),
           const SizedBox(height: 12),
           if (profile.sounds.isEmpty)
-            const Text(
+            Text(
               'Hozircha logopedik tovushlar bo‘yicha qaydlar kiritilmagan.',
               style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
             )
@@ -1063,8 +1063,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               children: [
                 StatusPill(
                   label: 'O‘zlashtirilgan: ${profile.mastered.length}',
-                  color: const Color(0xFF12803A),
-                  backgroundColor: const Color(0xFFEEF9EC),
+                  color: AppColors.success,
+                  backgroundColor: AppColors.successBg,
                 ),
                 StatusPill(
                   label: 'Jarayonda: ${profile.inProgress.length}',
@@ -1075,8 +1075,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   StatusPill(
                     label:
                         '⚠ Rivojlanmayotgan: ${profile.stuck.map((p) => p.sound.display).join(", ")}',
-                    color: const Color(0xFFD97706),
-                    backgroundColor: const Color(0xFFFFFBEB),
+                    color: AppColors.warning,
+                    backgroundColor: AppColors.warningBg,
                   ),
               ],
             ),
@@ -1086,7 +1086,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFC),
+                  color: AppColors.surfaceMuted,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.border),
                 ),
@@ -1100,9 +1100,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       children: [
                         Text(
                           '«${p.sound.display.toUpperCase()}» tovushi (${p.sound.group.label})',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13.5,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -1127,7 +1127,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     const SizedBox(height: 6),
                     Text(
                       'Keyingi qadam: ${app.soundNextStep(p)}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w600,
@@ -1337,15 +1337,15 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Row(
+              Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(LucideIcons.award, color: Color(0xFF12803A), size: 20),
+                  Icon(LucideIcons.award, color: AppColors.success, size: 20),
                   SizedBox(width: 10),
                   Text(
                     'Mening Yutuqlar Pasportim',
                     style: TextStyle(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       fontSize: 16,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
@@ -1369,7 +1369,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           ),
           const SizedBox(height: 12),
           if (passport == null || passport.entries.isEmpty)
-            const Text(
+            Text(
               'Hozircha yutuqlar qayd etilmagan. O‘quvchi erishgan ijobiy natijalar avtomatik va qo‘lda shu yerda to‘planadi.',
               style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
             )
@@ -1379,18 +1379,18 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEEF9EC),
+                  color: AppColors.successBg,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFF12803A).withValues(alpha: 0.25),
+                    color: AppColors.success.withValues(alpha: 0.25),
                   ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       LucideIcons.sparkles,
                       size: 16,
-                      color: Color(0xFF12803A),
+                      color: AppColors.success,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -1399,7 +1399,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         children: [
                           Text(
                             a.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -1407,7 +1407,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           ),
                           Text(
                             '${a.category.label} • ${DateFormat("dd.MM.yyyy").format(a.achievedAt)}${a.isAutomatic ? " (Avtomatik)" : ""}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11.5,
                               color: AppColors.textSecondary,
                             ),
@@ -1528,14 +1528,14 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(LucideIcons.users, color: AppColors.primary, size: 20),
               SizedBox(width: 10),
               Text(
                 'Mutaxassislar Konsiliumi (Qo‘shma muhokamalar)',
                 style: TextStyle(
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                   fontSize: 16,
                   color: AppColors.textPrimary,
                   letterSpacing: -0.25,
@@ -1545,7 +1545,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           ),
           const SizedBox(height: 12),
           if (conferences.isEmpty)
-            const Text(
+            Text(
               'Ushbu o‘quvchi bo‘yicha hali qo‘shma konsilium yig‘ilishi o‘tkazilmagan.',
               style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
             )
@@ -1555,7 +1555,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFC),
+                  color: AppColors.surfaceMuted,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.border),
                 ),
@@ -1569,7 +1569,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           child: Text(
                             c.agenda,
                             style: const TextStyle(
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               fontSize: 13.5,
                             ),
                           ),
@@ -1584,7 +1584,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     const SizedBox(height: 4),
                     Text(
                       'Sana: ${df.format(c.scheduledAt)} • Tashkilotchi: ${c.convenedByName}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textMuted,
                       ),
@@ -1593,7 +1593,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       const SizedBox(height: 6),
                       Text(
                         'Xulosa: ${c.conclusion}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textSecondary,
@@ -1629,7 +1629,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w600,
@@ -1638,7 +1638,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               const SizedBox(height: 3),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
                   color: AppColors.textPrimary,
@@ -1739,8 +1739,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               children: [
                                 Text(
                                   a.title,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w800,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
                                     fontSize: 15.5,
                                     color: AppColors.textPrimary,
                                   ),
@@ -1748,7 +1748,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 const SizedBox(height: 3),
                                 Text(
                                   'Yo‘nalish: ${a.category}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12.5,
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w700,
@@ -1762,7 +1762,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             label:
                                 '${a.totalScore.toInt()} / ${a.maxScore.toInt()} ball',
                             color: AppColors.success,
-                            backgroundColor: Colors.white.withValues(
+                            backgroundColor: AppColors.surface.withValues(
                               alpha: 0.85,
                             ),
                           ),
@@ -1777,7 +1777,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
+                              Icon(
                                 LucideIcons.userCheck,
                                 size: 14,
                                 color: AppColors.textMuted,
@@ -1788,7 +1788,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   a.specialistName,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12.5,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.textPrimary,
@@ -1800,13 +1800,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           StatusPill(
                             label: a.specialistRole,
                             color: AppColors.textSecondary,
-                            backgroundColor: Colors.white.withValues(
+                            backgroundColor: AppColors.surface.withValues(
                               alpha: 0.8,
                             ),
                           ),
                           Text(
                             df.format(a.assessmentDate),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               color: AppColors.textMuted,
                               fontFeatures: [FontFeature.tabularFigures()],
@@ -1823,7 +1823,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           children: [
                             Text(
                               'Xulosa: ${a.notes}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 height: 1.45,
                                 color: AppColors.textPrimary,
@@ -1832,7 +1832,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             const SizedBox(height: 8),
                             Text(
                               'Tavsiya: ${a.recommendations}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12.5,
                                 color: AppColors.primaryDark,
                                 fontWeight: FontWeight.w600,
@@ -1901,8 +1901,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   Expanded(
                                     child: Text(
                                       s.topic,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
                                         fontSize: 14.5,
                                         color: AppColors.textPrimary,
                                       ),
@@ -1912,7 +1912,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   StatusPill(
                                     label: s.status,
                                     color: statusColor,
-                                    backgroundColor: Colors.white.withValues(
+                                    backgroundColor: AppColors.surface.withValues(
                                       alpha: 0.85,
                                     ),
                                     showDot: true,
@@ -1922,7 +1922,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               const SizedBox(height: 5),
                               Text(
                                 '${s.specialistName} • ${df.format(s.scheduledAt)}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12.5,
                                   color: AppColors.textMuted,
                                 ),
@@ -1932,7 +1932,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 const SizedBox(height: 6),
                                 Text(
                                   s.activities!,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13,
                                     color: AppColors.textSecondary,
                                     height: 1.4,
@@ -1995,10 +1995,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Rejalashtirilgan o‘lchanadigan maqsadlar va ularning bajarilishi:',
               style: TextStyle(
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
                 fontSize: 14,
                 color: AppColors.textPrimary,
               ),
@@ -2019,8 +2019,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           Expanded(
                             child: Text(
                               obj.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
                                 fontSize: 14.5,
                                 color: AppColors.textPrimary,
                               ),
@@ -2033,7 +2033,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 obj.progressPercent >= 80
                                     ? AppColors.success
                                     : AppColors.primary,
-                            backgroundColor: Colors.white.withValues(
+                            backgroundColor: AppColors.surface.withValues(
                               alpha: 0.86,
                             ),
                           ),
@@ -2042,7 +2042,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       const SizedBox(height: 5),
                       Text(
                         'Soha: ${obj.domain} • Mezon: ${obj.successCriteria ?? ''}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12.5,
                           color: AppColors.textMuted,
                         ),
@@ -2089,13 +2089,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   static Color _dynamicsColor(DynamicsStatus st) {
     switch (st) {
       case DynamicsStatus.growth:
-        return const Color(0xFF12803A);
+        return AppColors.success;
       case DynamicsStatus.decline:
-        return const Color(0xFFDC2626);
+        return AppColors.error;
       case DynamicsStatus.stable:
-        return const Color(0xFF0062CC);
+        return AppColors.primary;
       case DynamicsStatus.ineffective:
-        return const Color(0xFFD97706);
+        return AppColors.warning;
       case DynamicsStatus.insufficientData:
         return AppColors.textMuted;
     }
@@ -2104,15 +2104,15 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   static Color _dynamicsBg(DynamicsStatus st) {
     switch (st) {
       case DynamicsStatus.growth:
-        return const Color(0xFFEEF9EC);
+        return AppColors.successBg;
       case DynamicsStatus.decline:
-        return const Color(0xFFFEF2F2);
+        return AppColors.errorBg;
       case DynamicsStatus.stable:
-        return const Color(0xFFEAF3FD);
+        return AppColors.primaryLight;
       case DynamicsStatus.ineffective:
-        return const Color(0xFFFFFBEB);
+        return AppColors.warningBg;
       case DynamicsStatus.insufficientData:
-        return const Color(0xFFF1F5F9);
+        return AppColors.surfaceMuted;
     }
   }
 
@@ -2167,7 +2167,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     runSpacing: 8,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'Taqqoslash davri:',
                         style: TextStyle(
                           fontSize: 13,
@@ -2254,10 +2254,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           runSpacing: 6,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               'Avtomatik rivojlanish dinamikasi xulosasi',
                               style: TextStyle(
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w700,
                                 fontSize: 16,
                                 color: AppColors.textPrimary,
                               ),
@@ -2277,7 +2277,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         const SizedBox(height: 6),
                         Text(
                           overallAssessmentDyn.reason,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             height: 1.45,
                             color: AppColors.textSecondary,
@@ -2299,16 +2299,16 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Ko‘rsatkichlar bo‘yicha rivojlanish dinamikasi (O‘sish / Pasayish / To‘xtash / Samarasiz)',
                     style: TextStyle(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       fontSize: 15.5,
                       color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Har bir ko‘rsatkich birligi bilan (daqiqa, so‘z, marta) oldingi davrga nisbatan kompyuter tomonidan taqqoslanadi',
                     style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
@@ -2331,7 +2331,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF9FAFC),
+                        color: AppColors.surfaceMuted,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: c.withValues(alpha: 0.3)),
                       ),
@@ -2349,9 +2349,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   children: [
                                     Text(
                                       '${m.name} (${m.unit})',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 13.5,
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w700,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
@@ -2366,7 +2366,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 const SizedBox(height: 4),
                                 Text(
                                   dyn.reason,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12.5,
                                     color: AppColors.textSecondary,
                                   ),
@@ -2378,7 +2378,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             '${records.last.value} ${m.unit}',
                             style: TextStyle(
                               fontSize: 14,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               color: c,
                             ),
                           ),
@@ -2387,7 +2387,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     );
                   }),
                   if (app.measurementsFor(student.id).isEmpty)
-                    const Text(
+                    Text(
                       'Hozircha birlikli o‘lchovlar kiritilmagan. "Yangi o‘lchov kiritish" tugmasi orqali o‘lchov qo‘shing.',
                       style: TextStyle(
                         fontSize: 12.5,
@@ -2406,10 +2406,10 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Baholash ko‘rsatkichlari grafigi (%)',
                       style: TextStyle(
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         fontSize: 15.5,
                         color: AppColors.textPrimary,
                       ),
@@ -2453,8 +2453,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   getTitlesWidget:
                                       (val, _) => Text(
                                         '${val.toInt()}%',
-                                        style: const TextStyle(
-                                          fontSize: 10.5,
+                                        style: TextStyle(
+                                          fontSize: 11,
                                           color: AppColors.textMuted,
                                         ),
                                       ),
@@ -2484,7 +2484,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                         DateFormat(
                                           'dd.MM',
                                         ).format(sorted[idx].assessmentDate),
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
                                           color: AppColors.textMuted,
@@ -2552,17 +2552,17 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Monitoring baholarining vaqt bo‘yicha o‘zgarishi',
                     style: TextStyle(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       fontSize: 15.5,
                       color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 14),
                   if (assessments.isEmpty)
-                    const Text(
+                    Text(
                       'Hozircha monitoring ballari kiritilmagan.',
                       style: TextStyle(
                         fontSize: 13,
@@ -2578,7 +2578,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(top: 2),
                               child: Icon(
                                 LucideIcons.activity,
@@ -2590,7 +2590,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             Expanded(
                               child: Text(
                                 '${a.category}: ${a.title}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
@@ -2602,7 +2602,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               label:
                                   '${a.totalScore.toInt()} ball (${a.trend})',
                               color: AppColors.primary,
-                              backgroundColor: Colors.white.withValues(
+                              backgroundColor: AppColors.surface.withValues(
                                 alpha: 0.85,
                               ),
                             ),
@@ -2750,20 +2750,20 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 LucideIcons.graduationCap,
                 color: AppColors.primary,
                 size: 21,
               ),
               const SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Davlat ta’lim standartlariga (DTS) moslik va Individual daraja',
                       style: TextStyle(
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         fontSize: 16,
                         color: AppColors.textPrimary,
                         letterSpacing: -0.25,
@@ -2793,12 +2793,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color:
-                    hasGap ? const Color(0xFFFFFBEB) : const Color(0xFFF9FAFC),
+                    hasGap ? AppColors.warningBg : AppColors.surfaceMuted,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color:
                       hasGap
-                          ? const Color(0xFFD97706).withValues(alpha: 0.35)
+                          ? AppColors.warning.withValues(alpha: 0.35)
                           : AppColors.border,
                 ),
               ),
@@ -2816,8 +2816,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         children: [
                           Text(
                             subject,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w800,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
                               fontSize: 14.5,
                               color: AppColors.textPrimary,
                             ),
@@ -2837,19 +2837,19 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                       : 'Haqiqiy daraja: ${level.confirmedGrade}-sinf${level.gap > 0 ? " (${level.gap} sinf past)" : ""}',
                               color:
                                   hasGap
-                                      ? const Color(0xFFD97706)
-                                      : const Color(0xFF12803A),
+                                      ? AppColors.warning
+                                      : AppColors.success,
                               backgroundColor:
                                   hasGap
-                                      ? const Color(0xFFFEF3C7)
-                                      : const Color(0xFFEEF9EC),
+                                      ? AppColors.warningBg
+                                      : AppColors.successBg,
                               showDot: true,
                             )
                           else
-                            const StatusPill(
+                            StatusPill(
                               label: 'DTS darajasi tekshirilmagan',
                               color: AppColors.textMuted,
-                              backgroundColor: Color(0xFFF1F5F9),
+                              backgroundColor: AppColors.surfaceMuted,
                             ),
                         ],
                       ),
@@ -2912,7 +2912,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     const SizedBox(height: 6),
                     Text(
                       app.describeSubjectLevel(level),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textSecondary,
@@ -2923,7 +2923,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     const SizedBox(height: 10),
                     const Divider(height: 1),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Individual fan topshiriqlari:',
                       style: TextStyle(
                         fontSize: 12,
@@ -2951,7 +2951,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             Expanded(
                               child: Text(
                                 '[${t.levelGrade}-sinf darajasi] ${t.title}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textPrimary,
@@ -2999,7 +2999,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     color: AppColors.primaryLight,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     'Natijani belgilash',
                                     style: TextStyle(
                                       fontSize: 11,
@@ -3072,18 +3072,18 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEAF3FD),
+                              color: AppColors.primaryLight,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: const Color(0xFFBFDBFE),
+                                color: AppColors.primaryTint,
                               ),
                             ),
                             child: Text(
                               'Tizim tavsiyasi: ${preview == 0 ? "1-sinf talablariga hali yetmagan" : "$preview-sinf darajasi"}${needsLower ? " (Quyiroq sinf talablarini ham tekshiring!)" : ""}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF003D88),
+                                color: AppColors.primaryDark,
                               ),
                             ),
                           ),
@@ -3092,17 +3092,17 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             margin: const EdgeInsets.only(top: 8),
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFFBEB),
+                              color: AppColors.warningBg,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: const Color(0xFFFDE68A),
+                                color: AppColors.warningBorder,
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Tizim darajani hozircha aniq tavsiya qila olmaydi. 1-sinfdan boshlab sinflarni ketma-ket baholab, birinchi o‘zlashtirilmagan talab aniqlanguncha davom eting. Barcha mavjud talablar bajarilgan bo‘lsa, o‘qituvchi darajani qo‘lda tasdiqlasin.',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Color(0xFF92400E),
+                                color: AppColors.warning,
                                 height: 1.4,
                               ),
                             ),
@@ -3115,7 +3115,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF8FAFC),
+                                color: AppColors.surfaceMuted,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: AppColors.border),
                               ),
@@ -3131,7 +3131,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                       ),
                                       const SizedBox(width: 8),
                                       if (!std.isOfficial)
-                                        const Text(
+                                        Text(
                                           '(Namuna)',
                                           style: TextStyle(
                                             fontSize: 11,
@@ -3375,7 +3375,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Row(
+              Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
@@ -3387,7 +3387,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                   Text(
                     'O‘quvchining Imkoniyat Profili (Muloqot va sezgi)',
                     style: TextStyle(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       fontSize: 16,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
@@ -3412,7 +3412,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           ),
           const SizedBox(height: 12),
           if (ap == null)
-            const Text(
+            Text(
               'Imkoniyat profili hali to‘ldirilmagan. Savollarni bolaning imkoniyatiga mos tanlash uchun uni to‘ldiring.',
               style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
             )
@@ -3672,7 +3672,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.only(top: 2),
                           child: Icon(
                             LucideIcons.arrowUpRight,
@@ -3691,8 +3691,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   Expanded(
                                     child: Text(
                                       '${r.toSpecialistType}ga yo‘naltirish',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
                                         fontSize: 14.5,
                                         color: AppColors.textPrimary,
                                       ),
@@ -3702,7 +3702,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   StatusPill(
                                     label: r.status,
                                     color: AppColors.primary,
-                                    backgroundColor: Colors.white.withValues(
+                                    backgroundColor: AppColors.surface.withValues(
                                       alpha: 0.85,
                                     ),
                                   ),
@@ -3711,7 +3711,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               const SizedBox(height: 5),
                               Text(
                                 'Yuborgan: ${r.fromSpecialistName}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12.5,
                                   color: AppColors.textMuted,
                                 ),
@@ -3719,7 +3719,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               const SizedBox(height: 3),
                               Text(
                                 'Sababi: ${r.reason}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
                                   color: AppColors.textSecondary,
                                   height: 1.4,
@@ -3764,7 +3764,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     padding: const EdgeInsets.all(20),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           LucideIcons.fileText,
                           color: AppColors.error,
                           size: 22,
@@ -3776,8 +3776,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             children: [
                               Text(
                                 doc.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
                                   fontSize: 14.5,
                                   color: AppColors.textPrimary,
                                 ),
@@ -3785,7 +3785,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               const SizedBox(height: 3),
                               Text(
                                 doc.subtitle,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12.5,
                                   color: AppColors.textMuted,
                                 ),
@@ -3794,7 +3794,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             LucideIcons.download,
                             size: 19,
                             color: AppColors.primary,
@@ -3842,7 +3842,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.only(top: 2),
                           child: Icon(
                             LucideIcons.history,
@@ -3857,7 +3857,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             children: [
                               Text(
                                 log.details,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
@@ -3871,7 +3871,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 children: [
                                   Text(
                                     '${log.userFullName} (${log.userRole})',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textMuted,
                                     ),
@@ -3880,7 +3880,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     DateFormat(
                                       'dd.MM HH:mm',
                                     ).format(log.timestamp),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11.5,
                                       color: AppColors.textSubtle,
                                       fontWeight: FontWeight.w600,

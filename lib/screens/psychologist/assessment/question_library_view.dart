@@ -66,7 +66,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
   void _confirmDeleteQuestion(AssessmentQuestionModel q) {
     if (q.isStandard) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
             'Standart bazaviy metodika savolini o‘chirib bo‘lmaydi. Faqat o‘zingiz yaratgan savollarni o‘chirishingiz mumkin.',
           ),
@@ -119,7 +119,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -137,12 +137,12 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEAF3FD),
+                      color: AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.quiz_rounded,
-                      color: Color(0xFF0062CC),
+                      color: AppColors.primary,
                       size: 20,
                     ),
                   ),
@@ -155,12 +155,12 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                           q.questionTitle,
                           style: const TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
                           '${q.domain} • ${q.safeAgeRange}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textMuted,
                           ),
@@ -182,18 +182,18 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Savol / Topshiriq matni:',
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textMuted,
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         q.questionText,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -203,9 +203,9 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                       if (q.options.isNotEmpty) ...[
                         Text(
                           'Javob variantlari va shkala (${_typeNames[q.questionType] ?? q.questionType}):',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textMuted,
                           ),
                         ),
@@ -218,16 +218,16 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFC),
+                              color: AppColors.surfaceMuted,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: AppColors.border),
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.check_circle_outline,
                                   size: 16,
-                                  color: Color(0xFF0062CC),
+                                  color: AppColors.primary,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
@@ -242,15 +242,15 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFEAF3FD),
+                                    color: AppColors.primaryLight,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     '${opt.score.toStringAsFixed(opt.score.truncateToDouble() == opt.score ? 0 : 1)} ball',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0062CC),
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primary,
                                     ),
                                   ),
                                 ),
@@ -261,18 +261,18 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                         const SizedBox(height: 14),
                       ],
                       if (q.safeCriteria.isNotEmpty) ...[
-                        const Text(
+                        Text(
                           'Baholash mezonlari:',
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textMuted,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           q.safeCriteria,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             color: AppColors.textSecondary,
                           ),
@@ -280,11 +280,11 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                         const SizedBox(height: 14),
                       ],
                       if (q.safeNotes.isNotEmpty) ...[
-                        const Text(
+                        Text(
                           'Psixolog uchun metodik ko‘rsatma:',
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textMuted,
                           ),
                         ),
@@ -292,17 +292,17 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFFBEB),
+                            color: AppColors.warningBg,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                              color: AppColors.warning.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Text(
                             q.safeNotes,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12.5,
-                              color: Color(0xFF92400E),
+                              color: AppColors.warning,
                             ),
                           ),
                         ),
@@ -322,7 +322,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                             q.isStandard
                                 ? 'Standart metodika bazasi'
                                 : 'Muallif: ${q.authorName}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               color: AppColors.textMuted,
                             ),
@@ -349,7 +349,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                     const SizedBox(width: 12),
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF0062CC),
+                        backgroundColor: AppColors.primary,
                       ),
                       icon: const Icon(Icons.add_task_rounded, size: 16),
                       label: const Text('Baholashga qo‘shish'),
@@ -373,12 +373,12 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: isReady ? const Color(0xFFEEF9EC) : const Color(0xFFFFFBEB),
+        color: isReady ? AppColors.successBg : AppColors.warningBg,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: isReady
-              ? const Color(0xFF12803A).withValues(alpha: 0.3)
-              : const Color(0xFFD97706).withValues(alpha: 0.3),
+              ? AppColors.success.withValues(alpha: 0.3)
+              : AppColors.warning.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -387,15 +387,15 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
           Icon(
             isReady ? Icons.check_circle_rounded : Icons.pending_outlined,
             size: 12,
-            color: isReady ? const Color(0xFF12803A) : const Color(0xFFD97706),
+            color: isReady ? AppColors.success : AppColors.warning,
           ),
           const SizedBox(width: 4),
           Text(
             isReady ? 'Tayyor' : 'Qoralama',
             style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.bold,
-              color: isReady ? const Color(0xFF12803A) : const Color(0xFFD97706),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isReady ? AppColors.success : AppColors.warning,
             ),
           ),
         ],
@@ -447,11 +447,11 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
               children: [
                 Row(
                   children: [
-                    const Text(
+                    Text(
                       'Savollar Kutubxonasi',
                       style: TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -462,22 +462,22 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEAF3FD),
+                        color: AppColors.primaryLight,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         '${filtered.length} ta savol',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0062CC),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 2),
-                const Text(
+                Text(
                   'Psixologik diagnostika metodikalari va test topshiriqlari banki',
                   style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                 ),
@@ -485,7 +485,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
             ),
             FilledButton.icon(
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF0062CC),
+                backgroundColor: AppColors.primary,
               ),
               icon: const Icon(Icons.add_rounded, size: 18),
               label: const Text('+ Yangi savol'),
@@ -524,7 +524,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: AppColors.border),
           ),
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -678,7 +678,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
             alignment: Alignment.center,
             child: Column(
               children: [
-                const Icon(
+                Icon(
                   Icons.quiz_outlined,
                   size: 44,
                   color: AppColors.textMuted,
@@ -686,17 +686,17 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                 const SizedBox(height: 10),
                 const Text(
                   'Mos keluvchi savollar topilmadi',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Qidiruv yoki filtr parametrlarini o‘zgartirib ko‘ring yoki yangi savol qo‘shing',
                   style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                 ),
                 const SizedBox(height: 14),
                 FilledButton.icon(
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF0062CC),
+                    backgroundColor: AppColors.primary,
                   ),
                   icon: const Icon(Icons.add, size: 16),
                   label: const Text('Yangi savol yaratish'),
@@ -725,7 +725,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: InkWell(
         onTap: () => _showQuestionDetails(q),
@@ -741,12 +741,12 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEAF3FD),
+                      color: AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.help_outline_rounded,
-                      color: Color(0xFF0062CC),
+                      color: AppColors.primary,
                       size: 18,
                     ),
                   ),
@@ -760,8 +760,8 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                             Expanded(
                               child: Text(
                                 q.questionTitle,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                   color: AppColors.textPrimary,
                                 ),
@@ -775,7 +775,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                           q.questionText,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             color: AppColors.textSecondary,
                           ),
@@ -793,27 +793,27 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                   _buildTag(
                     Icons.category_outlined,
                     q.domain,
-                    const Color(0xFF0062CC),
-                    const Color(0xFFEAF3FD),
+                    AppColors.primary,
+                    AppColors.primaryLight,
                   ),
                   _buildTag(
                     Icons.tune_rounded,
                     _typeNames[q.questionType] ?? q.questionType,
-                    const Color(0xFF00808A),
-                    const Color(0xFFE8F7F6),
+                    AppColors.info,
+                    AppColors.infoBg,
                   ),
                   _buildTag(
                     Icons.school_outlined,
                     q.safeAgeRange,
-                    const Color(0xFF475569),
-                    const Color(0xFFF1F5F9),
+                    AppColors.textSecondary,
+                    AppColors.surfaceMuted,
                   ),
                   if (q.questionType != 'open_text')
                     _buildTag(
                       Icons.star_outline_rounded,
                       'Maks: ${q.maxScore.toStringAsFixed(0)} ball',
-                      const Color(0xFF12803A),
-                      const Color(0xFFEEF9EC),
+                      AppColors.success,
+                      AppColors.successBg,
                     ),
                 ],
               ),
@@ -827,7 +827,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                     q.isStandard
                         ? 'Standart metodika'
                         : 'Muallif: ${q.authorName}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textMuted,
                     ),

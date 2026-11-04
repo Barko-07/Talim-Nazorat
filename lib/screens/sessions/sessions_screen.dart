@@ -38,7 +38,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
 
     if (students.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Hozircha birorta o‘quvchi mavjud emas.'),
           backgroundColor: AppColors.warning,
         ),
@@ -140,7 +140,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               LucideIcons.calendarClock,
                               color: AppColors.primary,
                               size: 20,
@@ -149,7 +149,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
+                                Text(
                                   'Mashg‘ulot vaqti',
                                   style: TextStyle(
                                     fontSize: 11.5,
@@ -160,7 +160,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                   DateFormat('dd.MM.yyyy HH:mm')
                                       .format(scheduledDate),
                                   style: const TextStyle(
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w700,
                                     fontSize: 13.5,
                                     fontFeatures: [FontFeature.tabularFigures()],
                                   ),
@@ -227,7 +227,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
               onPressed: () async {
                 if (topicCtrl.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content:
                           Text('Iltimos, mashg‘ulot mavzusini kiriting!'),
                       backgroundColor: AppColors.error,
@@ -266,7 +266,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
                           'Mashg‘ulot muvaffaqiyatli rejalashtirildi!',
                         ),
@@ -307,7 +307,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                 children: [
                   Text(
                     'Mavzu: ${session.topic}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                       color: AppColors.textSecondary,
@@ -357,7 +357,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
               onPressed: () async {
                 if (observationsCtrl.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
                         'Iltimos, mashg‘ulot bo‘yicha professional kuzatuv xulosangizni yozing!',
                       ),
@@ -379,7 +379,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
                         'Mashg‘ulot yakunlandi va natijalar saqlandi!',
                       ),
@@ -448,7 +448,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                         horizontal: 30,
                         vertical: 36,
                       ),
-                      child: const Column(
+                      child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
@@ -462,7 +462,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 15.5,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
                             ),
                           ),
@@ -548,8 +548,8 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                             s.topic,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w800,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w700,
                                               fontSize: 15,
                                               color: AppColors.textPrimary,
                                               letterSpacing: -0.25,
@@ -561,7 +561,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                             '${s.studentName} • ${s.specialistName}',
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 13,
                                               color: AppColors.textSecondary,
                                               fontWeight: FontWeight.w600,
@@ -573,7 +573,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                             '${s.sessionType} • ${df.format(s.scheduledAt)} (${s.durationMinutes} daqiqa)',
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 12,
                                               color: AppColors.textMuted,
                                               fontFeatures: [
@@ -596,7 +596,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                     padding: const EdgeInsets.all(15),
                                     child: Text(
                                       'Kuzatuv: ${s.observations}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12.5,
                                         color: AppColors.textPrimary,
                                         height: 1.45,
@@ -632,7 +632,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                           style: OutlinedButton.styleFrom(
                                             foregroundColor: AppColors.error,
                                             backgroundColor: Colors.white,
-                                            side: const BorderSide(
+                                            side: BorderSide(
                                               color: AppColors.errorBorder,
                                               width: 1.0,
                                             ),
@@ -681,7 +681,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                             style: OutlinedButton.styleFrom(
                                               foregroundColor: AppColors.error,
                                               backgroundColor: Colors.white,
-                                              side: const BorderSide(
+                                              side: BorderSide(
                                                 color: AppColors.errorBorder,
                                                 width: 1.0,
                                               ),

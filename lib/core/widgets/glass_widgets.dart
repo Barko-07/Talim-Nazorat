@@ -56,18 +56,26 @@ class AmbientMeshBackground extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               // 1. Asosiy yorug' va nafas oladigan fon (Fresh Porcelain & Light Sky Mist)
-              const DecoratedBox(
+              DecoratedBox(
                 decoration: BoxDecoration(
                   color: AppColors.background,
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFFF6F9FF),
-                      Color(0xFFEDF3FE),
-                      Color(0xFFE4EDFD),
-                      Color(0xFFDCE7FB),
-                    ],
+                    // Qorong'i mavzuda — sokin grafit, yorug'da — havorang tus
+                    colors: AppColors.isDark
+                        ? [
+                          AppColors.background,
+                          AppColors.background,
+                          AppColors.backgroundDeep,
+                          AppColors.backgroundDeep,
+                        ]
+                        : [
+                          AppColors.surfaceMuted,
+                          AppColors.primaryLight,
+                          AppColors.primaryLight,
+                          AppColors.primaryTint,
+                        ],
                     stops: [0.0, 0.35, 0.70, 1.0],
                   ),
                 ),
@@ -84,8 +92,8 @@ class AmbientMeshBackground extends StatelessWidget {
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          Colors.white.withValues(alpha: 0.65),
-                          Colors.white.withValues(alpha: 0.0),
+                          AppColors.surface.withValues(alpha: 0.65),
+                          AppColors.surface.withValues(alpha: 0.0),
                         ],
                       ),
                     ),
@@ -124,9 +132,9 @@ class AmbientMeshBackground extends StatelessWidget {
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          const Color(0xFF1E7FE0)
+                          AppColors.primary
                               .withValues(alpha: subtleAlpha * 0.6),
-                          const Color(0xFF1E7FE0).withValues(alpha: 0.0),
+                          AppColors.primary.withValues(alpha: 0.0),
                         ],
                       ),
                     ),
@@ -173,7 +181,7 @@ class GlassSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = tintColor ?? Colors.white;
+    final baseColor = tintColor ?? AppColors.surface;
     final radius = customBorderRadius ?? BorderRadius.circular(borderRadius);
     final effectiveOpacity = kIsWeb
         ? opacity.clamp(0.95, 1.0)
@@ -328,8 +336,8 @@ class _SurfaceCardState extends State<SurfaceCard> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.white.withValues(alpha: topAlpha),
-                  Colors.white.withValues(alpha: bottomAlpha),
+                  AppColors.surface.withValues(alpha: topAlpha),
+                  AppColors.surface.withValues(alpha: bottomAlpha),
                 ],
               ),
         borderRadius: radius,
@@ -841,7 +849,7 @@ class ModernPillFilterBar extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(3.5),
         decoration: BoxDecoration(
-          color: const Color(0xFFEFF1F5),
+          color: AppColors.surfaceMuted,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.border, width: 0.9),
         ),
@@ -945,7 +953,7 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
                   decoration: BoxDecoration(
                     color: widget.isSelected
                         ? AppColors.primaryLight
-                        : Colors.white.withValues(alpha: 0.7),
+                        : AppColors.surface.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
