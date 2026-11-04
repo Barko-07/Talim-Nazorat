@@ -7,7 +7,7 @@ import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../main_navigation_screen.dart';
-import '../auth/login_screen.dart';
+import '../auth/logout_dialog.dart';
 import '../referrals/referrals_screen.dart';
 
 import 'tabs/admin_overview_tab.dart';
@@ -346,7 +346,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
               size: 20,
             ),
             tooltip: 'Tizimdan chiqish',
-            onPressed: () => _confirmLogout(context),
+            onPressed: () => confirmLogout(context),
           ),
           const SizedBox(width: 12),
         ],
@@ -517,43 +517,6 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  void _confirmLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('Tizimdan chiqish'),
-            content: const Text(
-              'Haqiqatan ham Administrator portalidan chiqmoqchimisiz?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Bekor qilish'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.error,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () async {
-                  Navigator.pop(ctx);
-                  final auth = context.read<AuthProvider>();
-                  await auth.logout();
-                  if (context.mounted) {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (route) => false,
-                    );
-                  }
-                },
-                child: const Text('Chiqish'),
-              ),
-            ],
-          ),
     );
   }
 }

@@ -1,0 +1,246 @@
+"""Second factor on every login (emailed code / authenticator / recovery code),
+"remember this device", and sign-up with an emailed confirmation code."""
+from datetime import timedelta
+
+from fastapi.testclient import TestClient
+from sqlalchemy import select, update
+
+from app.main import create_app
+from app.models import AuthSession, OneTimeCode, PendingRegistration, Role, User, utcnow
+
+from conftest import (
+    PASSWORD,
+    Api,
+    add_institution,
+    add_user,
+    db_session,
+    last_code_for,
+    make_settings,
+    totp_now,
+)
+
+NEW = "Yangi-Mustahkam-Parol-77"
+
+
+# ------------------------------------------------------------------ emailed login code
+
+def test_every_login_needs_the_emailed_code(api, app):
+    add_user(app, "t@maktab.uz")
+    r = api.login("t@maktab.uz", email_code=False)
+    assert r.status_code == 200 and r.json()["state"] == "email_code_required"
+    assert "kirish kodi" in app.state.ctx.mailer.outbox[-1].subject
+    assert api.get("/api/students").status_code == 403  # password alone opens nothing
+
+    code = last_code_for(app, "t@maktab.uz")
+    assert api.post("/api/auth/email-code/verify", {"code": "000000" if code != "000000" else "111111"}).status_code == 401
+    r = api.post("/api/auth/email-code/verify", {"code": code})
+    assert r.status_code == 200 and r.json()["state"] == "ok"
+    assert api.post("/api/auth/email-code/verify", {"code": code}).status_code == 403  # already done
+
+
+def test_login_code_is_single_use_and_attempts_are_limited(api, app):
+    add_user(app, "a@maktab.uz")
+    api.login("a@maktab.uz", email_code=False)
+    code = last_code_for(app, "a@maktab.uz")
+    wrong = "000000" if code != "000000" else "111111"
+    for _ in range(5):
+        api.post("/api/auth/email-code/verify", {"code": wrong})
+    # the 6th try - even with the right code - is refused: the code was burnt
+    assert api.post("/api/auth/email-code/verify", {"code": code}).status_code == 401
+
+
+def test_resend_waits_a_minute_between_codes():
+    app = create_app(make_settings(code_resend_seconds=60))
+    api = Api(TestClient(app))
+    add_user(app, "w@maktab.uz")
+    r = api.login("w@maktab.uz", email_code=False)
+    assert r.json()["resend_after"] == 60
+    r = api.post("/api/auth/email-code/send")
+    assert r.status_code == 429 and 0 < r.json()["retry_after"] <= 60
+
+    with db_session(app) as db:
+        db.execute(update(OneTimeCode).values(created_at=utcnow() - timedelta(seconds=61)))
+        db.commit()
+    first = last_code_for(app, "w@maktab.uz")
+    r = api.post("/api/auth/email-code/send")
+    assert r.status_code == 200
+    second = last_code_for(app, "w@maktab.uz")
+    if first != second:  # the old code stops working once a new one is sent
+        assert api.post("/api/auth/email-code/verify", {"code": first}).status_code == 401
+    assert api.post("/api/auth/email-code/verify", {"code": second}).json()["state"] == "ok"
+
+
+# ------------------------------------------------------------------ remember this device
+
+def test_remembered_device_skips_the_code_until_password_changes(api, app):
+    add_user(app, "d@maktab.uz")
+    api.login("d@maktab.uz", remember=True)
+    api.post("/api/auth/logout")
+
+    sent = len(app.state.ctx.mailer.outbox)
+    r = api.login("d@maktab.uz", email_code=False)
+    assert r.json()["state"] == "ok"
+    assert len(app.state.ctx.mailer.outbox) == sent  # no code mailed
+    with db_session(app) as db:
+        live = db.scalars(select(AuthSession).where(AuthSession.revoked.is_(False))).one()
+        assert live.factor == "device"
+
+    api.post("/api/auth/password/change/request")
+    code = last_code_for(app, "d@maktab.uz")
+    assert api.post("/api/auth/password/change",
+                    {"current_password": PASSWORD, "code": code, "new_password": NEW}).status_code == 200
+    api.post("/api/auth/logout")
+    assert api.login("d@maktab.uz", NEW, email_code=False).json()["state"] == "email_code_required"
+
+
+def test_device_remembered_for_one_user_does_not_help_another(api, app):
+    add_user(app, "one@maktab.uz")
+    add_user(app, "two@maktab.uz")
+    api.login("one@maktab.uz", remember=True)
+    api.post("/api/auth/logout")
+    assert api.login("two@maktab.uz", email_code=False).json()["state"] == "email_code_required"
+
+
+def test_admins_cannot_skip_the_second_factor(api, app):
+    add_user(app, "boss@maktab.uz", Role.SUPER_ADMIN)
+    r = api.login("boss@maktab.uz", remember=True)
+    assert r.json()["user"]["can_remember_device"] is False
+    assert r.json()["state"] == "mfa_setup_required"  # email proven, authenticator next
+    api.post("/api/auth/logout")
+    assert api.login("boss@maktab.uz", email_code=False).json()["state"] == "email_code_required"
+
+
+# ------------------------------------------------------------------ authenticator + recovery codes
+
+def _enable_mfa(api) -> tuple[str, list[str]]:
+    secret = api.post("/api/auth/mfa/setup", {"password": PASSWORD}).json()["secret"]
+    r = api.post("/api/auth/mfa/enable", {"code": totp_now(secret)})
+    assert r.status_code == 200
+    return secret, r.json()["recovery_codes"]
+
+
+def test_enabling_mfa_gives_ten_single_use_recovery_codes(api, app):
+    add_user(app, "adm@maktab.uz", Role.SUPER_ADMIN)
+    api.login("adm@maktab.uz")
+    _, codes = _enable_mfa(api)
+    assert len(codes) == 10 and len(set(codes)) == 10
+    api.post("/api/auth/logout")
+
+    assert api.login("adm@maktab.uz").json()["state"] == "mfa_required"  # no email code once TOTP is on
+    r = api.post("/api/auth/mfa/recovery", {"code": codes[0].lower()})
+    assert r.status_code == 200 and r.json()["state"] == "ok" and r.json()["recovery_codes_left"] == 9
+    assert "zaxira kod" in app.state.ctx.mailer.outbox[-1].subject
+    api.post("/api/auth/logout")
+
+    api.login("adm@maktab.uz")
+    assert api.post("/api/auth/mfa/recovery", {"code": codes[0]}).status_code == 401  # used
+    assert api.post("/api/auth/mfa/recovery", {"code": "ABCD-EFGH"}).status_code == 401
+
+
+def test_forced_change_of_temporary_password_needs_no_second_code(api, app):
+    add_user(app, "tmp@maktab.uz", must_change=True)
+    assert api.login("tmp@maktab.uz").json()["state"] == "password_change_required"
+    r = api.post("/api/auth/password/change", {"current_password": PASSWORD, "new_password": NEW})
+    assert r.status_code == 200 and r.json()["state"] == "ok"
+
+
+def test_voluntary_password_change_still_needs_the_emailed_code(api, app):
+    add_user(app, "vol@maktab.uz")
+    api.login("vol@maktab.uz")
+    r = api.post("/api/auth/password/change", {"current_password": PASSWORD, "new_password": NEW})
+    assert r.status_code == 401
+
+
+# ------------------------------------------------------------------ sign-up
+
+FORM = {
+    "first_name": "Dilnoza", "last_name": "Karimova", "email": "dilnoza@maktab.uz",
+    "phone": "+998901112233", "role": "PSYCHOLOGIST", "specialization": "Psixolog",
+    "qualification_category": "Birinchi", "experience_years": 4, "region": "Namangan viloyati",
+    "district": "Namangan shahri", "institution_name": "14-sonli maktab", "password": NEW,
+}
+
+
+def test_sign_up_needs_the_emailed_code_then_admin_approval(api, app):
+    r = api.post("/api/auth/register", FORM)
+    assert r.status_code == 202
+    reg_id = r.json()["registration_id"]
+    code = last_code_for(app, FORM["email"])
+    with db_session(app) as db:
+        assert db.scalar(select(User).where(User.email == FORM["email"])) is None  # no account yet
+
+    bad = "000000" if code != "000000" else "111111"
+    assert api.post("/api/auth/register/verify", {"registration_id": reg_id, "code": bad}).status_code == 400
+    r = api.post("/api/auth/register/verify", {"registration_id": reg_id, "code": code})
+    assert r.status_code == 200
+    r = api.login(FORM["email"], NEW)
+    assert r.status_code == 403 and r.json()["code"] == "pending_approval"
+
+    admin = add_user(app, "root@maktab.uz", Role.SUPER_ADMIN, mfa=True)
+    boss = Api(TestClient(app))
+    boss.login("root@maktab.uz", mfa_secret=admin.mfa_secret)
+    pending = [u for u in boss.get("/api/admin/users").json() if u["pending_approval"]]
+    assert [u["email"] for u in pending] == [FORM["email"]]
+    assert pending[0]["profile"]["institution_name"] == "14-sonli maktab"
+    inst = add_institution(app)
+    assert boss.post(f"/api/admin/users/{pending[0]['id']}/approve", {"institution_id": inst}).status_code == 200
+
+    r = api.login(FORM["email"], NEW)
+    assert r.status_code == 200 and r.json()["state"] == "ok"
+    assert r.json()["user"]["institution_id"] == inst
+
+
+def test_sign_up_with_a_used_email_looks_the_same_but_creates_nothing(api, app):
+    add_user(app, FORM["email"])
+    r = api.post("/api/auth/register", FORM)
+    assert r.status_code == 202 and set(r.json()) == {"registration_id", "resend_after", "message"}
+    warning = app.state.ctx.mailer.outbox[-1]
+    assert "urinish" in warning.subject and not any(ch.isdigit() for ch in warning.body.split("\n")[0])
+    for guess in ("123456", "000000"):
+        assert api.post("/api/auth/register/verify",
+                        {"registration_id": r.json()["registration_id"], "code": guess}).status_code == 400
+
+
+def test_sign_up_resend_has_a_cooldown_and_replaces_the_code():
+    app = create_app(make_settings(code_resend_seconds=60))
+    api = Api(TestClient(app))
+    reg_id = api.post("/api/auth/register", FORM).json()["registration_id"]
+    first = last_code_for(app, FORM["email"])
+    assert api.post("/api/auth/register/resend", {"registration_id": reg_id}).status_code == 429
+    with db_session(app) as db:
+        db.execute(update(PendingRegistration).values(last_sent_at=utcnow() - timedelta(seconds=61)))
+        db.commit()
+    assert api.post("/api/auth/register/resend", {"registration_id": reg_id}).status_code == 200
+    second = last_code_for(app, FORM["email"])
+    if first != second:
+        assert api.post("/api/auth/register/verify",
+                        {"registration_id": reg_id, "code": first}).status_code == 400
+    assert api.post("/api/auth/register/verify",
+                    {"registration_id": reg_id, "code": second}).status_code == 200
+
+
+def test_sign_up_refuses_admin_roles_and_weak_passwords(api):
+    assert api.post("/api/auth/register", {**FORM, "role": "SUPER_ADMIN"}).status_code == 422
+    assert api.post("/api/auth/register", {**FORM, "password": "qisqa"}).status_code == 422
+    assert api.post("/api/auth/register", {**FORM, "password": "Dilnoza-Kuchli-2026"}).status_code == 422
+
+
+def test_expired_sign_up_code_cannot_be_used(api, app):
+    reg_id = api.post("/api/auth/register", FORM).json()["registration_id"]
+    code = last_code_for(app, FORM["email"])
+    with db_session(app) as db:
+        db.execute(update(PendingRegistration).values(expires_at=utcnow() - timedelta(seconds=1)))
+        db.commit()
+    r = api.post("/api/auth/register/verify", {"registration_id": reg_id, "code": code})
+    assert r.status_code == 400 and r.json()["code"] == "registration_expired"
+
+
+def test_rejected_sign_up_is_deleted(api, app):
+    reg_id = api.post("/api/auth/register", FORM).json()["registration_id"]
+    api.post("/api/auth/register/verify", {"registration_id": reg_id, "code": last_code_for(app, FORM["email"])})
+    admin = add_user(app, "root@maktab.uz", Role.SUPER_ADMIN, mfa=True)
+    boss = Api(TestClient(app))
+    boss.login("root@maktab.uz", mfa_secret=admin.mfa_secret)
+    uid = next(u["id"] for u in boss.get("/api/admin/users").json() if u["pending_approval"])
+    assert boss.post(f"/api/admin/users/{uid}/reject").status_code == 200
+    assert api.login(FORM["email"], NEW).status_code == 401

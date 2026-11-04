@@ -7,7 +7,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
-import '../auth/login_screen.dart';
+import '../auth/logout_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -238,16 +238,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: 'Profildan chiqish',
                     isLast: true,
                     showChevron: false,
-                    onTap: () async {
-                      await auth.logout();
-                      if (context.mounted) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (_) => const LoginScreen(),
-                          ),
-                        );
-                      }
-                    },
+                    onTap: () => confirmLogout(context),
                   ),
                 ],
               ),

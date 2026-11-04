@@ -54,6 +54,10 @@ class Settings:
     # Password / reset codes
     code_ttl_minutes: int = 10
     code_max_attempts: int = 5
+    code_resend_seconds: int = 60  # minimum gap between two emailed codes
+
+    # "Remember this device" for the emailed login code (never for admin roles)
+    trusted_device_days: int = 30
 
     # Two-factor authentication is mandatory for these roles
     mfa_required_roles: list[str] = field(
@@ -122,6 +126,8 @@ def load_settings() -> Settings:
         api_per_minute=_int("API_PER_MINUTE", 120),
         code_ttl_minutes=_int("CODE_TTL_MINUTES", 10),
         code_max_attempts=_int("CODE_MAX_ATTEMPTS", 5),
+        code_resend_seconds=_int("CODE_RESEND_SECONDS", 60),
+        trusted_device_days=_int("TRUSTED_DEVICE_DAYS", 30),
         mfa_required_roles=_list("MFA_REQUIRED_ROLES") or ["SUPER_ADMIN", "INSTITUTION_ADMIN"],
         admin_ip_allowlist=_list("ADMIN_IP_ALLOWLIST"),
         trusted_proxies=_list("TRUSTED_PROXIES") or ["127.0.0.1", "::1"],

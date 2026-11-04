@@ -5,14 +5,15 @@ from __future__ import annotations
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import func, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
 from ..context import AppContext
 from ..deps import ApiError, Principal, get_ctx, get_db, require_admin
-from ..models import AuditEvent, AuthSession, Institution, Role, User, utcnow
-from ..schemas import InstitutionIn, UserCreateIn, UserUpdateIn
+from ..models import AuditEvent, AuthSession, Institution, RecoveryCode, Role, User, utcnow
+from ..schemas import ApproveIn, InstitutionIn, UserCreateIn, UserUpdateIn
 from ..security import audit, passwords, sessions
+from .auth import profile_of
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -23,6 +24,7 @@ def _user_row(u: User) -> dict:
         "institution_id": u.institution_id, "is_active": u.is_active,
         "mfa_enabled": u.mfa_enabled, "locked": u.locked_now(utcnow()),
         "must_change_password": u.must_change_password,
+        "pending_approval": u.pending_approval, "phone": u.phone, "profile": profile_of(u),
     }
 
 
@@ -100,6 +102,41 @@ def update_user(user_id: str, body: UserUpdateIn, p: Principal = Depends(require
     return _user_row(u)
 
 
+@router.post("/users/{user_id}/approve")
+def approve_user(user_id: str, body: ApproveIn, p: Principal = Depends(require_admin),
+                 db: Session = Depends(get_db), ctx: AppContext = Depends(get_ctx)):
+    """Lets a self-registered account in, attached to the school the admin picks."""
+    u = _get_user(db, user_id)
+    if not u.pending_approval:
+        raise ApiError(409, "not_pending", "Bu hisob tasdiq kutmayapti")
+    if db.get(Institution, body.institution_id) is None:
+        raise ApiError(422, "bad_institution", "Muassasa topilmadi")
+    u.institution_id = body.institution_id
+    u.pending_approval = False
+    db.commit()
+    audit.record(db, "ADMIN_USER_APPROVED", user_id=p.user.id, subject=u.id, ip=p.ip)
+    ctx.mailer.send(u.email, "Individ: hisobingiz tasdiqlandi",
+                    "Hisobingiz administrator tomonidan tasdiqlandi. Endi Individ’ga kirishingiz mumkin.")
+    return _user_row(u)
+
+
+@router.post("/users/{user_id}/reject")
+def reject_user(user_id: str, p: Principal = Depends(require_admin), db: Session = Depends(get_db),
+                ctx: AppContext = Depends(get_ctx)):
+    """Deletes a sign-up that was never approved (it owns no data yet)."""
+    u = _get_user(db, user_id)
+    if not u.pending_approval:
+        raise ApiError(409, "not_pending", "Faqat tasdiq kutayotgan hisobni rad etish mumkin")
+    email = u.email
+    db.delete(u)
+    db.commit()
+    audit.record(db, "ADMIN_USER_REJECTED", user_id=p.user.id, subject=audit.mask_login(email), ip=p.ip)
+    ctx.mailer.send(email, "Individ: ro‘yxatdan o‘tish rad etildi",
+                    "Ro‘yxatdan o‘tish so‘rovingiz administrator tomonidan rad etildi. Savollar bo‘lsa, "
+                    "maktabingiz rahbariyatiga murojaat qiling.")
+    return {"ok": True}
+
+
 @router.post("/users/{user_id}/unlock")
 def unlock_user(user_id: str, p: Principal = Depends(require_admin), db: Session = Depends(get_db)):
     u = _get_user(db, user_id)
@@ -117,6 +154,7 @@ def reset_mfa(user_id: str, p: Principal = Depends(require_admin), db: Session =
         raise ApiError(409, "self_change", "O‘z ikki bosqichli himoyangizni bu yerda o‘chira olmaysiz")
     u.mfa_enabled = False
     u.mfa_secret = None
+    db.execute(delete(RecoveryCode).where(RecoveryCode.user_id == u.id))
     db.commit()
     sessions.revoke_all(db, u.id)
     audit.record(db, "ADMIN_MFA_RESET", severity="warning", user_id=p.user.id, subject=u.id, ip=p.ip)

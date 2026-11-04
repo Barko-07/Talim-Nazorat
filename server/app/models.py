@@ -74,6 +74,11 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     must_change_password: Mapped[bool] = mapped_column(Boolean, default=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Self-registered accounts wait here until an administrator approves them.
+    pending_approval: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Profile details from the app (region, district, school name, specialization,
+    # qualification, experience) as encrypted JSON.
+    profile: Mapped[str | None] = mapped_column(EncryptedText, nullable=True)
 
     # Two-factor authentication (TOTP). Secret is encrypted at rest.
     mfa_secret: Mapped[str | None] = mapped_column(EncryptedText, nullable=True)
@@ -98,7 +103,10 @@ class AuthSession(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
     token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    # Second factor done in this session (authenticator, recovery code, emailed
+    # code or a remembered device); `factor` says which, for the audit trail.
     mfa_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    factor: Mapped[str] = mapped_column(String(16), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     ip: Mapped[str] = mapped_column(String(64), default="")
@@ -109,17 +117,59 @@ class AuthSession(Base):
 
 
 class OneTimeCode(Base):
-    """Emailed 6-digit codes for password reset / password change.
+    """Emailed 6-digit codes for login, password reset and password change.
     Stored hashed, expire quickly, single use, limited attempts."""
 
     __tablename__ = "one_time_codes"
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
-    purpose: Mapped[str] = mapped_column(String(32))  # password_reset | password_change
+    purpose: Mapped[str] = mapped_column(String(32))  # login | password_reset | password_change
     code_hash: Mapped[str] = mapped_column(String(64))
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     attempts: Mapped[int] = mapped_column(Integer, default=0)
     used: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class RecoveryCode(Base):
+    """Single-use backup codes for when the authenticator phone is lost.
+    Only HMACs are stored; the codes are shown once, when 2FA is enabled."""
+
+    __tablename__ = "recovery_codes"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    code_hash: Mapped[str] = mapped_column(String(64))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class TrustedDevice(Base):
+    """"Remember this device": lets a non-admin skip the emailed login code on
+    one browser/phone for a limited time. The device holds a random token in an
+    HttpOnly cookie; the DB keeps its HMAC. Void after a password change."""
+
+    __tablename__ = "trusted_devices"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    user_agent: Mapped[str] = mapped_column(String(300), default="")
+    revoked: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class PendingRegistration(Base):
+    """A sign-up waiting for its emailed code. No account exists until the code
+    is confirmed; the form (with the already-hashed password) is encrypted."""
+
+    __tablename__ = "pending_registrations"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    email: Mapped[str] = mapped_column(String(254), index=True)
+    data: Mapped[str] = mapped_column(EncryptedText)
+    code_hash: Mapped[str] = mapped_column(String(64))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    sends: Mapped[int] = mapped_column(Integer, default=1)
+    last_sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 

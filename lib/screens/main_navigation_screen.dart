@@ -15,7 +15,7 @@ import '../core/constants/specialist_workspaces.dart';
 import '../providers/app_provider.dart';
 import '../providers/auth_provider.dart';
 import 'assessments/assessments_list_screen.dart';
-import 'auth/login_screen.dart';
+import 'auth/logout_dialog.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'iep/iep_list_screen.dart';
 import 'monitoring/monitoring_screen.dart';
@@ -717,16 +717,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     Navigator.of(dialogCtx).pop();
                     _selectTab(9);
                   },
-                  onLogout: () async {
+                  onLogout: () {
                     Navigator.of(dialogCtx).pop();
-                    await auth.logout();
-                    if (context.mounted) {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (_) => const LoginScreen(),
-                        ),
-                      );
-                    }
+                    confirmLogout(context);
                   },
                 ),
               ),
@@ -2039,16 +2032,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
                   ),
                   TextButton.icon(
-                    onPressed: () async {
-                      await auth.logout();
-                      if (context.mounted) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (_) => const LoginScreen(),
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: () => confirmLogout(context),
                     icon: const Icon(
                       LucideIcons.logOut,
                       size: 15,

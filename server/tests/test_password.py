@@ -33,15 +33,15 @@ def test_reset_with_code_works_once_and_signs_out_everywhere(api, app, client):
     api.post("/api/auth/password/reset/request", {"email": "r@maktab.uz"})
     code = _last_code(app)
     with db_session(app) as db:
-        stored = db.scalars(select(OneTimeCode)).one()
+        stored = db.scalars(select(OneTimeCode).where(OneTimeCode.purpose == "password_reset")).one()
         assert code not in stored.code_hash  # stored hashed
     ok = api.post("/api/auth/password/reset/confirm", {"email": "r@maktab.uz", "code": code, "new_password": NEW})
     assert ok.status_code == 200
     again = api.post("/api/auth/password/reset/confirm", {"email": "r@maktab.uz", "code": code, "new_password": NEW + "x"})
     assert again.status_code == 400  # single use
     assert other.get("/api/auth/me").status_code == 401  # old sessions revoked
+    assert any("parol tiklandi" in m.subject for m in app.state.ctx.mailer.outbox)
     assert api.login("r@maktab.uz", NEW).status_code == 200
-    assert "parol tiklandi" in app.state.ctx.mailer.outbox[-1].subject
 
 
 def test_reset_code_expires(api, app):

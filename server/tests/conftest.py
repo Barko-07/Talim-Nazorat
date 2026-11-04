@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import time
 from dataclasses import replace
 
@@ -26,6 +27,8 @@ passwords.DUMMY_HASH = passwords._hasher.hash("dummy-password-x")
 
 
 def make_settings(**overrides):
+    # Tests log in many times a second; the resend gap is tested on its own.
+    overrides.setdefault("code_resend_seconds", 0)
     return replace(load_settings(), **overrides)
 
 
@@ -123,11 +126,21 @@ class Api:
         if isinstance(body, dict) and body.get("csrf_token"):
             self.csrf = body["csrf_token"]
 
-    def login(self, email, password=PASSWORD, mfa_secret=None):
+    def login(self, email, password=PASSWORD, mfa_secret=None, email_code=True, remember=False):
+        """Logs in like the app: password, then the second factor (authenticator
+        code, or the code emailed to the account - read from the test outbox)."""
         r = self.post("/api/auth/login", {"email": email, "password": password})
         if r.status_code == 200 and r.json()["state"] == "mfa_required" and mfa_secret:
             r = self.post("/api/auth/mfa/verify", {"code": totp_now(mfa_secret)})
+        if r.status_code == 200 and r.json()["state"] == "email_code_required" and email_code:
+            code = last_code_for(self.c.app, email)
+            r = self.post("/api/auth/email-code/verify", {"code": code, "remember_device": remember})
         return r
+
+
+def last_code_for(app, email) -> str:
+    mails = [m for m in app.state.ctx.mailer.outbox if m.to == email]
+    return re.search(r"\b(\d{6})\b", mails[-1].body).group(1)
 
 
 @pytest.fixture

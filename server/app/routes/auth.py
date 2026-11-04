@@ -1,22 +1,29 @@
 """Login, two-factor authentication, logout and password management."""
 from __future__ import annotations
 
+import json
+import math
 import secrets
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, Request, Response
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 
 from ..context import AppContext
 from ..crypto import constant_time_equals, keyed_hash
 from ..deps import ApiError, Principal, _authenticate, client_ip, get_ctx, get_db, require_partial
-from ..models import OneTimeCode, User, _tz, utcnow
+from ..models import OneTimeCode, PendingRegistration, RecoveryCode, User, _tz, utcnow
 from ..schemas import (
     CodeIn,
+    EmailCodeIn,
     LoginIn,
     PasswordChangeIn,
     PasswordConfirmIn,
+    RecoveryCodeIn,
+    RegisterIn,
+    RegistrationIdIn,
+    RegistrationVerifyIn,
     ResetConfirmIn,
     ResetRequestIn,
 )
@@ -28,7 +35,15 @@ GENERIC_LOGIN_ERROR = "Login yoki parol noto‘g‘ri, yoki hisob vaqtincha blok
 MAX_LOCK = timedelta(hours=24)
 
 
-def _user_out(ctx: AppContext, p_session, user: User) -> dict:
+def profile_of(user: User) -> dict:
+    try:
+        data = json.loads(user.profile or "{}")
+    except ValueError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _user_out(ctx: AppContext, p_session, user: User, **extra) -> dict:
     return {
         "state": sessions.session_state(ctx.settings, p_session),
         "csrf_token": sessions.csrf_token(p_session),
@@ -38,8 +53,12 @@ def _user_out(ctx: AppContext, p_session, user: User) -> dict:
             "full_name": user.full_name,
             "role": user.role,
             "institution_id": user.institution_id,
+            "phone": user.phone,
             "mfa_enabled": user.mfa_enabled,
+            "can_remember_device": sessions.may_remember_device(ctx.settings, user),
+            "profile": profile_of(user),
         },
+        **extra,
     }
 
 
@@ -101,14 +120,67 @@ def login(
                      subject=audit.mask_login(email), ip=ip, webhook_url=s.alert_webhook_url)
         raise ApiError(401, "invalid_credentials", GENERIC_LOGIN_ERROR)
 
+    if user.pending_approval:
+        # Told only to someone who knows the password.
+        raise ApiError(403, "pending_approval",
+                       "Hisobingiz administrator tasdig‘ini kutmoqda. Tasdiqlangach emailingizga xabar keladi.")
+
     user.failed_logins = 0
     user.locked_until = None
     if passwords.needs_rehash(user.password_hash):
         user.password_hash = passwords.hash_password(body.password)
     db.commit()
 
+    if not user.mfa_enabled and sessions.trusted_device(db, s, user, request):
+        sess = sessions.issue(db, s, user, request, response, mfa_verified=True, ip=ip, factor="device")
+        audit.record(db, "LOGIN_OK", user_id=user.id, subject=audit.mask_login(email), ip=ip,
+                     detail="password + remembered device")
+        return _user_out(ctx, sess, user)
+
     sess = sessions.issue(db, s, user, request, response, mfa_verified=False, ip=ip)
     audit.record(db, "LOGIN_PASSWORD_OK", user_id=user.id, subject=audit.mask_login(email), ip=ip)
+    if user.mfa_enabled:
+        return _user_out(ctx, sess, user)
+    # Second factor by email: the code goes out right away (unless one was sent
+    # moments ago), so the user only has to open the mailbox.
+    wait = _code_cooldown(db, ctx, user, "login")
+    if wait == 0:
+        _issue_code(db, ctx, user, "login")
+        audit.record(db, "LOGIN_CODE_SENT", user_id=user.id, ip=ip)
+        wait = s.code_resend_seconds
+    return _user_out(ctx, sess, user, resend_after=wait)
+
+
+@router.post("/email-code/send")
+def email_code_send(request: Request, db: Session = Depends(get_db), ctx: AppContext = Depends(get_ctx)):
+    """"Kodni qayta yuborish": a new login code, at most once a minute."""
+    p = _authenticate(request, db, {"email_code_required"})
+    wait = _code_cooldown(db, ctx, p.user, "login")
+    if wait:
+        raise ApiError(429, "resend_too_soon", f"Kodni {wait} soniyadan keyin qayta so‘rashingiz mumkin",
+                       retry_after=wait)
+    _too_many(ctx, db, f"login-code:{p.user.id}", 5, 900, p.ip, "login code resend")
+    _issue_code(db, ctx, p.user, "login")
+    audit.record(db, "LOGIN_CODE_SENT", user_id=p.user.id, ip=p.ip, detail="resend")
+    return {"ok": True, "resend_after": ctx.settings.code_resend_seconds}
+
+
+@router.post("/email-code/verify")
+def email_code_verify(body: EmailCodeIn, request: Request, response: Response,
+                      db: Session = Depends(get_db), ctx: AppContext = Depends(get_ctx)):
+    p = _authenticate(request, db, {"email_code_required"})
+    _too_many(ctx, db, f"email-code:{p.session.id}", 10, 300, p.ip, "login code attempts")
+    user = p.user
+    if not _consume_code(db, ctx, user, "login", body.code, p.ip):
+        raise ApiError(401, "invalid_code", "Kod noto‘g‘ri yoki muddati o‘tgan")
+    p.session.revoked = True  # privilege change: rotate the session token
+    db.commit()
+    sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=p.ip,
+                          factor="email")
+    if body.remember_device and sessions.may_remember_device(ctx.settings, user):
+        sessions.remember_device(db, ctx.settings, user, request, response)
+        audit.record(db, "DEVICE_REMEMBERED", user_id=user.id, ip=p.ip)
+    audit.record(db, "LOGIN_OK", user_id=user.id, ip=p.ip, detail="password + email code")
     return _user_out(ctx, sess, user)
 
 
@@ -132,9 +204,43 @@ def mfa_verify(
     user.mfa_last_step = step
     p.session.revoked = True  # privilege change: rotate the session token
     db.commit()
-    sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=ip)
+    sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=ip,
+                          factor="totp")
     audit.record(db, "LOGIN_OK", user_id=user.id, ip=ip, detail="password + 2FA")
     return _user_out(ctx, sess, user)
+
+
+@router.post("/mfa/recovery")
+def mfa_recovery(body: RecoveryCodeIn, request: Request, response: Response,
+                 db: Session = Depends(get_db), ctx: AppContext = Depends(get_ctx)):
+    """Lost phone: one of the single-use backup codes replaces the app code."""
+    p = _authenticate(request, db, {"mfa_required"})
+    _too_many(ctx, db, f"mfa:{p.session.id}", 5, 300, p.ip, "mfa attempts")
+    user = p.user
+    wanted = keyed_hash(f"recovery:{user.id}:{mfa.normalize_recovery_code(body.code)}")
+    unused = db.scalars(
+        select(RecoveryCode).where(RecoveryCode.user_id == user.id, RecoveryCode.used_at.is_(None))
+    ).all()
+    match = None
+    for rc in unused:  # compare against all of them: timing does not reveal which matched
+        if constant_time_equals(rc.code_hash, wanted):
+            match = rc
+    if match is None:
+        audit.record(db, "MFA_RECOVERY_FAILED", severity="warning", user_id=user.id, ip=p.ip,
+                     webhook_url=ctx.settings.alert_webhook_url)
+        raise ApiError(401, "invalid_code", "Zaxira kod noto‘g‘ri yoki allaqachon ishlatilgan")
+    match.used_at = utcnow()
+    p.session.revoked = True
+    db.commit()
+    left = len(unused) - 1
+    sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=p.ip,
+                          factor="recovery")
+    audit.record(db, "MFA_RECOVERY_USED", severity="warning", user_id=user.id, ip=p.ip,
+                 detail=f"{left} left", webhook_url=ctx.settings.alert_webhook_url)
+    ctx.mailer.send(user.email, "Individ: zaxira kod ishlatildi",
+                    f"Hisobingizga zaxira kod bilan kirildi. Qolgan zaxira kodlar: {left} ta.\n"
+                    "Agar bu siz bo‘lmasangiz, darhol administratorga murojaat qiling.")
+    return _user_out(ctx, sess, user, recovery_codes_left=left)
 
 
 @router.post("/logout")
@@ -151,8 +257,12 @@ def logout(request: Request, response: Response, db: Session = Depends(get_db),
 
 @router.get("/me")
 def me(request: Request, db: Session = Depends(get_db), ctx: AppContext = Depends(get_ctx)):
-    p = _authenticate(request, db, {"ok", "mfa_required", "mfa_setup_required", "password_change_required"})
-    return _user_out(ctx, p.session, p.user)
+    p = _authenticate(request, db, {"ok", "mfa_required", "email_code_required", "mfa_setup_required",
+                                    "password_change_required"})
+    extra = {}
+    if sessions.session_state(ctx.settings, p.session) == "email_code_required":
+        extra["resend_after"] = _code_cooldown(db, ctx, p.user, "login")
+    return _user_out(ctx, p.session, p.user, **extra)
 
 
 # ------------------------------------------------------------------ MFA setup
@@ -189,17 +299,55 @@ def mfa_enable(body: CodeIn, request: Request, response: Response,
     user.mfa_enabled = True
     user.mfa_last_step = step
     p.session.revoked = True
+    codes = mfa.new_recovery_codes()
+    db.execute(delete(RecoveryCode).where(RecoveryCode.user_id == user.id))
+    for code in codes:
+        db.add(RecoveryCode(user_id=user.id,
+                            code_hash=keyed_hash(f"recovery:{user.id}:{mfa.normalize_recovery_code(code)}")))
     db.commit()
-    sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=p.ip)
+    sessions.forget_devices(db, user.id)  # from now on the authenticator is always asked
+    sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=p.ip,
+                          factor="totp")
     sessions.revoke_all(db, user.id, except_id=sess.id)
     audit.record(db, "MFA_ENABLED", user_id=user.id, ip=p.ip)
     ctx.mailer.send(user.email, "Individ: ikki bosqichli himoya yoqildi",
                     "Hisobingiz uchun ikki bosqichli himoya yoqildi. Agar bu siz bo‘lmasangiz, "
                     "darhol administratorga murojaat qiling.")
-    return _user_out(ctx, sess, user)
+    # Shown once: only their HMACs are kept.
+    return _user_out(ctx, sess, user, recovery_codes=codes)
 
 
 # ------------------------------------------------------------------ one-time codes
+
+CODE_PURPOSES = {
+    "login": ("Individ: kirish kodi", "tizimga kirish"),
+    "password_reset": ("Individ: tasdiqlash kodi", "parolni tiklash"),
+    "password_change": ("Individ: tasdiqlash kodi", "parolni o‘zgartirish"),
+}
+
+
+def _code_mail(ctx: AppContext, what: str, code: str) -> str:
+    return (
+        f"Sizning {what} kodingiz: {code}\n\n"
+        f"Kod {ctx.settings.code_ttl_minutes} daqiqa amal qiladi va faqat bir marta ishlatiladi.\n"
+        "Agar bu so‘rovni siz yubormagan bo‘lsangiz, ushbu xatni e’tiborsiz qoldiring va "
+        "administratorga xabar bering. Kodni hech kimga aytmang."
+    )
+
+
+def _code_cooldown(db: Session, ctx: AppContext, user: User, purpose: str) -> int:
+    """Seconds until another code may be emailed (0 = now)."""
+    last = db.scalar(
+        select(OneTimeCode.created_at)
+        .where(OneTimeCode.user_id == user.id, OneTimeCode.purpose == purpose)
+        .order_by(OneTimeCode.created_at.desc())
+        .limit(1)
+    )
+    if last is None:
+        return 0
+    passed = (utcnow() - _tz(last)).total_seconds()
+    return max(0, math.ceil(ctx.settings.code_resend_seconds - passed))
+
 
 def _issue_code(db: Session, ctx: AppContext, user: User, purpose: str) -> None:
     db.execute(
@@ -213,15 +361,8 @@ def _issue_code(db: Session, ctx: AppContext, user: User, purpose: str) -> None:
         expires_at=utcnow() + timedelta(minutes=ctx.settings.code_ttl_minutes),
     ))
     db.commit()
-    what = "parolni tiklash" if purpose == "password_reset" else "parolni o‘zgartirish"
-    ctx.mailer.send(
-        user.email,
-        "Individ: tasdiqlash kodi",
-        f"Sizning {what} kodingiz: {code}\n\n"
-        f"Kod {ctx.settings.code_ttl_minutes} daqiqa amal qiladi va faqat bir marta ishlatiladi.\n"
-        "Agar bu so‘rovni siz yubormagan bo‘lsangiz, ushbu xatni e’tiborsiz qoldiring va "
-        "administratorga xabar bering. Kodni hech kimga aytmang.",
-    )
+    subject, what = CODE_PURPOSES[purpose]
+    ctx.mailer.send(user.email, subject, _code_mail(ctx, what, code))
 
 
 def _consume_code(db: Session, ctx: AppContext, user: User, purpose: str, code: str, ip: str) -> bool:
@@ -261,6 +402,7 @@ def _set_password(db: Session, ctx: AppContext, user: User, new_password: str) -
     user.failed_logins = 0
     user.locked_until = None
     db.commit()
+    sessions.forget_devices(db, user.id)  # a new password re-asks the emailed code everywhere
 
 
 # ------------------------------------------------------------------ change password (logged in)
@@ -285,13 +427,17 @@ def password_change(body: PasswordChangeIn, request: Request, response: Response
         audit.record(db, "PASSWORD_CHANGE_BAD_PASSWORD", severity="warning", user_id=user.id,
                      ip=p.ip, webhook_url=ctx.settings.alert_webhook_url)
         raise ApiError(401, "invalid_credentials", "Joriy parol yoki kod noto‘g‘ri")
-    if not _consume_code(db, ctx, user, "password_change", body.code, p.ip):
+    # The forced change of a temporary password happens right after the login's
+    # second factor, so no extra emailed code is asked for it.
+    forced = user.must_change_password and p.session.mfa_verified
+    if not forced and not (body.code and _consume_code(db, ctx, user, "password_change", body.code, p.ip)):
         raise ApiError(401, "invalid_credentials", "Joriy parol yoki kod noto‘g‘ri")
     _set_password(db, ctx, user, body.new_password)
-    mfa_ok = p.session.mfa_verified
+    mfa_ok, factor = p.session.mfa_verified, p.session.factor
     p.session.revoked = True
     db.commit()
-    sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=mfa_ok, ip=p.ip)
+    sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=mfa_ok, ip=p.ip,
+                          factor=factor)
     sessions.revoke_all(db, user.id, except_id=sess.id)  # sign out every other device
     audit.record(db, "PASSWORD_CHANGED", user_id=user.id, ip=p.ip)
     ctx.mailer.send(user.email, "Individ: parol o‘zgartirildi",
@@ -335,3 +481,149 @@ def password_reset_confirm(body: ResetConfirmIn, request: Request, response: Res
                     "Hisobingiz paroli tiklandi va barcha seanslar yopildi. Agar bu siz bo‘lmasangiz, "
                     "darhol administratorga murojaat qiling.")
     return {"ok": True}
+
+
+# ------------------------------------------------------------------ sign-up with email confirmation
+
+MAX_REGISTRATION_SENDS = 5
+REGISTRATION_SENT = "Tasdiqlash kodi emailingizga yuborildi"
+
+
+def _registration_code(reg_id: str, code: str) -> str:
+    return keyed_hash(f"register:{reg_id}:{code}")
+
+
+def _new_code() -> str:
+    return f"{secrets.randbelow(1_000_000):06d}"
+
+
+@router.post("/register", status_code=202)
+def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
+             ctx: AppContext = Depends(get_ctx)):
+    """Step 1 of sign-up. Answers the same way whether or not the email is
+    already used, so the form cannot be used to discover accounts; the owner
+    of an existing account gets a warning email instead of a code."""
+    s = ctx.settings
+    ip = client_ip(request)
+    _too_many(ctx, db, f"register-ip:{ip}", 5, 3600, ip, "registrations per IP")
+    email = body.email.lower()
+    full_name = f"{body.last_name} {body.first_name}"
+    problems = passwords.password_problems(body.password, email=email, full_name=full_name)
+    if problems:
+        raise ApiError(422, "weak_password", "; ".join(problems))
+
+    now = utcnow()
+    db.execute(delete(PendingRegistration).where(PendingRegistration.expires_at < now - timedelta(days=1)))
+    existing = db.scalar(select(User).where(User.email == email))
+    reg = PendingRegistration(email=email, code_hash="", data="{}",
+                              expires_at=now + timedelta(minutes=s.code_ttl_minutes))
+    db.add(reg)
+    db.flush()
+    if existing is not None:
+        reg.data = json.dumps({"existing": True})
+        reg.code_hash = _registration_code(reg.id, secrets.token_hex(16))  # can never match
+        db.commit()
+        audit.record(db, "REGISTER_EXISTING_EMAIL", severity="warning", user_id=existing.id,
+                     subject=audit.mask_login(email), ip=ip, webhook_url=s.alert_webhook_url)
+        ctx.mailer.send(email, "Individ: ro‘yxatdan o‘tishga urinish",
+                        "Kimdir ushbu email bilan Individ’da yangi hisob ochmoqchi bo‘ldi. Sizda allaqachon "
+                        "hisob bor, shuning uchun yangi hisob ochilmadi.\nParolingizni unutgan bo‘lsangiz, "
+                        "kirish sahifasidagi “Parolni unutdingizmi?” orqali tiklang. Agar bu siz "
+                        "bo‘lmasangiz, hech narsa qilish shart emas.")
+    else:
+        code = _new_code()
+        reg.code_hash = _registration_code(reg.id, code)
+        reg.data = json.dumps({
+            "full_name": full_name,
+            "phone": body.phone,
+            "role": body.role.value,
+            "password_hash": passwords.hash_password(body.password),
+            "profile": {
+                "first_name": body.first_name, "last_name": body.last_name,
+                "specialization": body.specialization,
+                "qualification_category": body.qualification_category,
+                "experience_years": body.experience_years,
+                "region": body.region, "district": body.district,
+                "institution_name": body.institution_name,
+            },
+        })
+        db.commit()
+        audit.record(db, "REGISTER_CODE_SENT", subject=audit.mask_login(email), ip=ip)
+        ctx.mailer.send(email, "Individ: emailni tasdiqlash", _code_mail(ctx, "ro‘yxatdan o‘tish", code))
+    return {"registration_id": reg.id, "resend_after": s.code_resend_seconds, "message": REGISTRATION_SENT}
+
+
+def _pending(db: Session, reg_id: str) -> PendingRegistration:
+    reg = db.get(PendingRegistration, reg_id)
+    if reg is None or _tz(reg.expires_at) < utcnow():
+        raise ApiError(400, "registration_expired",
+                       "Tasdiqlash muddati tugadi. Ro‘yxatdan o‘tishni qaytadan boshlang")
+    return reg
+
+
+@router.post("/register/resend")
+def register_resend(body: RegistrationIdIn, request: Request, db: Session = Depends(get_db),
+                    ctx: AppContext = Depends(get_ctx)):
+    """"Kodni qayta yuborish" on the sign-up code screen."""
+    s = ctx.settings
+    ip = client_ip(request)
+    _too_many(ctx, db, f"register-resend-ip:{ip}", 10, 3600, ip, "registration resends per IP")
+    reg = _pending(db, body.registration_id)
+    wait = max(0, math.ceil(s.code_resend_seconds - (utcnow() - _tz(reg.last_sent_at)).total_seconds()))
+    if wait:
+        raise ApiError(429, "resend_too_soon", f"Kodni {wait} soniyadan keyin qayta so‘rashingiz mumkin",
+                       retry_after=wait)
+    if reg.sends >= MAX_REGISTRATION_SENDS:
+        raise ApiError(429, "rate_limited", "Juda ko‘p urinish. Ro‘yxatdan o‘tishni qaytadan boshlang")
+    reg.sends += 1
+    reg.attempts = 0
+    reg.last_sent_at = utcnow()
+    reg.expires_at = utcnow() + timedelta(minutes=s.code_ttl_minutes)
+    data = json.loads(reg.data)
+    if data.get("existing"):
+        db.commit()  # same answer as a real resend; nothing is mailed
+    else:
+        code = _new_code()
+        reg.code_hash = _registration_code(reg.id, code)
+        db.commit()
+        ctx.mailer.send(reg.email, "Individ: emailni tasdiqlash", _code_mail(ctx, "ro‘yxatdan o‘tish", code))
+    return {"ok": True, "resend_after": s.code_resend_seconds, "message": REGISTRATION_SENT}
+
+
+@router.post("/register/verify")
+def register_verify(body: RegistrationVerifyIn, request: Request, db: Session = Depends(get_db),
+                    ctx: AppContext = Depends(get_ctx)):
+    """Step 2: the emailed code creates the account, which then waits for an
+    administrator to approve it (and attach it to the right school)."""
+    s = ctx.settings
+    ip = client_ip(request)
+    _too_many(ctx, db, f"register-verify-ip:{ip}", 20, 900, ip, "registration verify per IP")
+    reg = _pending(db, body.registration_id)
+    reg.attempts += 1
+    if reg.attempts > s.code_max_attempts:
+        db.commit()
+        raise ApiError(429, "rate_limited", "Juda ko‘p noto‘g‘ri urinish. Yangi kod so‘rang")
+    if not constant_time_equals(reg.code_hash, _registration_code(reg.id, body.code)):
+        db.commit()
+        audit.record(db, "REGISTER_CODE_FAILED", severity="warning", subject=audit.mask_login(reg.email), ip=ip)
+        raise ApiError(400, "invalid_code", "Kod noto‘g‘ri yoki muddati o‘tgan")
+    data = json.loads(reg.data)
+    if db.scalar(select(User).where(User.email == reg.email)) is not None:  # taken meanwhile
+        db.delete(reg)
+        db.commit()
+        raise ApiError(400, "invalid_code", "Kod noto‘g‘ri yoki muddati o‘tgan")
+    user = User(
+        email=reg.email, full_name=data["full_name"], role=data["role"], phone=data["phone"],
+        password_hash=data["password_hash"], must_change_password=False, is_active=True,
+        pending_approval=True, profile=json.dumps(data["profile"]),
+    )
+    db.add(user)
+    db.delete(reg)
+    db.commit()
+    audit.record(db, "REGISTERED_PENDING_APPROVAL", user_id=user.id, subject=audit.mask_login(user.email), ip=ip)
+    admins = db.scalars(select(User).where(User.role == "SUPER_ADMIN", User.is_active.is_(True))).all()
+    for admin in admins:
+        ctx.mailer.send(admin.email, "Individ: yangi ro‘yxatdan o‘tish",
+                        f"{user.full_name} ({data['profile'].get('institution_name', '')}) ro‘yxatdan o‘tdi va "
+                        "tasdiqlashingizni kutmoqda. Administrator panelida ko‘rib chiqing.")
+    return {"ok": True, "message": "Email tasdiqlandi. Hisobingiz administrator tasdig‘idan so‘ng faollashadi"}

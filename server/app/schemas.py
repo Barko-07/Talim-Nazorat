@@ -53,10 +53,59 @@ class PasswordConfirmIn(Strict):
     password: str = Field(min_length=1, max_length=128)
 
 
+class EmailCodeIn(Strict):
+    code: str = Field(pattern=r"^\d{6}$")
+    remember_device: bool = False
+
+
+class RecoveryCodeIn(Strict):
+    # XXXX-XXXX from the list shown when 2FA was enabled; case and dash optional.
+    code: str = Field(pattern=r"^[A-Za-z0-9]{4}-?[A-Za-z0-9]{4}$")
+
+
 class PasswordChangeIn(Strict):
     current_password: str = Field(min_length=1, max_length=128)
-    code: str = Field(pattern=r"^\d{6}$")
+    # Not needed for the forced first change of a temporary password: that
+    # session has already passed the emailed login code.
+    code: str | None = Field(default=None, pattern=r"^\d{6}$")
     new_password: str = Field(min_length=1, max_length=128)
+
+
+# Roles a person may pick when signing up; everything else is created by an admin.
+SELF_REGISTRATION_ROLES = {
+    Role.PSYCHOLOGIST, Role.SPEECH_THERAPIST, Role.SPECIAL_EDUCATION,
+    Role.SPECIAL_ED_TEACHER, Role.TEACHER,
+}
+
+
+class RegisterIn(Strict):
+    first_name: PlainStr = Field(min_length=2, max_length=60)
+    last_name: PlainStr = Field(min_length=2, max_length=60)
+    email: EmailStr = Field(max_length=254)
+    phone: str = Field(pattern=r"^\+?[0-9 ()-]{7,20}$")
+    role: Role
+    specialization: PlainStr = Field(default="", max_length=120)
+    qualification_category: PlainStr = Field(default="", max_length=60)
+    experience_years: int = Field(default=0, ge=0, le=60)
+    region: PlainStr = Field(default="", max_length=100)
+    district: PlainStr = Field(default="", max_length=100)
+    institution_name: PlainStr = Field(min_length=2, max_length=200)
+    password: str = Field(min_length=1, max_length=128)
+
+    @field_validator("role")
+    @classmethod
+    def _self_service_role(cls, v: Role) -> Role:
+        if v not in SELF_REGISTRATION_ROLES:
+            raise ValueError("bu rol bilan o‘zingiz ro‘yxatdan o‘ta olmaysiz")
+        return v
+
+
+class RegistrationIdIn(Strict):
+    registration_id: str = Field(pattern=r"^[a-f0-9]{32}$")
+
+
+class RegistrationVerifyIn(RegistrationIdIn):
+    code: str = Field(pattern=r"^\d{6}$")
 
 
 class ResetRequestIn(Strict):
@@ -81,6 +130,10 @@ class UserUpdateIn(Strict):
     full_name: PlainStr | None = Field(default=None, min_length=3, max_length=120)
     role: Role | None = None
     is_active: bool | None = None
+
+
+class ApproveIn(Strict):
+    institution_id: str = Field(pattern=r"^[a-f0-9]{32}$")
 
 
 class InstitutionIn(Strict):

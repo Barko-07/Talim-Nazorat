@@ -96,7 +96,7 @@ def test_idle_and_absolute_timeouts(api, app):
     add_user(app, "idle@maktab.uz")
     api.login("idle@maktab.uz")
     with db_session(app) as db:
-        s = db.scalars(select(AuthSession)).one()
+        s = db.scalars(select(AuthSession).where(AuthSession.revoked.is_(False))).one()
         s.last_seen_at = utcnow() - timedelta(minutes=31)
         db.commit()
     assert api.get("/api/auth/me").status_code == 401
