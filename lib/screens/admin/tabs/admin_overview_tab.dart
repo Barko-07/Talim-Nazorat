@@ -1311,9 +1311,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         color:
                             isRed
                                 ? AppColors.error.withValues(alpha: 0.2)
-                                : const Color(
-                                  0xFFD97706,
-                                ).withValues(alpha: 0.2),
+                                : AppColors.warning.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -1434,19 +1432,15 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         const SizedBox(width: 12),
                         ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
+                            backgroundColor: AppColors.surface,
                             foregroundColor:
                                 isRed ? AppColors.error : AppColors.warning,
                             elevation: 0,
                             side: BorderSide(
                               color:
                                   isRed
-                                      ? const Color(
-                                        0xFFDC2626,
-                                      ).withValues(alpha: 0.4)
-                                      : const Color(
-                                        0xFFD97706,
-                                      ).withValues(alpha: 0.4),
+                                      ? AppColors.error.withValues(alpha: 0.4)
+                                      : AppColors.warning.withValues(alpha: 0.4),
                             ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,

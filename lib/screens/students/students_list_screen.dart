@@ -72,13 +72,14 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
         for (final st in summary.statuses) st.student.id: st,
     };
 
-    final students = _selectedStatusColor == null
-        ? rawStudents
-        : rawStudents
-              .where(
-                (s) => statusByStudentId[s.id]?.color == _selectedStatusColor,
-              )
-              .toList();
+    final students =
+        _selectedStatusColor == null
+            ? rawStudents
+            : rawStudents
+                .where(
+                  (s) => statusByStudentId[s.id]?.color == _selectedStatusColor,
+                )
+                .toList();
 
     final canPop = Navigator.canPop(context);
     final width = MediaQuery.sizeOf(context).width;
@@ -98,20 +99,21 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
             subtitle:
                 'Ro‘yxatda ${students.length} nafar inklyuziv ta’lim o‘quvchisi',
             // Yangi o'quvchini faqat koordinator va rahbariyat ro'yxatga oladi
-            action: !canAddStudent
-                ? null
-                : HeaderActionButton(
-                    icon: LucideIcons.userPlus,
-                    label: 'Yangi o‘quvchi',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const AddStudentScreen(),
-                        ),
-                      );
-                    },
-                  ),
+            action:
+                !canAddStudent
+                    ? null
+                    : HeaderActionButton(
+                      icon: LucideIcons.userPlus,
+                      label: 'Yangi o‘quvchi',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AddStudentScreen(),
+                          ),
+                        );
+                      },
+                    ),
           ),
           const SizedBox(height: 9),
 
@@ -137,12 +139,13 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                       horizontal: 15,
                       vertical: 13,
                     ),
-                    suffixIcon: app.searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(LucideIcons.x, size: 16),
-                            onPressed: () => app.setSearchQuery(''),
-                          )
-                        : null,
+                    suffixIcon:
+                        app.searchQuery.isNotEmpty
+                            ? IconButton(
+                              icon: const Icon(LucideIcons.x, size: 16),
+                              onPressed: () => app.setSearchQuery(''),
+                            )
+                            : null,
                   ),
                   onChanged: (val) => app.setSearchQuery(val),
                 );
@@ -157,12 +160,13 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                       border: Border.all(color: AppColors.border, width: 1.0),
                     ),
                     child: DropdownButton<String?>(
-                      value: _gradeOptions.contains(app.selectedGrade)
-                          ? app.selectedGrade
-                          : null,
+                      value:
+                          _gradeOptions.contains(app.selectedGrade)
+                              ? app.selectedGrade
+                              : null,
                       isExpanded: isCompact,
                       borderRadius: BorderRadius.circular(14),
-                      dropdownColor: Colors.white,
+                      dropdownColor: AppColors.surfaceRaised,
                       icon: Padding(
                         padding: EdgeInsets.only(left: 6),
                         child: Icon(
@@ -234,8 +238,10 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                               color: AppColors.primary,
                               bg: AppColors.primaryLight,
                               selected: _selectedStatusColor == null,
-                              onTap: () =>
-                                  setState(() => _selectedStatusColor = null),
+                              onTap:
+                                  () => setState(
+                                    () => _selectedStatusColor = null,
+                                  ),
                             ),
                             const SizedBox(width: 8),
                             _buildStatusFilterChip(
@@ -243,14 +249,16 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                                   '🔴 Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
                               color: AppColors.error,
                               bg: AppColors.errorBg,
-                              selected:
-                                  _selectedStatusColor == StatusColor.red,
-                              onTap: () => setState(
-                                () => _selectedStatusColor =
-                                    _selectedStatusColor == StatusColor.red
-                                    ? null
-                                    : StatusColor.red,
-                              ),
+                              selected: _selectedStatusColor == StatusColor.red,
+                              onTap:
+                                  () => setState(
+                                    () =>
+                                        _selectedStatusColor =
+                                            _selectedStatusColor ==
+                                                    StatusColor.red
+                                                ? null
+                                                : StatusColor.red,
+                                  ),
                             ),
                             const SizedBox(width: 8),
                             _buildStatusFilterChip(
@@ -260,12 +268,15 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                               bg: AppColors.warningBg,
                               selected:
                                   _selectedStatusColor == StatusColor.yellow,
-                              onTap: () => setState(
-                                () => _selectedStatusColor =
-                                    _selectedStatusColor == StatusColor.yellow
-                                    ? null
-                                    : StatusColor.yellow,
-                              ),
+                              onTap:
+                                  () => setState(
+                                    () =>
+                                        _selectedStatusColor =
+                                            _selectedStatusColor ==
+                                                    StatusColor.yellow
+                                                ? null
+                                                : StatusColor.yellow,
+                                  ),
                             ),
                             const SizedBox(width: 8),
                             _buildStatusFilterChip(
@@ -275,12 +286,15 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                               bg: AppColors.successBg,
                               selected:
                                   _selectedStatusColor == StatusColor.green,
-                              onTap: () => setState(
-                                () => _selectedStatusColor =
-                                    _selectedStatusColor == StatusColor.green
-                                    ? null
-                                    : StatusColor.green,
-                              ),
+                              onTap:
+                                  () => setState(
+                                    () =>
+                                        _selectedStatusColor =
+                                            _selectedStatusColor ==
+                                                    StatusColor.green
+                                                ? null
+                                                : StatusColor.green,
+                                  ),
                             ),
                           ],
                         ),
@@ -295,62 +309,63 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
 
           // Bolalar ro'yxati
           Expanded(
-            child: students.isEmpty
-                ? Center(
-                    child: SurfaceCard(
-                      borderRadius: 26,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 34,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            LucideIcons.userSearch,
-                            size: 36,
-                            color: AppColors.primary,
-                          ),
-                          SizedBox(height: 14),
-                          Text(
-                            'O‘quvchilar topilmadi',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
+            child:
+                students.isEmpty
+                    ? Center(
+                      child: SurfaceCard(
+                        borderRadius: 26,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 34,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              LucideIcons.userSearch,
+                              size: 36,
+                              color: AppColors.primary,
                             ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            'Qidiruv so‘zini yoki sinf filtrini o‘zgartirib ko‘ring',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textMuted,
+                            SizedBox(height: 14),
+                            Text(
+                              'O‘quvchilar topilmadi',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 5),
+                            Text(
+                              'Qidiruv so‘zini yoki sinf filtrini o‘zgartirib ko‘ring',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                    )
+                    : ListView.separated(
+                      padding: EdgeInsets.fromLTRB(
+                        0,
+                        0,
+                        0,
+                        width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
+                      ),
+                      itemCount: students.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final student = students[index];
+                        return _buildStudentCard(
+                          context,
+                          student,
+                          statusByStudentId[student.id],
+                        );
+                      },
                     ),
-                  )
-                : ListView.separated(
-                    padding: EdgeInsets.fromLTRB(
-                      0,
-                      0,
-                      0,
-                      width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
-                    ),
-                    itemCount: students.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      final student = students[index];
-                      return _buildStudentCard(
-                        context,
-                        student,
-                        statusByStudentId[student.id],
-                      );
-                    },
-                  ),
           ),
         ],
       ),
@@ -358,9 +373,10 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
 
     return Scaffold(
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
-      appBar: canPop
-          ? AppBar(title: const Text('Bolalar elektron reyestri'))
-          : null,
+      appBar:
+          canPop
+              ? AppBar(title: const Text('Bolalar elektron reyestri'))
+              : null,
       body: canPop ? AmbientMeshBackground(child: bodyContent) : bodyContent,
     );
   }
@@ -402,9 +418,10 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
     StudentModel s,
     ChildStatus? status,
   ) {
-    final guardianText = s.guardians.isNotEmpty
-        ? '${s.guardians.first.relationship}: ${s.guardians.first.fullName}'
-        : 'Vasiy kiritilmagan';
+    final guardianText =
+        s.guardians.isNotEmpty
+            ? '${s.guardians.first.relationship}: ${s.guardians.first.fullName}'
+            : 'Vasiy kiritilmagan';
     final statusColor = status != null ? _colorFor(status.color) : null;
     final statusBg = status != null ? _bgFor(status.color) : null;
     final isRed = status?.color == StatusColor.red;
@@ -413,9 +430,10 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
       borderRadius: 26,
       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
       backgroundColor: isRed ? AppColors.errorBg : null,
-      borderColor: statusColor != null
-          ? statusColor.withValues(alpha: isRed ? 0.55 : 0.32)
-          : null,
+      borderColor:
+          statusColor != null
+              ? statusColor.withValues(alpha: isRed ? 0.55 : 0.32)
+              : null,
       onTap: () {
         Navigator.push(
           context,
@@ -444,32 +462,36 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                // Ism to'liq kenglikda; holat belgilari uning ostida (telefonda
+                // ism belgilar orasida bitta harfgacha siqilib qolardi).
+                Text(
+                  s.fullName,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.25,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
                   children: [
-                    Expanded(
-                      child: Text(
-                        s.fullName,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 15.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                          letterSpacing: -0.25,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    if (status != null) ...[
+                    if (status != null)
                       StatusPill(
-                        label: '${status.color.label}: ${status.color == StatusColor.red ? "Ishlanmagan" : status.color == StatusColor.yellow ? "E’tibor talab" : "Ijobiy"}',
+                        label:
+                            '${status.color.label}: ${status.color == StatusColor.red
+                                ? "Ishlanmagan"
+                                : status.color == StatusColor.yellow
+                                ? "E’tibor talab"
+                                : "Ijobiy"}',
                         color: statusColor!,
                         backgroundColor: statusBg!,
                         showDot: true,
                       ),
-                      const SizedBox(width: 6),
-                    ],
                     StatusPill(
                       label: '${s.grade}-sinf',
                       color: AppColors.primary,

@@ -26,7 +26,7 @@ Future<void> confirmLogout(BuildContext context) async {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.error,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.onPrimary,
               ),
               onPressed: () => Navigator.pop(ctx, true),
               child: const Text('Ha, chiqish'),

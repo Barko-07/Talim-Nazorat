@@ -83,9 +83,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                           color: AppColors.purpleBg,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(
-                              0xFF7C3AED,
-                            ).withValues(alpha: 0.2),
+                            color: AppColors.purple.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
@@ -620,7 +618,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
+                        foregroundColor: AppColors.onPrimary,
                       ),
                       onPressed: () async {
                         if (selectedStudent != null) {

@@ -442,7 +442,7 @@ class _CallToAction extends StatelessWidget {
               height: 50,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppColors.surface,
                   foregroundColor: AppColors.primary,
                 ),
                 onPressed: () => LandingScreen.openAuth(context, signUp: true),

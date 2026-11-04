@@ -789,7 +789,7 @@ class _IepListScreenState extends State<IepListScreen> {
           final printButton = OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primaryDark,
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.surface,
               side: BorderSide(color: AppColors.border, width: 1.0),
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             ),

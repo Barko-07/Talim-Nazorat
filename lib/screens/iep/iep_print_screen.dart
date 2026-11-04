@@ -31,7 +31,7 @@ class IepPrintScreen extends StatelessWidget {
             padding: const EdgeInsets.only(right: 14),
             child: OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.surface,
                 foregroundColor: AppColors.primaryDark,
                 side: BorderSide(color: AppColors.border, width: 1.0),
                 padding: const EdgeInsets.symmetric(

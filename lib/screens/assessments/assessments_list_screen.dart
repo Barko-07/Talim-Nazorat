@@ -79,7 +79,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                 : StatusPill(
                     label: 'Ko‘rish rejimi',
                     color: AppColors.textMuted,
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppColors.surface,
                     borderColor: AppColors.border,
                     icon: LucideIcons.eye,
                   ),

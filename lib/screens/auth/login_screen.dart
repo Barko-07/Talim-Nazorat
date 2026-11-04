@@ -1266,7 +1266,7 @@ class _LoginScreenState extends State<LoginScreen>
                             color:
                                 isSelected
                                     ? AppColors.primary.withValues(alpha: 0.12)
-                                    : Colors.white,
+                                    : AppColors.surface,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color:

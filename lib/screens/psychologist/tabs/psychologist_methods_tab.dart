@@ -605,7 +605,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                 label: const Text('Baholash'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: domainColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 10,
@@ -947,7 +947,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                       label: const Text('Ushbu metodika bilan baholash'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: domainColor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: AppColors.onPrimary,
                       ),
                     ),
                   ],

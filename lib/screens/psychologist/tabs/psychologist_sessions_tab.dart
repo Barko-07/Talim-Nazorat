@@ -13,13 +13,11 @@ import '../../../providers/auth_provider.dart';
 class PsychologistSessionsTab extends StatefulWidget {
   final VoidCallback? onScheduleNew;
 
-  const PsychologistSessionsTab({
-    super.key,
-    this.onScheduleNew,
-  });
+  const PsychologistSessionsTab({super.key, this.onScheduleNew});
 
   @override
-  State<PsychologistSessionsTab> createState() => _PsychologistSessionsTabState();
+  State<PsychologistSessionsTab> createState() =>
+      _PsychologistSessionsTabState();
 }
 
 class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
@@ -36,11 +34,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
     'Bekor qilindi',
   ];
 
-  final List<String> _types = [
-    'Barchasi',
-    'Individual',
-    'Kichik guruhda',
-  ];
+  final List<String> _types = ['Barchasi', 'Individual', 'Kichik guruhda'];
 
   @override
   void dispose() {
@@ -59,26 +53,33 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
     final now = DateTime.now();
 
     // Filtrlash
-    final filteredSessions = allSessions.where((s) {
-      final matchesStatus = _selectedStatus == 'Barchasi' || s.status == _selectedStatus;
-      final matchesType = _selectedType == 'Barchasi' || s.sessionType == _selectedType;
-      final q = _searchQuery.toLowerCase().trim();
-      final matchesSearch = q.isEmpty ||
-          s.studentName.toLowerCase().contains(q) ||
-          s.topic.toLowerCase().contains(q) ||
-          (s.goalDescription != null && s.goalDescription!.toLowerCase().contains(q));
-      return matchesStatus && matchesType && matchesSearch;
-    }).toList();
+    final filteredSessions =
+        allSessions.where((s) {
+          final matchesStatus =
+              _selectedStatus == 'Barchasi' || s.status == _selectedStatus;
+          final matchesType =
+              _selectedType == 'Barchasi' || s.sessionType == _selectedType;
+          final q = _searchQuery.toLowerCase().trim();
+          final matchesSearch =
+              q.isEmpty ||
+              s.studentName.toLowerCase().contains(q) ||
+              s.topic.toLowerCase().contains(q) ||
+              (s.goalDescription != null &&
+                  s.goalDescription!.toLowerCase().contains(q));
+          return matchesStatus && matchesType && matchesSearch;
+        }).toList();
 
     // Statistika
     final scheduledCount = allSessions.where((s) => s.isScheduled).length;
     final completedCount = allSessions.where((s) => s.isCompleted).length;
-    final todayCount = allSessions.where((s) {
-      return s.scheduledAt.year == now.year &&
-          s.scheduledAt.month == now.month &&
-          s.scheduledAt.day == now.day;
-    }).length;
-    final missedCount = allSessions.where((s) => s.isMissed || s.isCancelled).length;
+    final todayCount =
+        allSessions.where((s) {
+          return s.scheduledAt.year == now.year &&
+              s.scheduledAt.month == now.month &&
+              s.scheduledAt.day == now.day;
+        }).length;
+    final missedCount =
+        allSessions.where((s) => s.isMissed || s.isCancelled).length;
 
     return Scaffold(
       backgroundColor: AppColors.surfaceMuted,
@@ -102,101 +103,138 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                   ),
                 ],
               ),
-              child: Row(
-                children: [
-                  Container(
+              child: LayoutBuilder(
+                builder: (context, c) {
+                  final icon = Container(
                     width: 52,
                     height: 52,
                     decoration: BoxDecoration(
                       color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.calendar_month_rounded, color: AppColors.primary, size: 28),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Psixologik mashg‘ulotlar va korreksion uchrashuvlar',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'O‘quvchilar bilan individual va kichik guruhdagi psixologik korreksiya, suhbat va mashg‘ulotlar jadvali.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary.withOpacity(0.9),
-                          ),
-                        ),
-                      ],
+                    child: Icon(
+                      Icons.calendar_month_rounded,
+                      color: AppColors.primary,
+                      size: 28,
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    onPressed: () => _showScheduleSessionDialog(context, students, currentUser),
+                  );
+                  final texts = Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Psixologik mashg‘ulotlar va korreksion uchrashuvlar',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'O‘quvchilar bilan individual va kichik guruhdagi psixologik korreksiya, suhbat va mashg‘ulotlar jadvali.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  );
+                  final button = ElevatedButton.icon(
+                    onPressed:
+                        () => _showScheduleSessionDialog(
+                          context,
+                          students,
+                          currentUser,
+                        ),
                     icon: const Icon(Icons.add_rounded, size: 18),
                     label: const Text('Mashg‘ulot rejalashtirish'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      foregroundColor: AppColors.onPrimary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                  ),
-                ],
+                  );
+                  if (c.maxWidth < 640) {
+                    // Telefon: tugma matn ostida, butun kenglikda
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            icon,
+                            const SizedBox(width: 14),
+                            Expanded(child: texts),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        button,
+                      ],
+                    );
+                  }
+                  return Row(
+                    children: [
+                      icon,
+                      const SizedBox(width: 16),
+                      Expanded(child: texts),
+                      const SizedBox(width: 12),
+                      button,
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 20),
 
-            // Statistika kartalari
-            Row(
-              children: [
-                Expanded(
-                  child: _buildMetricCard(
+            // Statistika kartalari — telefonda 2 tadan, kengroq ekranda 4 tasi bir qatorda
+            LayoutBuilder(
+              builder: (context, c) {
+                final columns = c.maxWidth >= 760 ? 4 : 2;
+                const gap = 14.0;
+                final w = (c.maxWidth - gap * (columns - 1)) / columns;
+                final cards = [
+                  _buildMetricCard(
                     title: 'Bugungi mashg‘ulotlar',
                     value: '$todayCount',
                     icon: Icons.today_rounded,
                     color: AppColors.primaryDark,
                     bgColor: AppColors.primaryLight,
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: _buildMetricCard(
+                  _buildMetricCard(
                     title: 'Rejalashtirilgan',
                     value: '$scheduledCount',
                     icon: Icons.schedule_rounded,
                     color: AppColors.brandTeal,
                     bgColor: AppColors.infoBg,
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: _buildMetricCard(
+                  _buildMetricCard(
                     title: 'Bajarilgan seanslar',
                     value: '$completedCount',
                     icon: Icons.check_circle_outline_rounded,
                     color: AppColors.success,
                     bgColor: AppColors.successBg,
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: _buildMetricCard(
+                  _buildMetricCard(
                     title: 'Qatnashmadi / Bekor',
                     value: '$missedCount',
                     icon: Icons.cancel_outlined,
                     color: AppColors.error,
                     bgColor: AppColors.errorBg,
                   ),
-                ),
-              ],
+                ];
+                return Wrap(
+                  spacing: gap,
+                  runSpacing: gap,
+                  children: [
+                    for (final card in cards) SizedBox(width: w, child: card),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 20),
 
@@ -220,22 +258,30 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                       });
                     },
                     decoration: InputDecoration(
-                      hintText: 'O‘quvchi ismi, mashg‘ulot mavzusi yoki ITR maqsadi bo‘yicha qidiring...',
-                      prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear, size: 18),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchQuery = '';
-                                });
-                              },
-                            )
-                          : null,
+                      hintText:
+                          'O‘quvchi ismi, mashg‘ulot mavzusi yoki ITR maqsadi bo‘yicha qidiring...',
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: AppColors.textSecondary,
+                      ),
+                      suffixIcon:
+                          _searchQuery.isNotEmpty
+                              ? IconButton(
+                                icon: const Icon(Icons.clear, size: 18),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _searchQuery = '';
+                                  });
+                                },
+                              )
+                              : null,
                       filled: true,
                       fillColor: AppColors.surfaceMuted,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(color: AppColors.border),
@@ -253,56 +299,92 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                     children: [
                       Text(
                         'Holat: ',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       const SizedBox(width: 6),
                       Wrap(
                         spacing: 6,
-                        children: _statuses.map((st) {
-                          final isSelected = _selectedStatus == st;
-                          return ChoiceChip(
-                            label: Text(st),
-                            selected: isSelected,
-                            onSelected: (val) {
-                              if (val) setState(() => _selectedStatus = st);
-                            },
-                            selectedColor: AppColors.primary.withOpacity(0.12),
-                            backgroundColor: AppColors.surfaceMuted,
-                            labelStyle: TextStyle(
-                              fontSize: 11,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                            ),
-                            side: BorderSide(color: isSelected ? AppColors.primary : Colors.transparent),
-                          );
-                        }).toList(),
+                        children:
+                            _statuses.map((st) {
+                              final isSelected = _selectedStatus == st;
+                              return ChoiceChip(
+                                label: Text(st),
+                                selected: isSelected,
+                                onSelected: (val) {
+                                  if (val) setState(() => _selectedStatus = st);
+                                },
+                                selectedColor: AppColors.primary.withOpacity(
+                                  0.12,
+                                ),
+                                backgroundColor: AppColors.surfaceMuted,
+                                labelStyle: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight:
+                                      isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                  color:
+                                      isSelected
+                                          ? AppColors.primary
+                                          : AppColors.textSecondary,
+                                ),
+                                side: BorderSide(
+                                  color:
+                                      isSelected
+                                          ? AppColors.primary
+                                          : Colors.transparent,
+                                ),
+                              );
+                            }).toList(),
                       ),
                       const Spacer(),
                       Text(
                         'Turi: ',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       const SizedBox(width: 6),
                       Wrap(
                         spacing: 6,
-                        children: _types.map((tp) {
-                          final isSelected = _selectedType == tp;
-                          return ChoiceChip(
-                            label: Text(tp),
-                            selected: isSelected,
-                            onSelected: (val) {
-                              if (val) setState(() => _selectedType = tp);
-                            },
-                            selectedColor: AppColors.primary.withOpacity(0.12),
-                            backgroundColor: AppColors.surfaceMuted,
-                            labelStyle: TextStyle(
-                              fontSize: 11,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                            ),
-                            side: BorderSide(color: isSelected ? AppColors.primary : Colors.transparent),
-                          );
-                        }).toList(),
+                        children:
+                            _types.map((tp) {
+                              final isSelected = _selectedType == tp;
+                              return ChoiceChip(
+                                label: Text(tp),
+                                selected: isSelected,
+                                onSelected: (val) {
+                                  if (val) setState(() => _selectedType = tp);
+                                },
+                                selectedColor: AppColors.primary.withOpacity(
+                                  0.12,
+                                ),
+                                backgroundColor: AppColors.surfaceMuted,
+                                labelStyle: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight:
+                                      isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                  color:
+                                      isSelected
+                                          ? AppColors.primary
+                                          : AppColors.textSecondary,
+                                ),
+                                side: BorderSide(
+                                  color:
+                                      isSelected
+                                          ? AppColors.primary
+                                          : Colors.transparent,
+                                ),
+                              );
+                            }).toList(),
                       ),
                     ],
                   ),
@@ -323,20 +405,36 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 ),
                 child: Column(
                   children: [
-                    Icon(Icons.event_busy_rounded, size: 54, color: AppColors.textSecondary),
+                    Icon(
+                      Icons.event_busy_rounded,
+                      size: 54,
+                      color: AppColors.textSecondary,
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       'Bunday parametr bo‘yicha mashg‘ulotlar topilmadi',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       'Yangi mashg‘ulot rejalashtiring yoki filtrlarni tozalang.',
-                      style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton.icon(
-                      onPressed: () => _showScheduleSessionDialog(context, students, currentUser),
+                      onPressed:
+                          () => _showScheduleSessionDialog(
+                            context,
+                            students,
+                            currentUser,
+                          ),
                       icon: const Icon(Icons.add),
                       label: const Text('Mashg‘ulot rejalashtirish'),
                     ),
@@ -345,12 +443,13 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
               )
             else
               Column(
-                children: filteredSessions.map((session) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 14.0),
-                    child: _buildSessionCard(context, session, currentUser),
-                  );
-                }).toList(),
+                children:
+                    filteredSessions.map((session) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 14.0),
+                        child: _buildSessionCard(context, session, currentUser),
+                      );
+                    }).toList(),
               ),
           ],
         ),
@@ -397,10 +496,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
               const SizedBox(height: 2),
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
           ),
@@ -409,7 +505,11 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
     );
   }
 
-  Widget _buildSessionCard(BuildContext context, SessionModel session, UserModel? currentUser) {
+  Widget _buildSessionCard(
+    BuildContext context,
+    SessionModel session,
+    UserModel? currentUser,
+  ) {
     final df = DateFormat('dd.MM.yyyy');
     final tf = DateFormat('HH:mm');
 
@@ -466,7 +566,10 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
             children: [
               // Sana va soat
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceMuted,
                   borderRadius: BorderRadius.circular(8),
@@ -475,18 +578,34 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.calendar_today_outlined, size: 13, color: AppColors.primary),
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 13,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       df.format(session.scheduledAt),
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                     const SizedBox(width: 8),
-                    Icon(Icons.access_time_rounded, size: 13, color: AppColors.primary),
+                    Icon(
+                      Icons.access_time_rounded,
+                      size: 13,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       tf.format(session.scheduledAt),
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ],
                 ),
@@ -502,7 +621,10 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 ),
                 child: Text(
                   '${session.durationMinutes} daq',
-                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -511,9 +633,10 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: session.sessionType == 'Individual'
-                      ? AppColors.primaryLight
-                      : AppColors.purpleBg,
+                  color:
+                      session.sessionType == 'Individual'
+                          ? AppColors.primaryLight
+                          : AppColors.purpleBg,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -521,9 +644,10 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: session.sessionType == 'Individual'
-                        ? AppColors.primaryDark
-                        : AppColors.purple,
+                    color:
+                        session.sessionType == 'Individual'
+                            ? AppColors.primaryDark
+                            : AppColors.purple,
                   ),
                 ),
               ),
@@ -531,7 +655,10 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
 
               // Holat badge
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: statusBgColor,
                   borderRadius: BorderRadius.circular(20),
@@ -565,7 +692,11 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 backgroundColor: AppColors.primary.withOpacity(0.12),
                 child: Text(
                   session.studentName.isNotEmpty ? session.studentName[0] : 'O',
-                  style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.primary, fontSize: 13),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                    fontSize: 13,
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -583,7 +714,10 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                     ),
                     Text(
                       'Mutaxassis: ${session.specialistName} (${session.specialistRole})',
-                      style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ],
                 ),
@@ -606,21 +740,33 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.psychology_outlined, size: 15, color: AppColors.primary),
+                    Icon(
+                      Icons.psychology_outlined,
+                      size: 15,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         'Mavzu: ${session.topic}',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                if (session.goalDescription != null && session.goalDescription!.isNotEmpty) ...[
+                if (session.goalDescription != null &&
+                    session.goalDescription!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     'ITR maqsadi: ${session.goalDescription}',
-                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ],
@@ -628,7 +774,9 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
           ),
 
           // Agar bajarilgan bo'lsa natija va kuzatuvlar
-          if (session.isCompleted && session.observations != null && session.observations!.isNotEmpty) ...[
+          if (session.isCompleted &&
+              session.observations != null &&
+              session.observations!.isNotEmpty) ...[
             const SizedBox(height: 10),
             Container(
               width: double.infinity,
@@ -643,24 +791,41 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.notes_rounded, size: 14, color: AppColors.success),
+                      Icon(
+                        Icons.notes_rounded,
+                        size: 14,
+                        color: AppColors.success,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         'Kuzatuv va natija qaydlari:',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.success),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.success,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
                     session.observations!,
-                    style: TextStyle(fontSize: 12, color: AppColors.success, height: 1.4),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.success,
+                      height: 1.4,
+                    ),
                   ),
-                  if (session.nextSteps != null && session.nextSteps!.isNotEmpty) ...[
+                  if (session.nextSteps != null &&
+                      session.nextSteps!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       'Tavsiya / Keyingi qadam: ${session.nextSteps}',
-                      style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: AppColors.success),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic,
+                        color: AppColors.success,
+                      ),
                     ),
                   ],
                 ],
@@ -679,7 +844,10 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                   icon: const Icon(Icons.edit_calendar_outlined, size: 14),
                   label: const Text('Holat'),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
                     textStyle: const TextStyle(fontSize: 11),
                   ),
                 ),
@@ -690,15 +858,25 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                   label: const Text('Natijani qayd etish'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.success,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                    foregroundColor: AppColors.onPrimary,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
               const SizedBox(width: 8),
               IconButton(
-                icon: Icon(Icons.delete_outline, size: 18, color: AppColors.textSubtle),
+                icon: Icon(
+                  Icons.delete_outline,
+                  size: 18,
+                  color: AppColors.textSubtle,
+                ),
                 tooltip: 'Mashg‘ulotni o‘chirish',
                 onPressed: () => _confirmDeleteSession(context, session),
               ),
@@ -718,7 +896,11 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
   ) {
     if (students.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mashg‘ulot rejalashtirish uchun biriktirilgan o‘quvchilar mavjud emas.')),
+        const SnackBar(
+          content: Text(
+            'Mashg‘ulot rejalashtirish uchun biriktirilgan o‘quvchilar mavjud emas.',
+          ),
+        ),
       );
       return;
     }
@@ -737,7 +919,9 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Container(
                 width: 550,
                 padding: const EdgeInsets.all(24),
@@ -754,13 +938,20 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                               color: AppColors.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(Icons.event_available_rounded, color: AppColors.primary),
+                            child: Icon(
+                              Icons.event_available_rounded,
+                              color: AppColors.primary,
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               'Yangi psixologik mashg‘ulot rejalashtirish',
-                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                           ),
                           IconButton(
@@ -774,7 +965,11 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                       // O'quvchini tanlash
                       Text(
                         'O‘quvchi *',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<StudentModel>(
@@ -783,15 +978,21 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: AppColors.surfaceMuted,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                        items: students.map((s) {
-                          return DropdownMenuItem(
-                            value: s,
-                            child: Text('${s.fullName} (${s.grade}-sinf)'),
-                          );
-                        }).toList(),
+                        items:
+                            students.map((s) {
+                              return DropdownMenuItem(
+                                value: s,
+                                child: Text('${s.fullName} (${s.grade}-sinf)'),
+                              );
+                            }).toList(),
                         onChanged: (val) {
                           if (val != null) {
                             setDialogState(() => selectedStudent = val);
@@ -803,16 +1004,23 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                       // Mavzu
                       Text(
                         'Mashg‘ulot mavzusi / Yo‘nalishi *',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       TextField(
                         controller: topicController,
                         decoration: InputDecoration(
-                          hintText: 'Masalan: Xavotir darajasini pasaytirish mashg‘uloti',
+                          hintText:
+                              'Masalan: Xavotir darajasini pasaytirish mashg‘uloti',
                           filled: true,
                           fillColor: AppColors.surfaceMuted,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -820,16 +1028,23 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                       // ITR maqsadi
                       Text(
                         'Aloqador ITR maqsadi (ixtiyoriy)',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       TextField(
                         controller: goalController,
                         decoration: InputDecoration(
-                          hintText: 'Masalan: O‘z-o‘zini nazorat qilish va irodaviy zo‘riqishni bartaraf etish',
+                          hintText:
+                              'Masalan: O‘z-o‘zini nazorat qilish va irodaviy zo‘riqishni bartaraf etish',
                           filled: true,
                           fillColor: AppColors.surfaceMuted,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -843,7 +1058,11 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                               children: [
                                 Text(
                                   'Mashg‘ulot shakli',
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<String>(
@@ -852,13 +1071,20 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: AppColors.surfaceMuted,
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
-                                  items: ['Individual', 'Kichik guruhda'].map((t) {
-                                    return DropdownMenuItem(value: t, child: Text(t));
-                                  }).toList(),
+                                  items:
+                                      ['Individual', 'Kichik guruhda'].map((t) {
+                                        return DropdownMenuItem(
+                                          value: t,
+                                          child: Text(t),
+                                        );
+                                      }).toList(),
                                   onChanged: (val) {
-                                    if (val != null) setDialogState(() => sessionType = val);
+                                    if (val != null)
+                                      setDialogState(() => sessionType = val);
                                   },
                                 ),
                               ],
@@ -871,7 +1097,11 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                               children: [
                                 Text(
                                   'Davomiyligi (daqiqa)',
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<int>(
@@ -880,13 +1110,20 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: AppColors.surfaceMuted,
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
-                                  items: [30, 45, 60].map((d) {
-                                    return DropdownMenuItem(value: d, child: Text('$d daqiqa'));
-                                  }).toList(),
+                                  items:
+                                      [30, 45, 60].map((d) {
+                                        return DropdownMenuItem(
+                                          value: d,
+                                          child: Text('$d daqiqa'),
+                                        );
+                                      }).toList(),
                                   onChanged: (val) {
-                                    if (val != null) setDialogState(() => duration = val);
+                                    if (val != null)
+                                      setDialogState(() => duration = val);
                                   },
                                 ),
                               ],
@@ -905,8 +1142,12 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                 final picked = await showDatePicker(
                                   context: context,
                                   initialDate: selectedDate,
-                                  firstDate: DateTime.now().subtract(const Duration(days: 7)),
-                                  lastDate: DateTime.now().add(const Duration(days: 60)),
+                                  firstDate: DateTime.now().subtract(
+                                    const Duration(days: 7),
+                                  ),
+                                  lastDate: DateTime.now().add(
+                                    const Duration(days: 60),
+                                  ),
                                 );
                                 if (picked != null) {
                                   setDialogState(() {
@@ -921,7 +1162,9 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                 }
                               },
                               icon: const Icon(Icons.calendar_month, size: 16),
-                              label: Text(DateFormat('dd.MM.yyyy').format(selectedDate)),
+                              label: Text(
+                                DateFormat('dd.MM.yyyy').format(selectedDate),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -967,7 +1210,11 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                               final topic = topicController.text.trim();
                               if (topic.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Mashg‘ulot mavzusini kiriting.')),
+                                  const SnackBar(
+                                    content: Text(
+                                      'Mashg‘ulot mavzusini kiriting.',
+                                    ),
+                                  ),
                                 );
                                 return;
                               }
@@ -984,28 +1231,32 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                 status: 'Rejalashtirilgan',
                                 topic: topic,
                                 sessionType: sessionType,
-                                goalDescription: goalController.text.trim().isNotEmpty
-                                    ? goalController.text.trim()
-                                    : null,
+                                goalDescription:
+                                    goalController.text.trim().isNotEmpty
+                                        ? goalController.text.trim()
+                                        : null,
                               );
 
-                              final res = await context.read<AppProvider>().addSession(
-                                    newSession,
-                                    byUser: currentUser,
-                                  );
+                              final res = await context
+                                  .read<AppProvider>()
+                                  .addSession(newSession, byUser: currentUser);
 
                               if (res['success'] == true) {
                                 Navigator.pop(ctx);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('Mashg‘ulot muvaffaqiyatli rejalashtirildi.'),
+                                    content: Text(
+                                      'Mashg‘ulot muvaffaqiyatli rejalashtirildi.',
+                                    ),
                                     backgroundColor: AppColors.success,
                                   ),
                                 );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text(res['message'] ?? 'Xatolik yuz berdi'),
+                                    content: Text(
+                                      res['message'] ?? 'Xatolik yuz berdi',
+                                    ),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
@@ -1015,7 +1266,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                             label: const Text('Rejalashtirish'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
-                              foregroundColor: Colors.white,
+                              foregroundColor: AppColors.onPrimary,
                             ),
                           ),
                         ],
@@ -1039,7 +1290,9 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
       context: context,
       builder: (ctx) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Container(
             width: 550,
             padding: const EdgeInsets.all(24),
@@ -1056,7 +1309,10 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                           color: AppColors.successBg,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(Icons.task_alt_rounded, color: AppColors.success),
+                        child: Icon(
+                          Icons.task_alt_rounded,
+                          color: AppColors.success,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -1065,11 +1321,18 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                           children: [
                             Text(
                               'Mashg‘ulot natijasini qayd etish',
-                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                             Text(
                               '${session.studentName} • ${session.topic}',
-                              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                           ],
                         ),
@@ -1092,11 +1355,19 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.check_circle, color: AppColors.success, size: 18),
+                        Icon(
+                          Icons.check_circle,
+                          color: AppColors.success,
+                          size: 18,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'O‘quvchining davomati tasdiqlandi (Ishtirok etdi)',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.success),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.success,
+                          ),
                         ),
                       ],
                     ),
@@ -1106,17 +1377,24 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                   // Psixologik kuzatuv va natijalar
                   Text(
                     'Mashg‘ulot jarayoni va o‘quvchining psixoemotsional holati *',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   TextField(
                     controller: obsController,
                     maxLines: 4,
                     decoration: InputDecoration(
-                      hintText: 'O‘quvchining reaksiyasi, mashqlarni bajarishi, xulq-atvori va dinamikasini tavsiflang...',
+                      hintText:
+                          'O‘quvchining reaksiyasi, mashqlarni bajarishi, xulq-atvori va dinamikasini tavsiflang...',
                       filled: true,
                       fillColor: AppColors.surfaceMuted,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -1124,17 +1402,24 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                   // Tavsiya va keyingi qadamlar
                   Text(
                     'Keyingi qadamlar va tavsiyalar (pedagog va ota-onaga)',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   TextField(
                     controller: nextStepsController,
                     maxLines: 2,
                     decoration: InputDecoration(
-                      hintText: 'Navbatdagi uchrashuv rejasi, uyga mashqlar yoki tavsiyalar...',
+                      hintText:
+                          'Navbatdagi uchrashuv rejasi, uyga mashqlar yoki tavsiyalar...',
                       filled: true,
                       fillColor: AppColors.surfaceMuted,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -1153,23 +1438,30 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                           final obs = obsController.text.trim();
                           if (obs.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Iltimos, mashg‘ulot natijasi va kuzatuvini kiriting.')),
+                              const SnackBar(
+                                content: Text(
+                                  'Iltimos, mashg‘ulot natijasi va kuzatuvini kiriting.',
+                                ),
+                              ),
                             );
                             return;
                           }
 
                           await context.read<AppProvider>().completeSession(
-                                session.id,
-                                observations: obs,
-                                nextSteps: nextStepsController.text.trim().isNotEmpty
+                            session.id,
+                            observations: obs,
+                            nextSteps:
+                                nextStepsController.text.trim().isNotEmpty
                                     ? nextStepsController.text.trim()
                                     : null,
-                              );
+                          );
 
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Mashg‘ulot natijasi muvaffaqiyatli saqlandi.'),
+                              content: Text(
+                                'Mashg‘ulot natijasi muvaffaqiyatli saqlandi.',
+                              ),
                               backgroundColor: AppColors.success,
                             ),
                           );
@@ -1178,7 +1470,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                         label: const Text('Bajarildi deb qayd etish'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.success,
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.onPrimary,
                         ),
                       ),
                     ],
@@ -1202,7 +1494,9 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: const Text('Mashg‘ulot holatini o‘zgartirish'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1216,13 +1510,21 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: AppColors.surfaceMuted,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                    items: ['Rejalashtirilgan', 'Qatnashmadi', 'Bekor qilindi'].map((st) {
-                      return DropdownMenuItem(value: st, child: Text(st));
-                    }).toList(),
+                    items:
+                        [
+                          'Rejalashtirilgan',
+                          'Qatnashmadi',
+                          'Bekor qilindi',
+                        ].map((st) {
+                          return DropdownMenuItem(value: st, child: Text(st));
+                        }).toList(),
                     onChanged: (val) {
-                      if (val != null) setDialogState(() => selectedStatus = val);
+                      if (val != null)
+                        setDialogState(() => selectedStatus = val);
                     },
                   ),
                   const SizedBox(height: 12),
@@ -1243,12 +1545,13 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 ElevatedButton(
                   onPressed: () async {
                     await context.read<AppProvider>().updateSessionStatus(
-                          session.id,
-                          selectedStatus,
-                          notes: notesController.text.trim().isNotEmpty
+                      session.id,
+                      selectedStatus,
+                      notes:
+                          notesController.text.trim().isNotEmpty
                               ? notesController.text.trim()
                               : null,
-                        );
+                    );
                     Navigator.pop(ctx);
                   },
                   child: const Text('Saqlash'),
@@ -1267,14 +1570,19 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
       builder: (ctx) {
         return AlertDialog(
           title: const Text('Mashg‘ulotni o‘chirish'),
-          content: Text('${session.studentName} bilan rejalashtirilgan "${session.topic}" mashg‘ulotini o‘chirmoqchimisiz?'),
+          content: Text(
+            '${session.studentName} bilan rejalashtirilgan "${session.topic}" mashg‘ulotini o‘chirmoqchimisiz?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: const Text('Bekor qilish'),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: AppColors.onPrimary,
+              ),
               onPressed: () async {
                 await context.read<AppProvider>().deleteSession(session.id);
                 Navigator.pop(ctx);

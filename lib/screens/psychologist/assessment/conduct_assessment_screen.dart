@@ -342,9 +342,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                           child: LinearProgressIndicator(
                                             value: dPct.clamp(0.0, 1.0),
                                             minHeight: 6,
-                                            backgroundColor: const Color(
-                                              0xFFE2E8F0,
-                                            ),
+                                            backgroundColor: AppColors.border,
                                             valueColor:
                                                 AlwaysStoppedAnimation<
                                                   Color
@@ -390,9 +388,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                   color: AppColors.warningBg,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: const Color(
-                                      0xFFF59E0B,
-                                    ).withValues(alpha: 0.3),
+                                    color: AppColors.warning.withValues(alpha: 0.3),
                                   ),
                                 ),
                                 child: Row(
@@ -780,9 +776,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                               color: AppColors.warningBg,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: const Color(
-                                  0xFFF59E0B,
-                                ).withValues(alpha: 0.3),
+                                color: AppColors.warning.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Row(
@@ -1017,7 +1011,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primaryLight : Colors.white,
+                  color: isSelected ? AppColors.primaryLight : AppColors.surface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color:
@@ -1094,7 +1088,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               decoration: BoxDecoration(
-                color: isChecked ? AppColors.primaryLight : Colors.white,
+                color: isChecked ? AppColors.primaryLight : AppColors.surface,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: isChecked ? AppColors.primary : AppColors.border,

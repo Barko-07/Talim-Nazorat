@@ -90,7 +90,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.textPrimary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,
@@ -436,7 +436,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.onPrimary,
             ),
             onPressed: () {
               Navigator.pop(ctx);

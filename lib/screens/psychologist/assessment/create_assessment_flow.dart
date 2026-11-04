@@ -683,7 +683,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
 
               return Card(
                 elevation: 0,
-                color: isSelected ? AppColors.primaryLight : Colors.white,
+                color: isSelected ? AppColors.primaryLight : AppColors.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                   side: BorderSide(

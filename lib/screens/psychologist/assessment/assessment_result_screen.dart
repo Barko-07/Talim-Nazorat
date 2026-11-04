@@ -364,9 +364,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                       child: LinearProgressIndicator(
                                         value: (pct / 100.0).clamp(0.0, 1.0),
                                         minHeight: 8,
-                                        backgroundColor: const Color(
-                                          0xFFE2E8F0,
-                                        ),
+                                        backgroundColor: AppColors.border,
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
                                               AppColors.primary,
@@ -546,9 +544,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                       color: AppColors.warningBg,
                                       borderRadius: BorderRadius.circular(4),
                                       border: Border.all(
-                                        color: const Color(
-                                          0xFFF59E0B,
-                                        ).withValues(alpha: 0.3),
+                                        color: AppColors.warning.withValues(alpha: 0.3),
                                       ),
                                     ),
                                     child: Text(

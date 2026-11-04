@@ -151,7 +151,7 @@ class DashboardScreen extends StatelessWidget {
                           StatusPill(
                             label: 'Ko‘rish',
                             color: AppColors.warning,
-                            backgroundColor: Colors.white,
+                            backgroundColor: AppColors.surface,
                             icon: LucideIcons.arrowUpRight,
                           ),
                         ],
@@ -846,7 +846,7 @@ class DashboardScreen extends StatelessWidget {
                       StatusPill(
                         label: '${a.totalScore.toInt()}/${a.maxScore.toInt()}',
                         color: AppColors.success,
-                        backgroundColor: Colors.white,
+                        backgroundColor: AppColors.surface,
                       ),
                     ],
                   ),
@@ -964,7 +964,7 @@ class DashboardScreen extends StatelessWidget {
                         label: s.status,
                         color: accent,
                         showDot: true,
-                        backgroundColor: Colors.white,
+                        backgroundColor: AppColors.surface,
                       ),
                     ],
                   ),

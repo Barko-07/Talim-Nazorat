@@ -627,7 +627,7 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
         ];
         break;
       case HeaderActionVariant.secondary:
-        bg = Colors.white;
+        bg = AppColors.surface;
         border = AppColors.border;
         fg = AppColors.textPrimary;
         iconColor = AppColors.primary;
@@ -640,7 +640,7 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
         ];
         break;
       case HeaderActionVariant.danger:
-        bg = Colors.white;
+        bg = AppColors.surface;
         border = AppColors.errorBorder;
         fg = AppColors.error;
         iconColor = AppColors.error;
@@ -911,7 +911,7 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
             vertical: 7.5,
           ),
           decoration: BoxDecoration(
-            color: widget.isSelected ? Colors.white : Colors.transparent,
+            color: widget.isSelected ? AppColors.surfaceRaised : Colors.transparent,
             borderRadius: BorderRadius.circular(9),
             border: Border.all(
               color: widget.isSelected

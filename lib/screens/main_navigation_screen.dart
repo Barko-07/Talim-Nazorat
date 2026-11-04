@@ -620,7 +620,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       ),
                       backgroundColor: isSel
                           ? AppColors.primaryLight
-                          : Colors.white,
+                          : AppColors.surface,
                       borderColor: isSel
                           ? AppColors.primary.withValues(alpha: 0.35)
                           : AppColors.border,
@@ -1565,7 +1565,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                               decoration: BoxDecoration(
                                                 color: isAlertBadge
                                                     ? AppColors.errorBg
-                                                    : Colors.white,
+                                                    : AppColors.surface,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(

@@ -109,7 +109,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                 label: const Text('Yangi Foydalanuvchi'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 18,
                     vertical: 12,
@@ -523,7 +523,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
             style: ElevatedButton.styleFrom(
               backgroundColor:
                   newStatus ? AppColors.success : AppColors.error,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.onPrimary,
             ),
             onPressed: () async {
               Navigator.pop(ctx);
@@ -586,7 +586,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.onPrimary,
             ),
             onPressed: () async {
               Navigator.pop(ctx);
@@ -881,7 +881,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.onPrimary,
                 ),
                 onPressed: () async {
                   if (formKey.currentState?.validate() ?? false) {
@@ -1079,7 +1079,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.onPrimary,
               ),
               onPressed: () async {
                 if (formKey.currentState?.validate() ?? false) {

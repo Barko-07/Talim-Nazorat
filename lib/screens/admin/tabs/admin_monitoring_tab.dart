@@ -345,7 +345,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.success,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: AppColors.onPrimary,
                                   elevation: 0,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 12,
@@ -461,7 +461,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.success,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.onPrimary,
             ),
             onPressed: () async {
               if (notesCtrl.text.trim().isNotEmpty) {

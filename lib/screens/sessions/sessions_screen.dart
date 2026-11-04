@@ -631,7 +631,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                         OutlinedButton.icon(
                                           style: OutlinedButton.styleFrom(
                                             foregroundColor: AppColors.error,
-                                            backgroundColor: Colors.white,
+                                            backgroundColor: AppColors.surface,
                                             side: BorderSide(
                                               color: AppColors.errorBorder,
                                               width: 1.0,
@@ -680,7 +680,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                                           child: OutlinedButton.icon(
                                             style: OutlinedButton.styleFrom(
                                               foregroundColor: AppColors.error,
-                                              backgroundColor: Colors.white,
+                                              backgroundColor: AppColors.surface,
                                               side: BorderSide(
                                                 color: AppColors.errorBorder,
                                                 width: 1.0,

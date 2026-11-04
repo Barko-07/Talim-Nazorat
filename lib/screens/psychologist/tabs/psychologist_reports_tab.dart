@@ -138,7 +138,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 label: const Text('Nusxa olish'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.onPrimary,
                 ),
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: csvData));

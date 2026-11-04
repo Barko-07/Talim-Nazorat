@@ -98,13 +98,18 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Sarlavha va vakolat eslatmasi
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.end,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(
                         'Psixologik hisobdagi o‘quvchilar',
@@ -124,9 +129,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                           color: AppColors.primaryLight,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: const Color(
-                              0xFF1E7FE0,
-                            ).withValues(alpha: 0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
@@ -460,7 +463,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
 
                 return Card(
                   elevation: 0,
-                  color: isRed ? AppColors.errorBg : Colors.white,
+                  color: isRed ? AppColors.errorBg : AppColors.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
@@ -568,9 +571,8 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                               6,
                                             ),
                                             border: Border.all(
-                                              color: const Color(
-                                                0xFF12803A,
-                                              ).withValues(alpha: 0.3),
+                                              color: AppColors.success
+                                                  .withValues(alpha: 0.3),
                                             ),
                                           ),
                                           child: Text(
@@ -606,63 +608,67 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                 ],
                               ),
                             ),
-                            // Harakatlar
-                            Row(
-                              children: [
-                                IconButton.outlined(
-                                  tooltip: 'Kuzatuv qayd etish',
-                                  icon: const Icon(
-                                    Icons.edit_note_rounded,
-                                    size: 18,
+                          ],
+                        ),
+                        // Harakatlar — telefonda ham sig'ishi uchun alohida qatorda
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          alignment: WrapAlignment.end,
+                          children: [
+                            IconButton.outlined(
+                              tooltip: 'Kuzatuv qayd etish',
+                              icon: const Icon(
+                                Icons.edit_note_rounded,
+                                size: 18,
+                              ),
+                              onPressed:
+                                  () => widget.onSelectStudentForObservation
+                                      ?.call(s),
+                            ),
+                            const SizedBox(width: 6),
+                            IconButton.outlined(
+                              tooltip: 'Diagnostika o‘tkazish',
+                              icon: const Icon(
+                                Icons.psychology_outlined,
+                                size: 18,
+                              ),
+                              onPressed:
+                                  () => widget.onSelectStudentForAssessment
+                                      ?.call(s),
+                            ),
+                            const SizedBox(width: 6),
+                            IconButton.outlined(
+                              tooltip: 'Mashg‘ulot rejalashtirish',
+                              icon: const Icon(
+                                Icons.alarm_add_rounded,
+                                size: 18,
+                              ),
+                              onPressed:
+                                  () =>
+                                      widget.onSelectStudentForSession?.call(s),
+                            ),
+                            const SizedBox(width: 8),
+                            FilledButton.tonal(
+                              style: FilledButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => StudentDetailScreen(
+                                          studentId: s.id,
+                                        ),
                                   ),
-                                  onPressed:
-                                      () => widget.onSelectStudentForObservation
-                                          ?.call(s),
-                                ),
-                                const SizedBox(width: 6),
-                                IconButton.outlined(
-                                  tooltip: 'Diagnostika o‘tkazish',
-                                  icon: const Icon(
-                                    Icons.psychology_outlined,
-                                    size: 18,
-                                  ),
-                                  onPressed:
-                                      () => widget.onSelectStudentForAssessment
-                                          ?.call(s),
-                                ),
-                                const SizedBox(width: 6),
-                                IconButton.outlined(
-                                  tooltip: 'Mashg‘ulot rejalashtirish',
-                                  icon: const Icon(
-                                    Icons.alarm_add_rounded,
-                                    size: 18,
-                                  ),
-                                  onPressed:
-                                      () => widget.onSelectStudentForSession
-                                          ?.call(s),
-                                ),
-                                const SizedBox(width: 8),
-                                FilledButton.tonal(
-                                  style: FilledButton.styleFrom(
-                                    visualDensity: VisualDensity.compact,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (_) => StudentDetailScreen(
-                                              studentId: s.id,
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                  child: const Text(
-                                    'Profil',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ),
-                              ],
+                                );
+                              },
+                              child: const Text(
+                                'Profil',
+                                style: TextStyle(fontSize: 12),
+                              ),
                             ),
                           ],
                         ),

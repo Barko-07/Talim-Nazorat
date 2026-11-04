@@ -467,7 +467,7 @@ class AdminReportsTab extends StatelessWidget {
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.onPrimary,
                 ),
                 onPressed: () {
                   Navigator.pop(ctx);

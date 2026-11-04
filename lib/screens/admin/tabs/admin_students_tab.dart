@@ -146,7 +146,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                 label: const Text('Yangi O‘quvchi Qo‘shish'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 18,
                     vertical: 12,
@@ -346,7 +346,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
 
               return Card(
                 elevation: 0,
-                color: isRed ? AppColors.errorBg : Colors.white,
+                color: isRed ? AppColors.errorBg : AppColors.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(
@@ -630,7 +630,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.warning,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.onPrimary,
             ),
             onPressed: () async {
               if (reasonCtrl.text.trim().isNotEmpty) {
