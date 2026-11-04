@@ -3,8 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/config/app_config.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../providers/auth_provider.dart';
+import '../../auth/verification_screens.dart';
 
 class AdminSettingsTab extends StatefulWidget {
   const AdminSettingsTab({super.key});
@@ -328,6 +330,10 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
   }
 
   void _showChangePasswordDialog(BuildContext context) {
+    if (AppConfig.serverMode) {
+      showServerPasswordChange(context);
+      return;
+    }
     final auth = context.read<AuthProvider>();
     final oldPassCtrl = TextEditingController();
     final newPassCtrl = TextEditingController();

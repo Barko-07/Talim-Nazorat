@@ -5,13 +5,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/config/app_config.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/namangan_data.dart';
 import '../../core/widgets/brand_logo.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/auth_api.dart';
 import '../main_navigation_screen.dart';
+import 'verification_screens.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool initialIsSignUp;
@@ -300,7 +303,13 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     if (mounted) {
-      if (result['success'] == true) {
+      if (result['success'] == true && !auth.isAuthenticated) {
+        // Server rejimi: parol to'g'ri — endi emailga kelgan kod yoki Authenticator.
+        _loginPasswordCtrl.clear();
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const SecondFactorScreen()),
+        );
+      } else if (result['success'] == true) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
         );
@@ -334,6 +343,18 @@ class _LoginScreenState extends State<LoginScreen>
         return;
       }
     } else if (_signUpStep == 2) {
+      // Server rejimida email majburiy: unga tasdiqlash kodi yuboriladi.
+      if (AppConfig.serverMode &&
+          !RegExp(
+            r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+          ).hasMatch(_emailCtrl.text.trim())) {
+        setState(
+          () =>
+              _errorMessage =
+                  'Elektron pochtangizni kiriting — unga tasdiqlash kodi yuboriladi.',
+        );
+        return;
+      }
       final phone = _phoneCtrl.text.trim();
       final digits = phone.replaceAll(RegExp(r'\D'), '');
       if (digits.length < 9) {
@@ -367,7 +388,8 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  bool get _hasMinLength => _signUpPasswordCtrl.text.trim().length >= 8;
+  bool get _hasMinLength =>
+      PasswordRules.longEnough(_signUpPasswordCtrl.text.trim());
   bool get _hasUppercase => RegExp(r'[A-Z]').hasMatch(_signUpPasswordCtrl.text);
   bool get _hasLowercase => RegExp(r'[a-z]').hasMatch(_signUpPasswordCtrl.text);
   bool get _hasDigit => RegExp(r'[0-9]').hasMatch(_signUpPasswordCtrl.text);
@@ -392,7 +414,7 @@ class _LoginScreenState extends State<LoginScreen>
       setState(
         () =>
             _errorMessage =
-                'Parolda kamida 8 ta belgi, 1 ta katta harf (A-Z), 1 ta kichik harf (a-z) va 1 ta raqam (0-9) bo‘lishi shart.',
+                'Parolda kamida ${PasswordRules.minLength} ta belgi, 1 ta katta harf (A-Z), 1 ta kichik harf (a-z) va 1 ta raqam (0-9) bo‘lishi shart.',
       );
       return;
     }
@@ -407,6 +429,11 @@ class _LoginScreenState extends State<LoginScreen>
 
     final auth = context.read<AuthProvider>();
     final roleToRegister = _selectedRole;
+
+    if (AppConfig.serverMode) {
+      await _startServerRegistration(auth, roleToRegister);
+      return;
+    }
 
     final result = await auth.register(
       firstName: _firstNameCtrl.text.trim(),
@@ -446,6 +473,51 @@ class _LoginScreenState extends State<LoginScreen>
         });
       }
     }
+  }
+
+  /// Server rejimi: forma serverga yuboriladi, emailga kod keladi. Hisob kod
+  /// tasdiqlangach yaratiladi va administrator tasdig'ini kutadi.
+  Future<void> _startServerRegistration(AuthProvider auth, UserRole role) async {
+    final email = _emailCtrl.text.trim();
+    final result = await auth.startRegistration(
+      firstName: _firstNameCtrl.text.trim(),
+      lastName: _lastNameCtrl.text.trim(),
+      email: email,
+      phone: _phoneCtrl.text.trim(),
+      role: role,
+      specialization:
+          _specializationCtrl.text.trim().isNotEmpty
+              ? _specializationCtrl.text.trim()
+              : role.label,
+      qualificationCategory: 'Mutaxassis',
+      experienceYears: 3,
+      region: NamanganData.defaultRegion,
+      district: _selectedDistrict,
+      institutionName: _institutionCtrl.text.trim(),
+      password: _signUpPasswordCtrl.text.trim(),
+    );
+    if (!mounted) return;
+    if (result['success'] != true) {
+      setState(() => _errorMessage = result['message'] as String?);
+      return;
+    }
+    final started = result['extra'] as RegistrationStarted;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (_) => RegistrationCodeScreen(
+              registrationId: started.registrationId,
+              email: email,
+              resendAfter: started.resendAfter,
+            ),
+      ),
+    );
+    if (!mounted) return;
+    // Kod tasdiqlansa ham, kirish administrator tasdig'idan keyin — kirish oynasiga qaytamiz.
+    _signUpPasswordCtrl.clear();
+    _signUpConfirmPasswordCtrl.clear();
+    setState(() => _signUpStep = 0);
+    _tabController.animateTo(0);
   }
 
   @override
@@ -866,6 +938,17 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _showPasswordRecoveryDialog(BuildContext context) {
+    if (AppConfig.serverMode) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder:
+              (_) => PasswordResetScreen(
+                initialEmail: _loginIdentifierCtrl.text.trim(),
+              ),
+        ),
+      );
+      return;
+    }
     final ctrl = TextEditingController(text: _loginIdentifierCtrl.text.trim());
     showDialog(
       context: context,
@@ -1544,7 +1627,10 @@ class _LoginScreenState extends State<LoginScreen>
             }),
           ),
           const SizedBox(height: 11),
-          _buildPasswordRuleRow('Kamida 8 ta belgi', _hasMinLength),
+          _buildPasswordRuleRow(
+            'Kamida ${PasswordRules.minLength} ta belgi',
+            _hasMinLength,
+          ),
           const SizedBox(height: 6),
           _buildPasswordRuleRow('Kamida 1 ta katta harf (A–Z)', _hasUppercase),
           const SizedBox(height: 6),

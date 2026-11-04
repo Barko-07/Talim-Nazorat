@@ -41,6 +41,8 @@ dependencies:
   lucide_icons_flutter: ^4.0.1
   flutter_animate: ^4.5.2
   animations: ^3.0.0
+  http: ^1.6.0
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

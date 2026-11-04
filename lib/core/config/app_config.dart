@@ -27,8 +27,13 @@ class AppConfig {
     defaultValue: 'Tizim administratori',
   );
 
-  /// Kelajakdagi server manzili (HTTPS bo'lishi shart)
+  /// Server manzili (HTTPS bo'lishi shart). Saytda bo'sh qoladi — ilova API bilan
+  /// bitta domenda (individ.uz) ishlaydi; telefon ilovasida `https://individ.uz`.
   static const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
+
+  /// Kirish, ro'yxatdan o'tish va parolni tiklash server orqali ishlaydi
+  /// (`--dart-define=SERVER_MODE=true`). O'chiq bo'lsa — eski, faqat qurilmadagi rejim.
+  static const serverMode = bool.fromEnvironment('SERVER_MODE');
 
   /// Demo rejimi faqat aniq yoqilganda ishlaydi; release yig‘ilishlarda standart o‘chiq.
   static const demoMode = bool.fromEnvironment(

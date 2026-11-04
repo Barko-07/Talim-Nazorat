@@ -3,11 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/config/app_config.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/logout_dialog.dart';
+import '../auth/verification_screens.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -587,6 +589,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showChangePasswordSheet(BuildContext context) {
+    if (AppConfig.serverMode) {
+      showServerPasswordChange(context);
+      return;
+    }
     final auth = context.read<AuthProvider>();
     final oldPassCtrl = TextEditingController();
     final newPassCtrl = TextEditingController();

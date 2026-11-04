@@ -1082,6 +1082,18 @@ class LocalDbService {
     if (changed) await _persistAll();
   }
 
+  /// Server rejimi: serverda kirgan foydalanuvchini xotiradagi ro'yxatga qo'yadi,
+  /// shunda ilovaning qolgan qismi (huquqlar, ro'yxatlar) uni taniydi. Diskka
+  /// yozilmaydi — foydalanuvchilar ma'lumotining asl manbai server.
+  void cacheSignedInUser(UserModel user) {
+    final i = _users.indexWhere((u) => u.id == user.id);
+    if (i == -1) {
+      _users.insert(0, user);
+    } else {
+      _users[i] = user;
+    }
+  }
+
   UserModel? getUserById(String id) {
     try {
       return _users.firstWhere((u) => u.id == id);

@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import '../core/config/app_config.dart';
 import '../models/user_model.dart';
+import '../services/api_client.dart';
+import '../services/auth_api.dart';
 import '../services/local_db_service.dart';
 import '../services/app_exceptions.dart';
 import '../services/auth_session.dart';
@@ -26,6 +29,11 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   UserRole get currentRole => _currentUser?.role ?? UserRole.reviewer;
 
   Timer? _sessionTimer;
+
+  /// Serverdagi SESSION_IDLE_MINUTES bilan bir xil.
+  static const serverIdleTimeout = Duration(minutes: 30);
+  DateTime _lastActivity = DateTime.now();
+  DateTime _lastServerCheck = DateTime.now();
 
   AuthProvider() {
     WidgetsBinding.instance.addObserver(this);
@@ -54,6 +62,14 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> validateSession() async {
     final cached = _currentUser;
     if (cached == null) return;
+    if (AppConfig.serverMode) {
+      // Faolsizlik ilovada hisoblanadi: har daqiqalik tekshiruv serverga
+      // so'rov yuborsa, serverdagi 30 daqiqalik muddat hech qachon tugamasdi.
+      if (DateTime.now().difference(_lastActivity) > serverIdleTimeout) {
+        await logout();
+      }
+      return;
+    }
     final prefs = await SharedPreferences.getInstance();
     final session = AuthSession.decode(prefs.getString(AuthSession.prefsKey));
     final fresh = _db.getUserById(cached.id);
@@ -74,6 +90,11 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     try {
       await _db.init();
+      if (AppConfig.serverMode) {
+        await _restoreServerSession();
+        _lastActivity = DateTime.now();
+        return;
+      }
       _dummyHash.length; // soxta xeshni oldindan tayyorlash
 
       final prefs = await SharedPreferences.getInstance();
@@ -106,6 +127,18 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// Sessiya muddati tugagan bo'lsa — tizimdan chiqariladi.
   Future<void> touchSession() async {
     if (_currentUser == null) return;
+    if (AppConfig.serverMode) {
+      await validateSession();
+      if (_currentUser == null) return;
+      final now = DateTime.now();
+      _lastActivity = now;
+      // Faol foydalanuvchining serverdagi sessiyasi ham yangilanadi (5 daqiqada bir marta).
+      if (now.difference(_lastServerCheck) > const Duration(minutes: 5)) {
+        _lastServerCheck = now;
+        await _validateServerSession();
+      }
+      return;
+    }
     await validateSession();
     if (_currentUser == null) return;
     final prefs = await SharedPreferences.getInstance();
@@ -148,6 +181,10 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
     if (password.isEmpty) {
       return _fail('Iltimos, parolingizni kiriting.');
+    }
+    if (AppConfig.serverMode) {
+      _lastActivity = DateTime.now();
+      return _serverLogin(id.toLowerCase(), password);
     }
 
     final user = _db.findUserByEmailOrPhone(id);
@@ -323,10 +360,21 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<Map<String, dynamic>> changePassword(
     String currentPassword,
-    String newPassword,
-  ) async {
+    String newPassword, {
+    String? code,
+  }) async {
     if (_currentUser == null) {
       return {'success': false, 'message': 'Foydalanuvchi tizimga kirmagan.'};
+    }
+    if (AppConfig.serverMode) {
+      try {
+        _apply(
+          await _authApi.changePassword(currentPassword, newPassword, code: code),
+        );
+        return _ok('Parolingiz muvaffaqiyatli o‘zgartirildi.');
+      } on ApiException catch (e) {
+        return _apiFail(e);
+      }
     }
 
     if (!_db.verifyPassword(_currentUser!, currentPassword.trim())) {
@@ -371,6 +419,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     String identifier,
   ) async {
     final cleaned = identifier.trim();
+    if (AppConfig.serverMode) return requestPasswordReset(cleaned);
     if (cleaned.isEmpty) {
       return {
         'success': false,
@@ -394,7 +443,15 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     _currentUser = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(AuthSession.prefsKey);
-    if (user != null) {
+    if (AppConfig.serverMode) {
+      _pending = null;
+      try {
+        await _authApi.logout();
+      } on ApiException catch (_) {
+        // Server bilan aloqa bo'lmasa ham, qurilmada sessiya tugatiladi;
+        // serverdagi sessiya o'z muddati (30 daqiqa faolsizlik) bilan yopiladi.
+      }
+    } else if (user != null) {
       await _db.addAuditLog(
         userFullName: user.fullName,
         userRole: user.role.label,
@@ -404,5 +461,277 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
       );
     }
     notifyListeners();
+  }
+
+  // ======================================================================
+  // SERVER REJIMI (AppConfig.serverMode): kirish, ikkinchi bosqich (emailga
+  // kod yoki Authenticator), ro'yxatdan o'tish va parolni tiklash serverda.
+  // Barcha tekshiruvlarni server qiladi — ilova faqat natijani ko'rsatadi.
+  // ======================================================================
+
+  final AuthApi _authApi = AuthApi();
+
+  /// Parol to'g'ri, lekin kirish hali tugamagan (kod kutilmoqda va h.k.).
+  AuthResult? _pending;
+
+  AuthStep? get pendingStep => _pending?.step;
+  UserModel? get pendingUser => _pending?.user;
+  bool get canRememberDevice => _pending?.canRememberDevice ?? false;
+  int get resendAfter => _pending?.resendAfter ?? 0;
+
+  Map<String, dynamic> _ok([String message = '', Object? extra]) => {
+    'success': true,
+    'message': message,
+    'step': _pending?.step ?? AuthStep.ok,
+    'extra': extra,
+  };
+
+  Map<String, dynamic> _apiFail(ApiException e) {
+    _isLoading = false;
+    notifyListeners();
+    return {
+      'success': false,
+      'message': e.message,
+      'code': e.code,
+      'retryAfter': e.retryAfter,
+    };
+  }
+
+  /// Server javobini qo'llaydi: kirish tugagan bo'lsa — foydalanuvchi faollashadi,
+  /// aks holda keyingi bosqich eslab qolinadi.
+  void _apply(AuthResult result) {
+    if (result.step == AuthStep.ok) {
+      _db.cacheSignedInUser(result.user);
+      _currentUser = result.user;
+      _pending = null;
+    } else {
+      _pending = result;
+    }
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> _restoreServerSession() async {
+    try {
+      final me = await _authApi.me();
+      if (me != null && me.step == AuthStep.ok) {
+        _apply(me);
+      } else if (me != null) {
+        // Yarim qolgan kirish (masalan kod kiritilmagan) — boshidan boshlanadi.
+        await _authApi.logout();
+      }
+    } on ApiException catch (_) {
+      // Internet yo'q: kirish sahifasi ko'rsatiladi, xabar kirishda chiqadi.
+    }
+  }
+
+  Future<void> _validateServerSession() async {
+    try {
+      final me = await _authApi.me();
+      if (me == null || me.step != AuthStep.ok) {
+        _currentUser = null;
+        _pending = null;
+        notifyListeners();
+      }
+    } on ApiException catch (_) {
+      // Vaqtinchalik aloqa uzilishi sessiyani tugatmaydi.
+    }
+  }
+
+  Future<Map<String, dynamic>> _serverLogin(String email, String password) async {
+    if (!email.contains('@')) {
+      return _fail('Elektron pochtangizni kiriting (masalan: ism@maktab.uz).');
+    }
+    try {
+      _apply(await _authApi.login(email, password));
+      return _ok('Xush kelibsiz!');
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyEmailCode(
+    String code, {
+    bool remember = false,
+  }) async {
+    try {
+      _apply(await _authApi.verifyEmailCode(code, remember: remember));
+      return _ok();
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  /// "Kodni qayta yuborish". `extra` — keyingi so'rovgacha kutiladigan soniyalar.
+  Future<Map<String, dynamic>> resendEmailCode() async {
+    try {
+      final wait = await _authApi.resendEmailCode();
+      return _ok('Yangi kod emailingizga yuborildi', wait);
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyTotp(String code) async {
+    try {
+      _apply(await _authApi.verifyTotp(code));
+      return _ok();
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  /// Zaxira kod bilan kirish. `extra` — qolgan zaxira kodlar soni.
+  Future<Map<String, dynamic>> useRecoveryCode(String code) async {
+    try {
+      final result = await _authApi.useRecoveryCode(code);
+      _apply(result);
+      return _ok('', result.recoveryCodesLeft);
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> startTotpSetup(String password) async {
+    try {
+      return _ok('', await _authApi.startTotpSetup(password));
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  /// Authenticator'ni yoqish. `extra` — bir marta ko'rsatiladigan zaxira kodlar.
+  /// Kodlar ko'rsatilib bo'lgach [finishTotpSetup] chaqiriladi.
+  Future<Map<String, dynamic>> enableTotp(String code) async {
+    try {
+      final result = await _authApi.enableTotp(code);
+      _enabledTotp = result;
+      return {'success': true, 'extra': result.recoveryCodes};
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  AuthResult? _enabledTotp;
+
+  /// Foydalanuvchi zaxira kodlarini saqlab olganini tasdiqladi — kirish yakunlanadi.
+  void finishTotpSetup() {
+    final result = _enabledTotp;
+    _enabledTotp = null;
+    if (result != null) _apply(result);
+  }
+
+  /// Vaqtinchalik parolni birinchi kirishda almashtirish (qo'shimcha kod so'ralmaydi).
+  Future<Map<String, dynamic>> changeTemporaryPassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
+    try {
+      _apply(await _authApi.changePassword(currentPassword, newPassword));
+      return _ok('Parolingiz yangilandi');
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  /// Profil sozlamalarida parolni o'zgartirish uchun emailga kod yuborish.
+  Future<Map<String, dynamic>> requestPasswordChangeCode() async {
+    try {
+      await _authApi.requestPasswordChangeCode();
+      return _ok('Tasdiqlash kodi emailingizga yuborildi');
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> requestPasswordReset(String email) async {
+    if (!email.trim().contains('@')) {
+      return {'success': false, 'message': 'Elektron pochtangizni kiriting.'};
+    }
+    try {
+      await _authApi.requestPasswordReset(email.trim().toLowerCase());
+      return _ok('Agar hisob mavjud bo‘lsa, tasdiqlash kodi emailga yuborildi.');
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> confirmPasswordReset(
+    String email,
+    String code,
+    String newPassword,
+  ) async {
+    try {
+      await _authApi.confirmPasswordReset(
+        email.trim().toLowerCase(),
+        code,
+        newPassword,
+      );
+      return _ok('Parolingiz tiklandi. Endi yangi parol bilan kiring.');
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  /// Ro'yxatdan o'tish (1-qadam). `extra` — [RegistrationStarted].
+  Future<Map<String, dynamic>> startRegistration({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phone,
+    required UserRole role,
+    required String specialization,
+    required String qualificationCategory,
+    required int experienceYears,
+    required String region,
+    required String district,
+    required String institutionName,
+    required String password,
+  }) async {
+    try {
+      final started = await _authApi.register(
+        firstName: firstName,
+        lastName: lastName,
+        email: email.trim().toLowerCase(),
+        phone: phone,
+        role: role,
+        specialization: specialization,
+        qualificationCategory: qualificationCategory,
+        experienceYears: experienceYears,
+        region: region,
+        district: district,
+        institutionName: institutionName,
+        password: password,
+      );
+      return _ok('Tasdiqlash kodi emailingizga yuborildi', started);
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> resendRegistrationCode(String id) async {
+    try {
+      final wait = await _authApi.resendRegistrationCode(id);
+      return _ok('Yangi kod emailingizga yuborildi', wait);
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyRegistration(String id, String code) async {
+    try {
+      return _ok(await _authApi.verifyRegistration(id, code));
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
+  /// Kirish yarim yo'lda tashlab ketildi ("Orqaga") — serverdagi yarim sessiya yopiladi.
+  Future<void> cancelPendingLogin() async {
+    _pending = null;
+    notifyListeners();
+    try {
+      await _authApi.logout();
+    } on ApiException catch (_) {}
   }
 }
