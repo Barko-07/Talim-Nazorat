@@ -103,9 +103,16 @@ def device_cookie_name(settings: Settings) -> str:
     return "__Host-individ_device" if settings.cookie_secure else "individ_device"
 
 
+# Accounts that manage others confirm every single login, on every device.
+ADMIN_ROLES = {"SUPER_ADMIN", "INSTITUTION_ADMIN"}
+
+
 def may_remember_device(settings: Settings, user: User) -> bool:
-    # Admin accounts always prove the second factor: they control everything.
-    return user.role not in settings.mfa_required_roles and not user.mfa_enabled
+    return (
+        user.role not in ADMIN_ROLES
+        and user.role not in settings.mfa_required_roles
+        and not user.mfa_enabled
+    )
 
 
 def remember_device(db: Session, settings: Settings, user: User, request: Request,

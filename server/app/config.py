@@ -59,10 +59,9 @@ class Settings:
     # "Remember this device" for the emailed login code (never for admin roles)
     trusted_device_days: int = 30
 
-    # Two-factor authentication is mandatory for these roles
-    mfa_required_roles: list[str] = field(
-        default_factory=lambda: ["SUPER_ADMIN", "INSTITUTION_ADMIN"]
-    )
+    # Roles that must also set up an authenticator app. Empty by default: every
+    # login (admins included) is confirmed with a code emailed to the account.
+    mfa_required_roles: list[str] = field(default_factory=list)
 
     # Admin
     admin_ip_allowlist: list[str] = field(default_factory=list)
@@ -128,7 +127,7 @@ def load_settings() -> Settings:
         code_max_attempts=_int("CODE_MAX_ATTEMPTS", 5),
         code_resend_seconds=_int("CODE_RESEND_SECONDS", 60),
         trusted_device_days=_int("TRUSTED_DEVICE_DAYS", 30),
-        mfa_required_roles=_list("MFA_REQUIRED_ROLES") or ["SUPER_ADMIN", "INSTITUTION_ADMIN"],
+        mfa_required_roles=_list("MFA_REQUIRED_ROLES"),
         admin_ip_allowlist=_list("ADMIN_IP_ALLOWLIST"),
         trusted_proxies=_list("TRUSTED_PROXIES") or ["127.0.0.1", "::1"],
         smtp_host=os.environ.get("SMTP_HOST", ""),
@@ -159,8 +158,6 @@ def production_problems(s: Settings) -> list[str]:
         p.append("PUBLIC_BASE_URL must start with https://")
     if any(o == "*" or not o.startswith("https://") for o in s.allowed_origins):
         p.append("ALLOWED_ORIGINS may only list https:// origins (never *)")
-    if "SUPER_ADMIN" not in s.mfa_required_roles:
-        p.append("MFA_REQUIRED_ROLES must include SUPER_ADMIN")
     if not (s.smtp_host and s.smtp_from):
         p.append("SMTP_HOST and SMTP_FROM are required to deliver one-time codes")
     return p

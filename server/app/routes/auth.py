@@ -320,10 +320,16 @@ def mfa_enable(body: CodeIn, request: Request, response: Response,
 # ------------------------------------------------------------------ one-time codes
 
 CODE_PURPOSES = {
-    "login": ("Individ: kirish kodi", "tizimga kirish"),
-    "password_reset": ("Individ: tasdiqlash kodi", "parolni tiklash"),
-    "password_change": ("Individ: tasdiqlash kodi", "parolni o‘zgartirish"),
+    "login": ("kirish kodi", "tizimga kirish"),
+    "password_reset": ("parolni tiklash kodi", "parolni tiklash"),
+    "password_change": ("parolni o‘zgartirish kodi", "parolni o‘zgartirish"),
 }
+
+
+def _code_subject(code: str, what: str) -> str:
+    # The code is in the subject so every code arrives as its own email: mail
+    # apps group messages with the same subject into one conversation.
+    return f"{code} — Individ {what}"
 
 
 def _code_mail(ctx: AppContext, what: str, code: str) -> str:
@@ -362,7 +368,7 @@ def _issue_code(db: Session, ctx: AppContext, user: User, purpose: str) -> None:
     ))
     db.commit()
     subject, what = CODE_PURPOSES[purpose]
-    ctx.mailer.send(user.email, subject, _code_mail(ctx, what, code))
+    ctx.mailer.send(user.email, _code_subject(code, subject), _code_mail(ctx, what, code))
 
 
 def _consume_code(db: Session, ctx: AppContext, user: User, purpose: str, code: str, ip: str) -> bool:
@@ -549,7 +555,8 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
         })
         db.commit()
         audit.record(db, "REGISTER_CODE_SENT", subject=audit.mask_login(email), ip=ip)
-        ctx.mailer.send(email, "Individ: emailni tasdiqlash", _code_mail(ctx, "ro‘yxatdan o‘tish", code))
+        ctx.mailer.send(email, _code_subject(code, "ro‘yxatdan o‘tish kodi"),
+                        _code_mail(ctx, "ro‘yxatdan o‘tish", code))
     return {"registration_id": reg.id, "resend_after": s.code_resend_seconds, "message": REGISTRATION_SENT}
 
 
@@ -586,7 +593,8 @@ def register_resend(body: RegistrationIdIn, request: Request, db: Session = Depe
         code = _new_code()
         reg.code_hash = _registration_code(reg.id, code)
         db.commit()
-        ctx.mailer.send(reg.email, "Individ: emailni tasdiqlash", _code_mail(ctx, "ro‘yxatdan o‘tish", code))
+        ctx.mailer.send(reg.email, _code_subject(code, "ro‘yxatdan o‘tish kodi"),
+                        _code_mail(ctx, "ro‘yxatdan o‘tish", code))
     return {"ok": True, "resend_after": s.code_resend_seconds, "message": REGISTRATION_SENT}
 
 

@@ -1,11 +1,13 @@
 from datetime import timedelta
 
+from fastapi.testclient import TestClient
 from sqlalchemy import select
 
+from app.main import create_app
 from app.models import AuditEvent, AuthSession, Role, User, utcnow
 from app.security import passwords
 
-from conftest import PASSWORD, Api, add_institution, add_user, db_session, totp_now
+from conftest import PASSWORD, Api, add_institution, add_user, db_session, make_settings, totp_now
 
 
 def test_login_sets_httponly_strict_cookie_and_returns_csrf(api, app):
@@ -119,7 +121,9 @@ def test_blocked_user_cannot_login_and_loses_live_session(api, app):
     assert api.login("blk@maktab.uz").status_code == 401
 
 
-def test_admin_must_set_up_2fa_before_anything_else(api, app):
+def test_authenticator_can_still_be_made_mandatory_by_config():
+    app = create_app(make_settings(mfa_required_roles=["SUPER_ADMIN"]))
+    api = Api(TestClient(app))
     add_user(app, "boss@maktab.uz", Role.SUPER_ADMIN)
     r = api.login("boss@maktab.uz")
     assert r.json()["state"] == "mfa_setup_required"
@@ -160,7 +164,8 @@ def test_temporary_password_forces_change_first(api, app):
     assert api.get("/api/students").status_code == 403
 
 
-def test_inst_admin_requires_mfa_by_default(api, app):
+def test_admins_sign_in_with_the_emailed_code_by_default(api, app):
     inst = add_institution(app)
     add_user(app, "dir@maktab.uz", Role.INSTITUTION_ADMIN, inst)
-    assert api.login("dir@maktab.uz").json()["state"] == "mfa_setup_required"
+    assert api.login("dir@maktab.uz", email_code=False).json()["state"] == "email_code_required"
+    assert api.login("dir@maktab.uz").json()["state"] == "ok"

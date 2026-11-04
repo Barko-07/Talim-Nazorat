@@ -49,6 +49,23 @@ def test_login_code_is_single_use_and_attempts_are_limited(api, app):
     assert api.post("/api/auth/email-code/verify", {"code": code}).status_code == 401
 
 
+def test_each_code_email_has_its_own_subject(api, app):
+    # Same subject = one Gmail conversation; the code in the subject keeps them apart.
+    add_user(app, "s@maktab.uz")
+    api.login("s@maktab.uz", email_code=False)
+    api.post("/api/auth/email-code/send")
+    first, second = [m for m in app.state.ctx.mailer.outbox if m.to == "s@maktab.uz"][-2:]
+    for mail in (first, second):
+        assert mail.subject.startswith(last_code_for_mail(mail))
+    assert first.subject != second.subject or first.body == second.body
+
+
+def last_code_for_mail(mail) -> str:
+    import re
+
+    return re.search(r"\b(\d{6})\b", mail.body).group(1)
+
+
 def test_resend_waits_a_minute_between_codes():
     app = create_app(make_settings(code_resend_seconds=60))
     api = Api(TestClient(app))
@@ -105,7 +122,7 @@ def test_admins_cannot_skip_the_second_factor(api, app):
     add_user(app, "boss@maktab.uz", Role.SUPER_ADMIN)
     r = api.login("boss@maktab.uz", remember=True)
     assert r.json()["user"]["can_remember_device"] is False
-    assert r.json()["state"] == "mfa_setup_required"  # email proven, authenticator next
+    assert r.json()["state"] == "ok"
     api.post("/api/auth/logout")
     assert api.login("boss@maktab.uz", email_code=False).json()["state"] == "email_code_required"
 
