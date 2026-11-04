@@ -75,9 +75,10 @@ class AssessmentPlanModel {
             const [],
         createdById: json['createdById'] as String? ?? '',
         createdByName: json['createdByName'] as String? ?? '',
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'] as String)
-            : DateTime.now(),
+        createdAt:
+            json['createdAt'] != null
+                ? DateTime.parse(json['createdAt'] as String)
+                : DateTime.now(),
         isActive: json['isActive'] as bool? ?? true,
         replacedByPlanId: json['replacedByPlanId'] as String?,
         note: json['note'] as String?,

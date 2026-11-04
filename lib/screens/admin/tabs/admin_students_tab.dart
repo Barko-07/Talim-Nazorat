@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -60,25 +61,26 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
     };
     final df = DateFormat('dd.MM.yyyy');
 
-    final filtered = allStudents.where((s) {
-      if (_filterColor != null &&
-          statusByStudentId[s.id]?.color != _filterColor) {
-        return false;
-      }
-      if (_search.isNotEmpty) {
-        final q = _search.toLowerCase();
-        final matchName = s.fullName.toLowerCase().contains(q);
-        final matchNeed = s.primaryNeed.toLowerCase().contains(q);
-        final matchInst = s.institutionName.toLowerCase().contains(q);
-        if (!matchName && !matchNeed && !matchInst) return false;
-      }
-      if (_filterGrade != null && s.grade != _filterGrade) return false;
-      if (_filterStatus != null && s.status != _filterStatus) return false;
-      if (_filterLevel != null && !s.supportLevel.contains(_filterLevel!)) {
-        return false;
-      }
-      return true;
-    }).toList();
+    final filtered =
+        allStudents.where((s) {
+          if (_filterColor != null &&
+              statusByStudentId[s.id]?.color != _filterColor) {
+            return false;
+          }
+          if (_search.isNotEmpty) {
+            final q = _search.toLowerCase();
+            final matchName = s.fullName.toLowerCase().contains(q);
+            final matchNeed = s.primaryNeed.toLowerCase().contains(q);
+            final matchInst = s.institutionName.toLowerCase().contains(q);
+            if (!matchName && !matchNeed && !matchInst) return false;
+          }
+          if (_filterGrade != null && s.grade != _filterGrade) return false;
+          if (_filterStatus != null && s.status != _filterStatus) return false;
+          if (_filterLevel != null && !s.supportLevel.contains(_filterLevel!)) {
+            return false;
+          }
+          return true;
+        }).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -89,60 +91,66 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Alohida Ehtiyojli Bolalar Reyestri',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.successBg,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.success.withValues(alpha: 0.2),
-                          ),
-                        ),
-                        child: Text(
-                          '${filtered.length} nafar o‘quvchi',
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          'Alohida Ehtiyojli Bolalar Reyestri',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 20,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.success,
+                            color: AppColors.textPrimary,
                           ),
                         ),
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.successBg,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.success.withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Text(
+                            '${filtered.length} nafar o‘quvchi',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.success,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Viloyat va muassasalar kesimida ATEB bolalar hisobi, ta’limiy ehtiyojlari va individual profillari',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Viloyat va muassasalar kesimida ATEB bolalar hisobi, ta’limiy ehtiyojlari va individual profillari',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const AddStudentScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const AddStudentScreen()),
                   );
                 },
-                icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+                icon: const Icon(LucideIcons.userPlus, size: 18),
                 label: const Text('Yangi O‘quvchi Qo‘shish'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -177,7 +185,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                       onChanged: (v) => setState(() => _search = v.trim()),
                       decoration: InputDecoration(
                         hintText: 'F.I.SH, ehtiyoj toifasi yoki maktab...',
-                        prefixIcon: const Icon(Icons.search, size: 20),
+                        prefixIcon: const Icon(LucideIcons.search, size: 20),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 10,
@@ -192,6 +200,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
+                      isExpanded: true,
                       value: _filterStatus,
                       decoration: InputDecoration(
                         labelText: 'Holati',
@@ -224,6 +233,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
+                      isExpanded: true,
                       value: _filterLevel,
                       decoration: InputDecoration(
                         labelText: 'Yordam darajasi',
@@ -274,56 +284,62 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                 FilterChip(
                   selected: _filterColor == StatusColor.red,
                   label: Text(
-                    '🔴 Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
+                    'Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
                   ),
                   selectedColor: AppColors.error,
                   backgroundColor: AppColors.errorBg,
                   labelStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: _filterColor == StatusColor.red
-                        ? Colors.white
-                        : AppColors.error,
+                    color:
+                        _filterColor == StatusColor.red
+                            ? Colors.white
+                            : AppColors.error,
                   ),
-                  onSelected: (v) => setState(
-                    () => _filterColor = v ? StatusColor.red : null,
-                  ),
+                  onSelected:
+                      (v) => setState(
+                        () => _filterColor = v ? StatusColor.red : null,
+                      ),
                 ),
                 FilterChip(
                   selected: _filterColor == StatusColor.yellow,
                   label: Text(
-                    '🟡 Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
+                    'Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
                   ),
                   selectedColor: AppColors.warning,
                   backgroundColor: AppColors.warningBg,
                   labelStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: _filterColor == StatusColor.yellow
-                        ? Colors.white
-                        : AppColors.warning,
+                    color:
+                        _filterColor == StatusColor.yellow
+                            ? Colors.white
+                            : AppColors.warning,
                   ),
-                  onSelected: (v) => setState(
-                    () => _filterColor = v ? StatusColor.yellow : null,
-                  ),
+                  onSelected:
+                      (v) => setState(
+                        () => _filterColor = v ? StatusColor.yellow : null,
+                      ),
                 ),
                 FilterChip(
                   selected: _filterColor == StatusColor.green,
                   label: Text(
-                    '🟢 Yashil — Ijobiy (${summary.count(StatusColor.green)})',
+                    'Yashil — Ijobiy (${summary.count(StatusColor.green)})',
                   ),
                   selectedColor: AppColors.success,
                   backgroundColor: AppColors.successBg,
                   labelStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: _filterColor == StatusColor.green
-                        ? Colors.white
-                        : AppColors.success,
+                    color:
+                        _filterColor == StatusColor.green
+                            ? Colors.white
+                            : AppColors.success,
                   ),
-                  onSelected: (v) => setState(
-                    () => _filterColor = v ? StatusColor.green : null,
-                  ),
+                  onSelected:
+                      (v) => setState(
+                        () => _filterColor = v ? StatusColor.green : null,
+                      ),
                 ),
               ],
             ),
@@ -350,9 +366,10 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(
-                    color: !isArchived && stColor != null
-                        ? stColor.withValues(alpha: isRed ? 0.55 : 0.35)
-                        : AppColors.border,
+                    color:
+                        !isArchived && stColor != null
+                            ? stColor.withValues(alpha: isRed ? 0.55 : 0.35)
+                            : AppColors.border,
                     width: isRed ? 1.5 : 1.0,
                   ),
                 ),
@@ -362,17 +379,19 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                     children: [
                       CircleAvatar(
                         radius: 24,
-                        backgroundColor: isArchived
-                            ? Colors.grey.shade200
-                            : (stBg ?? AppColors.primaryLight),
+                        backgroundColor:
+                            isArchived
+                                ? Colors.grey.shade200
+                                : (stBg ?? AppColors.primaryLight),
                         child: Text(
                           s.firstName.isNotEmpty ? s.firstName[0] : 'B',
                           style: TextStyle(
-                            color: isArchived
-                                ? AppColors.textMuted
-                                : (stColor ?? AppColors.primary),
+                            color:
+                                isArchived
+                                    ? AppColors.textMuted
+                                    : (stColor ?? AppColors.primary),
                             fontWeight: FontWeight.w600,
-                            fontSize: 18,
+                            fontSize: 17,
                           ),
                         ),
                       ),
@@ -391,9 +410,10 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 14,
-                                    color: isArchived
-                                        ? AppColors.textMuted
-                                        : AppColors.textPrimary,
+                                    color:
+                                        isArchived
+                                            ? AppColors.textMuted
+                                            : AppColors.textPrimary,
                                   ),
                                 ),
                                 Container(
@@ -429,7 +449,11 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                       ),
                                     ),
                                     child: Text(
-                                      '${st.color.label}: ${st.color == StatusColor.red ? "Ishlanmagan" : st.color == StatusColor.yellow ? "E’tibor talab" : "Ijobiy"}',
+                                      '${st.color.label}: ${st.color == StatusColor.red
+                                          ? "Ishlanmagan"
+                                          : st.color == StatusColor.yellow
+                                          ? "E’tibor talab"
+                                          : "Ijobiy"}',
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
@@ -454,7 +478,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                               Text(
                                 'Svetofor sababi: ${st.reasons.first}',
                                 style: TextStyle(
-                                  fontSize: 11.5,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                   color: stColor,
                                 ),
@@ -462,7 +486,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                             ],
                             const SizedBox(height: 3),
                             Text(
-                              '🏛️ ${s.institutionName} • Tug‘ilgan: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
+                              '${s.institutionName} • Tug‘ilgan: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
                               style: TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textMuted,
@@ -472,86 +496,91 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.surfaceMuted,
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.badge_outlined,
-                                  size: 14,
-                                  color: AppColors.textSecondary,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${s.assignedSpecialistIds.length} mutaxassis',
-                                  style: TextStyle(
-                                    fontSize: 11,
+                      Flexible(
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceMuted,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    LucideIcons.badge,
+                                    size: 14,
                                     color: AppColors.textSecondary,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryLight,
-                              foregroundColor: AppColors.primary,
-                              elevation: 0,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 8,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => StudentDetailScreen(
-                                    studentId: s.id,
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${s.assignedSpecialistIds.length} mutaxassis',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
+                                    ),
                                   ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryLight,
+                                foregroundColor: AppColors.primary,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
                                 ),
-                              );
-                            },
-                            child: const Text(
-                              'Profilni ochish',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => StudentDetailScreen(
+                                          studentId: s.id,
+                                        ),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                'Profilni ochish',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          ),
-                          if (!isArchived) ...[
-                            const SizedBox(width: 6),
-                            IconButton(
-                              icon: Icon(
-                                Icons.archive_outlined,
-                                size: 18,
-                                color: AppColors.warning,
+                            if (!isArchived) ...[
+                              const SizedBox(width: 6),
+                              IconButton(
+                                icon: Icon(
+                                  LucideIcons.archive,
+                                  size: 18,
+                                  color: AppColors.warning,
+                                ),
+                                tooltip: 'Arxivlash',
+                                onPressed:
+                                    () => _confirmArchiveStudent(
+                                      context,
+                                      s,
+                                      currentUser,
+                                    ),
                               ),
-                              tooltip: 'Arxivlash',
-                              onPressed: () => _confirmArchiveStudent(
-                                context,
-                                s,
-                                currentUser,
-                              ),
-                            ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ],
                   ),
@@ -572,9 +601,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
         color: isArchived ? AppColors.errorBg : AppColors.successBg,
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: isArchived
-              ? AppColors.errorBorder
-              : AppColors.successBorder,
+          color: isArchived ? AppColors.errorBorder : AppColors.successBorder,
         ),
       ),
       child: Text(
@@ -582,9 +609,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: isArchived
-              ? AppColors.error
-              : AppColors.success,
+          color: isArchived ? AppColors.error : AppColors.success,
         ),
       ),
     );
@@ -597,63 +622,65 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
   ) {
     final app = context.read<AppProvider>();
     final reasonCtrl = TextEditingController(
-      text: 'Tibbiy-pedagogik komissiya xulosasiga binoan boshqa muassasaga o‘tkazildi',
+      text:
+          'Tibbiy-pedagogik komissiya xulosasiga binoan boshqa muassasaga o‘tkazildi',
     );
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('O‘quvchini arxivlash'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${student.fullName} anketasini arxivlash sababini kiriting:',
-              style: const TextStyle(fontSize: 13),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('O‘quvchini arxivlash'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${student.fullName} anketasini arxivlash sababini kiriting:',
+                  style: const TextStyle(fontSize: 13),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: reasonCtrl,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Arxivlash sababi *',
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: reasonCtrl,
-              maxLines: 2,
-              decoration: const InputDecoration(
-                labelText: 'Arxivlash sababi *',
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Bekor qilish'),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Bekor qilish'),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.warning,
+                  foregroundColor: AppColors.onPrimary,
+                ),
+                onPressed: () async {
+                  if (reasonCtrl.text.trim().isNotEmpty) {
+                    Navigator.pop(ctx);
+                    await app.deactivateStudent(
+                      student.id,
+                      reasonCtrl.text.trim(),
+                      byUser: byUser,
+                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${student.fullName} arxivlandi.'),
+                          backgroundColor: AppColors.warning,
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: const Text('Arxivlash'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.warning,
-              foregroundColor: AppColors.onPrimary,
-            ),
-            onPressed: () async {
-              if (reasonCtrl.text.trim().isNotEmpty) {
-                Navigator.pop(ctx);
-                await app.deactivateStudent(
-                  student.id,
-                  reasonCtrl.text.trim(),
-                  byUser: byUser,
-                );
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${student.fullName} arxivlandi.'),
-                      backgroundColor: AppColors.warning,
-                    ),
-                  );
-                }
-              }
-            },
-            child: const Text('Arxivlash'),
-          ),
-        ],
-      ),
     );
   }
 }

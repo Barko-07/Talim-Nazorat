@@ -80,13 +80,13 @@ class _TopBar extends StatelessWidget {
         children: [
           const BrandMark(height: 34),
           const SizedBox(width: 10),
-          const BrandWordmark(fontSize: 22),
+          const BrandWordmark(fontSize: 20),
           const Spacer(),
           TextButton(
             onPressed: () => LandingScreen.openAuth(context, signUp: false),
             child: const Text(
               'Kirish',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5),
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15.5),
             ),
           ),
           if (wide) ...[
@@ -121,7 +121,7 @@ class _Hero extends StatelessWidget {
           child: Text(
             'Inklyuziv ta’lim uchun yagona platforma',
             style: TextStyle(
-              fontSize: 12.5,
+              fontSize: 13,
               fontWeight: FontWeight.w700,
               color: AppColors.primary,
             ),
@@ -163,7 +163,7 @@ class _Hero extends StatelessWidget {
                 icon: const Icon(LucideIcons.userPlus, size: 18),
                 label: const Text(
                   'Ro‘yxatdan o‘tish',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700),
                 ),
               ),
             ),
@@ -174,7 +174,7 @@ class _Hero extends StatelessWidget {
                 icon: const Icon(LucideIcons.logIn, size: 18),
                 label: const Text(
                   'Kirish',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700),
                 ),
               ),
             ),
@@ -263,7 +263,8 @@ class _Features extends StatelessWidget {
           const SizedBox(height: 32),
           LayoutBuilder(
             builder: (context, c) {
-              final columns = c.maxWidth >= 900 ? 4 : (c.maxWidth >= 560 ? 2 : 1);
+              final columns =
+                  c.maxWidth >= 900 ? 4 : (c.maxWidth >= 560 ? 2 : 1);
               const gap = 16.0;
               final width = (c.maxWidth - gap * (columns - 1)) / columns;
               return Wrap(
@@ -290,7 +291,11 @@ class _FeatureCard extends StatelessWidget {
   final String title;
   final String body;
 
-  const _FeatureCard({required this.icon, required this.title, required this.body});
+  const _FeatureCard({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +322,7 @@ class _FeatureCard extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 16.5,
+              fontSize: 17,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
             ),
@@ -377,7 +382,10 @@ class _Audience extends StatelessWidget {
             children: [
               for (final (icon, label) in _roles)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(999),
@@ -391,7 +399,7 @@ class _Audience extends StatelessWidget {
                       Text(
                         label,
                         style: TextStyle(
-                          fontSize: 14.5,
+                          fontSize: 15.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
@@ -426,7 +434,7 @@ class _CallToAction extends StatelessWidget {
               'Jamoangiz bilan boshlang',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 26,
+                fontSize: 24,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
               ),
@@ -435,7 +443,11 @@ class _CallToAction extends StatelessWidget {
             const Text(
               'Ro‘yxatdan o‘ting — maktabingiz administratori hisobingizni tasdiqlaydi.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15.5, height: 1.5, color: Colors.white),
+              style: TextStyle(
+                fontSize: 15.5,
+                height: 1.5,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 22),
             SizedBox(
@@ -448,7 +460,7 @@ class _CallToAction extends StatelessWidget {
                 onPressed: () => LandingScreen.openAuth(context, signUp: true),
                 child: const Text(
                   'Ro‘yxatdan o‘tish',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700),
                 ),
               ),
             ),

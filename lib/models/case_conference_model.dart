@@ -8,8 +8,11 @@ enum ConferenceStatus {
   final String label;
   const ConferenceStatus(this.label);
 
-  static ConferenceStatus fromName(String? name) => ConferenceStatus.values
-      .firstWhere((s) => s.name == name, orElse: () => ConferenceStatus.planned);
+  static ConferenceStatus fromName(String? name) =>
+      ConferenceStatus.values.firstWhere(
+        (s) => s.name == name,
+        orElse: () => ConferenceStatus.planned,
+      );
 }
 
 /// Mutaxassisning konsiliumdagi xulosasi
@@ -99,9 +102,15 @@ class ConferenceDecision {
         text: json['text'] as String? ?? '',
         responsibleId: json['responsibleId'] as String? ?? '',
         responsibleName: json['responsibleName'] as String? ?? '',
-        dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate'] as String) : null,
+        dueDate:
+            json['dueDate'] != null
+                ? DateTime.parse(json['dueDate'] as String)
+                : null,
         isDone: json['isDone'] as bool? ?? false,
-        doneAt: json['doneAt'] != null ? DateTime.parse(json['doneAt'] as String) : null,
+        doneAt:
+            json['doneAt'] != null
+                ? DateTime.parse(json['doneAt'] as String)
+                : null,
       );
 }
 
@@ -140,9 +149,10 @@ class CaseConference {
       participantIds.contains(userId) || convenedById == userId;
 
   /// Xulosasini hali kiritmagan ishtirokchilar
-  List<String> get pendingParticipantIds => participantIds
-      .where((id) => !contributions.any((c) => c.userId == id))
-      .toList();
+  List<String> get pendingParticipantIds =>
+      participantIds
+          .where((id) => !contributions.any((c) => c.userId == id))
+          .toList();
 
   CaseConference copyWith({
     ConferenceStatus? status,
@@ -193,12 +203,16 @@ class CaseConference {
     convenedById: json['convenedById'] as String? ?? '',
     convenedByName: json['convenedByName'] as String? ?? '',
     participantIds:
-        (json['participantIds'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+        (json['participantIds'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
         const [],
     status: ConferenceStatus.fromName(json['status'] as String?),
     contributions:
         (json['contributions'] as List<dynamic>?)
-            ?.map((e) => ConferenceContribution.fromJson(e as Map<String, dynamic>))
+            ?.map(
+              (e) => ConferenceContribution.fromJson(e as Map<String, dynamic>),
+            )
             .toList() ??
         const [],
     conclusion: json['conclusion'] as String?,
@@ -207,6 +221,9 @@ class CaseConference {
             ?.map((e) => ConferenceDecision.fromJson(e as Map<String, dynamic>))
             .toList() ??
         const [],
-    heldAt: json['heldAt'] != null ? DateTime.parse(json['heldAt'] as String) : null,
+    heldAt:
+        json['heldAt'] != null
+            ? DateTime.parse(json['heldAt'] as String)
+            : null,
   );
 }

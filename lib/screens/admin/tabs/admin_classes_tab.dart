@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,20 +21,24 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
     final app = context.watch<AppProvider>();
     final classes = app.classesSummary;
     final allStudents = app.students;
-    final teachers = app.allUsers.where((u) => u.role == UserRole.teacher).toList();
+    final teachers =
+        app.allUsers.where((u) => u.role == UserRole.teacher).toList();
 
-    final filtered = classes.where((cl) {
-      final grade = (cl['grade'] as String).toLowerCase();
-      final inst = (cl['institutionName'] as String).toLowerCase();
-      final teacher = (cl['teacherName'] as String).toLowerCase();
-      if (_search.isNotEmpty) {
-        final q = _search.toLowerCase();
-        if (!grade.contains(q) && !inst.contains(q) && !teacher.contains(q)) {
-          return false;
-        }
-      }
-      return true;
-    }).toList();
+    final filtered =
+        classes.where((cl) {
+          final grade = (cl['grade'] as String).toLowerCase();
+          final inst = (cl['institutionName'] as String).toLowerCase();
+          final teacher = (cl['teacherName'] as String).toLowerCase();
+          if (_search.isNotEmpty) {
+            final q = _search.toLowerCase();
+            if (!grade.contains(q) &&
+                !inst.contains(q) &&
+                !teacher.contains(q)) {
+              return false;
+            }
+          }
+          return true;
+        }).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -44,49 +49,56 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Sinflar va Guruhlar Boshqaruvi',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.warningBg,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.warning.withValues(alpha: 0.2),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Sinflar va Guruhlar Boshqaruvi',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          '${filtered.length} ta sinf / guruh',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.warning,
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.warningBg,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.warning.withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Text(
+                            '${filtered.length} ta sinf / guruh',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.warning,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Ta’lim muassasalaridagi inklyuziv sinflar, bolalar tarkibi va biriktirilgan mas’ul o‘qituvchilar',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Ta’lim muassasalaridagi inklyuziv sinflar, bolalar tarkibi va biriktirilgan mas’ul o‘qituvchilar',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -104,8 +116,9 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
               child: TextField(
                 onChanged: (v) => setState(() => _search = v.trim()),
                 decoration: InputDecoration(
-                  hintText: 'Sinf (masalan: 1-A, 4-B), maktab yoki mas’ul o‘qituvchi bo‘yicha...',
-                  prefixIcon: const Icon(Icons.search, size: 20),
+                  hintText:
+                      'Sinf (masalan: 1-A, 4-B), maktab yoki mas’ul o‘qituvchi bo‘yicha...',
+                  prefixIcon: const Icon(LucideIcons.search, size: 20),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 10,
@@ -133,9 +146,13 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
               final teacherName = cl['teacherName'] as String;
               final needs = (cl['needs'] as Set<String>).toList();
 
-              final classStudents = allStudents
-                  .where((s) => s.grade == grade && s.institutionName == instName)
-                  .toList();
+              final classStudents =
+                  allStudents
+                      .where(
+                        (s) =>
+                            s.grade == grade && s.institutionName == instName,
+                      )
+                      .toList();
 
               return Card(
                 elevation: 0,
@@ -173,13 +190,16 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
                                   '$grade sinf',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 15,
+                                    fontSize: 15.5,
                                     color: AppColors.textPrimary,
                                   ),
                                 ),
@@ -206,7 +226,7 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '🏛️ $instName',
+                              '$instName',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
@@ -214,7 +234,7 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '👩‍🏫 Mas’ul sinf rahbari: $teacherName',
+                              'Mas’ul sinf rahbari: $teacherName',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textMuted,
@@ -225,28 +245,29 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                               const SizedBox(height: 6),
                               Wrap(
                                 spacing: 6,
-                                children: needs
-                                    .map(
-                                      (n) => Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 1,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.surfaceMuted,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          n,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: AppColors.textSecondary,
+                                children:
+                                    needs
+                                        .map(
+                                          (n) => Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 1,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.surfaceMuted,
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              n,
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: AppColors.textSecondary,
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
+                                        )
+                                        .toList(),
                               ),
                             ],
                           ],
@@ -271,7 +292,7 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                             teachers,
                           );
                         },
-                        icon: const Icon(Icons.people_outline, size: 16),
+                        icon: const Icon(LucideIcons.users, size: 16),
                         label: const Text('O‘quvchilar ro‘yxati'),
                       ),
                     ],
@@ -295,90 +316,96 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
   ) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          '$grade sinf tarkibi',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        content: SizedBox(
-          width: 500,
-          height: 380,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Muassasa: $instName\nMas’ul o‘qituvchi: $teacherName',
-                style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(
+              '$grade sinf tarkibi',
+              style: const TextStyle(
+                fontSize: 15.5,
+                fontWeight: FontWeight.w600,
               ),
-              const Divider(height: 16),
-              Text(
-                'Sinfdagi ATEB o‘quvchilar (${classStudents.length} nafar):',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: classStudents.isEmpty
-                    ? Center(
-                        child: Text(
-                          'Bu sinfda o‘quvchi ro‘yxatga olinmagan',
-                          style: TextStyle(color: AppColors.textMuted),
-                        ),
-                      )
-                    : ListView.separated(
-                        itemCount: classStudents.length,
-                        separatorBuilder: (_, _) => const Divider(height: 1),
-                        itemBuilder: (c, idx) {
-                          final st = classStudents[idx];
-                          return ListTile(
-                            dense: true,
-                            contentPadding: EdgeInsets.zero,
-                            leading: CircleAvatar(
-                              radius: 14,
-                              backgroundColor: AppColors.primaryLight,
+            ),
+            content: SizedBox(
+              width: 500,
+              height: 380,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Muassasa: $instName\nMas’ul o‘qituvchi: $teacherName',
+                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                  ),
+                  const Divider(height: 16),
+                  Text(
+                    'Sinfdagi ATEB o‘quvchilar (${classStudents.length} nafar):',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child:
+                        classStudents.isEmpty
+                            ? Center(
                               child: Text(
-                                '${idx + 1}',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                'Bu sinfda o‘quvchi ro‘yxatga olinmagan',
+                                style: TextStyle(color: AppColors.textMuted),
                               ),
+                            )
+                            : ListView.separated(
+                              itemCount: classStudents.length,
+                              separatorBuilder:
+                                  (_, _) => const Divider(height: 1),
+                              itemBuilder: (c, idx) {
+                                final st = classStudents[idx];
+                                return ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: CircleAvatar(
+                                    radius: 14,
+                                    backgroundColor: AppColors.primaryLight,
+                                    child: Text(
+                                      '${idx + 1}',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  title: Text(
+                                    st.fullName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    '${st.primaryNeed} • ${st.supportLevel}',
+                                    style: const TextStyle(fontSize: 11),
+                                  ),
+                                  trailing: Text(
+                                    '${st.assignedSpecialistIds.length} mutaxassis',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                            title: Text(
-                              st.fullName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                              ),
-                            ),
-                            subtitle: Text(
-                              '${st.primaryNeed} • ${st.supportLevel}',
-                              style: const TextStyle(fontSize: 11),
-                            ),
-                            trailing: Text(
-                              '${st.assignedSpecialistIds.length} mutaxassis',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Yopish'),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Yopish'),
-          ),
-        ],
-      ),
     );
   }
 }

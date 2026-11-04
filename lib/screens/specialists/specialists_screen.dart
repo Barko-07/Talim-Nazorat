@@ -10,6 +10,7 @@ import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/access_control_service.dart';
 import '../../services/password_hasher.dart';
+import '../../core/widgets/status_badge.dart';
 
 class SpecialistsScreen extends StatelessWidget {
   const SpecialistsScreen({super.key});
@@ -27,137 +28,142 @@ class SpecialistsScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDlgState) => AlertDialog(
-          title: const Text('Yangi xodim / mutaxassis qo‘shish'),
-          content: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'F.I.Sh. (To‘liq) *',
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<UserRole>(
-                    initialValue: selectedRole,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Lavozimi va roli *',
-                    ),
-                    items: [
-                      UserRole.psychologist,
-                      UserRole.speechTherapist,
-                      UserRole.specialEducation,
-                      UserRole.specialEdTeacher,
-                      UserRole.teacher,
-                      UserRole.coordinator,
-                      UserRole.institutionAdmin,
-                    ]
-                        .map(
-                          (r) => DropdownMenuItem(
-                            value: r,
-                            child: Text(
-                              r.label,
-                              overflow: TextOverflow.ellipsis,
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDlgState) => AlertDialog(
+                  title: const Text('Yangi xodim / mutaxassis qo‘shish'),
+                  content: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 440),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: nameCtrl,
+                            decoration: const InputDecoration(
+                              labelText: 'F.I.Sh. (To‘liq) *',
                             ),
                           ),
-                        )
-                        .toList(),
-                    onChanged: (v) {
-                      setDlgState(() {
-                        selectedRole = v!;
-                        specCtrl.text = selectedRole.professionTitle;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: specCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Mutaxassislik yo‘nalishi',
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<UserRole>(
+                            initialValue: selectedRole,
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Lavozimi va roli *',
+                            ),
+                            items:
+                                [
+                                      UserRole.psychologist,
+                                      UserRole.speechTherapist,
+                                      UserRole.specialEducation,
+                                      UserRole.specialEdTeacher,
+                                      UserRole.teacher,
+                                      UserRole.coordinator,
+                                      UserRole.institutionAdmin,
+                                    ]
+                                    .map(
+                                      (r) => DropdownMenuItem(
+                                        value: r,
+                                        child: Text(
+                                          r.label,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) {
+                              setDlgState(() {
+                                selectedRole = v!;
+                                specCtrl.text = selectedRole.professionTitle;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: specCtrl,
+                            decoration: const InputDecoration(
+                              labelText: 'Mutaxassislik yo‘nalishi',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: phoneCtrl,
+                            decoration: const InputDecoration(
+                              labelText: 'Telefon raqami *',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: emailCtrl,
+                            decoration: const InputDecoration(
+                              labelText: 'Elektron pochta (Email)',
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: phoneCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Telefon raqami *',
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Bekor qilish'),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: emailCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Elektron pochta (Email)',
+                    FilledButton(
+                      onPressed: () async {
+                        if (nameCtrl.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Iltimos, xodimning to‘liq ismini kiriting!',
+                              ),
+                              backgroundColor: AppColors.error,
+                            ),
+                          );
+                          return;
+                        }
+
+                        final tempPassword = PasswordHasher.generateTemporary();
+                        final newStaff = UserModel(
+                          id: 'usr_${const Uuid().v4().substring(0, 8)}',
+                          fullName: nameCtrl.text.trim(),
+                          email:
+                              emailCtrl.text.trim().isNotEmpty
+                                  ? emailCtrl.text.trim()
+                                  : '${phoneCtrl.text.replaceAll(RegExp(r'\D'), '')}@talim.uz',
+                          phone: phoneCtrl.text.trim(),
+                          role: selectedRole,
+                          specialization:
+                              specCtrl.text.trim().isNotEmpty
+                                  ? specCtrl.text.trim()
+                                  : selectedRole.label,
+                          institutionId: user?.institutionId,
+                          institutionName: user?.institutionName,
+                          region: user?.region ?? 'Namangan viloyati',
+                          district: user?.district ?? 'Chortoq tumani',
+                          password: tempPassword,
+                          isActive: true,
+                        );
+
+                        await app.addUser(newStaff, byUser: user);
+                        if (ctx.mounted) {
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Yangi xodim muvaffaqiyatli qo‘shildi! Vaqtinchalik parol: $tempPassword',
+                              ),
+                              duration: const Duration(seconds: 12),
+                              backgroundColor: AppColors.success,
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Qo‘shish'),
                     ),
-                  ),
-                ],
-              ),
-            ),
+                  ],
+                ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Bekor qilish'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                if (nameCtrl.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Iltimos, xodimning to‘liq ismini kiriting!',
-                      ),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
-                  return;
-                }
-
-                final tempPassword = PasswordHasher.generateTemporary();
-                final newStaff = UserModel(
-                  id: 'usr_${const Uuid().v4().substring(0, 8)}',
-                  fullName: nameCtrl.text.trim(),
-                  email: emailCtrl.text.trim().isNotEmpty
-                      ? emailCtrl.text.trim()
-                      : '${phoneCtrl.text.replaceAll(RegExp(r'\D'), '')}@talim.uz',
-                  phone: phoneCtrl.text.trim(),
-                  role: selectedRole,
-                  specialization: specCtrl.text.trim().isNotEmpty
-                      ? specCtrl.text.trim()
-                      : selectedRole.label,
-                  institutionId: user?.institutionId,
-                  institutionName: user?.institutionName,
-                  region: user?.region ?? 'Namangan viloyati',
-                  district: user?.district ?? 'Chortoq tumani',
-                  password: tempPassword,
-                  isActive: true,
-                );
-
-                await app.addUser(newStaff, byUser: user);
-                if (ctx.mounted) {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Yangi xodim muvaffaqiyatli qo‘shildi! Vaqtinchalik parol: $tempPassword',
-                      ),
-                      duration: const Duration(seconds: 12),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
-                }
-              },
-              child: const Text('Qo‘shish'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -184,13 +190,14 @@ class SpecialistsScreen extends StatelessWidget {
             title: 'Mutaxassislar shtati',
             subtitle:
                 'Muassasa kadrlari va yuklamasi • ${staffList.length} nafar',
-            action: canManage
-                ? HeaderActionButton(
-                    icon: LucideIcons.userPlus,
-                    label: 'Yangi xodim',
-                    onPressed: () => _showAddStaffDialog(context),
-                  )
-                : null,
+            action:
+                canManage
+                    ? HeaderActionButton(
+                      icon: LucideIcons.userPlus,
+                      label: 'Yangi xodim',
+                      onPressed: () => _showAddStaffDialog(context),
+                    )
+                    : null,
           ),
           const SizedBox(height: 9),
 
@@ -206,11 +213,15 @@ class SpecialistsScreen extends StatelessWidget {
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final staff = staffList[index];
-                final assignedCount = allStudents
-                    .where((s) => s.assignedSpecialistIds.contains(staff.id))
-                    .length;
+                final assignedCount =
+                    allStudents
+                        .where(
+                          (s) => s.assignedSpecialistIds.contains(staff.id),
+                        )
+                        .length;
                 final isActive = staff.isActive;
-                final showToggle = canManage &&
+                final showToggle =
+                    canManage &&
                     staff.id != user.id &&
                     staff.role != UserRole.superAdmin;
 
@@ -250,17 +261,17 @@ class SpecialistsScreen extends StatelessWidget {
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 15.5,
-                                        color: isActive
-                                            ? AppColors.textPrimary
-                                            : AppColors.textMuted,
+                                        color:
+                                            isActive
+                                                ? AppColors.textPrimary
+                                                : AppColors.textMuted,
                                         letterSpacing: -0.2,
                                       ),
                                     ),
                                     if (!isActive)
-                                      StatusPill(
-                                        label: 'Bloklangan',
-                                        color: AppColors.error,
-                                        backgroundColor: AppColors.errorBg,
+                                      StatusBadge(
+                                        'Bloklangan',
+                                        tone: StatusTone.danger,
                                       ),
                                   ],
                                 ),
@@ -293,34 +304,36 @@ class SpecialistsScreen extends StatelessWidget {
                         ],
                       );
 
-                      final toggleButton = showToggle
-                          ? TextButton(
-                              style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
+                      final toggleButton =
+                          showToggle
+                              ? TextButton(
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  minimumSize: const Size(0, 30),
+                                  foregroundColor:
+                                      isActive
+                                          ? AppColors.error
+                                          : AppColors.success,
                                 ),
-                                minimumSize: const Size(0, 30),
-                                foregroundColor: isActive
-                                    ? AppColors.error
-                                    : AppColors.success,
-                              ),
-                              onPressed: () {
-                                app.toggleUserActive(
-                                  staff.id,
-                                  !isActive,
-                                  byUser: user,
-                                );
-                              },
-                              child: Text(
-                                isActive ? 'Bloklash' : 'Faollashtirish',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
+                                onPressed: () {
+                                  app.toggleUserActive(
+                                    staff.id,
+                                    !isActive,
+                                    byUser: user,
+                                  );
+                                },
+                                child: Text(
+                                  isActive ? 'Bloklash' : 'Faollashtirish',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              ),
-                            )
-                          : null;
+                              )
+                              : null;
 
                       if (isCompact) {
                         return Column(

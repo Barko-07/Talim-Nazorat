@@ -43,13 +43,14 @@ class DynamicsResult {
   });
 
   double? get change =>
-      (previous != null && latest != null) ? latest!.value - previous!.value : null;
+      (previous != null && latest != null)
+          ? latest!.value - previous!.value
+          : null;
 
-  double? get changePercent => (previous != null &&
-          latest != null &&
-          previous!.value != 0)
-      ? (latest!.value - previous!.value) / previous!.value.abs() * 100
-      : null;
+  double? get changePercent =>
+      (previous != null && latest != null && previous!.value != 0)
+          ? (latest!.value - previous!.value) / previous!.value.abs() * 100
+          : null;
 }
 
 class DynamicsService {
@@ -70,9 +71,10 @@ class DynamicsService {
     if (period == DynamicsPeriod.measurement) return sorted;
     final byKey = <DateTime, DataPoint>{};
     for (final p in sorted) {
-      final key = period == DynamicsPeriod.month
-          ? DateTime(p.at.year, p.at.month)
-          : DateTime(p.at.year, ((p.at.month - 1) ~/ 3) * 3 + 1);
+      final key =
+          period == DynamicsPeriod.month
+              ? DateTime(p.at.year, p.at.month)
+              : DateTime(p.at.year, ((p.at.month - 1) ~/ 3) * 3 + 1);
       byKey[key] = DataPoint(key, p.value);
     }
     return byKey.values.toList()..sort((a, b) => a.at.compareTo(b.at));
@@ -115,7 +117,8 @@ class DynamicsService {
         series: series,
         previous: prev,
         latest: last,
-        reason: 'Oldingi natijaga nisbatan ko‘rsatkich yomonlashgan: $changeText.',
+        reason:
+            'Oldingi natijaga nisbatan ko‘rsatkich yomonlashgan: $changeText.',
       );
     }
 
@@ -124,7 +127,8 @@ class DynamicsService {
       final window = series.sublist(series.length - ineffectiveMinPoints);
       final days = window.last.at.difference(window.first.at).inDays;
       final overall = improvement(window.first.value, window.last.value);
-      if (days >= ineffectiveMinDays && overall <= threshold(window.first.value)) {
+      if (days >= ineffectiveMinDays &&
+          overall <= threshold(window.first.value)) {
         return DynamicsResult(
           status: DynamicsStatus.ineffective,
           series: series,

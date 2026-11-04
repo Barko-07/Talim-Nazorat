@@ -78,7 +78,10 @@ void main() {
       await db.updateUser(
         user.copyWith(isActive: false),
         byUser: UserModel(
-          id: 'adm', email: 'adm@talim.uz', fullName: 'Admin', role: UserRole.superAdmin,
+          id: 'adm',
+          email: 'adm@talim.uz',
+          fullName: 'Admin',
+          role: UserRole.superAdmin,
         ),
       );
       final res = await auth.login('test.psy@talim.uz', 'OwnPass99');
@@ -109,7 +112,10 @@ void main() {
 
   group('Storage safety', () {
     test('corrupted table is preserved, not replaced by demo data', () async {
-      await freshDb({'app_db_seeded_v2': true, 'db_students': 'not valid json'});
+      await freshDb({
+        'app_db_seeded_v2': true,
+        'db_students': 'not valid json',
+      });
       expect(db.loadErrors, contains('db_students'));
       // Namunaviy bolalar qo'shilmagan
       expect(db.getStudents(), isEmpty);
@@ -127,23 +133,25 @@ void main() {
       expect(prefs.getString('db_students_corrupt_backup'), 'not valid json');
     });
 
-    test('plain-text passwords from old versions are migrated to hashes',
-        () async {
-      final legacy = UserModel(
-        id: 'legacy_1',
-        email: 'legacy@talim.uz',
-        fullName: 'Eski Foydalanuvchi',
-        role: UserRole.psychologist,
-        password: 'legacyPass',
-      );
-      await freshDb({
-        'app_db_seeded_v2': true,
-        'db_users': jsonEncode([legacy.toJson()]),
-      });
-      final user = db.getUserById('legacy_1')!;
-      expect(PasswordHasher.isHashed(user.password), true);
-      expect(db.verifyPassword(user, 'legacyPass'), true);
-    });
+    test(
+      'plain-text passwords from old versions are migrated to hashes',
+      () async {
+        final legacy = UserModel(
+          id: 'legacy_1',
+          email: 'legacy@talim.uz',
+          fullName: 'Eski Foydalanuvchi',
+          role: UserRole.psychologist,
+          password: 'legacyPass',
+        );
+        await freshDb({
+          'app_db_seeded_v2': true,
+          'db_users': jsonEncode([legacy.toJson()]),
+        });
+        final user = db.getUserById('legacy_1')!;
+        expect(PasswordHasher.isHashed(user.password), true);
+        expect(db.verifyPassword(user, 'legacyPass'), true);
+      },
+    );
   });
 
   group('Access control', () {

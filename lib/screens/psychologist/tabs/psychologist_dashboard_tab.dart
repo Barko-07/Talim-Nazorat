@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -75,7 +76,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                     ),
                   ),
                   child: const Icon(
-                    Icons.psychology_rounded,
+                    LucideIcons.brain,
                     color: Colors.white,
                     size: 38,
                   ),
@@ -169,7 +170,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                     title: 'Biriktirilgan o‘quvchilar',
                     value: '${myStudents.length} nafar',
                     subtitle: 'Psixologik hisobda',
-                    icon: Icons.people_alt_rounded,
+                    icon: LucideIcons.users,
                     color: AppColors.primary,
                     bgColor: AppColors.primaryLight,
                     width: cardWidth,
@@ -179,7 +180,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                     title: 'Bugungi mashg‘ulotlar',
                     value: '${todaySessions.length} ta',
                     subtitle: 'Kun tartibida',
-                    icon: Icons.calendar_today_rounded,
+                    icon: LucideIcons.calendar,
                     color: AppColors.info,
                     bgColor: AppColors.infoBg,
                     width: cardWidth,
@@ -189,7 +190,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                     title: 'Psixologik baholashlar',
                     value: '${myAssessments.length} ta',
                     subtitle: 'Diagnostika xulosalari',
-                    icon: Icons.assignment_turned_in_rounded,
+                    icon: LucideIcons.clipboardCheck,
                     color: AppColors.success,
                     bgColor: AppColors.successBg,
                     width: cardWidth,
@@ -199,7 +200,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                     title: 'Kuzatuv daftari',
                     value: '${myObservations.length} ta qayd',
                     subtitle: 'Dinamik o‘zgarishlar',
-                    icon: Icons.auto_stories_rounded,
+                    icon: LucideIcons.bookOpen,
                     color: AppColors.warning,
                     bgColor: AppColors.warningBg,
                     width: cardWidth,
@@ -229,22 +230,22 @@ class PsychologistDashboardTab extends StatelessWidget {
                   (constraints.maxWidth - gap * (columns - 1)) / columns;
               final actions = [
                 (
-                  Icons.edit_note_rounded,
+                  LucideIcons.notebookPen,
                   'Yangi kuzatuv',
                   onNewObservation ?? () => onNavigateToTab?.call(3),
                 ),
                 (
-                  Icons.psychology_outlined,
+                  LucideIcons.brain,
                   'Diagnostika',
                   onNewAssessment ?? () => onNavigateToTab?.call(2),
                 ),
                 (
-                  Icons.event_available_outlined,
+                  LucideIcons.calendarCheck,
                   'Mashg‘ulot',
                   onNewSession ?? () => onNavigateToTab?.call(7),
                 ),
                 (
-                  Icons.bar_chart_rounded,
+                  LucideIcons.barChart,
                   'Hisobotlar',
                   () => onNavigateToTab?.call(8),
                 ),
@@ -367,7 +368,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                   Text(
                     value,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -409,23 +410,27 @@ class PsychologistDashboardTab extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.schedule_rounded,
-                      color: AppColors.primary,
-                      size: 20,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Bugungi uchrashuv va darslar',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                Flexible(
+                  child: Row(
+                    children: [
+                      Icon(
+                        LucideIcons.clock,
+                        color: AppColors.primary,
+                        size: 20,
                       ),
-                    ),
-                  ],
+                      SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          'Bugungi uchrashuv va darslar',
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 TextButton(
                   onPressed: () => onNavigateToTab?.call(7),
@@ -444,7 +449,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                 child: Column(
                   children: [
                     Icon(
-                      Icons.event_available_rounded,
+                      LucideIcons.calendarCheck,
                       size: 38,
                       color: Colors.grey.shade300,
                     ),
@@ -565,23 +570,23 @@ class PsychologistDashboardTab extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.visibility_outlined,
-                      color: AppColors.warning,
-                      size: 20,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Muhim psixologik kuzatuvlar',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                Flexible(
+                  child: Row(
+                    children: [
+                      Icon(LucideIcons.eye, color: AppColors.warning, size: 20),
+                      SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          'Muhim psixologik kuzatuvlar',
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 TextButton(
                   onPressed: () => onNavigateToTab?.call(3),
@@ -597,7 +602,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                 child: Column(
                   children: [
                     Icon(
-                      Icons.notes_rounded,
+                      LucideIcons.notebookText,
                       size: 38,
                       color: Colors.grey.shade300,
                     ),
@@ -646,7 +651,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                             child: Text(
                               obs.emotionalState,
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.warning,
                               ),
@@ -731,7 +736,7 @@ class _QuickActionTile extends StatelessWidget {
                   label,
                   maxLines: 2,
                   style: TextStyle(
-                    fontSize: 14.5,
+                    fontSize: 15.5,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary,
                   ),

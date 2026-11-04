@@ -296,7 +296,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                     Text(
                       'Sabab: ${referral.reason}',
                       style: TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 13,
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -550,7 +550,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                     Text(
                                       'O‘quvchi: ${ref.studentName}',
                                       style: TextStyle(
-                                        fontSize: 13.5,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.textPrimary,
                                       ),
@@ -572,7 +572,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                       Text(
                                         'Kuzatuvlar: ${ref.supportingObservations}',
                                         style: TextStyle(
-                                          fontSize: 12.5,
+                                          fontSize: 13,
                                           color: AppColors.textMuted,
                                           height: 1.4,
                                         ),
@@ -583,7 +583,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                       Text(
                                         'Bog‘langan baholash ID: ${ref.sourceAssessmentId}',
                                         style: TextStyle(
-                                          fontSize: 11.5,
+                                          fontSize: 12,
                                           color: AppColors.textMuted,
                                         ),
                                       ),
@@ -625,7 +625,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                   child: Text(
                                     'Yakuniy xulosa: ${ref.outcomeNotes}',
                                     style: TextStyle(
-                                      fontSize: 12.5,
+                                      fontSize: 13,
                                       color: AppColors.success,
                                       fontWeight: FontWeight.w700,
                                       height: 1.4,
@@ -678,7 +678,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                             },
                                             child: const Text(
                                               'Qabul qilish',
-                                              style: TextStyle(fontSize: 12.5),
+                                              style: TextStyle(fontSize: 13),
                                             ),
                                           ),
                                         ],
@@ -700,7 +700,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                             },
                                             child: const Text(
                                               'Jarayonga o‘tkazish',
-                                              style: TextStyle(fontSize: 12.5),
+                                              style: TextStyle(fontSize: 13),
                                             ),
                                           ),
                                         ],
@@ -724,7 +724,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                                     ),
                                             child: const Text(
                                               'Yakunlash',
-                                              style: TextStyle(fontSize: 12.5),
+                                              style: TextStyle(fontSize: 13),
                                             ),
                                           ),
                                         ],

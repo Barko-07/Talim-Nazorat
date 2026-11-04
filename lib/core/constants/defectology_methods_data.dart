@@ -94,7 +94,8 @@ class DefectologyMethodsData {
       id: 'method_ozeretsky_motor',
       code: 'OZERETSKY_MOTOR',
       title: 'Harakat koordinatsiyasi sinovlari (N.I. Ozeretskiy asosida)',
-      author: 'N.I. Ozeretskiy (1923) — ommaviy foydalanishdagi metodika asosida soddalashtirilgan',
+      author:
+          'N.I. Ozeretskiy (1923) — ommaviy foydalanishdagi metodika asosida soddalashtirilgan',
       targetAge: '4 — 16 yosh',
       domain: _sensorMotor,
       durationMinutes: 15,

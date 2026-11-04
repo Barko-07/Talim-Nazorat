@@ -12,6 +12,7 @@ import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/logout_dialog.dart';
 import '../auth/verification_screens.dart';
+import '../../core/widgets/status_badge.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -40,11 +41,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   String _formatShortName(String fullName) {
-    final parts = fullName
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((p) => p.isNotEmpty)
-        .toList();
+    final parts =
+        fullName
+            .trim()
+            .split(RegExp(r'\s+'))
+            .where((p) => p.isNotEmpty)
+            .toList();
     if (parts.length >= 2) {
       final firstInitial = parts[0].substring(0, 1).toUpperCase();
       return '$firstInitial. ${parts[1]}';
@@ -72,8 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final district = user?.district ?? 'Chortoq tumani';
     final fullName = user?.fullName ?? 'Mutaxassis';
     final phone = user?.phone ?? '+998 90 123-45-67';
-    final schoolName =
-        user?.institutionName ?? '';
+    final schoolName = user?.institutionName ?? '';
 
     final scrollBody = SingleChildScrollView(
       child: ResponsivePageContainer(
@@ -136,7 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Text(
                           _maskPhone(phone),
                           style: _myGovFont(
-                            fontSize: 13.5,
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: AppColors.textSecondary,
                           ),
@@ -145,9 +146,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   IconButton(
-                    tooltip: _hideSensitiveInfo
-                        ? 'Ma’lumotlarni ko‘rsatish'
-                        : 'Ma’lumotlarni yashirish',
+                    tooltip:
+                        _hideSensitiveInfo
+                            ? 'Ma’lumotlarni ko‘rsatish'
+                            : 'Ma’lumotlarni yashirish',
                     onPressed: () {
                       setState(() => _hideSensitiveInfo = !_hideSensitiveInfo);
                     },
@@ -204,8 +206,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: LucideIcons.house,
                     title: 'Ta’lim muassasasi',
                     subtitle: schoolName,
-                    onTap: () =>
-                        _showInstitutionSheet(context, schoolName, region, district),
+                    onTap:
+                        () => _showInstitutionSheet(
+                          context,
+                          schoolName,
+                          region,
+                          district,
+                        ),
                   ),
                   _buildMyGovMenuItem(
                     icon: LucideIcons.shield,
@@ -265,7 +272,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Text(
                     'Individ • v1.0.0',
                     style: _myGovFont(
-                      fontSize: 11.5,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSubtle,
                     ),
@@ -281,18 +288,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
-      appBar: canPop
-          ? AppBar(
-              title: Text(
-                'Sozlamalar',
-                style: _myGovFont(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+      appBar:
+          canPop
+              ? AppBar(
+                title: Text(
+                  'Sozlamalar',
+                  style: _myGovFont(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
-              ),
-            )
-          : null,
+              )
+              : null,
       body: canPop ? AmbientMeshBackground(child: scrollBody) : scrollBody,
     );
   }
@@ -316,14 +324,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
         decoration: BoxDecoration(
-          border: isLast
-              ? null
-              : Border(
-                  bottom: BorderSide(
-                    color: AppColors.surfaceMuted,
-                    width: 1.0,
+          border:
+              isLast
+                  ? null
+                  : Border(
+                    bottom: BorderSide(
+                      color: AppColors.surfaceMuted,
+                      width: 1.0,
+                    ),
                   ),
-                ),
         ),
         child: Row(
           children: [
@@ -337,11 +346,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 border: Border.all(color: AppColors.border),
               ),
               alignment: Alignment.center,
-              child: Icon(
-                icon,
-                size: 20,
-                color: AppColors.textPrimary,
-              ),
+              child: Icon(icon, size: 20, color: AppColors.textPrimary),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -375,28 +380,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             if (badgeText != null) ...[
               const SizedBox(width: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 11,
-                  vertical: 4.5,
-                ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.brandGreen, AppColors.primary],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  badgeText,
-                  style: _myGovFont(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              StatusBadge(badgeText, tone: StatusTone.success),
             ],
             if (trailingValue != null) ...[
               const SizedBox(width: 10),
@@ -480,11 +464,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showContactSheet(
-    BuildContext context,
-    String region,
-    String district,
-  ) {
+  void _showContactSheet(BuildContext context, String region, String district) {
     _showMyGovModal(
       context: context,
       title: 'Bog‘lanish',
@@ -533,7 +513,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Text(
                       title,
                       style: _myGovFont(
-                        fontSize: 17.5,
+                        fontSize: 17,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
@@ -571,7 +551,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: Text(
                             item.$2,
                             style: _myGovFont(
-                              fontSize: 13.5,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                               height: 1.35,
@@ -602,85 +582,88 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          'Parolni yangilash',
-          style: _myGovFont(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: SizedBox(
-          width: 380,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: oldPassCtrl,
-                obscureText: true,
-                style: _myGovFont(fontSize: 14),
-                decoration: const InputDecoration(labelText: 'Joriy parol *'),
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(
+              'Parolni yangilash',
+              style: _myGovFont(fontSize: 17, fontWeight: FontWeight.w600),
+            ),
+            content: SizedBox(
+              width: 380,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: oldPassCtrl,
+                    obscureText: true,
+                    style: _myGovFont(fontSize: 14),
+                    decoration: const InputDecoration(
+                      labelText: 'Joriy parol *',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: newPassCtrl,
+                    obscureText: true,
+                    style: _myGovFont(fontSize: 14),
+                    decoration: const InputDecoration(
+                      labelText: 'Yangi parol *',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: confirmPassCtrl,
+                    obscureText: true,
+                    style: _myGovFont(fontSize: 14),
+                    decoration: const InputDecoration(
+                      labelText: 'Yangi parolni tasdiqlang *',
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: newPassCtrl,
-                obscureText: true,
-                style: _myGovFont(fontSize: 14),
-                decoration: const InputDecoration(labelText: 'Yangi parol *'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(
+                  'Bekor qilish',
+                  style: _myGovFont(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textMuted,
+                  ),
+                ),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: confirmPassCtrl,
-                obscureText: true,
-                style: _myGovFont(fontSize: 14),
-                decoration: const InputDecoration(
-                  labelText: 'Yangi parolni tasdiqlang *',
+              FilledButton(
+                onPressed: () async {
+                  final res = await auth.changePassword(
+                    oldPassCtrl.text.trim(),
+                    newPassCtrl.text.trim(),
+                  );
+                  if (context.mounted) {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(res['message'] as String),
+                        backgroundColor:
+                            res['success'] == true
+                                ? AppColors.success
+                                : AppColors.error,
+                      ),
+                    );
+                  }
+                },
+                child: Text(
+                  'Saqlash',
+                  style: _myGovFont(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              'Bekor qilish',
-              style: _myGovFont(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textMuted,
-              ),
-            ),
-          ),
-          FilledButton(
-            onPressed: () async {
-              final res = await auth.changePassword(
-                oldPassCtrl.text.trim(),
-                newPassCtrl.text.trim(),
-              );
-              if (context.mounted) {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(res['message'] as String),
-                    backgroundColor: res['success'] == true
-                        ? AppColors.success
-                        : AppColors.error,
-                  ),
-                );
-              }
-            },
-            child: Text(
-              'Saqlash',
-              style: _myGovFont(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

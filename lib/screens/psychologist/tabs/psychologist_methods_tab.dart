@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,17 +29,17 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
   IconData _getDomainIcon(String domain) {
     switch (domain) {
       case 'Kognitiv va intellekt':
-        return Icons.psychology_outlined;
+        return LucideIcons.brain;
       case 'Diqqat va ishchanlik':
-        return Icons.track_changes_outlined;
+        return LucideIcons.target;
       case 'Xotira jarayonlari':
-        return Icons.memory_outlined;
+        return LucideIcons.brain;
       case 'Emotsional va xavotir':
-        return Icons.mood_outlined;
+        return LucideIcons.smile;
       case 'Shaxsiyat va moslashuv':
-        return Icons.person_outline_outlined;
+        return LucideIcons.user;
       default:
-        return Icons.menu_book_outlined;
+        return LucideIcons.bookOpen;
     }
   }
 
@@ -117,7 +118,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      Icons.menu_book_rounded,
+                      LucideIcons.bookOpen,
                       color: AppColors.primary,
                       size: 28,
                     ),
@@ -161,7 +162,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.verified_outlined,
+                          LucideIcons.verified,
                           size: 16,
                           color: AppColors.primaryDark,
                         ),
@@ -205,13 +206,13 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                       hintText:
                           'Metodika nomi, kodi (RAVEN, LANDOLT...), muallifi bo‘yicha qidiring...',
                       prefixIcon: Icon(
-                        Icons.search,
+                        LucideIcons.search,
                         color: AppColors.textSecondary,
                       ),
                       suffixIcon:
                           _searchQuery.isNotEmpty
                               ? IconButton(
-                                icon: const Icon(Icons.clear, size: 18),
+                                icon: const Icon(LucideIcons.x, size: 18),
                                 onPressed: () {
                                   _searchController.clear();
                                   setState(() {
@@ -301,7 +302,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                 child: Column(
                   children: [
                     Icon(
-                      Icons.search_off_rounded,
+                      LucideIcons.searchX,
                       size: 54,
                       color: AppColors.textSecondary,
                     ),
@@ -309,7 +310,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                     Text(
                       'Bunday parametr bo‘yicha metodika topilmadi',
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 15.5,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
@@ -434,23 +435,27 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                 ),
               ),
               const Spacer(),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.timer_outlined,
-                    size: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '~${m.durationMinutes} daq',
-                    style: TextStyle(
-                      fontSize: 11,
+              Flexible(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Icon(
+                      LucideIcons.timer,
+                      size: 14,
                       color: AppColors.textSecondary,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 4),
+                    Text(
+                      '~${m.durationMinutes} daq',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -460,7 +465,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           Text(
             m.title,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 15.5,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
               height: 1.3,
@@ -470,31 +475,21 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           Row(
             children: [
               Icon(
-                Icons.person_pin_outlined,
+                LucideIcons.userRound,
                 size: 14,
                 color: AppColors.textSecondary,
               ),
               const SizedBox(width: 4),
               Text(
                 'Muallif: ${m.author}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
               const SizedBox(width: 12),
-              Icon(
-                Icons.cake_outlined,
-                size: 14,
-                color: AppColors.textSecondary,
-              ),
+              Icon(LucideIcons.cake, size: 14, color: AppColors.textSecondary),
               const SizedBox(width: 4),
               Text(
                 m.targetAge,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
           ),
@@ -526,14 +521,14 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
-                    Icons.warning_amber_rounded,
+                    LucideIcons.triangleAlert,
                     size: 15,
                     color: AppColors.warning,
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      '⚠ Litsenziyalangan test: ${m.licenseNote ?? "Rasmiy litsenziyalangan qo‘llanma asosida talqin qilinadi."}',
+                      'Litsenziyalangan test: ${m.licenseNote ?? "Rasmiy litsenziyalangan qo‘llanma asosida talqin qilinadi."}',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -558,7 +553,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
             ),
             child: Row(
               children: [
-                Icon(Icons.checklist_rtl_rounded, size: 14, color: domainColor),
+                Icon(LucideIcons.listChecks, size: 14, color: domainColor),
                 const SizedBox(width: 6),
                 Text(
                   '${m.subscales.length} ta parametr / shkala',
@@ -587,7 +582,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () => _showMethodDetailsDialog(context, m),
-                  icon: const Icon(Icons.info_outline, size: 16),
+                  icon: const Icon(LucideIcons.info, size: 16),
                   label: const Text('Ko‘rsatma va me’yor'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
@@ -601,7 +596,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
               const SizedBox(width: 10),
               ElevatedButton.icon(
                 onPressed: () => _startAssessmentWithMethod(context, m),
-                icon: const Icon(Icons.play_arrow_rounded, size: 16),
+                icon: const Icon(LucideIcons.play, size: 16),
                 label: const Text('Baholash'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: domainColor,
@@ -698,7 +693,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           Text(
                             m.title,
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 17,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                             ),
@@ -714,7 +709,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: const Icon(LucideIcons.x),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
@@ -730,7 +725,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                         // Maqsad
                         _buildSectionHeader(
                           '1. Metodikaning maqsadi',
-                          Icons.flag_outlined,
+                          LucideIcons.flag,
                         ),
                         Container(
                           width: double.infinity,
@@ -754,7 +749,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                         // O'tkazish bo'yicha yo'riqnoma
                         _buildSectionHeader(
                           '2. O‘tkazish bo‘yicha yo‘riqnoma',
-                          Icons.rule_sharp,
+                          LucideIcons.listChecks,
                         ),
                         Container(
                           width: double.infinity,
@@ -778,7 +773,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                         // Subshkalalar
                         _buildSectionHeader(
                           '3. Baholanadigan parametrlar / shkalalar',
-                          Icons.format_list_bulleted_rounded,
+                          LucideIcons.list,
                         ),
                         Container(
                           width: double.infinity,
@@ -801,7 +796,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         const Icon(
-                                          Icons.check_circle_outline,
+                                          LucideIcons.circleCheck,
                                           size: 16,
                                           color: AppColors.brandTeal,
                                         ),
@@ -826,7 +821,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                         // Baholash va hisoblash
                         _buildSectionHeader(
                           '4. Natijalarni hisoblash tartibi',
-                          Icons.calculate_outlined,
+                          LucideIcons.calculator,
                         ),
                         Container(
                           width: double.infinity,
@@ -874,7 +869,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                         // Me'yoriy ko'rsatkichlar va talqin
                         _buildSectionHeader(
                           '5. Me’yoriy ko‘rsatkichlar va psixologik talqin',
-                          Icons.analytics_outlined,
+                          LucideIcons.chartColumn,
                         ),
                         Container(
                           width: double.infinity,
@@ -906,7 +901,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           child: Row(
                             children: [
                               Icon(
-                                Icons.shield_outlined,
+                                LucideIcons.shield,
                                 size: 16,
                                 color: AppColors.textSecondary,
                               ),
@@ -943,7 +938,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                         Navigator.pop(ctx);
                         _startAssessmentWithMethod(context, m);
                       },
-                      icon: const Icon(Icons.play_arrow_rounded),
+                      icon: const Icon(LucideIcons.play),
                       label: const Text('Ushbu metodika bilan baholash'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: domainColor,

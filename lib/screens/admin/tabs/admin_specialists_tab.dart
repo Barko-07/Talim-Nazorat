@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -60,49 +61,56 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Mutaxassislar va Pedagogik Kadrlar',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.purpleBg,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.purple.withValues(alpha: 0.2),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Mutaxassislar va Pedagogik Kadrlar',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          '${filtered.length} ta mutaxassis',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.purple,
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.purpleBg,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.purple.withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Text(
+                            '${filtered.length} ta mutaxassis',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.purple,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Inklyuziv va maxsus ta’lim bo‘yicha psixologlar, logopedlar, defektologlar va o‘qituvchilar hisobi',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Inklyuziv va maxsus ta’lim bo‘yicha psixologlar, logopedlar, defektologlar va o‘qituvchilar hisobi',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -126,7 +134,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                       decoration: InputDecoration(
                         hintText:
                             'F.I.SH, ixtisoslik yoki muassasa bo‘yicha...',
-                        prefixIcon: const Icon(Icons.search, size: 20),
+                        prefixIcon: const Icon(LucideIcons.search, size: 20),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 10,
@@ -182,6 +190,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
+                      isExpanded: true,
                       value: _filterCategory,
                       decoration: InputDecoration(
                         labelText: 'Toifasi',
@@ -272,13 +281,16 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
                                   sp.fullName,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 15,
+                                    fontSize: 15.5,
                                     color: AppColors.textPrimary,
                                   ),
                                 ),
@@ -332,7 +344,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '🏛️ ${sp.institutionName ?? 'Muassasa belgilanmagan'} (${sp.district ?? 'Namangan viloyati'})',
+                              '${sp.institutionName ?? 'Muassasa belgilanmagan'} (${sp.district ?? 'Namangan viloyati'})',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textMuted,
@@ -343,19 +355,19 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                               spacing: 8,
                               children: [
                                 _buildMetricPill(
-                                  icon: Icons.groups_rounded,
+                                  icon: LucideIcons.users,
                                   label:
                                       '${assignedStudents.length} ta bola biriktirilgan',
                                   color: AppColors.primary,
                                 ),
                                 _buildMetricPill(
-                                  icon: Icons.assignment_turned_in_rounded,
+                                  icon: LucideIcons.clipboardCheck,
                                   label:
                                       '$userAssessmentsCount ta baholash o‘tkazilgan',
                                   color: AppColors.success,
                                 ),
                                 _buildMetricPill(
-                                  icon: Icons.event_available_rounded,
+                                  icon: LucideIcons.calendarCheck,
                                   label:
                                       '$userSessionsCount ta korreksion mashg‘ulot',
                                   color: AppColors.warning,
@@ -378,7 +390,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                                   allStudents,
                                   currentUser,
                                 ),
-                            icon: const Icon(Icons.people_outline, size: 16),
+                            icon: const Icon(LucideIcons.users, size: 16),
                             label: const Text('O‘quvchilar ro‘yxati'),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.primary,
@@ -413,8 +425,10 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 6,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Icon(icon, size: 13, color: color),
           const SizedBox(width: 4),
@@ -456,7 +470,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                 title: Text(
                   '${specialist.fullName}ga biriktirilgan o‘quvchilar',
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 15.5,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -497,7 +511,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                                   },
                                 );
                               },
-                              icon: const Icon(Icons.add, size: 16),
+                              icon: const Icon(LucideIcons.plus, size: 16),
                               label: const Text('Yangi bola biriktirish'),
                             ),
                         ],

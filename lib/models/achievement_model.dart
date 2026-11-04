@@ -79,6 +79,7 @@ class AchievementPassport {
     required this.entries,
   });
 
-  int count(AchievementCategory c) => entries.where((e) => e.category == c).length;
+  int count(AchievementCategory c) =>
+      entries.where((e) => e.category == c).length;
   bool get isEmpty => entries.isEmpty;
 }

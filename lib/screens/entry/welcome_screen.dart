@@ -59,7 +59,7 @@ class WelcomeScreen extends StatelessWidget {
                       'individual reja tuzish — bir ilovada.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 15.5,
                         height: 1.5,
                         color: AppColors.textSecondary,
                       ),
@@ -73,7 +73,10 @@ class WelcomeScreen extends StatelessWidget {
                         onPressed: () => _open(context, signUp: false),
                         child: const Text(
                           'Kirish',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
@@ -84,7 +87,10 @@ class WelcomeScreen extends StatelessWidget {
                         onPressed: () => _open(context, signUp: true),
                         child: const Text(
                           'Ro‘yxatdan o‘tish',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
@@ -92,7 +98,10 @@ class WelcomeScreen extends StatelessWidget {
                     Text(
                       '${AppBrand.name} • ${AppBrand.tagline}',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ],
                 ).animate().fadeIn(duration: 350.ms),

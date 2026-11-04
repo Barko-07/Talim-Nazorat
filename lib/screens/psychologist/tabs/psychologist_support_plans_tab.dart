@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -32,89 +33,106 @@ class _PsychologistSupportPlansTabState
     final app = context.read<AppProvider>();
     final auth = context.read<AuthProvider>();
     int currentProgress = objective.progressPercent;
-    final notesCtrl = TextEditingController(text: objective.evidenceNotes ?? '');
+    final notesCtrl = TextEditingController(
+      text: objective.evidenceNotes ?? '',
+    );
 
     showDialog(
       context: context,
-      builder: (dlgCtx) => StatefulBuilder(
-        builder: (context, setDlgState) => AlertDialog(
-          title: const Text('Maqsad bo‘yicha progressni yangilash'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Maqsad: ${objective.title}',
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Bajarilish darajasi:', style: TextStyle(fontSize: 12)),
-                  Text(
-                    '$currentProgress%',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
+      builder:
+          (dlgCtx) => StatefulBuilder(
+            builder:
+                (context, setDlgState) => AlertDialog(
+                  title: const Text('Maqsad bo‘yicha progressni yangilash'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Maqsad: ${objective.title}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Bajarilish darajasi:',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          Text(
+                            '$currentProgress%',
+                            style: TextStyle(
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Slider(
+                        value: currentProgress.toDouble(),
+                        min: 0,
+                        max: 100,
+                        divisions: 20,
+                        activeColor: AppColors.primary,
+                        label: '$currentProgress%',
+                        onChanged:
+                            (v) =>
+                                setDlgState(() => currentProgress = v.toInt()),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: notesCtrl,
+                        maxLines: 2,
+                        decoration: const InputDecoration(
+                          labelText:
+                              'Dalil va pedagogik-psixologik kuzatuv izohi',
+                          hintText:
+                              'O‘tkazilgan testlar va erishilgan natija...',
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              Slider(
-                value: currentProgress.toDouble(),
-                min: 0,
-                max: 100,
-                divisions: 20,
-                activeColor: AppColors.primary,
-                label: '$currentProgress%',
-                onChanged: (v) => setDlgState(() => currentProgress = v.toInt()),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: notesCtrl,
-                maxLines: 2,
-                decoration: const InputDecoration(
-                  labelText: 'Dalil va pedagogik-psixologik kuzatuv izohi',
-                  hintText: 'O‘tkazilgan testlar va erishilgan natija...',
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dlgCtx),
-              child: const Text('Bekor qilish'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                await app.updateObjectiveProgress(
-                  plan.id,
-                  objective.id,
-                  currentProgress,
-                  evidenceNotes: notesCtrl.text.trim(),
-                  byUser: auth.currentUser,
-                );
-                if (dlgCtx.mounted) Navigator.pop(dlgCtx);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Maqsad progressi yangilandi!'),
-                      backgroundColor: AppColors.success,
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dlgCtx),
+                      child: const Text('Bekor qilish'),
                     ),
-                  );
-                }
-              },
-              child: const Text('Saqlash'),
-            ),
-          ],
-        ),
-      ),
+                    FilledButton(
+                      onPressed: () async {
+                        await app.updateObjectiveProgress(
+                          plan.id,
+                          objective.id,
+                          currentProgress,
+                          evidenceNotes: notesCtrl.text.trim(),
+                          byUser: auth.currentUser,
+                        );
+                        if (dlgCtx.mounted) Navigator.pop(dlgCtx);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Maqsad progressi yangilandi!'),
+                              backgroundColor: AppColors.success,
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Saqlash'),
+                    ),
+                  ],
+                ),
+          ),
     );
   }
 
-  void _showAddObjectiveDialog(BuildContext context, IndividualEducationPlanModel plan) {
+  void _showAddObjectiveDialog(
+    BuildContext context,
+    IndividualEducationPlanModel plan,
+  ) {
     final app = context.read<AppProvider>();
     final titleCtrl = TextEditingController();
     final criteriaCtrl = TextEditingController(
@@ -125,113 +143,130 @@ class _PsychologistSupportPlansTabState
 
     showDialog(
       context: context,
-      builder: (dlgCtx) => StatefulBuilder(
-        builder: (context, setDlgState) {
-          final df = DateFormat('dd.MM.yyyy');
+      builder:
+          (dlgCtx) => StatefulBuilder(
+            builder: (context, setDlgState) {
+              final df = DateFormat('dd.MM.yyyy');
 
-          return AlertDialog(
-            title: const Text('Yangi Psixologik Yordam Maqsadi Qo‘shish'),
-            content: SizedBox(
-              width: 500,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: titleCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Maqsad nomi *',
-                      hintText: 'Masalan: Ixtiyoriy diqqatni 20 daqiqa ushlab turish',
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    value: domain,
-                    decoration: const InputDecoration(labelText: 'Soha'),
-                    items: const [
-                      DropdownMenuItem(value: 'Kognitiv', child: Text('Kognitiv va intellekt')),
-                      DropdownMenuItem(value: 'Ijtimoiy-hissiy', child: Text('Emotsional-irodaviy soha')),
-                      DropdownMenuItem(value: 'Diqqat', child: Text('Diqqat va ishchanlik')),
+              return AlertDialog(
+                title: const Text('Yangi Psixologik Yordam Maqsadi Qo‘shish'),
+                content: SizedBox(
+                  width: 500,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: titleCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Maqsad nomi *',
+                          hintText:
+                              'Masalan: Ixtiyoriy diqqatni 20 daqiqa ushlab turish',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        isExpanded: true,
+                        value: domain,
+                        decoration: const InputDecoration(labelText: 'Soha'),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'Kognitiv',
+                            child: Text('Kognitiv va intellekt'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Ijtimoiy-hissiy',
+                            child: Text('Emotsional-irodaviy soha'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Diqqat',
+                            child: Text('Diqqat va ishchanlik'),
+                          ),
+                        ],
+                        onChanged: (v) {
+                          if (v != null) setDlgState(() => domain = v);
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: criteriaCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'O‘lchov mezoni',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: targetDate,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
+                            ),
+                          );
+                          if (picked != null) {
+                            setDlgState(() => targetDate = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: const InputDecoration(
+                            labelText: 'Kutilayotgan erishish sanasi',
+                            suffixIcon: Icon(LucideIcons.calendar, size: 18),
+                          ),
+                          child: Text(df.format(targetDate)),
+                        ),
+                      ),
                     ],
-                    onChanged: (v) {
-                      if (v != null) setDlgState(() => domain = v);
-                    },
                   ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: criteriaCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'O‘lchov mezoni',
-                    ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(dlgCtx),
+                    child: const Text('Bekor qilish'),
                   ),
-                  const SizedBox(height: 12),
-                  InkWell(
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: targetDate,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                  FilledButton(
+                    onPressed: () async {
+                      if (titleCtrl.text.trim().isEmpty) return;
+
+                      final newObj = PlanObjectiveModel(
+                        id: 'obj_psy_${const Uuid().v4().substring(0, 8)}',
+                        title: titleCtrl.text.trim(),
+                        domain: domain,
+                        startingLevel: '30%',
+                        targetLevel: '85%',
+                        measurementCriteria: criteriaCtrl.text.trim(),
+                        responsibleSpecialistId: 'user_psychologist',
+                        responsibleSpecialistName:
+                            'Usmonova Dilnoza (Psixolog)',
+                        startDate: DateTime.now(),
+                        targetDate: targetDate,
+                        status: 'Rejalashtirilgan',
+                        progressPercent: 30,
                       );
-                      if (picked != null) {
-                        setDlgState(() => targetDate = picked);
+
+                      final updatedPlan = plan.copyWith(
+                        objectives: [...plan.objectives, newObj],
+                      );
+
+                      await app.updateIepPlan(updatedPlan);
+                      if (dlgCtx.mounted) Navigator.pop(dlgCtx);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Yangi psixologik maqsad rejaga kiritildi!',
+                            ),
+                            backgroundColor: AppColors.success,
+                          ),
+                        );
                       }
                     },
-                    child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Kutilayotgan erishish sanasi',
-                        suffixIcon: Icon(Icons.calendar_today, size: 18),
-                      ),
-                      child: Text(df.format(targetDate)),
-                    ),
+                    child: const Text('Rejaga qo‘shish'),
                   ),
                 ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dlgCtx),
-                child: const Text('Bekor qilish'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  if (titleCtrl.text.trim().isEmpty) return;
-
-                  final newObj = PlanObjectiveModel(
-                    id: 'obj_psy_${const Uuid().v4().substring(0, 8)}',
-                    title: titleCtrl.text.trim(),
-                    domain: domain,
-                    startingLevel: '30%',
-                    targetLevel: '85%',
-                    measurementCriteria: criteriaCtrl.text.trim(),
-                    responsibleSpecialistId: 'user_psychologist',
-                    responsibleSpecialistName: 'Usmonova Dilnoza (Psixolog)',
-                    startDate: DateTime.now(),
-                    targetDate: targetDate,
-                    status: 'Rejalashtirilgan',
-                    progressPercent: 30,
-                  );
-
-                  final updatedPlan = plan.copyWith(
-                    objectives: [...plan.objectives, newObj],
-                  );
-
-                  await app.updateIepPlan(updatedPlan);
-                  if (dlgCtx.mounted) Navigator.pop(dlgCtx);
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Yangi psixologik maqsad rejaga kiritildi!'),
-                        backgroundColor: AppColors.success,
-                      ),
-                    );
-                  }
-                },
-                child: const Text('Rejaga qo‘shish'),
-              ),
-            ],
-          );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 
@@ -242,15 +277,16 @@ class _PsychologistSupportPlansTabState
     final allPlans = app.iepPlans;
     final df = DateFormat('dd.MM.yyyy');
 
-    final filteredPlans = allPlans.where((p) {
-      if (_selectedStudentId != null && p.studentId != _selectedStudentId) {
-        return false;
-      }
-      if (_selectedStatus != null && p.status != _selectedStatus) {
-        return false;
-      }
-      return true;
-    }).toList();
+    final filteredPlans =
+        allPlans.where((p) {
+          if (_selectedStudentId != null && p.studentId != _selectedStudentId) {
+            return false;
+          }
+          if (_selectedStatus != null && p.status != _selectedStatus) {
+            return false;
+          }
+          return true;
+        }).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -261,49 +297,56 @@ class _PsychologistSupportPlansTabState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Psixologik Yordam Rejalari (ITR)',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.3),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Psixologik Yordam Rejalari (ITR)',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          '${filteredPlans.length} ta reja',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryLight,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Text(
+                            '${filteredPlans.length} ta reja',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Bolaning kognitiv, emotsional va xulq-atvor maqsadlari, korreksion ishlar va erishilgan natijalar',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Bolaning kognitiv, emotsional va xulq-atvor maqsadlari, korreksion ishlar va erishilgan natijalar',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -368,8 +411,14 @@ class _PsychologistSupportPlansTabState
                           value: null,
                           child: Text('Barcha holatlar'),
                         ),
-                        DropdownMenuItem(value: 'Faol', child: Text('Faol rejalar')),
-                        DropdownMenuItem(value: 'Yakunlangan', child: Text('Yakunlangan')),
+                        DropdownMenuItem(
+                          value: 'Faol',
+                          child: Text('Faol rejalar'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Yakunlangan',
+                          child: Text('Yakunlangan'),
+                        ),
                       ],
                       onChanged: (v) => setState(() => _selectedStatus = v),
                     ),
@@ -387,11 +436,18 @@ class _PsychologistSupportPlansTabState
               alignment: Alignment.center,
               child: Column(
                 children: [
-                  Icon(Icons.assignment_outlined, size: 48, color: AppColors.textMuted),
+                  Icon(
+                    LucideIcons.clipboardList,
+                    size: 48,
+                    color: AppColors.textMuted,
+                  ),
                   SizedBox(height: 12),
                   Text(
                     'Yordam rejalari topilmadi',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -421,68 +477,76 @@ class _PsychologistSupportPlansTabState
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      p.studentName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.surfaceMuted,
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        '${p.studentGrade} • ${p.academicYear}',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          p.studentName,
+                                          style: TextStyle(
+                                            fontSize: 15.5,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.textPrimary,
+                                          ),
                                         ),
                                       ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.surfaceMuted,
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${p.studentGrade} • ${p.academicYear}',
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    p.title,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: AppColors.textSecondary,
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  p.title,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.textSecondary,
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  '$avgProgress%',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.primary,
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '$avgProgress%',
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.primary,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  'Umumiy o‘zlashtirish',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textMuted,
+                                  Text(
+                                    'Umumiy o‘zlashtirish',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textMuted,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -501,7 +565,7 @@ class _PsychologistSupportPlansTabState
                               Text(
                                 'Dastlabki holat (Baseline): ${p.baselineSummary}',
                                 style: TextStyle(
-                                  fontSize: 11.5,
+                                  fontSize: 12,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
@@ -509,7 +573,7 @@ class _PsychologistSupportPlansTabState
                               Text(
                                 'Kutilayotgan uzoq muddatli natija: ${p.longTermGoals}',
                                 style: TextStyle(
-                                  fontSize: 11.5,
+                                  fontSize: 12,
                                   color: AppColors.success,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -523,21 +587,27 @@ class _PsychologistSupportPlansTabState
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Psixologik korreksion vazifalar (${p.objectives.length} ta):',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                            Flexible(
+                              child: Text(
+                                'Psixologik korreksion vazifalar (${p.objectives.length} ta):',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ),
                             TextButton.icon(
                               style: TextButton.styleFrom(
                                 visualDensity: VisualDensity.compact,
                               ),
-                              onPressed: () => _showAddObjectiveDialog(context, p),
-                              icon: const Icon(Icons.add, size: 16),
-                              label: const Text('Maqsad qo‘shish', style: TextStyle(fontSize: 12)),
+                              onPressed:
+                                  () => _showAddObjectiveDialog(context, p),
+                              icon: const Icon(LucideIcons.plus, size: 16),
+                              label: const Text(
+                                'Maqsad qo‘shish',
+                                style: TextStyle(fontSize: 12),
+                              ),
                             ),
                           ],
                         ),
@@ -556,15 +626,18 @@ class _PsychologistSupportPlansTabState
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
-                                          Text(
-                                            obj.title,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
+                                          Flexible(
+                                            child: Text(
+                                              obj.title,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 13,
+                                              ),
                                             ),
                                           ),
                                           const SizedBox(width: 8),
@@ -575,7 +648,8 @@ class _PsychologistSupportPlansTabState
                                             ),
                                             decoration: BoxDecoration(
                                               color: AppColors.primaryLight,
-                                              borderRadius: BorderRadius.circular(4),
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
                                             ),
                                             child: Text(
                                               obj.domain,
@@ -600,9 +674,10 @@ class _PsychologistSupportPlansTabState
                                       LinearProgressIndicator(
                                         value: obj.progressPercent / 100.0,
                                         backgroundColor: AppColors.border,
-                                        color: obj.progressPercent >= 80
-                                            ? AppColors.success
-                                            : AppColors.primary,
+                                        color:
+                                            obj.progressPercent >= 80
+                                                ? AppColors.success
+                                                : AppColors.primary,
                                         minHeight: 6,
                                         borderRadius: BorderRadius.circular(3),
                                       ),
@@ -629,12 +704,16 @@ class _PsychologistSupportPlansTabState
                                         ),
                                         visualDensity: VisualDensity.compact,
                                       ),
-                                      onPressed: () => _showUpdateProgressDialog(
-                                        context,
-                                        p,
-                                        obj,
+                                      onPressed:
+                                          () => _showUpdateProgressDialog(
+                                            context,
+                                            p,
+                                            obj,
+                                          ),
+                                      child: const Text(
+                                        'Yangilash',
+                                        style: TextStyle(fontSize: 11),
                                       ),
-                                      child: const Text('Yangilash', style: TextStyle(fontSize: 11)),
                                     ),
                                   ],
                                 ),

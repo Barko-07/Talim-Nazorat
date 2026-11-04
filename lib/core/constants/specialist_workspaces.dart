@@ -24,7 +24,13 @@ class AssessmentDomains {
   static const sensorMotor = 'Sensor-motor rivojlanish';
   static const learningSkills = 'O‘quv ko‘nikmalari';
 
-  static const psychological = [cognitive, attentionMemory, emotional, social, behaviour];
+  static const psychological = [
+    cognitive,
+    attentionMemory,
+    emotional,
+    social,
+    behaviour,
+  ];
 }
 
 /// Har bir rol uchun kabinet ta'rifi
@@ -60,9 +66,17 @@ class SpecialistWorkspaces {
         ProgressMetrics.peerInitiations.id,
       ],
       sessionTemplates: const [
-        SessionTemplate('Individual psixokorreksion mashg‘ulot', 'Individual', 30),
+        SessionTemplate(
+          'Individual psixokorreksion mashg‘ulot',
+          'Individual',
+          30,
+        ),
         SessionTemplate('Ijtimoiy ko‘nikmalar treningi', 'Kichik guruhda', 40),
-        SessionTemplate('Emotsiyalarni boshqarish mashg‘uloti', 'Individual', 30),
+        SessionTemplate(
+          'Emotsiyalarni boshqarish mashg‘uloti',
+          'Individual',
+          30,
+        ),
         SessionTemplate('Ota-ona bilan konsultatsiya', 'Individual', 30),
       ],
       referralTargets: [
@@ -97,10 +111,22 @@ class SpecialistWorkspaces {
         ProgressMetrics.readingSpeed.id,
       ],
       sessionTemplates: const [
-        SessionTemplate('Artikulyatsion gimnastika va tovush qo‘yish', 'Individual', 25),
+        SessionTemplate(
+          'Artikulyatsion gimnastika va tovush qo‘yish',
+          'Individual',
+          25,
+        ),
         SessionTemplate('Tovushni avtomatlashtirish', 'Individual', 25),
-        SessionTemplate('Lug‘at va bog‘lanishli nutqni rivojlantirish', 'Kichik guruhda', 35),
-        SessionTemplate('Fonematik eshitishni rivojlantirish', 'Individual', 25),
+        SessionTemplate(
+          'Lug‘at va bog‘lanishli nutqni rivojlantirish',
+          'Kichik guruhda',
+          35,
+        ),
+        SessionTemplate(
+          'Fonematik eshitishni rivojlantirish',
+          'Individual',
+          25,
+        ),
       ],
       referralTargets: [
         ReferralTargets.psychologist,
@@ -139,7 +165,11 @@ class SpecialistWorkspaces {
         SessionTemplate('Sensor integratsiya mashg‘uloti', 'Individual', 30),
         SessionTemplate('Mayda motorika va grafomotorika', 'Individual', 25),
         SessionTemplate('O‘z-o‘ziga xizmat ko‘nikmalari', 'Kichik guruhda', 35),
-        SessionTemplate('Bilish jarayonlarini rivojlantirish', 'Individual', 30),
+        SessionTemplate(
+          'Bilish jarayonlarini rivojlantirish',
+          'Individual',
+          30,
+        ),
       ],
       referralTargets: [
         ReferralTargets.psychologist,
@@ -173,7 +203,11 @@ class SpecialistWorkspaces {
         ProgressMetrics.independentTasks.id,
       ],
       sessionTemplates: const [
-        SessionTemplate('Individual dars (darajaga mos topshiriqlar)', 'Individual', 40),
+        SessionTemplate(
+          'Individual dars (darajaga mos topshiriqlar)',
+          'Individual',
+          40,
+        ),
         SessionTemplate('O‘qish va yozish ko‘nikmalari', 'Individual', 30),
         SessionTemplate('Hisoblash ko‘nikmalari', 'Individual', 30),
         SessionTemplate('Kichik guruhda dars', 'Kichik guruhda', 45),
@@ -200,7 +234,10 @@ class SpecialistWorkspaces {
         WorkspaceModule.sessions: _v,
       },
       assessmentDomains: const [AssessmentDomains.learningSkills],
-      metricIds: [ProgressMetrics.independentTasks.id, ProgressMetrics.readingSpeed.id],
+      metricIds: [
+        ProgressMetrics.independentTasks.id,
+        ProgressMetrics.readingSpeed.id,
+      ],
       referralTargets: [
         ReferralTargets.psychologist,
         ReferralTargets.speechTherapist,
@@ -277,7 +314,8 @@ class SpecialistWorkspaces {
     UserRole.parent => SpecialistWorkspace(
       role: role,
       title: 'Ota-ona kabineti',
-      mission: 'Hozircha yopiq. Keyinchalik: farzandning yutuqlar pasporti va rivojlanishi.',
+      mission:
+          'Hozircha yopiq. Keyinchalik: farzandning yutuqlar pasporti va rivojlanishi.',
       modules: const {},
     ),
   };

@@ -382,7 +382,11 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (AppConfig.serverMode) {
       try {
         _apply(
-          await _authApi.changePassword(currentPassword, newPassword, code: code),
+          await _authApi.changePassword(
+            currentPassword,
+            newPassword,
+            code: code,
+          ),
         );
         return _ok('Parolingiz muvaffaqiyatli o‘zgartirildi.');
       } on ApiException catch (e) {
@@ -687,7 +691,9 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
     try {
       await _authApi.requestPasswordReset(email.trim().toLowerCase());
-      return _ok('Agar hisob mavjud bo‘lsa, tasdiqlash kodi emailga yuborildi.');
+      return _ok(
+        'Agar hisob mavjud bo‘lsa, tasdiqlash kodi emailga yuborildi.',
+      );
     } on ApiException catch (e) {
       return _apiFail(e);
     }
@@ -755,7 +761,10 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  Future<Map<String, dynamic>> verifyRegistration(String id, String code) async {
+  Future<Map<String, dynamic>> verifyRegistration(
+    String id,
+    String code,
+  ) async {
     try {
       return _ok(await _authApi.verifyRegistration(id, code));
     } on ApiException catch (e) {

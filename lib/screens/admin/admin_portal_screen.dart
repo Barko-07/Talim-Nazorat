@@ -1,8 +1,10 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/brand_logo.dart';
+import '../../core/widgets/status_badge.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -79,81 +81,81 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
       _AdminNavItemData(
         index: 0,
         title: 'Boshqaruv paneli',
-        icon: Icons.dashboard_outlined,
-        activeIcon: Icons.dashboard_rounded,
+        icon: LucideIcons.layoutDashboard,
+        activeIcon: LucideIcons.layoutDashboard,
       ),
     ]),
     _AdminNavCategory('MONITORING VA TAHLIL', [
       _AdminNavItemData(
         index: 8,
         title: 'Monitoring markazi',
-        icon: Icons.shield_outlined,
-        activeIcon: Icons.shield_rounded,
+        icon: LucideIcons.shield,
+        activeIcon: LucideIcons.shield,
         hasAlertBadge: true,
       ),
       _AdminNavItemData(
         index: 7,
         title: 'Tahliliy hisobotlar',
-        icon: Icons.bar_chart_outlined,
-        activeIcon: Icons.bar_chart_rounded,
+        icon: LucideIcons.barChart,
+        activeIcon: LucideIcons.barChart,
       ),
     ]),
     _AdminNavCategory('REYESTRLAR VA KADRLAR', [
       _AdminNavItemData(
         index: 3,
         title: 'O‘quvchilar reyestri',
-        icon: Icons.groups_outlined,
-        activeIcon: Icons.groups_rounded,
+        icon: LucideIcons.users,
+        activeIcon: LucideIcons.users,
       ),
       _AdminNavItemData(
         index: 2,
         title: 'Pedagog-mutaxassislar',
-        icon: Icons.psychology_outlined,
-        activeIcon: Icons.psychology_rounded,
+        icon: LucideIcons.brain,
+        activeIcon: LucideIcons.brain,
       ),
       _AdminNavItemData(
         index: 4,
         title: 'Ta’lim muassasalari',
-        icon: Icons.apartment_outlined,
-        activeIcon: Icons.apartment_rounded,
+        icon: LucideIcons.building2,
+        activeIcon: LucideIcons.building2,
       ),
       _AdminNavItemData(
         index: 5,
         title: 'Sinflar va guruhlar',
-        icon: Icons.school_outlined,
-        activeIcon: Icons.school_rounded,
+        icon: LucideIcons.school,
+        activeIcon: LucideIcons.school,
       ),
       _AdminNavItemData(
         index: 11,
         title: 'Yo‘naltirishlar jurnali',
-        icon: Icons.alt_route_outlined,
-        activeIcon: Icons.alt_route_rounded,
+        icon: LucideIcons.route,
+        activeIcon: LucideIcons.route,
       ),
     ]),
     _AdminNavCategory('XAVFSIZLIK VA MA’MURIYAT', [
       _AdminNavItemData(
         index: 1,
         title: 'Foydalanuvchilar',
-        icon: Icons.manage_accounts_outlined,
-        activeIcon: Icons.manage_accounts_rounded,
+        icon: LucideIcons.userCog,
+        activeIcon: LucideIcons.userCog,
       ),
       _AdminNavItemData(
         index: 6,
         title: 'Rollar va ruxsatlar',
-        icon: Icons.security_outlined,
-        activeIcon: Icons.security_rounded,
+        icon: LucideIcons.shield,
+        activeIcon: LucideIcons.shield,
       ),
       _AdminNavItemData(
         index: 10,
         title: 'Audit jurnali',
-        icon: Icons.history_edu_outlined,
-        activeIcon: Icons.history_edu_rounded,
+        icon: LucideIcons.scrollText,
+        activeIcon: LucideIcons.scrollText,
       ),
       _AdminNavItemData(
         index: 9,
         title: 'Tizim sozlamalari',
-        icon: Icons.settings_suggest_outlined,
-        activeIcon: Icons.settings_suggest_rounded,
+        icon: LucideIcons.settings2,
+        activeIcon: LucideIcons.settings2,
       ),
     ]),
   ];
@@ -221,27 +223,20 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                 children: [
                   Row(
                     children: [
-                      const BrandWordmark(fontSize: 17),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryDark,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          roleTag,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
-                          ),
+                      const Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: BrandWordmark(fontSize: 17),
                         ),
                       ),
+                      // Telefonda rol nomi sarlavhaga sig'maydi — u profil qatorida ko'rinadi
+                      if (MediaQuery.sizeOf(context).width >= 700) ...[
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: StatusBadge(roleTag, tone: StatusTone.primary),
+                        ),
+                      ],
                     ],
                   ),
                   Text(
@@ -264,7 +259,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
           if (MediaQuery.sizeOf(context).width < 700)
             IconButton(
               tooltip: 'Mutaxassis interfeysi',
-              icon: Icon(Icons.swap_horiz_rounded, color: AppColors.primary),
+              icon: Icon(LucideIcons.arrowLeftRight, color: AppColors.primary),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -295,7 +290,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                   ),
                 );
               },
-              icon: const Icon(Icons.swap_horiz_rounded, size: 18),
+              icon: const Icon(LucideIcons.arrowLeftRight, size: 18),
               label: const Text(
                 'Mutaxassis interfeysi',
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
@@ -361,7 +356,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
 
           // CHIQISH (LOGOUT)
           IconButton(
-            icon: Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
+            icon: Icon(LucideIcons.logOut, color: AppColors.error, size: 20),
             tooltip: 'Tizimdan chiqish',
             onPressed: () => confirmLogout(context),
           ),
@@ -415,7 +410,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
             color: AppColors.primaryDark,
             child: const Row(
               children: [
-                Icon(Icons.admin_panel_settings, color: Colors.white, size: 28),
+                Icon(LucideIcons.shieldCheck, color: Colors.white, size: 28),
                 SizedBox(width: 10),
                 Text(
                   'ADMINISTRATOR MENYUSI',
@@ -488,7 +483,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                           title: Text(
                             itemTitle,
                             style: TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 13,
                               fontWeight:
                                   isSelected
                                       ? FontWeight.w600

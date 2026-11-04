@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +8,7 @@ import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/child_status_service.dart';
 import '../../students/student_detail_screen.dart';
+import '../../../core/widgets/status_badge.dart';
 
 class PsychologistStudentsTab extends StatefulWidget {
   final Function(StudentModel student)? onSelectStudentForObservation;
@@ -164,7 +166,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.lock_outline_rounded,
+                      LucideIcons.lock,
                       size: 14,
                       color: AppColors.textMuted,
                     ),
@@ -194,108 +196,122 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: TextField(
-                          onChanged: (v) => setState(() => _search = v.trim()),
-                          decoration: InputDecoration(
-                            hintText: 'Ism-familiya yoki ehtiyoj toifasi...',
-                            prefixIcon: const Icon(Icons.search, size: 20),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                  LayoutBuilder(
+                    builder: (context, c) {
+                      final search = TextField(
+                        onChanged: (v) => setState(() => _search = v.trim()),
+                        decoration: InputDecoration(
+                          hintText: 'Ism-familiya yoki ehtiyoj toifasi...',
+                          prefixIcon: const Icon(LucideIcons.search, size: 20),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 2,
-                        child: DropdownButtonFormField<String?>(
-                          value: _gradeFilter,
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            labelText: 'Sinfi',
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                      );
+                      final grade = DropdownButtonFormField<String?>(
+                        value: _gradeFilter,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          labelText: 'Sinfi',
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
                           ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: null,
-                              child: Text('Barcha sinflar'),
-                            ),
-                            DropdownMenuItem(
-                              value: '1-A',
-                              child: Text('1-A sinf'),
-                            ),
-                            DropdownMenuItem(
-                              value: '2-B',
-                              child: Text('2-B sinf'),
-                            ),
-                            DropdownMenuItem(
-                              value: '3-A',
-                              child: Text('3-A sinf'),
-                            ),
-                            DropdownMenuItem(
-                              value: '4-A',
-                              child: Text('4-A sinf'),
-                            ),
-                            DropdownMenuItem(
-                              value: '5-A',
-                              child: Text('5-A sinf'),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: null,
+                            child: Text('Barcha sinflar'),
+                          ),
+                          DropdownMenuItem(
+                            value: '1-A',
+                            child: Text('1-A sinf'),
+                          ),
+                          DropdownMenuItem(
+                            value: '2-B',
+                            child: Text('2-B sinf'),
+                          ),
+                          DropdownMenuItem(
+                            value: '3-A',
+                            child: Text('3-A sinf'),
+                          ),
+                          DropdownMenuItem(
+                            value: '4-A',
+                            child: Text('4-A sinf'),
+                          ),
+                          DropdownMenuItem(
+                            value: '5-A',
+                            child: Text('5-A sinf'),
+                          ),
+                        ],
+                        onChanged: (v) => setState(() => _gradeFilter = v),
+                      );
+                      final support = DropdownButtonFormField<String?>(
+                        value: _levelFilter,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          labelText: 'Yordam darajasi',
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: null,
+                            child: Text('Barcha darajalar'),
+                          ),
+                          DropdownMenuItem(
+                            value: '1-daraja',
+                            child: Text('1-daraja (Yengil)'),
+                          ),
+                          DropdownMenuItem(
+                            value: '2-daraja',
+                            child: Text('2-daraja (O‘rta)'),
+                          ),
+                          DropdownMenuItem(
+                            value: '3-daraja',
+                            child: Text('3-daraja (Intensiv)'),
+                          ),
+                        ],
+                        onChanged: (v) => setState(() => _levelFilter = v),
+                      );
+                      if (c.maxWidth < 560) {
+                        // Telefon: qidiruv to'liq kenglikda, filtrlar ostida
+                        return Column(
+                          children: [
+                            search,
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(child: grade),
+                                const SizedBox(width: 10),
+                                Expanded(child: support),
+                              ],
                             ),
                           ],
-                          onChanged: (v) => setState(() => _gradeFilter = v),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 2,
-                        child: DropdownButtonFormField<String?>(
-                          value: _levelFilter,
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            labelText: 'Yordam darajasi',
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: null,
-                              child: Text('Barcha darajalar'),
-                            ),
-                            DropdownMenuItem(
-                              value: '1-daraja',
-                              child: Text('1-daraja (Yengil)'),
-                            ),
-                            DropdownMenuItem(
-                              value: '2-daraja',
-                              child: Text('2-daraja (O‘rta)'),
-                            ),
-                            DropdownMenuItem(
-                              value: '3-daraja',
-                              child: Text('3-daraja (Intensiv)'),
-                            ),
-                          ],
-                          onChanged: (v) => setState(() => _levelFilter = v),
-                        ),
-                      ),
-                    ],
+                        );
+                      }
+                      return Row(
+                        children: [
+                          Expanded(flex: 3, child: search),
+                          const SizedBox(width: 12),
+                          Expanded(flex: 2, child: grade),
+                          const SizedBox(width: 12),
+                          Expanded(flex: 2, child: support),
+                        ],
+                      );
+                    },
                   ),
                   const SizedBox(height: 10),
                   Wrap(
@@ -308,8 +324,8 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         label: const Text('Faqat menga biriktirilgan bolalar'),
                         avatar: Icon(
                           _onlyAssignedToMe
-                              ? Icons.check_circle_rounded
-                              : Icons.person_pin_circle_outlined,
+                              ? LucideIcons.circleCheck
+                              : LucideIcons.circleUser,
                           size: 16,
                           color:
                               _onlyAssignedToMe
@@ -332,7 +348,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         FilterChip(
                           selected: _statusColorFilter == StatusColor.red,
                           label: Text(
-                            '🔴 Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
+                            'Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
                           ),
                           selectedColor: AppColors.error,
                           backgroundColor: AppColors.errorBg,
@@ -354,7 +370,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         FilterChip(
                           selected: _statusColorFilter == StatusColor.yellow,
                           label: Text(
-                            '🟡 Sariq (${summary.count(StatusColor.yellow)})',
+                            'Sariq (${summary.count(StatusColor.yellow)})',
                           ),
                           selectedColor: AppColors.warning,
                           backgroundColor: AppColors.warningBg,
@@ -376,7 +392,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         FilterChip(
                           selected: _statusColorFilter == StatusColor.green,
                           label: Text(
-                            '🟢 Yashil (${summary.count(StatusColor.green)})',
+                            'Yashil (${summary.count(StatusColor.green)})',
                           ),
                           selectedColor: AppColors.success,
                           backgroundColor: AppColors.successBg,
@@ -427,14 +443,17 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
               child: Column(
                 children: [
                   Icon(
-                    Icons.search_off_rounded,
+                    LucideIcons.searchX,
                     size: 48,
                     color: AppColors.textMuted,
                   ),
                   SizedBox(height: 12),
                   Text(
                     'Mos keluvchi o‘quvchilar topilmadi',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   SizedBox(height: 4),
                   Text(
@@ -506,7 +525,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                         s.fullName,
                                         style: TextStyle(
                                           fontWeight: FontWeight.w600,
-                                          fontSize: 15,
+                                          fontSize: 15.5,
                                           color: AppColors.textPrimary,
                                         ),
                                       ),
@@ -530,59 +549,18 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                         ),
                                       ),
                                       if (st != null)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: stBg,
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
-                                            border: Border.all(
-                                              color: stColor!.withValues(
-                                                alpha: 0.35,
-                                              ),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            '${st.color.label}: ${st.color == StatusColor.red
-                                                ? "Ishlanmagan"
-                                                : st.color == StatusColor.yellow
-                                                ? "E’tibor talab"
-                                                : "Ijobiy"}',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w600,
-                                              color: stColor,
-                                            ),
-                                          ),
+                                        StatusBadge.child(
+                                          st.color,
+                                          '${st.color.label}: ${st.color == StatusColor.red
+                                              ? "Ishlanmagan"
+                                              : st.color == StatusColor.yellow
+                                              ? "E’tibor talab"
+                                              : "Ijobiy"}',
                                         ),
                                       if (isAssigned)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 1,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.successBg,
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
-                                            border: Border.all(
-                                              color: AppColors.success
-                                                  .withValues(alpha: 0.3),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            'Sizga biriktirilgan',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.success,
-                                            ),
-                                          ),
+                                        const StatusBadge(
+                                          'Sizga biriktirilgan',
+                                          tone: StatusTone.primary,
                                         ),
                                     ],
                                   ),
@@ -599,7 +577,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                     Text(
                                       'Holat sababi: ${st.reasons.first}',
                                       style: TextStyle(
-                                        fontSize: 11.5,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                         color: stColor,
                                       ),
@@ -620,7 +598,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                             IconButton.outlined(
                               tooltip: 'Kuzatuv qayd etish',
                               icon: const Icon(
-                                Icons.edit_note_rounded,
+                                LucideIcons.notebookPen,
                                 size: 18,
                               ),
                               onPressed:
@@ -630,10 +608,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                             const SizedBox(width: 6),
                             IconButton.outlined(
                               tooltip: 'Diagnostika o‘tkazish',
-                              icon: const Icon(
-                                Icons.psychology_outlined,
-                                size: 18,
-                              ),
+                              icon: const Icon(LucideIcons.brain, size: 18),
                               onPressed:
                                   () => widget.onSelectStudentForAssessment
                                       ?.call(s),
@@ -642,7 +617,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                             IconButton.outlined(
                               tooltip: 'Mashg‘ulot rejalashtirish',
                               icon: const Icon(
-                                Icons.alarm_add_rounded,
+                                LucideIcons.alarmClockPlus,
                                 size: 18,
                               ),
                               onPressed:

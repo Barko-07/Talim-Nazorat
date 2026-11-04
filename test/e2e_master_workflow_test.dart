@@ -56,7 +56,10 @@ void main() {
       password: 'TempPassword2026!',
     );
     await app.addUser(newSpec, byUser: superAdmin);
-    expect(db.getUserById('usr_e2e_spec_teacher')?.role, UserRole.specialEdTeacher);
+    expect(
+      db.getUserById('usr_e2e_spec_teacher')?.role,
+      UserRole.specialEdTeacher,
+    );
 
     // 5. Administrator registers a 7th-grade child + an unworked child
     final grade7Student = StudentModel(
@@ -93,13 +96,31 @@ void main() {
     // 6. Assign specialists to the child
     final coordinator = db.getUserById('user_coordinator')!;
     app.setCurrentUser(coordinator);
-    await app.assignSpecialistToStudent('student_e2e_7th', 'user_psychologist', byUser: coordinator);
-    await app.assignSpecialistToStudent('student_e2e_7th', 'usr_e2e_spec_teacher', byUser: coordinator);
-    await app.assignSpecialistToStudent('student_e2e_7th', 'user_speech', byUser: coordinator);
+    await app.assignSpecialistToStudent(
+      'student_e2e_7th',
+      'user_psychologist',
+      byUser: coordinator,
+    );
+    await app.assignSpecialistToStudent(
+      'student_e2e_7th',
+      'usr_e2e_spec_teacher',
+      byUser: coordinator,
+    );
+    await app.assignSpecialistToStudent(
+      'student_e2e_7th',
+      'user_speech',
+      byUser: coordinator,
+    );
 
     // Before work is recorded, both new children are RED in Svetofor
-    expect(app.childStatus(db.getStudentById('student_e2e_7th')!).color, StatusColor.red);
-    expect(app.childStatus(db.getStudentById('student_e2e_unworked')!).color, StatusColor.red);
+    expect(
+      app.childStatus(db.getStudentById('student_e2e_7th')!).color,
+      StatusColor.red,
+    );
+    expect(
+      app.childStatus(db.getStudentById('student_e2e_unworked')!).color,
+      StatusColor.red,
+    );
 
     // 7-13. Psychologist logs in, selects methodology & questions, conducts assessment & observation
     final psychologist = db.getUserById('user_psychologist')!;
@@ -125,7 +146,8 @@ void main() {
         maxScore: 100,
         previousScore: 60,
         notes: 'Diqqat konsentratsiyasi 2 daqiqadan 7 daqiqagacha oshdi.',
-        recommendations: 'Matematikadan vizual kartochkalar va bosqichli tushuntirish qo‘llansin.',
+        recommendations:
+            'Matematikadan vizual kartochkalar va bosqichli tushuntirish qo‘llansin.',
       ),
       byUser: psychologist,
     );
@@ -143,7 +165,8 @@ void main() {
         emotionalState: 'Barqaror / Ijobiy',
         triggerOrContext: 'Individual topshiriq bajarishda',
         observationText: 'Vizual taymer bilan chalg‘imasdan 7 daqiqa ishladi.',
-        recommendationOrAction: '3-sinf darajasidagi amaliy misollarni davom ettirish.',
+        recommendationOrAction:
+            '3-sinf darajasidagi amaliy misollarni davom ettirish.',
         isConfidential: false,
         createdAt: DateTime.now().subtract(const Duration(days: 1)),
       ),
@@ -198,7 +221,8 @@ void main() {
         'dts_mat_4_1': Mastery.notYet,
       },
       confirmedGrade: 3,
-      notes: '7-sinf o‘quvchisi, biroq DTS bo‘yicha 3-sinf matematika darajasida o‘qitiladi.',
+      notes:
+          '7-sinf o‘quvchisi, biroq DTS bo‘yicha 3-sinf matematika darajasida o‘qitiladi.',
     );
     expect(savedLevel.classGrade, 7);
     expect(savedLevel.confirmedGrade, 3);
@@ -220,7 +244,11 @@ void main() {
         assignedAt: DateTime.now().subtract(const Duration(days: 2)),
       ),
     );
-    await app.completeSubjectTask(task.id, Mastery.mastered, note: 'Mustaqil to‘liq yechdi');
+    await app.completeSubjectTask(
+      task.id,
+      Mastery.mastered,
+      note: 'Mustaqil to‘liq yechdi',
+    );
 
     // Achievement passport automatically includes the personal best & mastered task
     final passport = app.achievementPassport('student_e2e_7th');
@@ -238,7 +266,8 @@ void main() {
         toSpecialistType: 'Logoped-defektolog',
         toSpecialistId: 'user_speech',
         toSpecialistName: 'Sodiqov Bobur Mirzayevich',
-        reason: 'Matematik atamalarni talaffuz qilishda logopedik ko‘mak zarur.',
+        reason:
+            'Matematik atamalarni talaffuz qilishda logopedik ko‘mak zarur.',
         priority: 'Rejali',
         status: 'Ko‘rib chiqilmoqda',
         createdAt: DateTime.now(),
@@ -246,9 +275,18 @@ void main() {
       byUser: specTeacher,
     );
     final speechUser = db.getUserById('user_speech')!;
-    expect(db.getNotifications(speechUser.id).any((n) => n.relatedRecordId == 'ref_e2e_1'), isTrue);
+    expect(
+      db
+          .getNotifications(speechUser.id)
+          .any((n) => n.relatedRecordId == 'ref_e2e_1'),
+      isTrue,
+    );
     app.setCurrentUser(speechUser);
-    await app.updateReferralStatus('ref_e2e_1', 'Qabul qilindi', byUser: speechUser);
+    await app.updateReferralStatus(
+      'ref_e2e_1',
+      'Qabul qilindi',
+      byUser: speechUser,
+    );
     await app.recordSoundEntry(
       SoundEntry(
         id: 'snd_e2e_1',
@@ -256,7 +294,8 @@ void main() {
         soundId: 'r',
         stage: SoundStage.staging,
         disorder: SoundDisorder.distortion,
-        note: 'Matematik atamalar uchun "R" tovushi ustida mashg‘ulot boshlandi.',
+        note:
+            'Matematik atamalar uchun "R" tovushi ustida mashg‘ulot boshlandi.',
         recordedById: speechUser.id,
         recordedByName: speechUser.fullName,
         recordedAt: DateTime.now(),
@@ -272,7 +311,8 @@ void main() {
         studentName: 'Normatov Sardor',
         studentGrade: '7-A',
         institutionName: schoolName,
-        title: 'Normatov Sardor uchun individual moslashtirilgan ITR (Matematika 3-sinf darajasi)',
+        title:
+            'Normatov Sardor uchun individual moslashtirilgan ITR (Matematika 3-sinf darajasi)',
         academicYear: '2026-2027',
         startDate: DateTime(2026, 9, 1),
         reviewDate: DateTime(2026, 12, 25),
@@ -281,9 +321,12 @@ void main() {
         coordinatorId: coordinator.id,
         coordinatorName: coordinator.fullName,
         status: 'Faol',
-        baselineSummary: 'Matematikadan 3-sinf DTS darajasi, diqqat davomiyligi 7 daqiqa.',
-        longTermGoals: '3-sinf DTS talablarini to‘liq yakunlab, 4-sinf dasturiga o‘tish.',
-        supportStrategies: 'Vizual kartochkalar, bosqichli masalalar, logoped va psixolog hamkorligi.',
+        baselineSummary:
+            'Matematikadan 3-sinf DTS darajasi, diqqat davomiyligi 7 daqiqa.',
+        longTermGoals:
+            '3-sinf DTS talablarini to‘liq yakunlab, 4-sinf dasturiga o‘tish.',
+        supportStrategies:
+            'Vizual kartochkalar, bosqichli masalalar, logoped va psixolog hamkorligi.',
         objectives: [
           PlanObjectiveModel(
             id: 'obj_e2e_1',
@@ -304,7 +347,9 @@ void main() {
     app.setCurrentUser(adminUser);
 
     final workedStatus = app.childStatus(db.getStudentById('student_e2e_7th')!);
-    final unworkedStatus = app.childStatus(db.getStudentById('student_e2e_unworked')!);
+    final unworkedStatus = app.childStatus(
+      db.getStudentById('student_e2e_unworked')!,
+    );
     expect(workedStatus.color, StatusColor.green);
     expect(unworkedStatus.color, StatusColor.red);
 
@@ -317,9 +362,11 @@ void main() {
 
     final backupJson = app.exportDatabaseBackupJson();
     final decoded = jsonDecode(backupJson) as Map<String, dynamic>;
-    expect((decoded['tables'] as Map<String, dynamic>)['subjectLevels'], isNotEmpty);
+    expect(
+      (decoded['tables'] as Map<String, dynamic>)['subjectLevels'],
+      isNotEmpty,
+    );
 
     auth.dispose();
   });
 }
-

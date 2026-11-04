@@ -69,41 +69,44 @@ void main() {
       },
     );
 
-    test('NamanganData provides all 14 administrative districts and realistic school data', () {
-      expect(NamanganData.defaultRegion, 'Namangan viloyati');
-      expect(NamanganData.districts.length, 14);
+    test(
+      'NamanganData provides all 14 administrative districts and realistic school data',
+      () {
+        expect(NamanganData.defaultRegion, 'Namangan viloyati');
+        expect(NamanganData.districts.length, 14);
 
-      const requiredDistricts = [
-        'Namangan shahri',
-        'Davlatobod tumani',
-        'Yangi Namangan tumani',
-        'Chortoq tumani',
-        'Chust tumani',
-        'Kosonsoy tumani',
-        'Mingbuloq tumani',
-        'Namangan tumani',
-        'Norin tumani',
-        'Pop tumani',
-        'To‘raqo‘rg‘on tumani',
-        'Uychi tumani',
-        'Uchqo‘rg‘on tumani',
-        'Yangiqo‘rg‘on tumani',
-      ];
+        const requiredDistricts = [
+          'Namangan shahri',
+          'Davlatobod tumani',
+          'Yangi Namangan tumani',
+          'Chortoq tumani',
+          'Chust tumani',
+          'Kosonsoy tumani',
+          'Mingbuloq tumani',
+          'Namangan tumani',
+          'Norin tumani',
+          'Pop tumani',
+          'To‘raqo‘rg‘on tumani',
+          'Uychi tumani',
+          'Uchqo‘rg‘on tumani',
+          'Yangiqo‘rg‘on tumani',
+        ];
 
-      for (final district in requiredDistricts) {
-        expect(
-          NamanganData.districts.contains(district),
-          true,
-          reason: '$district mavjud bo‘lishi lozim',
-        );
-        final schools = NamanganData.getSchoolsForDistrict(district);
-        expect(
-          schools.isNotEmpty,
-          true,
-          reason: '$district da kamida 1 ta maktab bo‘lishi lozim',
-        );
-      }
-    });
+        for (final district in requiredDistricts) {
+          expect(
+            NamanganData.districts.contains(district),
+            true,
+            reason: '$district mavjud bo‘lishi lozim',
+          );
+          final schools = NamanganData.getSchoolsForDistrict(district);
+          expect(
+            schools.isNotEmpty,
+            true,
+            reason: '$district da kamida 1 ta maktab bo‘lishi lozim',
+          );
+        }
+      },
+    );
 
     test(
       'UserModel stores locked profession, Namangan region and district',
@@ -126,30 +129,31 @@ void main() {
       },
     );
 
-    testWidgets('AddStudentScreen renders without DropdownButton assertion errors', (tester) async {
-      final appProvider = AppProvider();
-      final authProvider = AuthProvider();
+    testWidgets(
+      'AddStudentScreen renders without DropdownButton assertion errors',
+      (tester) async {
+        final appProvider = AppProvider();
+        final authProvider = AuthProvider();
 
-      await tester.pumpWidget(
-        MultiProvider(
-          providers: [
-            ChangeNotifierProvider.value(value: appProvider),
-            ChangeNotifierProvider.value(value: authProvider),
-          ],
-          child: const MaterialApp(
-            home: AddStudentScreen(),
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider.value(value: appProvider),
+              ChangeNotifierProvider.value(value: authProvider),
+            ],
+            child: const MaterialApp(home: AddStudentScreen()),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Yangi o‘quvchini ro‘yxatga olish'), findsOneWidget);
-      expect(find.text('Familiyasi *'), findsOneWidget);
-      expect(find.text('Qo‘llab-quvvatlash darajasi'), findsOneWidget);
+        expect(find.text('Yangi o‘quvchini ro‘yxatga olish'), findsOneWidget);
+        expect(find.text('Familiyasi *'), findsOneWidget);
+        expect(find.text('Qo‘llab-quvvatlash darajasi'), findsOneWidget);
 
-      // Sessiya taymeri to'xtatiladi (ilovada provayderni ChangeNotifierProvider yopadi)
-      await tester.pumpWidget(const SizedBox());
-      authProvider.dispose();
-    });
+        // Sessiya taymeri to'xtatiladi (ilovada provayderni ChangeNotifierProvider yopadi)
+        await tester.pumpWidget(const SizedBox());
+        authProvider.dispose();
+      },
+    );
   });
 }

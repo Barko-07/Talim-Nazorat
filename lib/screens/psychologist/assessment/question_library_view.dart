@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -78,40 +79,41 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Savolni o‘chirish'),
-          ],
-        ),
-        content: Text(
-          'Haqiqatan ham "${q.title}" savolini o‘chirmoqchimisiz? Bu amalni ortga qaytarib bo‘lmaydi.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Bekor qilish'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Row(
+              children: [
+                Icon(LucideIcons.triangleAlert, color: Colors.red),
+                SizedBox(width: 8),
+                Text('Savolni o‘chirish'),
+              ],
+            ),
+            content: Text(
+              'Haqiqatan ham "${q.title}" savolini o‘chirmoqchimisiz? Bu amalni ortga qaytarib bo‘lmaydi.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Bekor qilish'),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  await context.read<AppProvider>().deleteQuestion(q.id);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('"${q.title}" savoli o‘chirildi.'),
+                        backgroundColor: AppColors.textSecondary,
+                      ),
+                    );
+                  }
+                },
+                child: const Text('O‘chirish'),
+              ),
+            ],
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await context.read<AppProvider>().deleteQuestion(q.id);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('"${q.title}" savoli o‘chirildi.'),
-                    backgroundColor: AppColors.textSecondary,
-                  ),
-                );
-              }
-            },
-            child: const Text('O‘chirish'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -123,248 +125,251 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      builder:
+          (ctx) => ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.quiz_rounded,
-                      color: AppColors.primary,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          q.questionTitle,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          '${q.domain} • ${q.safeAgeRange}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  _buildStatusBadge(q.status),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Navigator.pop(ctx),
-                  ),
-                ],
-              ),
-              const Divider(height: 24),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
                     children: [
-                      Text(
-                        'Savol / Topshiriq matni:',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textMuted,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          LucideIcons.fileQuestion,
+                          color: AppColors.primary,
+                          size: 20,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        q.questionText,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              q.questionTitle,
+                              style: const TextStyle(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              '${q.domain} • ${q.safeAgeRange}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      if (q.options.isNotEmpty) ...[
-                        Text(
-                          'Javob variantlari va shkala (${_typeNames[q.questionType] ?? q.questionType}):',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ...q.options.map((opt) {
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 6),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.surfaceMuted,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.check_circle_outline,
-                                  size: 16,
-                                  color: AppColors.primary,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    opt.text,
-                                    style: const TextStyle(fontSize: 13),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryLight,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    '${opt.score.toStringAsFixed(opt.score.truncateToDouble() == opt.score ? 0 : 1)} ball',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                        const SizedBox(height: 14),
-                      ],
-                      if (q.safeCriteria.isNotEmpty) ...[
-                        Text(
-                          'Baholash mezonlari:',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          q.safeCriteria,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                      ],
-                      if (q.safeNotes.isNotEmpty) ...[
-                        Text(
-                          'Psixolog uchun metodik ko‘rsatma:',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.warningBg,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: AppColors.warning.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Text(
-                            q.safeNotes,
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.warning,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                      ],
-                      Row(
-                        children: [
-                          Icon(
-                            q.isStandard
-                                ? Icons.verified_user_rounded
-                                : Icons.person_rounded,
-                            size: 16,
-                            color: AppColors.textMuted,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            q.isStandard
-                                ? 'Standart metodika bazasi'
-                                : 'Muallif: ${q.authorName}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                        ],
+                      _buildStatusBadge(q.status),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(LucideIcons.x),
+                        onPressed: () => Navigator.pop(ctx),
                       ),
                     ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.edit_outlined, size: 16),
-                    label: const Text('Tahrirlash'),
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      _openQuestionEditor(q);
-                    },
-                  ),
-                  if (widget.onSelectQuestion != null) ...[
-                    const SizedBox(width: 12),
-                    FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                  const Divider(height: 24),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Savol / Topshiriq matni:',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            q.questionText,
+                            style: TextStyle(
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          if (q.options.isNotEmpty) ...[
+                            Text(
+                              'Javob variantlari va shkala (${_typeNames[q.questionType] ?? q.questionType}):',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ...q.options.map((opt) {
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceMuted,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppColors.border),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      LucideIcons.circleCheck,
+                                      size: 16,
+                                      color: AppColors.primary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        opt.text,
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primaryLight,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        '${opt.score.toStringAsFixed(opt.score.truncateToDouble() == opt.score ? 0 : 1)} ball',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                            const SizedBox(height: 14),
+                          ],
+                          if (q.safeCriteria.isNotEmpty) ...[
+                            Text(
+                              'Baholash mezonlari:',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              q.safeCriteria,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                          ],
+                          if (q.safeNotes.isNotEmpty) ...[
+                            Text(
+                              'Psixolog uchun metodik ko‘rsatma:',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: AppColors.warningBg,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: AppColors.warning.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                q.safeNotes,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: AppColors.warning,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                          ],
+                          Row(
+                            children: [
+                              Icon(
+                                q.isStandard
+                                    ? LucideIcons.shieldCheck
+                                    : LucideIcons.user,
+                                size: 16,
+                                color: AppColors.textMuted,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                q.isStandard
+                                    ? 'Standart metodika bazasi'
+                                    : 'Muallif: ${q.authorName}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      icon: const Icon(Icons.add_task_rounded, size: 16),
-                      label: const Text('Baholashga qo‘shish'),
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        widget.onSelectQuestion!(q);
-                      },
                     ),
-                  ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton.icon(
+                        icon: const Icon(LucideIcons.edit, size: 16),
+                        label: const Text('Tahrirlash'),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          _openQuestionEditor(q);
+                        },
+                      ),
+                      if (widget.onSelectQuestion != null) ...[
+                        const SizedBox(width: 12),
+                        FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                          ),
+                          icon: const Icon(LucideIcons.listPlus, size: 16),
+                          label: const Text('Baholashga qo‘shish'),
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            widget.onSelectQuestion!(q);
+                          },
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -376,16 +381,17 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
         color: isReady ? AppColors.successBg : AppColors.warningBg,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: isReady
-              ? AppColors.success.withValues(alpha: 0.3)
-              : AppColors.warning.withValues(alpha: 0.3),
+          color:
+              isReady
+                  ? AppColors.success.withValues(alpha: 0.3)
+                  : AppColors.warning.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            isReady ? Icons.check_circle_rounded : Icons.pending_outlined,
+            isReady ? LucideIcons.circleCheck : LucideIcons.hourglass,
             size: 12,
             color: isReady ? AppColors.success : AppColors.warning,
           ),
@@ -410,30 +416,34 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
     final currentUserId = auth.currentUser?.id ?? 'user_psychologist';
 
     // Ro'yxatni olish
-    final allQuestions = _activeTabIndex == 0
-        ? app.questions
-        : app.questions.where((q) => q.authorId == currentUserId).toList();
+    final allQuestions =
+        _activeTabIndex == 0
+            ? app.questions
+            : app.questions.where((q) => q.authorId == currentUserId).toList();
 
     // Filtrlash
-    final filtered = allQuestions.where((q) {
-      if (_search.isNotEmpty) {
-        final qry = _search.toLowerCase();
-        final matchTitle = (q.title ?? '').toLowerCase().contains(qry);
-        final matchText = q.questionText.toLowerCase().contains(qry);
-        final matchCrit = (q.scoringCriteria ?? '').toLowerCase().contains(qry);
-        if (!matchTitle && !matchText && !matchCrit) return false;
-      }
-      if (_selectedDomain != null && q.domain != _selectedDomain) {
-        return false;
-      }
-      if (_selectedType != null && q.questionType != _selectedType) {
-        return false;
-      }
-      if (_selectedStatus != null && q.status != _selectedStatus) {
-        return false;
-      }
-      return true;
-    }).toList();
+    final filtered =
+        allQuestions.where((q) {
+          if (_search.isNotEmpty) {
+            final qry = _search.toLowerCase();
+            final matchTitle = (q.title ?? '').toLowerCase().contains(qry);
+            final matchText = q.questionText.toLowerCase().contains(qry);
+            final matchCrit = (q.scoringCriteria ?? '').toLowerCase().contains(
+              qry,
+            );
+            if (!matchTitle && !matchText && !matchCrit) return false;
+          }
+          if (_selectedDomain != null && q.domain != _selectedDomain) {
+            return false;
+          }
+          if (_selectedType != null && q.questionType != _selectedType) {
+            return false;
+          }
+          if (_selectedStatus != null && q.status != _selectedStatus) {
+            return false;
+          }
+          return true;
+        }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,7 +460,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                     Text(
                       'Savollar Kutubxonasi',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 17,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
@@ -484,10 +494,8 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
               ],
             ),
             FilledButton.icon(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
-              ),
-              icon: const Icon(Icons.add_rounded, size: 18),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+              icon: const Icon(LucideIcons.plus, size: 18),
               label: const Text('+ Yangi savol'),
               onPressed: () => _openQuestionEditor(),
             ),
@@ -540,7 +548,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                     onChanged: (v) => setState(() => _search = v.trim()),
                     decoration: InputDecoration(
                       hintText: 'Savol matni yoki mavzusi...',
-                      prefixIcon: const Icon(Icons.search, size: 18),
+                      prefixIcon: const Icon(LucideIcons.search, size: 18),
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -572,7 +580,10 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                     items: [
                       const DropdownMenuItem(
                         value: null,
-                        child: Text('Barcha yo‘nalishlar', style: TextStyle(fontSize: 12)),
+                        child: Text(
+                          'Barcha yo‘nalishlar',
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ),
                       ..._domains.map(
                         (d) => DropdownMenuItem(
@@ -604,12 +615,18 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                     items: [
                       const DropdownMenuItem(
                         value: null,
-                        child: Text('Barcha turlar', style: TextStyle(fontSize: 12)),
+                        child: Text(
+                          'Barcha turlar',
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ),
                       ..._typeNames.entries.map(
                         (e) => DropdownMenuItem(
                           value: e.key,
-                          child: Text(e.value, style: const TextStyle(fontSize: 12)),
+                          child: Text(
+                            e.value,
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         ),
                       ),
                     ],
@@ -620,6 +637,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                 SizedBox(
                   width: 150,
                   child: DropdownButtonFormField<String?>(
+                    isExpanded: true,
                     value: _selectedStatus,
                     decoration: InputDecoration(
                       labelText: 'Holat',
@@ -662,8 +680,11 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                         _selectedStatus = null;
                       });
                     },
-                    icon: const Icon(Icons.clear_all_rounded, size: 16),
-                    label: const Text('Tozalash', style: TextStyle(fontSize: 12)),
+                    icon: const Icon(LucideIcons.listX, size: 16),
+                    label: const Text(
+                      'Tozalash',
+                      style: TextStyle(fontSize: 12),
+                    ),
                   ),
               ],
             ),
@@ -679,7 +700,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
             child: Column(
               children: [
                 Icon(
-                  Icons.quiz_outlined,
+                  LucideIcons.fileQuestion,
                   size: 44,
                   color: AppColors.textMuted,
                 ),
@@ -698,7 +719,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                   ),
-                  icon: const Icon(Icons.add, size: 16),
+                  icon: const Icon(LucideIcons.plus, size: 16),
                   label: const Text('Yangi savol yaratish'),
                   onPressed: () => _openQuestionEditor(),
                 ),
@@ -745,7 +766,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
-                      Icons.help_outline_rounded,
+                      LucideIcons.circleHelp,
                       color: AppColors.primary,
                       size: 18,
                     ),
@@ -791,26 +812,26 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                 runSpacing: 4,
                 children: [
                   _buildTag(
-                    Icons.category_outlined,
+                    LucideIcons.shapes,
                     q.domain,
                     AppColors.primary,
                     AppColors.primaryLight,
                   ),
                   _buildTag(
-                    Icons.tune_rounded,
+                    LucideIcons.slidersHorizontal,
                     _typeNames[q.questionType] ?? q.questionType,
                     AppColors.info,
                     AppColors.infoBg,
                   ),
                   _buildTag(
-                    Icons.school_outlined,
+                    LucideIcons.school,
                     q.safeAgeRange,
                     AppColors.textSecondary,
                     AppColors.surfaceMuted,
                   ),
                   if (q.questionType != 'open_text')
                     _buildTag(
-                      Icons.star_outline_rounded,
+                      LucideIcons.star,
                       'Maks: ${q.maxScore.toStringAsFixed(0)} ball',
                       AppColors.success,
                       AppColors.successBg,
@@ -827,27 +848,24 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                     q.isStandard
                         ? 'Standart metodika'
                         : 'Muallif: ${q.authorName}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                   ),
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.visibility_outlined, size: 18),
+                        icon: const Icon(LucideIcons.eye, size: 18),
                         tooltip: 'Ko‘rish',
                         onPressed: () => _showQuestionDetails(q),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        icon: const Icon(LucideIcons.edit, size: 18),
                         tooltip: 'Tahrirlash',
                         onPressed: () => _openQuestionEditor(q),
                       ),
                       if (!q.isStandard)
                         IconButton(
                           icon: const Icon(
-                            Icons.delete_outline_rounded,
+                            LucideIcons.trash2,
                             size: 18,
                             color: Colors.red,
                           ),

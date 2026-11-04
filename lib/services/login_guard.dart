@@ -44,7 +44,9 @@ class LoginGuard {
       return '${name.substring(0, name.length < 2 ? name.length : 2)}***${id.substring(at)}';
     }
     final digits = id.replaceAll(RegExp(r'\D'), '');
-    return digits.length >= 4 ? '***${digits.substring(digits.length - 4)}' : '***';
+    return digits.length >= 4
+        ? '***${digits.substring(digits.length - 4)}'
+        : '***';
   }
 
   /// [lockCount]-chi bloklash davomiyligi
@@ -64,7 +66,11 @@ class LoginGuard {
   }
 
   /// Saqlashdan oldin eskirgan yozuvlar olib tashlanadi (ro'yxat cheksiz o'smasin)
-  Future<void> _save(SharedPreferences prefs, Map<String, dynamic> data, DateTime now) {
+  Future<void> _save(
+    SharedPreferences prefs,
+    Map<String, dynamic> data,
+    DateTime now,
+  ) {
     data.removeWhere((_, v) {
       final e = v as Map;
       final last = DateTime.tryParse(e['lastAt'] as String? ?? '');
@@ -84,7 +90,9 @@ class LoginGuard {
     final last = DateTime.tryParse(entry['lastAt'] as String? ?? '');
     final until = DateTime.tryParse(entry['lockedUntil'] as String? ?? '');
     // Soat oxirgi qayddan orqaga surilgan — bloklash davom etadi
-    if (until != null && last != null && t.isBefore(last.subtract(const Duration(minutes: 5)))) {
+    if (until != null &&
+        last != null &&
+        t.isBefore(last.subtract(const Duration(minutes: 5)))) {
       return until.difference(last);
     }
     if (until == null || !until.isAfter(t)) return null;
@@ -103,12 +111,13 @@ class LoginGuard {
     var lockCount = (entry['lockCount'] as num?)?.toInt() ?? 0;
     if (last != null && t.difference(last) > lockMemory) lockCount = 0;
 
-    final failures = ((entry['failures'] as List?) ?? const [])
-        .map((e) => DateTime.tryParse(e.toString()))
-        .whereType<DateTime>()
-        .where((d) => t.difference(d) < window && !d.isAfter(t))
-        .toList()
-      ..add(t);
+    final failures =
+        ((entry['failures'] as List?) ?? const [])
+            .map((e) => DateTime.tryParse(e.toString()))
+            .whereType<DateTime>()
+            .where((d) => t.difference(d) < window && !d.isAfter(t))
+            .toList()
+          ..add(t);
 
     var locked = false;
     if (failures.length >= maxFailures) {
@@ -128,7 +137,8 @@ class LoginGuard {
   /// Muvaffaqiyatli kirishdan keyin hisoblagich tozalanadi
   Future<void> registerSuccess(String identifier) async {
     final prefs = await SharedPreferences.getInstance();
-    final data = await _load(prefs)..remove(normalize(identifier));
+    final data = await _load(prefs)
+      ..remove(normalize(identifier));
     await _save(prefs, data, DateTime.now());
   }
 }

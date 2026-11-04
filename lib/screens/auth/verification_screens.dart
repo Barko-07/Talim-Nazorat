@@ -24,15 +24,17 @@ class PasswordRules {
 
   static bool longEnough(String p) => p.length >= minLength;
 
-  static int classes(String p) => [
-    RegExp(r'[a-z]').hasMatch(p),
-    RegExp(r'[A-Z]').hasMatch(p),
-    RegExp(r'[0-9]').hasMatch(p),
-    RegExp(r'[^A-Za-z0-9]').hasMatch(p),
-  ].where((ok) => ok).length;
+  static int classes(String p) =>
+      [
+        RegExp(r'[a-z]').hasMatch(p),
+        RegExp(r'[A-Z]').hasMatch(p),
+        RegExp(r'[0-9]').hasMatch(p),
+        RegExp(r'[^A-Za-z0-9]').hasMatch(p),
+      ].where((ok) => ok).length;
 
   static String? problem(String p) {
-    if (!longEnough(p)) return 'Parol kamida $minLength ta belgidan iborat bo‘lsin.';
+    if (!longEnough(p))
+      return 'Parol kamida $minLength ta belgidan iborat bo‘lsin.';
     if (classes(p) < 3) {
       return 'Kichik va katta harf, raqam va belgilardan kamida uchtasini ishlating.';
     }
@@ -136,7 +138,7 @@ class _AuthShell extends StatelessWidget {
                             title,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 19,
+                              fontSize: 20,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
                             ),
@@ -146,7 +148,7 @@ class _AuthShell extends StatelessWidget {
                             subtitle,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 13.5,
+                              fontSize: 14,
                               height: 1.45,
                               color: AppColors.textSecondary,
                             ),
@@ -401,7 +403,7 @@ class _RuleRow extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                fontSize: 12.5,
+                fontSize: 13,
                 color: ok ? AppColors.success : AppColors.textSecondary,
               ),
             ),
@@ -444,7 +446,10 @@ class _NewPasswordFieldsState extends State<_NewPasswordFields> {
           PasswordRules.classes(p) >= 3,
         ),
         const SizedBox(height: 12),
-        _PasswordField(controller: widget.confirm, label: 'Yangi parolni takrorlang'),
+        _PasswordField(
+          controller: widget.confirm,
+          label: 'Yangi parolni takrorlang',
+        ),
       ],
     );
   }
@@ -640,7 +645,7 @@ class _TotpStepState extends State<_TotpStep> {
               textAlign: TextAlign.center,
               textCapitalization: TextCapitalization.characters,
               style: const TextStyle(
-                fontSize: 22,
+                fontSize: 20,
                 letterSpacing: 4,
                 fontWeight: FontWeight.w700,
               ),
@@ -785,7 +790,7 @@ class _TotpSetupStepState extends State<_TotpSetupStep> {
           Text(
             'Skanerlab bo‘lmasa, kalitni qo‘lda kiriting:',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
+            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
           ),
           SelectableText(
             setup.secret.replaceAllMapped(
@@ -835,7 +840,7 @@ class _TotpSetupStepState extends State<_TotpSetupStep> {
                     c,
                     style: TextStyle(
                       fontFamily: 'monospace',
-                      fontSize: 16,
+                      fontSize: 15.5,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                     ),
@@ -846,9 +851,7 @@ class _TotpSetupStepState extends State<_TotpSetupStep> {
           const SizedBox(height: 10),
           OutlinedButton.icon(
             onPressed: () {
-              Clipboard.setData(
-                ClipboardData(text: _recoveryCodes.join('\n')),
-              );
+              Clipboard.setData(ClipboardData(text: _recoveryCodes.join('\n')));
               _snack(context, 'Zaxira kodlar nusxalandi');
             },
             icon: const Icon(LucideIcons.copy, size: 16),
@@ -1142,7 +1145,11 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
             ),
             _ErrorText(_error),
             const SizedBox(height: 16),
-            _PrimaryButton(label: 'Kod yuborish', busy: _busy, onPressed: _request),
+            _PrimaryButton(
+              label: 'Kod yuborish',
+              busy: _busy,
+              onPressed: _request,
+            ),
           ],
         ),
       );
@@ -1294,7 +1301,11 @@ class _ChangePasswordScreenState extends State<_ChangePasswordScreen> {
                   _NewPasswordFields(password: _new, confirm: _confirm),
                   _ErrorText(_error),
                   const SizedBox(height: 16),
-                  _PrimaryButton(label: 'Saqlash', busy: _busy, onPressed: _save),
+                  _PrimaryButton(
+                    label: 'Saqlash',
+                    busy: _busy,
+                    onPressed: _save,
+                  ),
                   const SizedBox(height: 8),
                   ResendCodeButton(
                     initialWait: 60,

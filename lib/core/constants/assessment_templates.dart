@@ -44,7 +44,8 @@ class AssessmentTemplates {
       category: 'Nutq va muloqot',
       title: 'Logopedik nutq va artikulyatsiya diagnostikasi',
       targetRole: UserRole.speechTherapist,
-      description: 'Tovushlar talaffuzi, fonematik idrok, artikulyatsion apparat va bog‘lanishli nutq ko‘nikmalari tahlili.',
+      description:
+          'Tovushlar talaffuzi, fonematik idrok, artikulyatsion apparat va bog‘lanishli nutq ko‘nikmalari tahlili.',
       fields: [
         AssessmentTemplateField(
           key: 'speech_sounds',
@@ -87,7 +88,8 @@ class AssessmentTemplates {
       category: 'Kognitiv va psixologik',
       title: 'Psixologik kognitiv va emotsional rivojlanish',
       targetRole: UserRole.psychologist,
-      description: 'Diqqat barqarorligi, xotira, tafakkur tezligi, hissiy-irodaviy holat va motivatsiya tahlili.',
+      description:
+          'Diqqat barqarorligi, xotira, tafakkur tezligi, hissiy-irodaviy holat va motivatsiya tahlili.',
       fields: [
         AssessmentTemplateField(
           key: 'attention',
@@ -99,14 +101,16 @@ class AssessmentTemplates {
         AssessmentTemplateField(
           key: 'memory_thinking',
           label: 'Xotira va ko‘rgazmali-obrazli tafakkur',
-          hint: 'Qisqa va uzoq muddatli eslab qolish, mantiqiy bog‘liqlikni topish',
+          hint:
+              'Qisqa va uzoq muddatli eslab qolish, mantiqiy bog‘liqlikni topish',
           maxScore: 25.0,
           defaultScore: 19.0,
         ),
         AssessmentTemplateField(
           key: 'emotional_behavior',
           label: 'Emotsional-irodaviy soha va xulq-atvor',
-          hint: 'Hissiyotlarni boshqara olish, qoidalarga rioya qilish, xavotir darajasi',
+          hint:
+              'Hissiyotlarni boshqara olish, qoidalarga rioya qilish, xavotir darajasi',
           maxScore: 25.0,
           defaultScore: 21.0,
         ),
@@ -130,7 +134,8 @@ class AssessmentTemplates {
       category: 'Maxsus pedagogika va sensorika',
       title: 'Sensor-motorika va maxsus pedagogik o‘rganish',
       targetRole: UserRole.specialEducation,
-      description: 'Sensor integratsiya, fazoviy tasavvur, motorika va hayotiy ko‘nikmalar holati.',
+      description:
+          'Sensor integratsiya, fazoviy tasavvur, motorika va hayotiy ko‘nikmalar holati.',
       fields: [
         AssessmentTemplateField(
           key: 'sensory_integration',
@@ -149,7 +154,8 @@ class AssessmentTemplates {
         AssessmentTemplateField(
           key: 'academic_readiness',
           label: 'O‘quv ko‘nikmalari va topshiriq bajarish',
-          hint: 'Oddiy hisob-kitob, harflarni idrok etish, ko‘rsatmalarga amal qilish',
+          hint:
+              'Oddiy hisob-kitob, harflarni idrok etish, ko‘rsatmalarga amal qilish',
           maxScore: 25.0,
           defaultScore: 18.0,
         ),
@@ -174,7 +180,8 @@ class AssessmentTemplates {
       category: 'O‘quv va dars faoliyati',
       title: 'Pedagogik o‘quv faoliyati va moslashuv monitoringi',
       targetRole: UserRole.teacher,
-      description: 'Dars mashg‘ulotlaridagi faollik, topshiriqlarni o‘zlashtirish va sinfdagi xatti-harakat.',
+      description:
+          'Dars mashg‘ulotlaridagi faollik, topshiriqlarni o‘zlashtirish va sinfdagi xatti-harakat.',
       fields: [
         AssessmentTemplateField(
           key: 'academic_progress',

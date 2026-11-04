@@ -37,23 +37,26 @@ class AppTheme {
           TargetPlatform.linux: FadeThroughPageTransitionsBuilder(),
         },
       ),
-      colorScheme: (dark ? const ColorScheme.dark() : const ColorScheme.light()).copyWith(
-        primary: AppColors.primary,
-        onPrimary: AppColors.onPrimary,
-        primaryContainer: AppColors.primaryLight,
-        onPrimaryContainer: AppColors.primaryDark,
-        secondary: AppColors.textPrimary,
-        surface: AppColors.surface,
-        onSurface: AppColors.textPrimary,
-        onSurfaceVariant: AppColors.textMuted,
-        outline: AppColors.border,
-        outlineVariant: AppColors.borderLight,
-        error: AppColors.error,
-        onError: AppColors.onPrimary,
-      ),
+      colorScheme: (dark ? const ColorScheme.dark() : const ColorScheme.light())
+          .copyWith(
+            primary: AppColors.primary,
+            onPrimary: AppColors.onPrimary,
+            primaryContainer: AppColors.primaryLight,
+            onPrimaryContainer: AppColors.primaryDark,
+            secondary: AppColors.textPrimary,
+            surface: AppColors.surface,
+            onSurface: AppColors.textPrimary,
+            onSurfaceVariant: AppColors.textMuted,
+            outline: AppColors.border,
+            outlineVariant: AppColors.borderLight,
+            error: AppColors.error,
+            onError: AppColors.onPrimary,
+          ),
       canvasColor: AppColors.surface,
       iconTheme: IconThemeData(color: AppColors.textSecondary),
-      progressIndicatorTheme: ProgressIndicatorThemeData(color: AppColors.primary),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: AppColors.primary,
+      ),
       checkboxTheme: CheckboxThemeData(
         side: BorderSide(color: AppColors.textMuted, width: 1.4),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
@@ -152,10 +155,7 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: AppColors.errorBorder,
-            width: 1.0,
-          ),
+          borderSide: BorderSide(color: AppColors.errorBorder, width: 1.0),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -263,15 +263,41 @@ class AppTheme {
   /// Sozlamalar sahifasidagi o'lchamlar: sarlavha 20/600, karta sarlavhasi
   /// 15.5/600, oddiy matn 14/500, izoh 13/500.
   static TextTheme _textTheme(TextTheme t) => t.copyWith(
-    headlineSmall: t.headlineSmall?.copyWith(fontSize: 22, fontWeight: FontWeight.w700, letterSpacing: -0.3),
-    titleLarge: t.titleLarge?.copyWith(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.2),
-    titleMedium: t.titleMedium?.copyWith(fontSize: 15.5, fontWeight: FontWeight.w600),
-    titleSmall: t.titleSmall?.copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+    headlineSmall: t.headlineSmall?.copyWith(
+      fontSize: 22,
+      fontWeight: FontWeight.w700,
+      letterSpacing: -0.3,
+    ),
+    titleLarge: t.titleLarge?.copyWith(
+      fontSize: 20,
+      fontWeight: FontWeight.w700,
+      letterSpacing: -0.2,
+    ),
+    titleMedium: t.titleMedium?.copyWith(
+      fontSize: 15.5,
+      fontWeight: FontWeight.w600,
+    ),
+    titleSmall: t.titleSmall?.copyWith(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+    ),
     bodyLarge: t.bodyLarge?.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
-    bodyMedium: t.bodyMedium?.copyWith(fontSize: 14, fontWeight: FontWeight.w500),
+    bodyMedium: t.bodyMedium?.copyWith(
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+    ),
     bodySmall: t.bodySmall?.copyWith(fontSize: 13, fontWeight: FontWeight.w500),
-    labelLarge: t.labelLarge?.copyWith(fontSize: 14, fontWeight: FontWeight.w600),
-    labelMedium: t.labelMedium?.copyWith(fontSize: 12.5, fontWeight: FontWeight.w600),
-    labelSmall: t.labelSmall?.copyWith(fontSize: 11.5, fontWeight: FontWeight.w600),
+    labelLarge: t.labelLarge?.copyWith(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+    ),
+    labelMedium: t.labelMedium?.copyWith(
+      fontSize: 12.5,
+      fontWeight: FontWeight.w600,
+    ),
+    labelSmall: t.labelSmall?.copyWith(
+      fontSize: 11.5,
+      fontWeight: FontWeight.w600,
+    ),
   );
 }

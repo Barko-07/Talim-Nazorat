@@ -6,10 +6,13 @@ class PsychologicalObservationModel {
   final String psychologistId;
   final String psychologistName;
   final DateTime date;
-  final String category; // 'Darsdagi xulq-atvor', 'Hissiy holat (Affektiv)', 'Tengdoshlar bilan muloqot', 'Kognitiv faollik va diqqat', 'Sensor yoki xavotir belgilari'
+  final String
+  category; // 'Darsdagi xulq-atvor', 'Hissiy holat (Affektiv)', 'Tengdoshlar bilan muloqot', 'Kognitiv faollik va diqqat', 'Sensor yoki xavotir belgilari'
   final String observationText;
-  final String emotionalState; // 'Barqaror / Ijobiy', 'Xavotirli', 'Tirishqoq / Chalg‘uvchan', 'Agressiv / Qo‘zg‘aluvchan', 'Passiv / Tortinchoq'
-  final String? triggerOrContext; // 'Mustaqil ishlaganda', 'Tanaffus vaqtida', 'Yangi mavzu tushuntirilganda', 'Boshqa bolalar bilan ziddiyatda'
+  final String
+  emotionalState; // 'Barqaror / Ijobiy', 'Xavotirli', 'Tirishqoq / Chalg‘uvchan', 'Agressiv / Qo‘zg‘aluvchan', 'Passiv / Tortinchoq'
+  final String?
+  triggerOrContext; // 'Mustaqil ishlaganda', 'Tanaffus vaqtida', 'Yangi mavzu tushuntirilganda', 'Boshqa bolalar bilan ziddiyatda'
   final String? recommendationOrAction;
   final bool isConfidential;
   final DateTime createdAt;
@@ -99,8 +102,9 @@ class PsychologicalObservationModel {
         triggerOrContext: json['triggerOrContext'] as String?,
         recommendationOrAction: json['recommendationOrAction'] as String?,
         isConfidential: json['isConfidential'] as bool? ?? true,
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'] as String)
-            : DateTime.now(),
+        createdAt:
+            json['createdAt'] != null
+                ? DateTime.parse(json['createdAt'] as String)
+                : DateTime.now(),
       );
 }

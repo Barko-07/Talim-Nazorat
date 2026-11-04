@@ -36,11 +36,12 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
     final app = context.watch<AppProvider>();
     final allAssessments = app.assessments;
 
-    final filtered = _selectedCategory == 'Barchasi'
-        ? allAssessments
-        : allAssessments
-            .where((a) => a.category == _selectedCategory)
-            .toList();
+    final filtered =
+        _selectedCategory == 'Barchasi'
+            ? allAssessments
+            : allAssessments
+                .where((a) => a.category == _selectedCategory)
+                .toList();
 
     final auth = context.watch<AuthProvider>();
     final currentUser = auth.currentUser;
@@ -63,26 +64,27 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
             title: 'Kasbiy baholashlar',
             subtitle:
                 '${currentRole.label} • ${filtered.length} ta diagnostik qayd',
-            action: currentRole.canCreateAssessments
-                ? HeaderActionButton(
-                    icon: LucideIcons.plus,
-                    label: 'Yangi baholash',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const NewAssessmentScreen(),
-                        ),
-                      );
-                    },
-                  )
-                : StatusPill(
-                    label: 'Ko‘rish rejimi',
-                    color: AppColors.textMuted,
-                    backgroundColor: AppColors.surface,
-                    borderColor: AppColors.border,
-                    icon: LucideIcons.eye,
-                  ),
+            action:
+                currentRole.canCreateAssessments
+                    ? HeaderActionButton(
+                      icon: LucideIcons.plus,
+                      label: 'Yangi baholash',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NewAssessmentScreen(),
+                          ),
+                        );
+                      },
+                    )
+                    : StatusPill(
+                      label: 'Ko‘rish rejimi',
+                      color: AppColors.textMuted,
+                      backgroundColor: AppColors.surface,
+                      borderColor: AppColors.border,
+                      icon: LucideIcons.eye,
+                    ),
           ),
           const SizedBox(height: 9),
 
@@ -94,59 +96,60 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
           const SizedBox(height: 9),
 
           Expanded(
-            child: filtered.isEmpty
-                ? Center(
-                    child: SurfaceCard(
-                      borderRadius: 26,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 36,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            LucideIcons.clipboardList,
-                            size: 34,
-                            color: AppColors.primary,
-                          ),
-                          SizedBox(height: 14),
-                          Text(
-                            'Baholashlar topilmadi',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 15.5,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
+            child:
+                filtered.isEmpty
+                    ? Center(
+                      child: SurfaceCard(
+                        borderRadius: 26,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 36,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              LucideIcons.clipboardList,
+                              size: 34,
+                              color: AppColors.primary,
                             ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            'Boshqa yo‘nalishni tanlang yoki yangi baholash kiriting',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textMuted,
-                              height: 1.4,
+                            SizedBox(height: 14),
+                            Text(
+                              'Baholashlar topilmadi',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 5),
+                            Text(
+                              'Boshqa yo‘nalishni tanlang yoki yangi baholash kiriting',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textMuted,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                    )
+                    : ListView.separated(
+                      padding: EdgeInsets.fromLTRB(
+                        0,
+                        0,
+                        0,
+                        width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
+                      ),
+                      itemCount: filtered.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        return _buildAssessmentCard(context, filtered[index]);
+                      },
                     ),
-                  )
-                : ListView.separated(
-                    padding: EdgeInsets.fromLTRB(
-                      0,
-                      0,
-                      0,
-                      width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
-                    ),
-                    itemCount: filtered.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      return _buildAssessmentCard(context, filtered[index]);
-                    },
-                  ),
           ),
         ],
       ),
@@ -161,9 +164,10 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
 
   Widget _buildAssessmentCard(BuildContext context, AssessmentModel a) {
     final df = DateFormat('dd.MM.yyyy');
-    final trendColor = a.trend == 'O‘sish'
-        ? AppColors.success
-        : a.trend == 'Pasayish'
+    final trendColor =
+        a.trend == 'O‘sish'
+            ? AppColors.success
+            : a.trend == 'Pasayish'
             ? AppColors.error
             : AppColors.info;
 
@@ -213,7 +217,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
-                            fontSize: 15,
+                            fontSize: 15.5,
                             color: AppColors.textPrimary,
                             letterSpacing: -0.25,
                             height: 1.3,
@@ -228,7 +232,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                             Text(
                               '${a.studentName} • ${df.format(a.assessmentDate)}',
                               style: TextStyle(
-                                fontSize: 12.5,
+                                fontSize: 13,
                                 color: AppColors.textMuted,
                                 fontWeight: FontWeight.w500,
                                 fontFeatures: [FontFeature.tabularFigures()],
@@ -240,10 +244,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                       ],
                     ),
                   ),
-                  if (!isNarrow) ...[
-                    const SizedBox(width: 12),
-                    scorePill,
-                  ],
+                  if (!isNarrow) ...[const SizedBox(width: 12), scorePill],
                 ],
               ),
               const SizedBox(height: 16),
@@ -266,7 +267,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                       Text(
                         'Tavsiya: ${a.recommendations}',
                         style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           color: AppColors.primaryDark,
                           fontWeight: FontWeight.w600,
                           height: 1.4,
@@ -292,11 +293,7 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  StatusPill(
-                    label: a.trend,
-                    color: trendColor,
-                    showDot: true,
-                  ),
+                  StatusPill(label: a.trend, color: trendColor, showDot: true),
                 ],
               ),
             ],

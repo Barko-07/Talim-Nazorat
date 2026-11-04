@@ -3069,8 +3069,7 @@ class LocalDbService {
     final visibleStudentIds = visibleStudents.map((s) => s.id).toSet();
     final payload = <String, dynamic>{
       'meta': {
-        'application':
-            'Individ — Inklyuziv va maxsus ta’lim monitoring tizimi',
+        'application': 'Individ — Inklyuziv va maxsus ta’lim monitoring tizimi',
         'schemaVersion': '2.0',
         'exportedAt': DateTime.now().toIso8601String(),
         'exportedBy': forUser?.fullName ?? 'System',
@@ -3136,8 +3135,7 @@ class LocalDbService {
   String exportFullSeedBackupJson({DateTime? exportedAt}) {
     final payload = <String, dynamic>{
       'meta': {
-        'application':
-            'Individ — Inklyuziv va maxsus ta’lim monitoring tizimi',
+        'application': 'Individ — Inklyuziv va maxsus ta’lim monitoring tizimi',
         'schemaVersion': '2.0',
         'exportedAt': (exportedAt ?? DateTime.now()).toIso8601String(),
         'description':

@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,49 +29,56 @@ class AdminReportsTab extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Tizim Faoliyati va Davlat Hisobotlari',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.infoBg,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.info.withValues(alpha: 0.2),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Tizim Faoliyati va Davlat Hisobotlari',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          'RFC 4180 CSV / Excel Standarti',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.info,
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.infoBg,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.info.withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Text(
+                            'RFC 4180 CSV / Excel Standarti',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.info,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Namangan viloyati maktabgacha va maktab ta’limi muassasalari bo‘yicha umumlashtirilgan pedagogik-statistik tahlillar',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Namangan viloyati maktabgacha va maktab ta’limi muassasalari bo‘yicha umumlashtirilgan pedagogik-statistik tahlillar',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -91,7 +99,7 @@ class AdminReportsTab extends StatelessWidget {
                   Text(
                     'Davlat Monitoringi Asosiy Ko‘rsatkichlari (KPI)',
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 15.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -99,9 +107,10 @@ class AdminReportsTab extends StatelessWidget {
                   const SizedBox(height: 16),
                   LayoutBuilder(
                     builder: (context, constraints) {
-                      final cols = constraints.maxWidth >= 900
-                          ? 4
-                          : constraints.maxWidth >= 500
+                      final cols =
+                          constraints.maxWidth >= 900
+                              ? 4
+                              : constraints.maxWidth >= 500
                               ? 2
                               : 1;
                       return GridView.count(
@@ -120,9 +129,10 @@ class AdminReportsTab extends StatelessWidget {
                           ),
                           _buildKpiCard(
                             label: 'O‘rtacha Rivojlanish O‘sishi',
-                            val: avgGrowth > 0
-                                ? '+${avgGrowth.toStringAsFixed(1)} ball'
-                                : '0.0 ball',
+                            val:
+                                avgGrowth > 0
+                                    ? '+${avgGrowth.toStringAsFixed(1)} ball'
+                                    : '0.0 ball',
                             sub: '${assessments.length} ta baholash asosida',
                             color: AppColors.success,
                           ),
@@ -164,14 +174,16 @@ class AdminReportsTab extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.download_rounded, color: AppColors.primary),
+                      Icon(LucideIcons.download, color: AppColors.primary),
                       SizedBox(width: 8),
-                      Text(
-                        'Rasmiy CSV / Excel Eksport Fayllari (UTF-8 BOM)',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                      Flexible(
+                        child: Text(
+                          'Rasmiy CSV / Excel Eksport Fayllari (UTF-8 BOM)',
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
                     ],
@@ -190,7 +202,7 @@ class AdminReportsTab extends StatelessWidget {
                         context,
                         title: 'O‘quvchilar reyestri CSV',
                         subtitle: '${students.length} ta yozuv',
-                        icon: Icons.people_alt_rounded,
+                        icon: LucideIcons.users,
                         color: AppColors.primary,
                         onExport: () => app.exportStudentsCsv(),
                       ),
@@ -198,7 +210,7 @@ class AdminReportsTab extends StatelessWidget {
                         context,
                         title: 'Baholashlar dinamikasi CSV',
                         subtitle: '${assessments.length} ta baholash',
-                        icon: Icons.assignment_turned_in_rounded,
+                        icon: LucideIcons.clipboardCheck,
                         color: AppColors.success,
                         onExport: () => app.exportAssessmentsCsv(),
                       ),
@@ -206,7 +218,7 @@ class AdminReportsTab extends StatelessWidget {
                         context,
                         title: 'Korreksion mashg‘ulotlar CSV',
                         subtitle: '${sessions.length} ta sessiya',
-                        icon: Icons.calendar_today_rounded,
+                        icon: LucideIcons.calendar,
                         color: AppColors.purple,
                         onExport: () => app.exportSessionsCsv(),
                       ),
@@ -214,7 +226,7 @@ class AdminReportsTab extends StatelessWidget {
                         context,
                         title: 'Individual ta’lim rejalari (ITR) CSV',
                         subtitle: '${iepPlans.length} ta reja',
-                        icon: Icons.menu_book_rounded,
+                        icon: LucideIcons.bookOpen,
                         color: AppColors.info,
                         onExport: () => app.exportIepCsv(),
                       ),
@@ -222,7 +234,7 @@ class AdminReportsTab extends StatelessWidget {
                         context,
                         title: 'Monitoring signallari CSV',
                         subtitle: '${alerts.length} ta ogohlantirish',
-                        icon: Icons.warning_amber_rounded,
+                        icon: LucideIcons.triangleAlert,
                         color: AppColors.error,
                         onExport: () => app.exportAlertsCsv(),
                       ),
@@ -230,7 +242,7 @@ class AdminReportsTab extends StatelessWidget {
                         context,
                         title: 'Audit jurnali to‘liq CSV',
                         subtitle: '${app.auditLogs.length} ta yozuv',
-                        icon: Icons.history_edu_rounded,
+                        icon: LucideIcons.scrollText,
                         color: AppColors.textSecondary,
                         onExport: () => app.exportAuditLogsCsv(),
                       ),
@@ -238,15 +250,16 @@ class AdminReportsTab extends StatelessWidget {
                         context,
                         title: 'Svetofor va Dinamika hisoboti CSV',
                         subtitle: 'Oxirgi 30 kunlik monitoring',
-                        icon: Icons.traffic_rounded,
+                        icon: LucideIcons.trafficCone,
                         color: AppColors.info,
                         onExport: () => app.exportMonitoringReportCsv(),
                       ),
                       _buildExportBtn(
                         context,
                         title: 'Mutaxassislar faolligi CSV',
-                        subtitle: '${app.specialists.length} nafar kadr qamrovi',
-                        icon: Icons.verified_user_rounded,
+                        subtitle:
+                            '${app.specialists.length} nafar kadr qamrovi',
+                        icon: LucideIcons.shieldCheck,
                         color: AppColors.primary,
                         onExport: () => app.exportSpecialistActivityCsv(),
                       ),
@@ -254,7 +267,7 @@ class AdminReportsTab extends StatelessWidget {
                         context,
                         title: 'To‘liq ma’lumotlar bazasi (JSON Backup)',
                         subtitle: '18 ta jadval zaxira nusxasi',
-                        icon: Icons.storage_rounded,
+                        icon: LucideIcons.database,
                         color: AppColors.textPrimary,
                         onExport: () => app.exportDatabaseBackupJson(),
                       ),
@@ -281,7 +294,7 @@ class AdminReportsTab extends StatelessWidget {
                   Text(
                     'Muassasalar Faoliyati Konsolidatsiyasi',
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 15.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -402,15 +415,12 @@ class AdminReportsTab extends StatelessWidget {
           Text(
             val,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 17,
               fontWeight: FontWeight.w600,
               color: color,
             ),
           ),
-          Text(
-            sub,
-            style: TextStyle(fontSize: 11, color: AppColors.textMuted),
-          ),
+          Text(sub, style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
         ],
       ),
     );
@@ -429,60 +439,61 @@ class AdminReportsTab extends StatelessWidget {
         final csv = onExport();
         showDialog(
           context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(title),
-            content: SizedBox(
-              width: 500,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Fayl muvaffaqiyatli tayyorlandi (RFC 4180 UTF-8 BOM). Quyida dastlabki qatorlar ko‘rinishi:',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceMuted,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      csv.split('\n').take(6).join('\n'),
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 11,
+          builder:
+              (ctx) => AlertDialog(
+                title: Text(title),
+                content: SizedBox(
+                  width: 500,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Fayl muvaffaqiyatli tayyorlandi (RFC 4180 UTF-8 BOM). Quyida dastlabki qatorlar ko‘rinishi:',
+                        style: TextStyle(fontSize: 12),
                       ),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceMuted,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          csv.split('\n').take(6).join('\n'),
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Yopish'),
+                  ),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.onPrimary,
                     ),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('$title muvaffaqiyatli yuklab olindi.'),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    },
+                    icon: const Icon(LucideIcons.download, size: 16),
+                    label: const Text('Yuklab olish'),
                   ),
                 ],
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Yopish'),
-              ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.onPrimary,
-                ),
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('$title muvaffaqiyatli yuklab olindi.'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.download, size: 16),
-                label: const Text('Yuklab olish'),
-              ),
-            ],
-          ),
         );
       },
       borderRadius: BorderRadius.circular(10),
@@ -521,16 +532,13 @@ class AdminReportsTab extends StatelessWidget {
                   ),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                   ),
                 ],
               ),
             ),
             Icon(
-              Icons.chevron_right,
+              LucideIcons.chevronRight,
               size: 16,
               color: AppColors.textMuted,
             ),

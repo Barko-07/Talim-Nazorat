@@ -35,7 +35,8 @@ enum ModuleAccess {
   view,
   edit;
 
-  String get label => this == ModuleAccess.edit ? 'Kiritish va tahrirlash' : 'Faqat ko‘rish';
+  String get label =>
+      this == ModuleAccess.edit ? 'Kiritish va tahrirlash' : 'Faqat ko‘rish';
 }
 
 /// Mashg'ulot shabloni (mutaxassisga mos mavzular)

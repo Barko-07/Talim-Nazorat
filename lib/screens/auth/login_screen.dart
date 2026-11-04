@@ -166,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   Text(
                                     'Ta’lim muassasasini tanlash',
                                     style: TextStyle(
-                                      fontSize: 17.5,
+                                      fontSize: 17,
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.textPrimary,
                                       letterSpacing: -0.3,
@@ -323,9 +323,9 @@ class _LoginScreenState extends State<LoginScreen>
       if (result['success'] == true && !auth.isAuthenticated) {
         // Administrator: parol to'g'ri — endi emailga kelgan kod.
         _loginPasswordCtrl.clear();
-        await Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const SecondFactorScreen()),
-        );
+        await Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const SecondFactorScreen()));
       } else if (result['success'] == true) {
         _openApp();
       } else {
@@ -490,7 +490,10 @@ class _LoginScreenState extends State<LoginScreen>
 
   /// Server rejimi: forma serverga yuboriladi, emailga kod keladi. Hisob kod
   /// tasdiqlangach yaratiladi va administrator tasdig'ini kutadi.
-  Future<void> _startServerRegistration(AuthProvider auth, UserRole role) async {
+  Future<void> _startServerRegistration(
+    AuthProvider auth,
+    UserRole role,
+  ) async {
     final email = _emailCtrl.text.trim();
     final result = await auth.startRegistration(
       firstName: _firstNameCtrl.text.trim(),
@@ -570,7 +573,6 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                     const SizedBox(height: 24),
 
-
                     if (_errorMessage != null) ...[
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -598,7 +600,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 _errorMessage!,
                                 style: TextStyle(
                                   color: AppColors.error,
-                                  fontSize: 12.5,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -657,7 +659,7 @@ class _LoginScreenState extends State<LoginScreen>
                         'O‘zbekiston Respublikasi Maktabgacha va maktab ta’limi vazirligi © 2026',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 11.5,
+                          fontSize: 12,
                           color: AppColors.textMuted,
                           fontWeight: FontWeight.w500,
                         ),
@@ -717,7 +719,7 @@ class _LoginScreenState extends State<LoginScreen>
         Text(
           'Kirish',
           style: _myGovFont(
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
             letterSpacing: -0.3,
@@ -729,7 +731,7 @@ class _LoginScreenState extends State<LoginScreen>
               ? 'Email va parolingizni kiriting.'
               : 'Email yoki telefon raqamingiz va parolingizni kiriting.',
           style: _myGovFont(
-            fontSize: 13.5,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
             color: AppColors.textSecondary,
             height: 1.35,
@@ -771,7 +773,8 @@ class _LoginScreenState extends State<LoginScreen>
               color: AppColors.primary,
             ),
             suffixIcon: IconButton(
-              tooltip: _loginObscure ? 'Parolni ko‘rsatish' : 'Parolni yashirish',
+              tooltip:
+                  _loginObscure ? 'Parolni ko‘rsatish' : 'Parolni yashirish',
               icon: Icon(
                 _loginObscure ? LucideIcons.eyeOff : LucideIcons.eye,
                 size: 18,
@@ -804,7 +807,7 @@ class _LoginScreenState extends State<LoginScreen>
                 Text(
                   'Eslab qolish',
                   style: _myGovFont(
-                    fontSize: 13.5,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary,
                   ),
@@ -849,7 +852,7 @@ class _LoginScreenState extends State<LoginScreen>
                     : const Text(
                       'Kirish',
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 15.5,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -877,7 +880,7 @@ class _LoginScreenState extends State<LoginScreen>
         Text(
           question,
           style: _myGovFont(
-            fontSize: 13.5,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
             color: AppColors.textSecondary,
           ),
@@ -891,7 +894,7 @@ class _LoginScreenState extends State<LoginScreen>
           child: Text(
             action,
             style: _myGovFont(
-              fontSize: 13.5,
+              fontSize: 14,
               fontWeight: FontWeight.w700,
               color: AppColors.primary,
             ),
@@ -917,13 +920,13 @@ class _LoginScreenState extends State<LoginScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline_rounded, size: 17, color: AppColors.warning),
+          Icon(LucideIcons.info, size: 17, color: AppColors.warning),
           SizedBox(width: 8),
           Expanded(
             child: Text(
               'Bu namunaviy versiya: ma’lumotlar faqat shu brauzerda saqlanadi. Haqiqiy bolalar ma’lumotlarini kiritmang.',
               style: TextStyle(
-                fontSize: 11.5,
+                fontSize: 12,
                 height: 1.35,
                 color: AppColors.warning,
               ),
@@ -961,7 +964,7 @@ class _LoginScreenState extends State<LoginScreen>
                   Text(
                     'Telefon raqamingiz yoki elektron pochtangizni kiriting. Muassasa yoki tizim administratoriga parolni tiklash so‘rovi yuboriladi va sizga vaqtinchalik parol taqdim etiladi.',
                     style: TextStyle(
-                      fontSize: 12.5,
+                      fontSize: 13,
                       color: AppColors.textSecondary,
                       height: 1.4,
                     ),
@@ -1090,7 +1093,7 @@ class _LoginScreenState extends State<LoginScreen>
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: _myGovFont(
-                    fontSize: 12.5,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primary,
                   ),
@@ -1127,7 +1130,7 @@ class _LoginScreenState extends State<LoginScreen>
           Text(
             '1-Qadam: Ism va Familiya',
             style: _myGovFont(
-              fontSize: 16.5,
+              fontSize: 17,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
               letterSpacing: -0.2,
@@ -1137,7 +1140,7 @@ class _LoginScreenState extends State<LoginScreen>
           Text(
             'Tizimda rasmiy hujjatlar sizning nomingizdan yuritiladi.',
             style: _myGovFont(
-              fontSize: 13.5,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: AppColors.textSecondary,
               height: 1.4,
@@ -1199,7 +1202,7 @@ class _LoginScreenState extends State<LoginScreen>
           Text(
             '2-Qadam: Soha va maktab',
             style: _myGovFont(
-              fontSize: 16.5,
+              fontSize: 17,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
               letterSpacing: -0.2,
@@ -1209,7 +1212,7 @@ class _LoginScreenState extends State<LoginScreen>
           Text(
             'Sohangiz va maktabingizni tanlang.',
             style: _myGovFont(
-              fontSize: 13.5,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: AppColors.textSecondary,
               height: 1.4,
@@ -1294,7 +1297,7 @@ class _LoginScreenState extends State<LoginScreen>
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: _myGovFont(
-                              fontSize: 13.5,
+                              fontSize: 14,
                               fontWeight:
                                   isSelected
                                       ? FontWeight.w600
@@ -1372,11 +1375,7 @@ class _LoginScreenState extends State<LoginScreen>
             onTap: () => _showIosSchoolPickerModal(context),
             child: Row(
               children: [
-                Icon(
-                  LucideIcons.school,
-                  color: AppColors.primary,
-                  size: 19,
-                ),
+                Icon(LucideIcons.school, color: AppColors.primary, size: 19),
                 const SizedBox(width: 11),
                 Expanded(
                   child: Text(
@@ -1384,7 +1383,7 @@ class _LoginScreenState extends State<LoginScreen>
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: _myGovFont(
-                      fontSize: 13.5,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -1413,7 +1412,7 @@ class _LoginScreenState extends State<LoginScreen>
           Text(
             '3-Qadam: Aloqa',
             style: _myGovFont(
-              fontSize: 16.5,
+              fontSize: 17,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
               letterSpacing: -0.2,
@@ -1423,7 +1422,7 @@ class _LoginScreenState extends State<LoginScreen>
           Text(
             'Kirish uchun telefon raqamingizni kiriting.',
             style: _myGovFont(
-              fontSize: 13.5,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: AppColors.textSecondary,
               height: 1.4,
@@ -1473,7 +1472,7 @@ class _LoginScreenState extends State<LoginScreen>
           Text(
             '4-Qadam: Parol',
             style: _myGovFont(
-              fontSize: 16.5,
+              fontSize: 17,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
               letterSpacing: -0.2,
@@ -1483,7 +1482,7 @@ class _LoginScreenState extends State<LoginScreen>
           Text(
             'Hisobingiz uchun kuchli parol o‘rnating.',
             style: _myGovFont(
-              fontSize: 13.5,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: AppColors.textSecondary,
               height: 1.4,
@@ -1583,7 +1582,7 @@ class _LoginScreenState extends State<LoginScreen>
               Text(
                 strengthLabel,
                 style: _myGovFont(
-                  fontSize: 12.5,
+                  fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: score == 0 ? AppColors.textSecondary : activeColor,
                 ),
@@ -1643,7 +1642,7 @@ class _LoginScreenState extends State<LoginScreen>
           child: Text(
             text,
             style: _myGovFont(
-              fontSize: 12.5,
+              fontSize: 13,
               fontWeight: met ? FontWeight.w600 : FontWeight.w500,
               color: met ? AppColors.textPrimary : AppColors.textMuted,
             ),
@@ -1700,7 +1699,7 @@ class _LoginScreenState extends State<LoginScreen>
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 13.5,
+                                fontSize: 14,
                               ),
                             ),
                           ),

@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,25 +25,28 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
     final allStudents = app.students;
     final allUsers = app.allUsers;
 
-    final filtered = institutions.where((inst) {
-      final name = (inst['name'] as String).toLowerCase();
-      final dist = (inst['district'] as String).toLowerCase();
-      final type = (inst['type'] as String);
+    final filtered =
+        institutions.where((inst) {
+          final name = (inst['name'] as String).toLowerCase();
+          final dist = (inst['district'] as String).toLowerCase();
+          final type = (inst['type'] as String);
 
-      if (_search.isNotEmpty) {
-        final q = _search.toLowerCase();
-        if (!name.contains(q) && !dist.contains(q)) return false;
-      }
-      if (_filterDistrict != null &&
-          _filterDistrict!.isNotEmpty &&
-          inst['district'] != _filterDistrict) {
-        return false;
-      }
-      if (_filterType != null && _filterType!.isNotEmpty && type != _filterType) {
-        return false;
-      }
-      return true;
-    }).toList();
+          if (_search.isNotEmpty) {
+            final q = _search.toLowerCase();
+            if (!name.contains(q) && !dist.contains(q)) return false;
+          }
+          if (_filterDistrict != null &&
+              _filterDistrict!.isNotEmpty &&
+              inst['district'] != _filterDistrict) {
+            return false;
+          }
+          if (_filterType != null &&
+              _filterType!.isNotEmpty &&
+              type != _filterType) {
+            return false;
+          }
+          return true;
+        }).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -53,49 +57,56 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Ta’lim Muassasalari Reyestri',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.infoBg,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.info.withValues(alpha: 0.2),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Ta’lim Muassasalari Reyestri',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          '${filtered.length} ta muassasa',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.info,
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.infoBg,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.info.withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Text(
+                            '${filtered.length} ta muassasa',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.info,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Namangan viloyati bo‘yicha umumta’lim maktablari, inklyuziv tayanch markazlari va ixtisoslashtirilgan maktab-internatlar',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Namangan viloyati bo‘yicha umumta’lim maktablari, inklyuziv tayanch markazlari va ixtisoslashtirilgan maktab-internatlar',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -117,8 +128,9 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                     child: TextField(
                       onChanged: (v) => setState(() => _search = v.trim()),
                       decoration: InputDecoration(
-                        hintText: 'Muassasa nomi yoki hudud bo‘yicha qidiruv...',
-                        prefixIcon: const Icon(Icons.search, size: 20),
+                        hintText:
+                            'Muassasa nomi yoki hudud bo‘yicha qidiruv...',
+                        prefixIcon: const Icon(LucideIcons.search, size: 20),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 10,
@@ -164,6 +176,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
+                      isExpanded: true,
                       value: _filterType,
                       decoration: InputDecoration(
                         labelText: 'Muassasa turi',
@@ -217,15 +230,22 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
               final specialistsCount = inst['specialistsCount'] as int;
               final iepCount = inst['activeIepCount'] as int;
 
-              final schoolStudents = allStudents
-                  .where((st) =>
-                      st.institutionName.toLowerCase() == name.toLowerCase())
-                  .toList();
-              final schoolStaff = allUsers
-                  .where((u) =>
-                      (u.institutionName ?? '').toLowerCase() ==
-                      name.toLowerCase())
-                  .toList();
+              final schoolStudents =
+                  allStudents
+                      .where(
+                        (st) =>
+                            st.institutionName.toLowerCase() ==
+                            name.toLowerCase(),
+                      )
+                      .toList();
+              final schoolStaff =
+                  allUsers
+                      .where(
+                        (u) =>
+                            (u.institutionName ?? '').toLowerCase() ==
+                            name.toLowerCase(),
+                      )
+                      .toList();
 
               return Card(
                 elevation: 0,
@@ -248,7 +268,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                           ),
                         ),
                         child: Icon(
-                          Icons.apartment_rounded,
+                          LucideIcons.building2,
                           color: AppColors.info,
                           size: 26,
                         ),
@@ -258,13 +278,16 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
                                   name,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 15,
+                                    fontSize: 15.5,
                                     color: AppColors.textPrimary,
                                   ),
                                 ),
@@ -291,7 +314,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '📍 $district • Namangan viloyati',
+                              '$district • Namangan viloyati',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
@@ -302,33 +325,36 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                               spacing: 12,
                               children: [
                                 Text(
-                                  '🧒 O‘quvchilar: $studentsCount nafar',
+                                  'O‘quvchilar: $studentsCount nafar',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: studentsCount > 0
-                                        ? AppColors.primary
-                                        : AppColors.textMuted,
+                                    color:
+                                        studentsCount > 0
+                                            ? AppColors.primary
+                                            : AppColors.textMuted,
                                   ),
                                 ),
                                 Text(
-                                  '👩‍🏫 Kadrlar: $specialistsCount ta',
+                                  'Kadrlar: $specialistsCount ta',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: specialistsCount > 0
-                                        ? AppColors.purple
-                                        : AppColors.textMuted,
+                                    color:
+                                        specialistsCount > 0
+                                            ? AppColors.purple
+                                            : AppColors.textMuted,
                                   ),
                                 ),
                                 Text(
-                                  '📋 Faol ITR: $iepCount ta',
+                                  'Faol ITR: $iepCount ta',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: iepCount > 0
-                                        ? AppColors.success
-                                        : AppColors.textMuted,
+                                    color:
+                                        iepCount > 0
+                                            ? AppColors.success
+                                            : AppColors.textMuted,
                                   ),
                                 ),
                               ],
@@ -357,7 +383,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                             schoolStaff,
                           );
                         },
-                        icon: const Icon(Icons.visibility_outlined, size: 16),
+                        icon: const Icon(LucideIcons.eye, size: 16),
                         label: const Text('Tarkibini ko‘rish'),
                       ),
                     ],
@@ -381,135 +407,141 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
   ) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          name,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        content: SizedBox(
-          width: 560,
-          height: 440,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Hudud: $district • Turi: $type',
-                style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(
+              name,
+              style: const TextStyle(
+                fontSize: 15.5,
+                fontWeight: FontWeight.w600,
               ),
-              const Divider(height: 20),
-              Expanded(
-                child: DefaultTabController(
-                  length: 2,
-                  child: Column(
-                    children: [
-                      TabBar(
-                        labelColor: AppColors.primary,
-                        unselectedLabelColor: AppColors.textSecondary,
-                        indicatorColor: AppColors.primary,
-                        tabs: [
-                          Tab(text: 'ATEB O‘quvchilar (${students.length})'),
-                          Tab(text: 'Pedagog-kadrlar (${staff.length})'),
+            ),
+            content: SizedBox(
+              width: 560,
+              height: 440,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Hudud: $district • Turi: $type',
+                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                  ),
+                  const Divider(height: 20),
+                  Expanded(
+                    child: DefaultTabController(
+                      length: 2,
+                      child: Column(
+                        children: [
+                          TabBar(
+                            labelColor: AppColors.primary,
+                            unselectedLabelColor: AppColors.textSecondary,
+                            indicatorColor: AppColors.primary,
+                            tabs: [
+                              Tab(
+                                text: 'ATEB O‘quvchilar (${students.length})',
+                              ),
+                              Tab(text: 'Pedagog-kadrlar (${staff.length})'),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Expanded(
+                            child: TabBarView(
+                              children: [
+                                // O'quvchilar
+                                students.isEmpty
+                                    ? Center(
+                                      child: Text(
+                                        'Bu muassasada hozircha o‘quvchi ro‘yxatga olinmagan',
+                                        style: TextStyle(
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                    )
+                                    : ListView.separated(
+                                      itemCount: students.length,
+                                      separatorBuilder:
+                                          (_, _) => const Divider(height: 1),
+                                      itemBuilder: (c, idx) {
+                                        final st = students[idx];
+                                        return ListTile(
+                                          dense: true,
+                                          title: Text(
+                                            st.fullName,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            '${st.grade} • ${st.primaryNeed}',
+                                          ),
+                                          trailing: Text(
+                                            st.supportLevel,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: AppColors.primary,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+
+                                // Kadrlar
+                                staff.isEmpty
+                                    ? Center(
+                                      child: Text(
+                                        'Bu muassasaga hozircha kadr biriktirilmagan',
+                                        style: TextStyle(
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                    )
+                                    : ListView.separated(
+                                      itemCount: staff.length,
+                                      separatorBuilder:
+                                          (_, _) => const Divider(height: 1),
+                                      itemBuilder: (c, idx) {
+                                        final u = staff[idx];
+                                        return ListTile(
+                                          dense: true,
+                                          title: Text(
+                                            u.fullName,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            '${u.role.label} • ${u.phone ?? ''}',
+                                          ),
+                                          trailing: Text(
+                                            u.qualificationCategory ??
+                                                'Mutaxassis',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: AppColors.purple,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: TabBarView(
-                          children: [
-                            // O'quvchilar
-                            students.isEmpty
-                                ? Center(
-                                    child: Text(
-                                      'Bu muassasada hozircha o‘quvchi ro‘yxatga olinmagan',
-                                      style: TextStyle(
-                                        color: AppColors.textMuted,
-                                      ),
-                                    ),
-                                  )
-                                : ListView.separated(
-                                    itemCount: students.length,
-                                    separatorBuilder: (_, _) =>
-                                        const Divider(height: 1),
-                                    itemBuilder: (c, idx) {
-                                      final st = students[idx];
-                                      return ListTile(
-                                        dense: true,
-                                        title: Text(
-                                          st.fullName,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        subtitle: Text(
-                                          '${st.grade} • ${st.primaryNeed}',
-                                        ),
-                                        trailing: Text(
-                                          st.supportLevel,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-
-                            // Kadrlar
-                            staff.isEmpty
-                                ? Center(
-                                    child: Text(
-                                      'Bu muassasaga hozircha kadr biriktirilmagan',
-                                      style: TextStyle(
-                                        color: AppColors.textMuted,
-                                      ),
-                                    ),
-                                  )
-                                : ListView.separated(
-                                    itemCount: staff.length,
-                                    separatorBuilder: (_, _) =>
-                                        const Divider(height: 1),
-                                    itemBuilder: (c, idx) {
-                                      final u = staff[idx];
-                                      return ListTile(
-                                        dense: true,
-                                        title: Text(
-                                          u.fullName,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        subtitle: Text(
-                                          '${u.role.label} • ${u.phone ?? ''}',
-                                        ),
-                                        trailing: Text(
-                                          u.qualificationCategory ??
-                                              'Mutaxassis',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: AppColors.purple,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Yopish'),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Yopish'),
-          ),
-        ],
-      ),
     );
   }
 }

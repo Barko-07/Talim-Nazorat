@@ -25,8 +25,18 @@ class UzbekSpeechSounds {
     SpeechSound('l', 'l', SoundGroup.sonorant, confusedWith: ['r', 'y']),
 
     // Til orqa
-    SpeechSound('k', 'k', SoundGroup.backLingual, confusedWith: ['q', 't', 'g']),
-    SpeechSound('g', 'g', SoundGroup.backLingual, confusedWith: ['g‘', 'd', 'k']),
+    SpeechSound(
+      'k',
+      'k',
+      SoundGroup.backLingual,
+      confusedWith: ['q', 't', 'g'],
+    ),
+    SpeechSound(
+      'g',
+      'g',
+      SoundGroup.backLingual,
+      confusedWith: ['g‘', 'd', 'k'],
+    ),
     SpeechSound('q', 'q', SoundGroup.backLingual, confusedWith: ['k', 'g‘']),
     SpeechSound('g‘', 'g‘', SoundGroup.backLingual, confusedWith: ['g', 'q']),
     SpeechSound('x', 'x', SoundGroup.backLingual, confusedWith: ['h', 'q']),

@@ -205,13 +205,19 @@ class AppColors {
   static Color get glassFill => _p.surface.withValues(alpha: 0.92);
   static Color get glassFillStrong => _p.surface.withValues(alpha: 0.96);
   static Color get glassWellFill => _p.surfaceMuted;
-  static Color get glassRecessedFill => _p.isDark ? _p.backgroundDeep : const Color(0xFFEAF1FB);
+  static Color get glassRecessedFill =>
+      _p.isDark ? _p.backgroundDeep : const Color(0xFFEAF1FB);
   static Color get glassSpecular => _p.surface;
-  static Color get glassWhiteBorder => _p.isDark ? _p.border : const Color(0xFFFFFFFF);
-  static Color get glassInnerBorder => _p.isDark ? _p.border : const Color(0xF5FFFFFF);
-  static Color get hairlineBorder => _p.isDark ? _p.border : const Color(0xF5FFFFFF);
-  static Color get cardGlassBorder => _p.isDark ? _p.border : const Color(0xFFFFFFFF);
-  static Color get navGlassBorder => _p.isDark ? _p.border : const Color(0xFFFFFFFF);
+  static Color get glassWhiteBorder =>
+      _p.isDark ? _p.border : const Color(0xFFFFFFFF);
+  static Color get glassInnerBorder =>
+      _p.isDark ? _p.border : const Color(0xF5FFFFFF);
+  static Color get hairlineBorder =>
+      _p.isDark ? _p.border : const Color(0xF5FFFFFF);
+  static Color get cardGlassBorder =>
+      _p.isDark ? _p.border : const Color(0xFFFFFFFF);
+  static Color get navGlassBorder =>
+      _p.isDark ? _p.border : const Color(0xFFFFFFFF);
   static double get navGlassOpacity => _p.isDark ? 0.94 : 0.78;
 
   // Matn

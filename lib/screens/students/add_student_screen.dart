@@ -42,8 +42,22 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
 
   static const List<String> _grades = [
     'Tayyorlov guruhi',
-    '1-A', '1-B', '2-A', '2-B', '3-A', '3-B', '4-A', '4-B',
-    '5-A', '5-B', '6-A', '7-A', '8-A', '9-A', '10-A', '11-A',
+    '1-A',
+    '1-B',
+    '2-A',
+    '2-B',
+    '3-A',
+    '3-B',
+    '4-A',
+    '4-B',
+    '5-A',
+    '5-B',
+    '6-A',
+    '7-A',
+    '8-A',
+    '9-A',
+    '10-A',
+    '11-A',
   ];
 
   final List<String> _needs = [
@@ -75,9 +89,10 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
         }
         final schools = NamanganData.getSchoolsForDistrict(_selectedDistrict);
         final own = user?.institutionName;
-        _selectedInstitution = (own != null && schools.contains(own))
-            ? own
-            : (schools.isNotEmpty ? schools.first : (own ?? ''));
+        _selectedInstitution =
+            (own != null && schools.contains(own))
+                ? own
+                : (schools.isNotEmpty ? schools.first : (own ?? ''));
       });
     });
   }
@@ -109,14 +124,15 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     if (_formKey.currentState!.validate()) {
       final app = context.read<AppProvider>();
       final user = context.read<AuthProvider>().currentUser;
-      final schoolName = _selectedInstitution.trim().isNotEmpty
-          ? _selectedInstitution.trim()
-          : (user?.institutionName ?? '');
+      final schoolName =
+          _selectedInstitution.trim().isNotEmpty
+              ? _selectedInstitution.trim()
+              : (user?.institutionName ?? '');
       // O'z maktabi bo'lsa — uning ID si; boshqa maktab tanlansa (tizim administratori) — nomidan
-      final schoolId = (user?.institutionName == schoolName &&
-              user?.institutionId != null)
-          ? user!.institutionId!
-          : 'inst_${schoolName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_')}';
+      final schoolId =
+          (user?.institutionName == schoolName && user?.institutionId != null)
+              ? user!.institutionId!
+              : 'inst_${schoolName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_')}';
       final guardianName = _guardianNameCtrl.text.trim();
       final guardianPhone = _guardianPhoneCtrl.text.trim();
       final newStudent = StudentModel(
@@ -125,32 +141,37 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
         institutionName: schoolName,
         firstName: _firstNameCtrl.text.trim(),
         lastName: _lastNameCtrl.text.trim(),
-        middleName: _middleNameCtrl.text.trim().isEmpty
-            ? null
-            : _middleNameCtrl.text.trim(),
+        middleName:
+            _middleNameCtrl.text.trim().isEmpty
+                ? null
+                : _middleNameCtrl.text.trim(),
         dateOfBirth: _dob,
         gender: _gender,
         grade: _grade,
         status: 'Faol',
         primaryNeed: _primaryNeed,
         supportLevel: _supportLevel,
-        medicalNotes: _medicalNotesCtrl.text.trim().isEmpty
-            ? null
-            : _medicalNotesCtrl.text.trim(),
-        psychologicalNotes: _psychNotesCtrl.text.trim().isEmpty
-            ? null
-            : _psychNotesCtrl.text.trim(),
+        medicalNotes:
+            _medicalNotesCtrl.text.trim().isEmpty
+                ? null
+                : _medicalNotesCtrl.text.trim(),
+        psychologicalNotes:
+            _psychNotesCtrl.text.trim().isEmpty
+                ? null
+                : _psychNotesCtrl.text.trim(),
         // Vasiy faqat ma'lumot kiritilgan bo'lsa saqlanadi (soxta telefon yoki ism yozilmaydi)
         guardians: [
           if (guardianName.isNotEmpty || guardianPhone.isNotEmpty)
             GuardianModel(
               id: 'g_${const Uuid().v4().substring(0, 6)}',
-              fullName: guardianName.isNotEmpty ? guardianName : _guardianRelation,
+              fullName:
+                  guardianName.isNotEmpty ? guardianName : _guardianRelation,
               relationship: _guardianRelation,
               phone: guardianPhone,
-              address: _addressCtrl.text.trim().isEmpty
-                  ? null
-                  : _addressCtrl.text.trim(),
+              address:
+                  _addressCtrl.text.trim().isEmpty
+                      ? null
+                      : _addressCtrl.text.trim(),
             ),
         ],
         createdAt: DateTime.now(),
@@ -161,7 +182,10 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       } on AppException catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
+            SnackBar(
+              content: Text(e.toString()),
+              backgroundColor: AppColors.error,
+            ),
           );
         }
         return;
@@ -219,7 +243,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               Text(
                 subtitle,
                 style: TextStyle(
-                  fontSize: 12.3,
+                  fontSize: 12,
                   color: AppColors.textMuted,
                   height: 1.35,
                 ),
@@ -272,9 +296,11 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                   color: AppColors.primary,
                                 ),
                               ),
-                              validator: (v) => v == null || v.trim().isEmpty
-                                  ? 'Familiyani kiriting'
-                                  : null,
+                              validator:
+                                  (v) =>
+                                      v == null || v.trim().isEmpty
+                                          ? 'Familiyani kiriting'
+                                          : null,
                             ),
                             const SizedBox(height: 14),
                             TextFormField(
@@ -287,9 +313,11 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                   color: AppColors.primary,
                                 ),
                               ),
-                              validator: (v) => v == null || v.trim().isEmpty
-                                  ? 'Ismni kiriting'
-                                  : null,
+                              validator:
+                                  (v) =>
+                                      v == null || v.trim().isEmpty
+                                          ? 'Ismni kiriting'
+                                          : null,
                             ),
                             const SizedBox(height: 14),
                             TextFormField(
@@ -313,16 +341,17 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                     decoration: const InputDecoration(
                                       labelText: 'Jinsi',
                                     ),
-                                    items: ['Erkak', 'Ayol']
-                                        .map(
-                                          (g) => DropdownMenuItem(
-                                            value: g,
-                                            child: Text(g),
-                                          ),
-                                        )
-                                        .toList(),
-                                    onChanged: (v) =>
-                                        setState(() => _gender = v!),
+                                    items:
+                                        ['Erkak', 'Ayol']
+                                            .map(
+                                              (g) => DropdownMenuItem(
+                                                value: g,
+                                                child: Text(g),
+                                              ),
+                                            )
+                                            .toList(),
+                                    onChanged:
+                                        (v) => setState(() => _gender = v!),
                                   ),
                                 ),
                                 const SizedBox(width: 14),
@@ -333,16 +362,17 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                     decoration: const InputDecoration(
                                       labelText: 'Sinfi',
                                     ),
-                                    items: _grades
-                                        .map(
-                                          (g) => DropdownMenuItem(
-                                            value: g,
-                                            child: Text(g),
-                                          ),
-                                        )
-                                        .toList(),
-                                    onChanged: (v) =>
-                                        setState(() => _grade = v!),
+                                    items:
+                                        _grades
+                                            .map(
+                                              (g) => DropdownMenuItem(
+                                                value: g,
+                                                child: Text(g),
+                                              ),
+                                            )
+                                            .toList(),
+                                    onChanged:
+                                        (v) => setState(() => _grade = v!),
                                   ),
                                 ),
                               ],
@@ -368,44 +398,75 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                             const SizedBox(height: 14),
                             DropdownButtonFormField<String>(
                               key: ValueKey('district_$_selectedDistrict'),
-                              initialValue: NamanganData.districts.contains(_selectedDistrict)
-                                  ? _selectedDistrict
-                                  : null,
+                              initialValue:
+                                  NamanganData.districts.contains(
+                                        _selectedDistrict,
+                                      )
+                                      ? _selectedDistrict
+                                      : null,
                               isExpanded: true,
-                              decoration: const InputDecoration(labelText: 'Tuman / shahar'),
-                              items: NamanganData.districts
-                                  .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                                  .toList(),
+                              decoration: const InputDecoration(
+                                labelText: 'Tuman / shahar',
+                              ),
+                              items:
+                                  NamanganData.districts
+                                      .map(
+                                        (d) => DropdownMenuItem(
+                                          value: d,
+                                          child: Text(d),
+                                        ),
+                                      )
+                                      .toList(),
                               onChanged: (v) {
                                 if (v == null) return;
-                                final schools = NamanganData.getSchoolsForDistrict(v);
+                                final schools =
+                                    NamanganData.getSchoolsForDistrict(v);
                                 setState(() {
                                   _selectedDistrict = v;
-                                  _selectedInstitution = schools.isNotEmpty ? schools.first : '';
+                                  _selectedInstitution =
+                                      schools.isNotEmpty ? schools.first : '';
                                 });
                               },
                             ),
                             const SizedBox(height: 14),
                             DropdownButtonFormField<String>(
-                              key: ValueKey('school_${_selectedDistrict}_$_selectedInstitution'),
-                              initialValue: NamanganData.getSchoolsForDistrict(_selectedDistrict)
-                                      .contains(_selectedInstitution)
-                                  ? _selectedInstitution
-                                  : null,
+                              key: ValueKey(
+                                'school_${_selectedDistrict}_$_selectedInstitution',
+                              ),
+                              initialValue:
+                                  NamanganData.getSchoolsForDistrict(
+                                        _selectedDistrict,
+                                      ).contains(_selectedInstitution)
+                                      ? _selectedInstitution
+                                      : null,
                               isExpanded: true,
-                              decoration: const InputDecoration(labelText: 'Ta’lim muassasasi *'),
-                              items: NamanganData.getSchoolsForDistrict(_selectedDistrict)
-                                  .map((sch) => DropdownMenuItem(
-                                        value: sch,
-                                        child: Text(sch, overflow: TextOverflow.ellipsis),
-                                      ))
-                                  .toList(),
+                              decoration: const InputDecoration(
+                                labelText: 'Ta’lim muassasasi *',
+                              ),
+                              items:
+                                  NamanganData.getSchoolsForDistrict(
+                                        _selectedDistrict,
+                                      )
+                                      .map(
+                                        (sch) => DropdownMenuItem(
+                                          value: sch,
+                                          child: Text(
+                                            sch,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
                               onChanged: (v) {
-                                if (v != null) setState(() => _selectedInstitution = v);
+                                if (v != null)
+                                  setState(() => _selectedInstitution = v);
                               },
-                              validator: (v) => (v == null || v.isEmpty) && _selectedInstitution.isEmpty
-                                  ? 'Ta’lim muassasasini tanlang'
-                                  : null,
+                              validator:
+                                  (v) =>
+                                      (v == null || v.isEmpty) &&
+                                              _selectedInstitution.isEmpty
+                                          ? 'Ta’lim muassasasini tanlang'
+                                          : null,
                             ),
                           ],
                         ),
@@ -432,20 +493,23 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               decoration: const InputDecoration(
                                 labelText: 'Asosiy ta’limiy ehtiyoj toifasi',
                               ),
-                              items: _needs
-                                  .map(
-                                    (n) => DropdownMenuItem(
-                                      value: n,
-                                      child: Text(
-                                        n,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (v) =>
-                                  setState(() => _primaryNeed = v!),
+                              items:
+                                  _needs
+                                      .map(
+                                        (n) => DropdownMenuItem(
+                                          value: n,
+                                          child: Text(
+                                            n,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged:
+                                  (v) => setState(() => _primaryNeed = v!),
                             ),
                             const SizedBox(height: 14),
                             DropdownButtonFormField<String>(
@@ -454,20 +518,23 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               decoration: const InputDecoration(
                                 labelText: 'Qo‘llab-quvvatlash darajasi',
                               ),
-                              items: _supportLevels
-                                  .map(
-                                    (d) => DropdownMenuItem(
-                                      value: d,
-                                      child: Text(
-                                        d,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (v) =>
-                                  setState(() => _supportLevel = v!),
+                              items:
+                                  _supportLevels
+                                      .map(
+                                        (d) => DropdownMenuItem(
+                                          value: d,
+                                          child: Text(
+                                            d,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged:
+                                  (v) => setState(() => _supportLevel = v!),
                             ),
                             const SizedBox(height: 14),
                             TextFormField(
@@ -517,22 +584,24 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                 decoration: const InputDecoration(
                                   labelText: 'Qarindoshligi',
                                 ),
-                                items: [
-                                  'Onasi',
-                                  'Otasi',
-                                  'Bobosi',
-                                  'Buvasi',
-                                  'Vasiy',
-                                ]
-                                    .map(
-                                      (r) => DropdownMenuItem(
-                                        value: r,
-                                        child: Text(r),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: (v) =>
-                                    setState(() => _guardianRelation = v!),
+                                items:
+                                    [
+                                          'Onasi',
+                                          'Otasi',
+                                          'Bobosi',
+                                          'Buvasi',
+                                          'Vasiy',
+                                        ]
+                                        .map(
+                                          (r) => DropdownMenuItem(
+                                            value: r,
+                                            child: Text(r),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged:
+                                    (v) =>
+                                        setState(() => _guardianRelation = v!),
                               ),
                               const SizedBox(height: 14),
                               TextFormField(
@@ -557,23 +626,25 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                       decoration: const InputDecoration(
                                         labelText: 'Qarindoshligi',
                                       ),
-                                      items: [
-                                        'Onasi',
-                                        'Otasi',
-                                        'Bobosi',
-                                        'Buvasi',
-                                        'Vasiy',
-                                      ]
-                                          .map(
-                                            (r) => DropdownMenuItem(
-                                              value: r,
-                                              child: Text(r),
-                                            ),
-                                          )
-                                          .toList(),
-                                      onChanged: (v) => setState(
-                                        () => _guardianRelation = v!,
-                                      ),
+                                      items:
+                                          [
+                                                'Onasi',
+                                                'Otasi',
+                                                'Bobosi',
+                                                'Buvasi',
+                                                'Vasiy',
+                                              ]
+                                              .map(
+                                                (r) => DropdownMenuItem(
+                                                  value: r,
+                                                  child: Text(r),
+                                                ),
+                                              )
+                                              .toList(),
+                                      onChanged:
+                                          (v) => setState(
+                                            () => _guardianRelation = v!,
+                                          ),
                                     ),
                                   ),
                                   const SizedBox(width: 14),
@@ -618,7 +689,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                         label: const Text(
                           'O‘quvchini tizimga saqlash',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 15.5,
                             fontWeight: FontWeight.w700,
                           ),
                         ),

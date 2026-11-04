@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -57,11 +58,12 @@ class _PsychologistAssessmentsTabState
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ConductAssessmentScreen(
-          assessment: draft,
-          selectedQuestions: const [],
-          isNew: false,
-        ),
+        builder:
+            (_) => ConductAssessmentScreen(
+              assessment: draft,
+              selectedQuestions: const [],
+              isNew: false,
+            ),
       ),
     );
   }
@@ -69,40 +71,41 @@ class _PsychologistAssessmentsTabState
   void _confirmDeleteAssessment(AssessmentModel a) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Baholashni o‘chirish'),
-          ],
-        ),
-        content: Text(
-          'Haqiqatan ham "${a.studentName}" uchun "${a.title}" baholash protokolini o‘chirmoqchimisiz? Bu amal tizim auditida qayd etiladi.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Bekor qilish'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Row(
+              children: [
+                Icon(LucideIcons.triangleAlert, color: Colors.red),
+                SizedBox(width: 8),
+                Text('Baholashni o‘chirish'),
+              ],
+            ),
+            content: Text(
+              'Haqiqatan ham "${a.studentName}" uchun "${a.title}" baholash protokolini o‘chirmoqchimisiz? Bu amal tizim auditida qayd etiladi.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Bekor qilish'),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  await context.read<AppProvider>().deleteAssessment(a.id);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Baholash protokoli o‘chirildi.'),
+                        backgroundColor: AppColors.textSecondary,
+                      ),
+                    );
+                  }
+                },
+                child: const Text('O‘chirish'),
+              ),
+            ],
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await context.read<AppProvider>().deleteAssessment(a.id);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Baholash protokoli o‘chirildi.'),
-                    backgroundColor: AppColors.textSecondary,
-                  ),
-                );
-              }
-            },
-            child: const Text('O‘chirish'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -115,28 +118,28 @@ class _PsychologistAssessmentsTabState
 
     final completedCount =
         allAssessments.where((a) => a.status == 'completed').length;
-    final draftCount =
-        allAssessments.where((a) => a.status == 'draft').length;
+    final draftCount = allAssessments.where((a) => a.status == 'draft').length;
 
-    final filtered = allAssessments.where((a) {
-      if (_search.isNotEmpty) {
-        final q = _search.toLowerCase();
-        final mName = a.studentName.toLowerCase().contains(q);
-        final mTitle = a.title.toLowerCase().contains(q);
-        if (!mName && !mTitle) return false;
-      }
-      if (_categoryFilter != null && a.category != _categoryFilter) {
-        return false;
-      }
-      if (_statusFilter != null && a.status != _statusFilter) {
-        return false;
-      }
-      if (_filterStudent != null && a.studentId != _filterStudent!.id) {
-        return false;
-      }
-      return true;
-    }).toList()
-      ..sort((a, b) => b.assessmentDate.compareTo(a.assessmentDate));
+    final filtered =
+        allAssessments.where((a) {
+            if (_search.isNotEmpty) {
+              final q = _search.toLowerCase();
+              final mName = a.studentName.toLowerCase().contains(q);
+              final mTitle = a.title.toLowerCase().contains(q);
+              if (!mName && !mTitle) return false;
+            }
+            if (_categoryFilter != null && a.category != _categoryFilter) {
+              return false;
+            }
+            if (_statusFilter != null && a.status != _statusFilter) {
+              return false;
+            }
+            if (_filterStudent != null && a.studentId != _filterStudent!.id) {
+              return false;
+            }
+            return true;
+          }).toList()
+          ..sort((a, b) => b.assessmentDate.compareTo(a.assessmentDate));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -147,75 +150,81 @@ class _PsychologistAssessmentsTabState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Psixologik Baholash Tizimi',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.successBg,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppColors.success
-                                .withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Text(
-                          '$completedCount ta yakunlangan',
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          'Psixologik Baholash Tizimi',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 20,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.success,
+                            color: AppColors.textPrimary,
                           ),
                         ),
-                      ),
-                      if (draftCount > 0) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.warningBg,
+                            color: AppColors.successBg,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: AppColors.warning
-                                  .withValues(alpha: 0.3),
+                              color: AppColors.success.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Text(
-                            '$draftCount ta qoralama',
+                            '$completedCount ta yakunlangan',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.warning,
+                              color: AppColors.success,
                             ),
                           ),
                         ),
+                        if (draftCount > 0) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.warningBg,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: AppColors.warning.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Text(
+                              '$draftCount ta qoralama',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.warning,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Kutubxona savollari asosida psixologik diagnostika va monitoring o‘tkazish',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Kutubxona savollari asosida psixologik diagnostika va monitoring o‘tkazish',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
@@ -226,7 +235,7 @@ class _PsychologistAssessmentsTabState
                   ),
                 ),
                 onPressed: () => _startNewAssessment(),
-                icon: const Icon(Icons.add_task_rounded, size: 18),
+                icon: const Icon(LucideIcons.listPlus, size: 18),
                 label: const Text('Yangi Baholash Boshlash'),
               ),
             ],
@@ -234,7 +243,9 @@ class _PsychologistAssessmentsTabState
           const SizedBox(height: 18),
 
           // Sub-tabs: Baholashlar tarixi VS Savollar kutubxonasi
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
             children: [
               ChoiceChip(
                 label: Text('Baholashlar tarixi (${allAssessments.length})'),
@@ -280,7 +291,7 @@ class _PsychologistAssessmentsTabState
                         onChanged: (v) => setState(() => _search = v.trim()),
                         decoration: InputDecoration(
                           hintText: 'O‘quvchi F.I.SH yoki mavzu...',
-                          prefixIcon: const Icon(Icons.search, size: 20),
+                          prefixIcon: const Icon(LucideIcons.search, size: 20),
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -314,7 +325,7 @@ class _PsychologistAssessmentsTabState
                             value: null,
                             child: Text(
                               'Barcha o‘quvchilar',
-                              style: TextStyle(fontSize: 12.5),
+                              style: TextStyle(fontSize: 13),
                             ),
                           ),
                           ...students.map(
@@ -322,7 +333,7 @@ class _PsychologistAssessmentsTabState
                               value: s,
                               child: Text(
                                 s.fullName,
-                                style: const TextStyle(fontSize: 12.5),
+                                style: const TextStyle(fontSize: 13),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -353,13 +364,16 @@ class _PsychologistAssessmentsTabState
                             value: null,
                             child: Text(
                               'Barcha yo‘nalishlar',
-                              style: TextStyle(fontSize: 12.5),
+                              style: TextStyle(fontSize: 13),
                             ),
                           ),
                           ..._categories.map(
                             (c) => DropdownMenuItem(
                               value: c,
-                              child: Text(c, style: const TextStyle(fontSize: 12.5)),
+                              child: Text(
+                                c,
+                                style: const TextStyle(fontSize: 13),
+                              ),
                             ),
                           ),
                         ],
@@ -370,6 +384,7 @@ class _PsychologistAssessmentsTabState
                     SizedBox(
                       width: 170,
                       child: DropdownButtonFormField<String?>(
+                        isExpanded: true,
                         value: _statusFilter,
                         decoration: InputDecoration(
                           labelText: 'Holat',
@@ -387,21 +402,21 @@ class _PsychologistAssessmentsTabState
                             value: null,
                             child: Text(
                               'Barcha holatlar',
-                              style: TextStyle(fontSize: 12.5),
+                              style: TextStyle(fontSize: 13),
                             ),
                           ),
                           DropdownMenuItem(
                             value: 'completed',
                             child: Text(
                               'Yakunlangan',
-                              style: TextStyle(fontSize: 12.5),
+                              style: TextStyle(fontSize: 13),
                             ),
                           ),
                           DropdownMenuItem(
                             value: 'draft',
                             child: Text(
                               'Qoralama',
-                              style: TextStyle(fontSize: 12.5),
+                              style: TextStyle(fontSize: 13),
                             ),
                           ),
                         ],
@@ -421,7 +436,7 @@ class _PsychologistAssessmentsTabState
                             _filterStudent = null;
                           });
                         },
-                        icon: const Icon(Icons.clear_all_rounded, size: 16),
+                        icon: const Icon(LucideIcons.listX, size: 16),
                         label: const Text('Filtrni tozalash'),
                       ),
                   ],
@@ -438,26 +453,32 @@ class _PsychologistAssessmentsTabState
                 child: Column(
                   children: [
                     Icon(
-                      Icons.assignment_late_outlined,
+                      LucideIcons.clipboardX,
                       size: 48,
                       color: AppColors.textMuted,
                     ),
                     const SizedBox(height: 12),
                     const Text(
                       'Mos keluvchi baholashlar topilmadi',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Yangi baholash boshlash uchun yuqoridagi tugmadan foydalaning',
-                      style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.primary,
                       ),
-                      icon: const Icon(Icons.add, size: 16),
+                      icon: const Icon(LucideIcons.plus, size: 16),
                       label: const Text('Yangi baholash boshlash'),
                       onPressed: () => _startNewAssessment(),
                     ),
@@ -473,18 +494,20 @@ class _PsychologistAssessmentsTabState
                 itemBuilder: (ctx, i) {
                   final a = filtered[i];
                   final isDraft = a.status == 'draft';
-                  final childAssessments = allAssessments
-                      .where((x) => x.studentId == a.studentId)
-                      .toList();
+                  final childAssessments =
+                      allAssessments
+                          .where((x) => x.studentId == a.studentId)
+                          .toList();
 
                   return Card(
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
-                        color: isDraft
-                            ? AppColors.warning.withValues(alpha: 0.5)
-                            : AppColors.border,
+                        color:
+                            isDraft
+                                ? AppColors.warning.withValues(alpha: 0.5)
+                                : AppColors.border,
                       ),
                     ),
                     child: Padding(
@@ -495,116 +518,139 @@ class _PsychologistAssessmentsTabState
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: isDraft
-                                          ? AppColors.warningBg
-                                          : AppColors.primaryLight,
-                                      borderRadius: BorderRadius.circular(8),
+                              Flexible(
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            isDraft
+                                                ? AppColors.warningBg
+                                                : AppColors.primaryLight,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        isDraft
+                                            ? LucideIcons.calendarCog
+                                            : LucideIcons.brain,
+                                        color:
+                                            isDraft
+                                                ? AppColors.warning
+                                                : AppColors.primary,
+                                        size: 20,
+                                      ),
                                     ),
-                                    child: Icon(
-                                      isDraft
-                                          ? Icons.edit_calendar_rounded
-                                          : Icons.psychology_rounded,
-                                      color: isDraft
-                                          ? AppColors.warning
-                                          : AppColors.primary,
-                                      size: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
+                                    const SizedBox(width: 10),
+                                    Flexible(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            a.studentName,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 15,
-                                              color: AppColors.textPrimary,
-                                            ),
+                                          Row(
+                                            children: [
+                                              Flexible(
+                                                child: Text(
+                                                  a.studentName,
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 15.5,
+                                                    color:
+                                                        AppColors.textPrimary,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 2,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      isDraft
+                                                          ? AppColors.warningBg
+                                                          : AppColors.successBg,
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                  border: Border.all(
+                                                    color:
+                                                        isDraft
+                                                            ? AppColors.warning
+                                                                .withValues(
+                                                                  alpha: 0.3,
+                                                                )
+                                                            : AppColors.success
+                                                                .withValues(
+                                                                  alpha: 0.3,
+                                                                ),
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  isDraft
+                                                      ? 'Qoralama'
+                                                      : 'Yakunlangan',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w600,
+                                                    color:
+                                                        isDraft
+                                                            ? AppColors.warning
+                                                            : AppColors.success,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          const SizedBox(width: 8),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 6,
-                                              vertical: 2,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: isDraft
-                                                  ? AppColors.warningBg
-                                                  : AppColors.successBg,
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                              border: Border.all(
-                                                color: isDraft
-                                                    ? AppColors.warning
-                                                        .withValues(alpha: 0.3)
-                                                    : AppColors.success
-                                                        .withValues(alpha: 0.3),
-                                              ),
-                                            ),
-                                            child: Text(
-                                              isDraft ? 'Qoralama' : 'Yakunlangan',
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w600,
-                                                color: isDraft
-                                                    ? AppColors.warning
-                                                    : AppColors.success,
-                                              ),
+                                          Text(
+                                            '${a.title} • ${a.category}',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: AppColors.textMuted,
                                             ),
                                           ),
                                         ],
                                       ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (!isDraft)
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
                                       Text(
-                                        '${a.title} • ${a.category}',
+                                        '${a.totalScore.toStringAsFixed(1)} / ${a.maxScore.toStringAsFixed(0)} ball',
                                         style: TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textMuted,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 15.5,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 1,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.successBg,
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          a.trend,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.success,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
-                              if (!isDraft)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      '${a.totalScore.toStringAsFixed(1)} / ${a.maxScore.toStringAsFixed(0)} ball',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 15,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 1,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.successBg,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        a.trend,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.success,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
                                 )
                               else
                                 Container(
@@ -672,89 +718,93 @@ class _PsychologistAssessmentsTabState
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Sana: ${df.format(a.assessmentDate)} • Mutaxassis: ${a.specialistName}',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.textMuted,
+                              Flexible(
+                                child: Text(
+                                  'Sana: ${df.format(a.assessmentDate)} • Mutaxassis: ${a.specialistName}',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.textMuted,
+                                  ),
                                 ),
                               ),
-                              Row(
-                                children: [
-                                  if (isDraft)
-                                    FilledButton.icon(
-                                      style: FilledButton.styleFrom(
-                                        backgroundColor:
-                                            AppColors.warning,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
+                              Flexible(
+                                child: Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    if (isDraft)
+                                      FilledButton.icon(
+                                        style: FilledButton.styleFrom(
+                                          backgroundColor: AppColors.warning,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
                                         ),
+                                        icon: const Icon(
+                                          LucideIcons.play,
+                                          size: 16,
+                                        ),
+                                        label: const Text(
+                                          'Davom ettirish',
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                        onPressed: () => _resumeDraft(a),
+                                      )
+                                    else ...[
+                                      if (childAssessments.length > 1)
+                                        IconButton(
+                                          icon: Icon(
+                                            LucideIcons.arrowLeftRight,
+                                            size: 18,
+                                            color: AppColors.primary,
+                                          ),
+                                          tooltip: 'Taqqoslash',
+                                          onPressed: () {
+                                            AssessmentCompareDialog.show(
+                                              context,
+                                              currentAssessment: a,
+                                              studentAssessments:
+                                                  childAssessments,
+                                            );
+                                          },
+                                        ),
+                                      FilledButton.icon(
+                                        style: FilledButton.styleFrom(
+                                          backgroundColor: AppColors.primary,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                        ),
+                                        icon: const Icon(
+                                          LucideIcons.eye,
+                                          size: 16,
+                                        ),
+                                        label: const Text(
+                                          'Natijalarni ko‘rish',
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                        onPressed:
+                                            () => AssessmentResultScreen.show(
+                                              context,
+                                              a,
+                                            ),
                                       ),
+                                    ],
+                                    const SizedBox(width: 4),
+                                    IconButton(
                                       icon: const Icon(
-                                        Icons.play_arrow_rounded,
-                                        size: 16,
+                                        LucideIcons.trash2,
+                                        size: 18,
+                                        color: Colors.red,
                                       ),
-                                      label: const Text(
-                                        'Davom ettirish',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      onPressed: () => _resumeDraft(a),
-                                    )
-                                  else ...[
-                                    if (childAssessments.length > 1)
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.compare_arrows_rounded,
-                                          size: 18,
-                                          color: AppColors.primary,
-                                        ),
-                                        tooltip: 'Taqqoslash',
-                                        onPressed: () {
-                                          AssessmentCompareDialog.show(
-                                            context,
-                                            currentAssessment: a,
-                                            studentAssessments:
-                                                childAssessments,
-                                          );
-                                        },
-                                      ),
-                                    FilledButton.icon(
-                                      style: FilledButton.styleFrom(
-                                        backgroundColor:
-                                            AppColors.primary,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
-                                        ),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.visibility_outlined,
-                                        size: 16,
-                                      ),
-                                      label: const Text(
-                                        'Natijalarni ko‘rish',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      onPressed: () =>
-                                          AssessmentResultScreen.show(
-                                        context,
-                                        a,
-                                      ),
+                                      tooltip: 'O‘chirish',
+                                      onPressed:
+                                          () => _confirmDeleteAssessment(a),
                                     ),
                                   ],
-                                  const SizedBox(width: 4),
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.delete_outline_rounded,
-                                      size: 18,
-                                      color: Colors.red,
-                                    ),
-                                    tooltip: 'O‘chirish',
-                                    onPressed: () =>
-                                        _confirmDeleteAssessment(a),
-                                  ),
-                                ],
+                                ),
                               ),
                             ],
                           ),

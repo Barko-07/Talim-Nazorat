@@ -19,9 +19,10 @@ enum GradeBand {
   static const int lowestGrade = 0;
   static const int highestGrade = 11;
 
-  String get label => this == GradeBand.preparatory
-      ? 'Tayyorlov guruhi'
-      : '$minGrade–$maxGrade-sinflar';
+  String get label =>
+      this == GradeBand.preparatory
+          ? 'Tayyorlov guruhi'
+          : '$minGrade–$maxGrade-sinflar';
 
   static GradeBand forGrade(int grade) {
     for (final b in values) {
@@ -204,9 +205,10 @@ class StudentAccessProfile {
         reading: AbilityLevel.fromName(json['reading'] as String?),
         writing: AbilityLevel.fromName(json['writing'] as String?),
         notes: json['notes'] as String?,
-        updatedAt: json['updatedAt'] != null
-            ? DateTime.parse(json['updatedAt'] as String)
-            : DateTime.now(),
+        updatedAt:
+            json['updatedAt'] != null
+                ? DateTime.parse(json['updatedAt'] as String)
+                : DateTime.now(),
         updatedById: json['updatedById'] as String?,
       );
 }
@@ -246,9 +248,10 @@ class DomainLevel {
     return DomainLevel(
       domain: domain,
       workingGrade: grade.clamp(GradeBand.lowestGrade, GradeBand.highestGrade),
-      setAt: json['setAt'] != null
-          ? DateTime.parse(json['setAt'] as String)
-          : DateTime.now(),
+      setAt:
+          json['setAt'] != null
+              ? DateTime.parse(json['setAt'] as String)
+              : DateTime.now(),
       setById: json['setById'] as String?,
       note: json['note'] as String?,
     );

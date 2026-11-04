@@ -85,12 +85,16 @@ class ReportService {
   /// Rahbariyat butun maktabni, mutaxassis faqat o'z bolalarini va o'z faoliyatini ko'radi.
   MonitoringReport build(UserModel viewer, {DateTime? from, DateTime? to}) {
     if (!_workspaces.canUse(viewer, WorkspaceModule.reports)) {
-      throw const PermissionDeniedException('hisobotlarni ko‘rish huquqi yo‘q.');
+      throw const PermissionDeniedException(
+        'hisobotlarni ko‘rish huquqi yo‘q.',
+      );
     }
     final end = to ?? DateTime.now();
     final start = from ?? end.subtract(const Duration(days: 30));
     if (start.isAfter(end)) {
-      throw const ValidationException('Hisobot davrining boshlanishi oxiridan keyin bo‘lmasligi kerak.');
+      throw const ValidationException(
+        'Hisobot davrining boshlanishi oxiridan keyin bo‘lmasligi kerak.',
+      );
     }
     bool inPeriod(DateTime d) => !d.isBefore(start) && !d.isAfter(end);
 
@@ -102,7 +106,8 @@ class ReportService {
       for (final c in children)
         c.id: _db.getWorkRecords(c.id).where((r) => inPeriod(r.at)).toList(),
     };
-    final workedWith = children.where((c) => recordsByChild[c.id]!.isNotEmpty).toList();
+    final workedWith =
+        children.where((c) => recordsByChild[c.id]!.isNotEmpty).toList();
     final workCounts = <WorkKind, int>{};
     for (final records in recordsByChild.values) {
       for (final r in records) {
@@ -112,20 +117,27 @@ class ReportService {
 
     // Holat ranglari
     final summary = _status.summaryFor(viewer, now: end);
-    final statusCounts = {for (final c in StatusColor.values) c: summary.count(c)};
+    final statusCounts = {
+      for (final c in StatusColor.values) c: summary.count(c),
+    };
 
     // Dinamika: har bir bola va ko'rsatkich bo'yicha holat
     final dynamicsCounts = {for (final s in DynamicsStatus.values) s: 0};
     for (final c in children) {
-      final measurements = _db.getMeasurements(forUser: viewer, studentId: c.id)
+      final measurements = _db
+          .getMeasurements(forUser: viewer, studentId: c.id)
           .where((m) => !m.measuredAt.isAfter(end));
       for (final metricId in measurements.map((m) => m.metricId).toSet()) {
         final metric = _db.getProgressMetric(metricId);
-        final points = measurements
-            .where((m) => m.metricId == metricId)
-            .map((m) => DataPoint(m.measuredAt, m.value))
-            .toList();
-        final r = _dynamics.evaluate(points, higherIsBetter: metric?.higherIsBetter ?? true);
+        final points =
+            measurements
+                .where((m) => m.metricId == metricId)
+                .map((m) => DataPoint(m.measuredAt, m.value))
+                .toList();
+        final r = _dynamics.evaluate(
+          points,
+          higherIsBetter: metric?.higherIsBetter ?? true,
+        );
         dynamicsCounts[r.status] = dynamicsCounts[r.status]! + 1;
       }
     }
@@ -146,51 +158,64 @@ class ReportService {
     }
 
     // Mutaxassislar faoliyati: rahbariyat — barcha mutaxassislar, mutaxassis — faqat o'zi
-    final staff = AccessControlService.childFacingRoles.contains(viewer.role)
-        ? [viewer]
-        : _db
-              .getUsers(forUser: viewer)
-              .where((u) => AccessControlService.childFacingRoles.contains(u.role))
-              .toList();
-    final specialists = staff.map((u) {
-      final mine = [
-        for (final records in recordsByChild.values)
-          ...records.where((r) => r.userId == u.id),
-      ];
-      final byKind = <WorkKind, int>{};
-      for (final r in mine) {
-        byKind[r.kind] = (byKind[r.kind] ?? 0) + 1;
-      }
-      final workedChildren = {
-        for (final e in recordsByChild.entries)
-          if (e.value.any((r) => r.userId == u.id)) e.key,
-      };
-      final assigned = children
-          .where((c) => c.assignedSpecialistIds.contains(u.id) || u.assignedStudentIds.contains(c.id))
-          .length;
-      return SpecialistActivity(
-        userId: u.id,
-        fullName: u.fullName,
-        role: u.role.label,
-        childrenAssigned: assigned,
-        childrenWorkedWith: workedChildren.length,
-        recordsByKind: byKind,
-        lastActivity: mine.isEmpty
-            ? null
-            : mine.map((r) => r.at).reduce((a, b) => a.isAfter(b) ? a : b),
-      );
-    }).toList()
-      ..sort((a, b) => b.totalRecords.compareTo(a.totalRecords));
+    final staff =
+        AccessControlService.childFacingRoles.contains(viewer.role)
+            ? [viewer]
+            : _db
+                .getUsers(forUser: viewer)
+                .where(
+                  (u) => AccessControlService.childFacingRoles.contains(u.role),
+                )
+                .toList();
+    final specialists =
+        staff.map((u) {
+            final mine = [
+              for (final records in recordsByChild.values)
+                ...records.where((r) => r.userId == u.id),
+            ];
+            final byKind = <WorkKind, int>{};
+            for (final r in mine) {
+              byKind[r.kind] = (byKind[r.kind] ?? 0) + 1;
+            }
+            final workedChildren = {
+              for (final e in recordsByChild.entries)
+                if (e.value.any((r) => r.userId == u.id)) e.key,
+            };
+            final assigned =
+                children
+                    .where(
+                      (c) =>
+                          c.assignedSpecialistIds.contains(u.id) ||
+                          u.assignedStudentIds.contains(c.id),
+                    )
+                    .length;
+            return SpecialistActivity(
+              userId: u.id,
+              fullName: u.fullName,
+              role: u.role.label,
+              childrenAssigned: assigned,
+              childrenWorkedWith: workedChildren.length,
+              recordsByKind: byKind,
+              lastActivity:
+                  mine.isEmpty
+                      ? null
+                      : mine
+                          .map((r) => r.at)
+                          .reduce((a, b) => a.isAfter(b) ? a : b),
+            );
+          }).toList()
+          ..sort((a, b) => b.totalRecords.compareTo(a.totalRecords));
 
     return MonitoringReport(
       from: start,
       to: end,
       totalChildren: children.length,
       childrenWorkedWith: workedWith.length,
-      notWorkedWithNames: children
-          .where((c) => recordsByChild[c.id]!.isEmpty)
-          .map((c) => c.fullName)
-          .toList(),
+      notWorkedWithNames:
+          children
+              .where((c) => recordsByChild[c.id]!.isEmpty)
+              .map((c) => c.fullName)
+              .toList(),
       statusCounts: statusCounts,
       workCounts: workCounts,
       dynamicsCounts: dynamicsCounts,

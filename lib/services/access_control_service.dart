@@ -148,7 +148,8 @@ class AccessControlService {
   bool canAssignSpecialists(UserModel user, StudentModel student) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin) return true;
-    return specialistAssigners.contains(user.role) && _sameSchool(user, student);
+    return specialistAssigners.contains(user.role) &&
+        _sameSchool(user, student);
   }
 
   /// [specialist] shu bolaga biriktirilishi mumkinmi (faol, bolalar bilan ishlaydi, shu maktabdan)
@@ -176,7 +177,8 @@ class AccessControlService {
   bool canTrackSounds(UserModel user, StudentModel student) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin) return true;
-    return user.role == UserRole.speechTherapist && canViewStudent(user, student);
+    return user.role == UserRole.speechTherapist &&
+        canViewStudent(user, student);
   }
 
   // ==================== BAHOLASH VA SAVOLLAR ====================

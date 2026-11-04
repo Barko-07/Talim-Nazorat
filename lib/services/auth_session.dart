@@ -28,12 +28,17 @@ class AuthSession {
 
   bool isValid({DateTime? now}) {
     final t = now ?? DateTime.now();
-    if (lastActive.isAfter(t.add(const Duration(minutes: 5)))) return false; // soat orqaga surilgan
-    return t.difference(lastActive) < idleTimeout && t.difference(issuedAt) < maxAge;
+    if (lastActive.isAfter(t.add(const Duration(minutes: 5))))
+      return false; // soat orqaga surilgan
+    return t.difference(lastActive) < idleTimeout &&
+        t.difference(issuedAt) < maxAge;
   }
 
-  AuthSession touched({DateTime? now}) =>
-      AuthSession(userId: userId, issuedAt: issuedAt, lastActive: now ?? DateTime.now());
+  AuthSession touched({DateTime? now}) => AuthSession(
+    userId: userId,
+    issuedAt: issuedAt,
+    lastActive: now ?? DateTime.now(),
+  );
 
   String encode() => jsonEncode({
     'userId': userId,

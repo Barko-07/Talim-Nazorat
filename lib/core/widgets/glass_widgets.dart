@@ -63,19 +63,20 @@ class AmbientMeshBackground extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     // Qorong'i mavzuda — sokin grafit, yorug'da — havorang tus
-                    colors: AppColors.isDark
-                        ? [
-                          AppColors.background,
-                          AppColors.background,
-                          AppColors.backgroundDeep,
-                          AppColors.backgroundDeep,
-                        ]
-                        : [
-                          AppColors.surfaceMuted,
-                          AppColors.primaryLight,
-                          AppColors.primaryLight,
-                          AppColors.primaryTint,
-                        ],
+                    colors:
+                        AppColors.isDark
+                            ? [
+                              AppColors.background,
+                              AppColors.background,
+                              AppColors.backgroundDeep,
+                              AppColors.backgroundDeep,
+                            ]
+                            : [
+                              AppColors.surfaceMuted,
+                              AppColors.primaryLight,
+                              AppColors.primaryLight,
+                              AppColors.primaryTint,
+                            ],
                     stops: [0.0, 0.35, 0.70, 1.0],
                   ),
                 ),
@@ -132,8 +133,9 @@ class AmbientMeshBackground extends StatelessWidget {
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          AppColors.primary
-                              .withValues(alpha: subtleAlpha * 0.6),
+                          AppColors.primary.withValues(
+                            alpha: subtleAlpha * 0.6,
+                          ),
                           AppColors.primary.withValues(alpha: 0.0),
                         ],
                       ),
@@ -183,9 +185,8 @@ class GlassSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final baseColor = tintColor ?? AppColors.surface;
     final radius = customBorderRadius ?? BorderRadius.circular(borderRadius);
-    final effectiveOpacity = kIsWeb
-        ? opacity.clamp(0.95, 1.0)
-        : opacity.clamp(0.0, 1.0);
+    final effectiveOpacity =
+        kIsWeb ? opacity.clamp(0.95, 1.0) : opacity.clamp(0.0, 1.0);
 
     Widget content = Container(
       padding: padding,
@@ -330,58 +331,57 @@ class _SurfaceCardState extends State<SurfaceCard> {
     Widget cardInner = Container(
       decoration: BoxDecoration(
         color: hasCustomBg ? widget.backgroundColor : null,
-        gradient: hasCustomBg
-            ? null
-            : LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.surface.withValues(alpha: topAlpha),
-                  AppColors.surface.withValues(alpha: bottomAlpha),
-                ],
-              ),
+        gradient:
+            hasCustomBg
+                ? null
+                : LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.surface.withValues(alpha: topAlpha),
+                    AppColors.surface.withValues(alpha: bottomAlpha),
+                  ],
+                ),
         borderRadius: radius,
-        border: Border.all(
-          color: effectiveBorderColor,
-          width: 1.0,
-        ),
+        border: Border.all(color: effectiveBorderColor, width: 1.0),
       ),
       child: Material(
         color: Colors.transparent,
         borderRadius: radius,
         child: InkWell(
           onTap: widget.onTap,
-          onTapDown: interactive ? (_) => setState(() => _pressed = true) : null,
+          onTapDown:
+              interactive ? (_) => setState(() => _pressed = true) : null,
           onTapUp: interactive ? (_) => setState(() => _pressed = false) : null,
-          onTapCancel: interactive ? () => setState(() => _pressed = false) : null,
-          onHighlightChanged: interactive
-              ? (value) {
-                  if (_pressed != value) setState(() => _pressed = value);
-                }
-              : null,
+          onTapCancel:
+              interactive ? () => setState(() => _pressed = false) : null,
+          onHighlightChanged:
+              interactive
+                  ? (value) {
+                    if (_pressed != value) setState(() => _pressed = value);
+                  }
+                  : null,
           borderRadius: radius,
           splashColor: AppColors.primary.withValues(alpha: 0.04),
           highlightColor: Colors.transparent,
-          child: Padding(
-            padding: widget.padding,
-            child: widget.child,
-          ),
+          child: Padding(padding: widget.padding, child: widget.child),
         ),
       ),
     );
 
-    Widget frostedCard = !kIsWeb && widget.useBlur && widget.blur > 0
-        ? ClipRRect(
-            borderRadius: radius,
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: widget.blur,
-                sigmaY: widget.blur,
+    Widget frostedCard =
+        !kIsWeb && widget.useBlur && widget.blur > 0
+            ? ClipRRect(
+              borderRadius: radius,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: widget.blur,
+                  sigmaY: widget.blur,
+                ),
+                child: cardInner,
               ),
-              child: cardInner,
-            ),
-          )
-        : cardInner;
+            )
+            : cardInner;
 
     Widget cardBody = Container(
       margin: widget.margin,
@@ -464,9 +464,10 @@ class ResponsiveGlassGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final w = constraints.maxWidth;
-        final cols = w >= 960
-            ? desktopColumns
-            : w >= 540
+        final cols =
+            w >= 960
+                ? desktopColumns
+                : w >= 540
                 ? tabletColumns
                 : mobileColumns;
 
@@ -540,17 +541,19 @@ class ResponsivePageContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final horizontal = width < 600
-        ? 16.0
-        : width < 1024
+    final horizontal =
+        width < 600
+            ? 16.0
+            : width < 1024
             ? 24.0
             : 32.0;
 
     final hasAppBar = Scaffold.maybeOf(context)?.hasAppBar ?? false;
     final needsTopOffset = withTopHeaderPadding ?? !hasAppBar;
-    final topPadding = needsTopOffset
-        ? MediaQuery.paddingOf(context).top + (width >= 920 ? 82.0 : 74.0)
-        : (width < 600 ? 16.0 : 24.0);
+    final topPadding =
+        needsTopOffset
+            ? MediaQuery.paddingOf(context).top + (width >= 920 ? 82.0 : 74.0)
+            : (width < 600 ? 16.0 : 24.0);
 
     final resolvedBottomPadding = bottomPadding ?? (width < 920 ? 96.0 : 28.0);
 
@@ -559,7 +562,8 @@ class ResponsivePageContainer extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),
         child: Padding(
-          padding: padding ??
+          padding:
+              padding ??
               EdgeInsets.fromLTRB(
                 horizontal,
                 topPadding,
@@ -604,7 +608,9 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
     final screenW = MediaQuery.sizeOf(context).width;
     final isMobile = screenW < 560;
     final effectiveLabel =
-        (isMobile && widget.compactLabel != null) ? widget.compactLabel! : widget.label;
+        (isMobile && widget.compactLabel != null)
+            ? widget.compactLabel!
+            : widget.label;
 
     final Color bg;
     final Color border;
@@ -656,9 +662,15 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
 
     final radius = BorderRadius.circular(10);
     final height = isMobile ? 35.0 : 38.0;
-    final pad = widget.icon != null
-        ? EdgeInsets.fromLTRB(isMobile ? 10.5 : 12.5, 0, isMobile ? 12 : 14, 0)
-        : EdgeInsets.symmetric(horizontal: isMobile ? 12 : 14);
+    final pad =
+        widget.icon != null
+            ? EdgeInsets.fromLTRB(
+              isMobile ? 10.5 : 12.5,
+              0,
+              isMobile ? 12 : 14,
+              0,
+            )
+            : EdgeInsets.symmetric(horizontal: isMobile ? 12 : 14);
 
     return AnimatedScale(
       scale: _pressed ? 0.955 : 1.0,
@@ -690,34 +702,34 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
               padding: pad,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (widget.icon != null) ...[
-                      Icon(
-                        widget.icon,
-                        size: isMobile ? 14.5 : 15.5,
-                        color: iconColor,
-                      ),
-                      const SizedBox(width: 6),
-                    ],
-                    Text(
-                      effectiveLabel,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: isMobile ? 12.3 : 13,
-                        fontWeight: FontWeight.w600,
-                        color: fg,
-                        letterSpacing: 0.0,
-                        wordSpacing: 0.25,
-                      ),
+                children: [
+                  if (widget.icon != null) ...[
+                    Icon(
+                      widget.icon,
+                      size: isMobile ? 14.5 : 15.5,
+                      color: iconColor,
                     ),
+                    const SizedBox(width: 6),
                   ],
-                ),
+                  Text(
+                    effectiveLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: isMobile ? 12.3 : 13,
+                      fontWeight: FontWeight.w600,
+                      color: fg,
+                      letterSpacing: 0.0,
+                      wordSpacing: 0.25,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
@@ -799,10 +811,7 @@ class AdaptivePageHeader extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (action != null) ...[
-                  const SizedBox(width: 12),
-                  action!,
-                ],
+                if (action != null) ...[const SizedBox(width: 12), action!],
               ],
             ),
             const SizedBox(height: 4),
@@ -855,17 +864,18 @@ class ModernPillFilterBar extends StatelessWidget {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: items.map((item) {
-            final isSelected = item == selectedItem;
-            final count = counts?[item];
+          children:
+              items.map((item) {
+                final isSelected = item == selectedItem;
+                final count = counts?[item];
 
-            return _ModernFilterPillItem(
-              item: item,
-              isSelected: isSelected,
-              count: count,
-              onTap: () => onSelected(item),
-            );
-          }).toList(),
+                return _ModernFilterPillItem(
+                  item: item,
+                  isSelected: isSelected,
+                  count: count,
+                  onTap: () => onSelected(item),
+                );
+              }).toList(),
         ),
       ),
     );
@@ -906,28 +916,30 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 13,
-            vertical: 7.5,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7.5),
           decoration: BoxDecoration(
-            color: widget.isSelected ? AppColors.surfaceRaised : Colors.transparent,
+            color:
+                widget.isSelected
+                    ? AppColors.surfaceRaised
+                    : Colors.transparent,
             borderRadius: BorderRadius.circular(9),
             border: Border.all(
-              color: widget.isSelected
-                  ? AppColors.glassWhiteBorder
-                  : Colors.transparent,
+              color:
+                  widget.isSelected
+                      ? AppColors.glassWhiteBorder
+                      : Colors.transparent,
               width: 0.85,
             ),
-            boxShadow: widget.isSelected
-                ? const [
-                    BoxShadow(
-                      color: Color(0x0D0A1A3F),
-                      blurRadius: 6,
-                      offset: Offset(0, 2),
-                    ),
-                  ]
-                : null,
+            boxShadow:
+                widget.isSelected
+                    ? const [
+                      BoxShadow(
+                        color: Color(0x0D0A1A3F),
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
+                    ]
+                    : null,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -935,12 +947,13 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
               Text(
                 widget.item,
                 style: TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 13,
                   fontWeight:
                       widget.isSelected ? FontWeight.w700 : FontWeight.w600,
-                  color: widget.isSelected
-                      ? AppColors.textPrimary
-                      : AppColors.textMuted,
+                  color:
+                      widget.isSelected
+                          ? AppColors.textPrimary
+                          : AppColors.textMuted,
                 ),
               ),
               if (widget.count != null) ...[
@@ -951,9 +964,10 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
                     vertical: 1.5,
                   ),
                   decoration: BoxDecoration(
-                    color: widget.isSelected
-                        ? AppColors.primaryLight
-                        : AppColors.surface.withValues(alpha: 0.7),
+                    color:
+                        widget.isSelected
+                            ? AppColors.primaryLight
+                            : AppColors.surface.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -962,9 +976,10 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       fontFeatures: const [FontFeature.tabularFigures()],
-                      color: widget.isSelected
-                          ? AppColors.primary
-                          : AppColors.textMuted,
+                      color:
+                          widget.isSelected
+                              ? AppColors.primary
+                              : AppColors.textMuted,
                     ),
                   ),
                 ),
@@ -1000,16 +1015,19 @@ class StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = backgroundColor ?? color.withValues(alpha: 0.08);
+    final bg =
+        backgroundColor ??
+        color.withValues(alpha: AppColors.isDark ? 0.16 : 0.10);
     final border = borderColor ?? color.withValues(alpha: 0.18);
 
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9.5, vertical: 4.5),
+        // StatusBadge bilan bir xil geometriya (to'liq yumaloq, 12px yozuv)
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 4.5),
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(999),
           border: Border.all(color: border, width: 0.85),
         ),
         child: Row(
@@ -1022,10 +1040,7 @@ class StatusPill extends StatelessWidget {
               Container(
                 width: 6,
                 height: 6,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
               const SizedBox(width: 5.5),
             ],
@@ -1035,11 +1050,10 @@ class StatusPill extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 11.5,
+                  fontSize: 12,
+                  height: 1.2,
                   fontWeight: FontWeight.w600,
                   color: color,
-                  letterSpacing: 0.0,
-                  wordSpacing: 0.25,
                 ),
               ),
             ),

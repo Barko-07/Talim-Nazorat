@@ -42,17 +42,22 @@ class SpeechProfile {
 
   const SpeechProfile(this.studentId, this.sounds);
 
-  List<SoundProgress> get mastered => sounds.where((s) => s.isMastered).toList();
-  List<SoundProgress> get inProgress => sounds.where((s) => !s.isMastered).toList();
+  List<SoundProgress> get mastered =>
+      sounds.where((s) => s.isMastered).toList();
+  List<SoundProgress> get inProgress =>
+      sounds.where((s) => !s.isMastered).toList();
 
   int countAt(SoundStage stage) => sounds.where((s) => s.stage == stage).length;
 
   /// Tuzatilishi kerak bo'lgan, lekin rivojlanmayotgan tovushlar
-  List<SoundProgress> get stuck => sounds
-      .where((s) =>
-          s.dynamics.status == DynamicsStatus.ineffective ||
-          s.dynamics.status == DynamicsStatus.decline)
-      .toList();
+  List<SoundProgress> get stuck =>
+      sounds
+          .where(
+            (s) =>
+                s.dynamics.status == DynamicsStatus.ineffective ||
+                s.dynamics.status == DynamicsStatus.decline,
+          )
+          .toList();
 }
 
 /// Tovushlar kartasi mantiqi: kiritilgan qaydni tekshirish, profil, keyingi qadam.
@@ -76,7 +81,8 @@ class SoundTrackerService {
       if (w == null || UzbekSpeechSounds.byId(w) == null) {
         return 'Tovush qaysi tovushga almashtirilishini ko‘rsating.';
       }
-      if (w == e.soundId) return 'Tovush o‘zi bilan almashtirilishi mumkin emas.';
+      if (w == e.soundId)
+        return 'Tovush o‘zi bilan almashtirilishi mumkin emas.';
     }
     final from = e.differentiatedFrom;
     if (from != null) {
@@ -94,19 +100,23 @@ class SoundTrackerService {
     for (final e in entries.where((e) => e.studentId == studentId)) {
       bySound.putIfAbsent(e.soundId, () => []).add(e);
     }
-    final order = {for (var i = 0; i < UzbekSpeechSounds.all.length; i++) UzbekSpeechSounds.all[i].id: i};
-    final sounds = bySound.entries
-        .where((e) => UzbekSpeechSounds.byId(e.key) != null)
-        .map((e) {
-          final history = [...e.value]..sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
-          return SoundProgress(
-            sound: UzbekSpeechSounds.byId(e.key)!,
-            history: history,
-            dynamics: stageDynamics(history),
-          );
-        })
-        .toList()
-      ..sort((a, b) => order[a.sound.id]!.compareTo(order[b.sound.id]!));
+    final order = {
+      for (var i = 0; i < UzbekSpeechSounds.all.length; i++)
+        UzbekSpeechSounds.all[i].id: i,
+    };
+    final sounds =
+        bySound.entries.where((e) => UzbekSpeechSounds.byId(e.key) != null).map(
+            (e) {
+              final history = [...e.value]
+                ..sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
+              return SoundProgress(
+                sound: UzbekSpeechSounds.byId(e.key)!,
+                history: history,
+                dynamics: stageDynamics(history),
+              );
+            },
+          ).toList()
+          ..sort((a, b) => order[a.sound.id]!.compareTo(order[b.sound.id]!));
     return SpeechProfile(studentId, sounds);
   }
 
@@ -114,10 +124,15 @@ class SoundTrackerService {
   /// Bir bosqichda 3 qayd va 30+ kun turib qolsa — "Samarasiz natija".
   /// Erkin nutqqa yetgan tovush o'zgarmasa — bu yutuq, "Barqaror holat".
   DynamicsResult stageDynamics(List<SoundEntry> history) {
-    final points = history
-        .map((e) => DataPoint(e.recordedAt, e.stage.index.toDouble()))
-        .toList();
-    final r = _dynamics.evaluate(points, absoluteThreshold: 0.5, unit: 'bosqich');
+    final points =
+        history
+            .map((e) => DataPoint(e.recordedAt, e.stage.index.toDouble()))
+            .toList();
+    final r = _dynamics.evaluate(
+      points,
+      absoluteThreshold: 0.5,
+      unit: 'bosqich',
+    );
     if (history.isNotEmpty &&
         history.last.stage.isMastered &&
         r.status == DynamicsStatus.ineffective) {

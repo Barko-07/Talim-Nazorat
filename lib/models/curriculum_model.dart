@@ -170,9 +170,10 @@ class SubjectLevelAssessment {
       confirmedGrade: (json['confirmedGrade'] as num?)?.toInt() ?? 0,
       assessedById: json['assessedById'] as String? ?? '',
       assessedByName: json['assessedByName'] as String? ?? '',
-      assessedAt: json['assessedAt'] != null
-          ? DateTime.parse(json['assessedAt'] as String)
-          : DateTime.now(),
+      assessedAt:
+          json['assessedAt'] != null
+              ? DateTime.parse(json['assessedAt'] as String)
+              : DateTime.now(),
       notes: json['notes'] as String?,
     );
   }

@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -44,10 +45,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     color: AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    Icons.download_rounded,
-                    color: AppColors.primary,
-                  ),
+                  child: Icon(LucideIcons.download, color: AppColors.primary),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -57,7 +55,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                       Text(
                         title,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 15.5,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -88,7 +86,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     child: Row(
                       children: [
                         Icon(
-                          Icons.shield_outlined,
+                          LucideIcons.shield,
                           size: 14,
                           color: AppColors.textSecondary,
                         ),
@@ -134,7 +132,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 child: const Text('Yopish'),
               ),
               ElevatedButton.icon(
-                icon: const Icon(Icons.copy_rounded, size: 16),
+                icon: const Icon(LucideIcons.copy, size: 16),
                 label: const Text('Nusxa olish'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -215,7 +213,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      Icons.bar_chart_rounded,
+                      LucideIcons.barChart,
                       color: AppColors.primary,
                       size: 28,
                     ),
@@ -245,34 +243,38 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  // Davr tanlagich
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceMuted,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedPeriod,
-                        items:
-                            _periods.map((p) {
-                              return DropdownMenuItem(
-                                value: p,
-                                child: Text(
-                                  p,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                  // Davr tanlagich (aniq kenglik: ro'yxat qatorda o'lchanadi)
+                  SizedBox(
+                    width: 170,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceMuted,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          isExpanded: true,
+                          value: _selectedPeriod,
+                          items:
+                              _periods.map((p) {
+                                return DropdownMenuItem(
+                                  value: p,
+                                  child: Text(
+                                    p,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                              );
-                            }).toList(),
-                        onChanged: (val) {
-                          if (val != null)
-                            setState(() => _selectedPeriod = val);
-                        },
+                                );
+                              }).toList(),
+                          onChanged: (val) {
+                            if (val != null)
+                              setState(() => _selectedPeriod = val);
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -292,7 +294,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
               child: Row(
                 children: [
                   Icon(
-                    Icons.shield_outlined,
+                    LucideIcons.shield,
                     color: AppColors.primaryDark,
                     size: 20,
                   ),
@@ -314,244 +316,252 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
             const SizedBox(height: 20),
 
             // Asosiy statistika kartalari (KPI)
-            Row(
-              children: [
-                Expanded(
-                  child: _buildKpiCard(
+            LayoutBuilder(
+              builder: (context, c) {
+                // KPI kartalari: telefonda 2 tadan, keng ekranda 4 tasi bir qatorda
+                final columns = c.maxWidth >= 760 ? 4 : 2;
+                const gap = 14.0;
+                final w = (c.maxWidth - gap * (columns - 1)) / columns;
+                final cards = [
+                  _buildKpiCard(
                     title: 'Psixologik kuzatuvdagi bolalar',
                     value: '${students.length}',
                     subtext: 'Biriktirilgan o‘quvchilar',
-                    icon: Icons.people_outline_rounded,
+                    icon: LucideIcons.users,
                     color: AppColors.primaryDark,
                     bgColor: AppColors.primaryLight,
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: _buildKpiCard(
+                  _buildKpiCard(
                     title: 'O‘tkazilgan baholashlar',
                     value: '${assessments.length}',
                     subtext: 'Standartlashtirilgan testlar',
-                    icon: Icons.assignment_turned_in_outlined,
+                    icon: LucideIcons.clipboardCheck,
                     color: AppColors.brandTeal,
                     bgColor: AppColors.infoBg,
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: _buildKpiCard(
+                  _buildKpiCard(
                     title: 'Bajarilgan mashg‘ulotlar',
                     value: '$completedSessions',
                     subtext: 'Rejadagilar: $scheduledSessions ta',
-                    icon: Icons.psychology_outlined,
+                    icon: LucideIcons.brain,
                     color: AppColors.success,
                     bgColor: AppColors.successBg,
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: _buildKpiCard(
+                  _buildKpiCard(
                     title: 'Ijobiy dinamika ulushi',
                     value: '$positiveDynamicsPercent%',
                     subtext: '$improvingCount ta o‘quvchida o‘sish',
-                    icon: Icons.trending_up_rounded,
+                    icon: LucideIcons.trendingUp,
                     color: AppColors.purple,
                     bgColor: AppColors.purpleBg,
                   ),
-                ),
-              ],
+                ];
+                return Wrap(
+                  spacing: gap,
+                  runSpacing: gap,
+                  children: [
+                    for (final card in cards) SizedBox(width: w, child: card),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 24),
 
             // Dinamika taqsimoti va Eksport bloki (2 ustun)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Chap: Baholash dinamikasi tahlili
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.pie_chart_outline_rounded,
-                              size: 20,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
+            LayoutBuilder(
+              builder: (context, c) {
+                // Telefonda dinamika va eksport bloklari ustma-ust
+                final dynamics = Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            LucideIcons.chartPie,
+                            size: 20,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
                               'Psixologik dinamika taqsimoti',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 15.5,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Yaxshilanish
-                        _buildDynamicBar(
-                          label: 'Ijobiy o‘sish (Yaxshilanish)',
-                          count: improvingCount,
-                          total: assessments.isEmpty ? 1 : assessments.length,
-                          color: AppColors.success,
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Barqaror
-                        _buildDynamicBar(
-                          label: 'Barqaror (O‘zgarmagan)',
-                          count: stableCount,
-                          total: assessments.isEmpty ? 1 : assessments.length,
-                          color: AppColors.primaryDark,
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Qo'shimcha e'tibor talab
-                        _buildDynamicBar(
-                          label: 'Qo‘shimcha korreksiya talab etiladi',
-                          count: needsAttentionCount,
-                          total: assessments.isEmpty ? 1 : assessments.length,
-                          color: AppColors.warning,
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Qisqacha tahliliy matn
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceMuted,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.border),
                           ),
-                          child: Text(
-                            'Kuzatuv davrida jami ${assessments.length} ta psixologik diagnostika va ${observations.length} ta xulq-atvor kuzatuvi amalga oshirildi. '
-                            'O‘tkazilgan korreksion mashg‘ulotlar natijasida bolalarning $positiveDynamicsPercent% qismida barqaror va ijobiy o‘sish dinamikasi qayd etildi.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              height: 1.5,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
 
-                // O'ng: Hisobotlarni eksport qilish (CSV)
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.file_download_outlined,
-                              size: 20,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Hisobotlarni yuklab olish',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
+                      // Yaxshilanish
+                      _buildDynamicBar(
+                        label: 'Ijobiy o‘sish (Yaxshilanish)',
+                        count: improvingCount,
+                        total: assessments.isEmpty ? 1 : assessments.length,
+                        color: AppColors.success,
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Barqaror
+                      _buildDynamicBar(
+                        label: 'Barqaror (O‘zgarmagan)',
+                        count: stableCount,
+                        total: assessments.isEmpty ? 1 : assessments.length,
+                        color: AppColors.primaryDark,
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Qo'shimcha e'tibor talab
+                      _buildDynamicBar(
+                        label: 'Qo‘shimcha korreksiya talab etiladi',
+                        count: needsAttentionCount,
+                        total: assessments.isEmpty ? 1 : assessments.length,
+                        color: AppColors.warning,
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Qisqacha tahliliy matn
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceMuted,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.border),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Excel (CSV UTF-8 BOM) formatida rasmiy ma’lumotlarni eksport qilish:',
+                        child: Text(
+                          'Kuzatuv davrida jami ${assessments.length} ta psixologik diagnostika va ${observations.length} ta xulq-atvor kuzatuvi amalga oshirildi. '
+                          'O‘tkazilgan korreksion mashg‘ulotlar natijasida bolalarning $positiveDynamicsPercent% qismida barqaror va ijobiy o‘sish dinamikasi qayd etildi.',
                           style: TextStyle(
                             fontSize: 12,
+                            height: 1.5,
                             color: AppColors.textSecondary,
                           ),
                         ),
-                        const SizedBox(height: 16),
-
-                        // Baholashlar CSV
-                        _buildExportButton(
-                          title: 'Psixologik baholashlar hisoboti',
-                          subtitle:
-                              '${assessments.length} ta baholash qaydlari',
-                          icon: Icons.quiz_outlined,
-                          onPressed: () {
-                            final csv = app.exportAssessmentsCsv();
-                            _showExportPreview(
-                              context,
-                              title: 'Psixologik baholashlar hisoboti',
-                              filename:
-                                  'psixolog_baholashlar_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv',
-                              csvData: csv,
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 10),
-
-                        // Kuzatuv jurnali CSV
-                        _buildExportButton(
-                          title: 'Kuzatuv jurnali hisoboti',
-                          subtitle:
-                              '${observations.length} ta kuzatuv qaydlari',
-                          icon: Icons.menu_book_outlined,
-                          onPressed: () {
-                            final csv = app.exportObservationsCsv();
-                            _showExportPreview(
-                              context,
-                              title: 'Psixologik kuzatuvlar jurnali',
-                              filename:
-                                  'psixolog_kuzatuvlar_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv',
-                              csvData: csv,
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 10),
-
-                        // Mashg'ulotlar CSV
-                        _buildExportButton(
-                          title: 'Mashg‘ulotlar va davomat hisoboti',
-                          subtitle:
-                              '${sessions.length} ta rejalashtirilgan seanslar',
-                          icon: Icons.event_note_outlined,
-                          onPressed: () {
-                            final csv = app.exportSessionsCsv();
-                            _showExportPreview(
-                              context,
-                              title: 'Psixologik mashg‘ulotlar hisoboti',
-                              filename:
-                                  'psixolog_mashgulotlar_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv',
-                              csvData: csv,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                );
+                final exports = Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            LucideIcons.download,
+                            size: 20,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              'Hisobotlarni yuklab olish',
+                              style: TextStyle(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Excel (CSV UTF-8 BOM) formatida rasmiy ma’lumotlarni eksport qilish:',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Baholashlar CSV
+                      _buildExportButton(
+                        title: 'Psixologik baholashlar hisoboti',
+                        subtitle: '${assessments.length} ta baholash qaydlari',
+                        icon: LucideIcons.fileQuestion,
+                        onPressed: () {
+                          final csv = app.exportAssessmentsCsv();
+                          _showExportPreview(
+                            context,
+                            title: 'Psixologik baholashlar hisoboti',
+                            filename:
+                                'psixolog_baholashlar_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv',
+                            csvData: csv,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Kuzatuv jurnali CSV
+                      _buildExportButton(
+                        title: 'Kuzatuv jurnali hisoboti',
+                        subtitle: '${observations.length} ta kuzatuv qaydlari',
+                        icon: LucideIcons.bookOpen,
+                        onPressed: () {
+                          final csv = app.exportObservationsCsv();
+                          _showExportPreview(
+                            context,
+                            title: 'Psixologik kuzatuvlar jurnali',
+                            filename:
+                                'psixolog_kuzatuvlar_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv',
+                            csvData: csv,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Mashg'ulotlar CSV
+                      _buildExportButton(
+                        title: 'Mashg‘ulotlar va davomat hisoboti',
+                        subtitle:
+                            '${sessions.length} ta rejalashtirilgan seanslar',
+                        icon: LucideIcons.calendarDays,
+                        onPressed: () {
+                          final csv = app.exportSessionsCsv();
+                          _showExportPreview(
+                            context,
+                            title: 'Psixologik mashg‘ulotlar hisoboti',
+                            filename:
+                                'psixolog_mashgulotlar_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv',
+                            csvData: csv,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+                if (c.maxWidth < 760) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [dynamics, const SizedBox(height: 20), exports],
+                  );
+                }
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 3, child: dynamics),
+                    const SizedBox(width: 20),
+                    Expanded(flex: 2, child: exports),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 24),
 
@@ -569,26 +579,30 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                   Row(
                     children: [
                       Icon(
-                        Icons.table_chart_outlined,
+                        LucideIcons.table,
                         size: 20,
                         color: AppColors.primary,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        'O‘quvchilar kesimida umumiy psixologik ko‘rsatkichlar',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                      Flexible(
+                        child: Text(
+                          'O‘quvchilar kesimida umumiy psixologik ko‘rsatkichlar',
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
                       const Spacer(),
-                      Text(
-                        'Jami: ${students.length} nafar o‘quvchi',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
+                      Flexible(
+                        child: Text(
+                          'Jami: ${students.length} nafar o‘quvchi',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
                     ],
@@ -806,20 +820,24 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
-            Text(
-              '$count ta ($pctStr%)',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: color,
+            Flexible(
+              child: Text(
+                '$count ta ($pctStr%)',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
               ),
             ),
           ],
@@ -888,7 +906,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
               ),
             ),
             Icon(
-              Icons.arrow_forward_ios_rounded,
+              LucideIcons.chevronRight,
               size: 14,
               color: AppColors.textSecondary,
             ),

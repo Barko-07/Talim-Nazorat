@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -178,16 +179,12 @@ class _InitializationErrorScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.storage_rounded,
-                size: 42,
-                color: AppColors.warning,
-              ),
+              Icon(LucideIcons.database, size: 42, color: AppColors.warning),
               const SizedBox(height: 14),
               const Text(
                 'Mahalliy ma’lumotlarni ochib bo‘lmadi',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
               Text(
@@ -198,7 +195,7 @@ class _InitializationErrorScreen extends StatelessWidget {
               const SizedBox(height: 18),
               FilledButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh_rounded),
+                icon: const Icon(LucideIcons.refreshCw),
                 label: const Text('Qayta urinish'),
               ),
             ],

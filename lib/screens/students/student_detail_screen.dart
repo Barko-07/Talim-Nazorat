@@ -248,7 +248,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                         sp.fullName,
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 13.5,
+                                          fontSize: 14,
                                           color: AppColors.textPrimary,
                                         ),
                                       ),
@@ -257,7 +257,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          fontSize: 11.5,
+                                          fontSize: 12,
                                           color: AppColors.textMuted,
                                         ),
                                       ),
@@ -349,7 +349,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           student.fullName,
           style: const TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: 16,
+            fontSize: 15.5,
             letterSpacing: -0.25,
           ),
         ),
@@ -443,7 +443,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
-                  fontSize: 16,
+                  fontSize: 15.5,
                   color: AppColors.textPrimary,
                 ),
               ),
@@ -524,7 +524,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           Text(
                             'Sababi: ${s.deactivationReason ?? 'Ko‘rsatilmagan'} • Sana: ${s.deactivatedAt != null ? df.format(s.deactivatedAt!) : 'Noma’lum'}',
                             style: TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 13,
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -611,7 +611,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       Text(
                         'Tug‘ilgan kuni: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
                         style: TextStyle(
-                          fontSize: 12.3,
+                          fontSize: 12,
                           color: AppColors.textMuted,
                         ),
                       ),
@@ -705,7 +705,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     'Ta’limiy Ehtiyoj va Qo‘llab-quvvatlash Darajasi',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize: 16,
+                      fontSize: 15.5,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
                     ),
@@ -761,7 +761,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 s.medicalNotes ??
                                     'Tibbiy ma’lumot kiritilmagan',
                                 style: TextStyle(
-                                  fontSize: 13.5,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textPrimary,
                                   height: 1.45,
@@ -818,7 +818,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         'Mas’ul Mutaxassislar Jamoasi',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 16,
+                          fontSize: 15.5,
                           color: AppColors.textPrimary,
                           letterSpacing: -0.25,
                         ),
@@ -835,7 +835,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           icon: const Icon(LucideIcons.userPlus, size: 15),
                           label: const Text(
                             'Biriktirish',
-                            style: TextStyle(fontSize: 12.5),
+                            style: TextStyle(fontSize: 13),
                           ),
                           onPressed:
                               () => _showAssignSpecialistDialog(
@@ -915,7 +915,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     'Ota-ona yoki Qonuniy Vasiylar',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize: 16,
+                      fontSize: 15.5,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
                     ),
@@ -960,7 +960,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   Text(
                                     '${g.relationship} • Tel: ${g.phone}',
                                     style: TextStyle(
-                                      fontSize: 12.5,
+                                      fontSize: 13,
                                       color: AppColors.textSecondary,
                                     ),
                                   ),
@@ -1029,7 +1029,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     'Logopedik Tovushlar Xaritasi',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize: 16,
+                      fontSize: 15.5,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
                     ),
@@ -1054,7 +1054,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           if (profile.sounds.isEmpty)
             Text(
               'Hozircha logopedik tovushlar bo‘yicha qaydlar kiritilmagan.',
-              style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+              style: TextStyle(fontSize: 13, color: AppColors.textMuted),
             )
           else ...[
             Wrap(
@@ -1074,7 +1074,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 if (profile.stuck.isNotEmpty)
                   StatusPill(
                     label:
-                        '⚠ Rivojlanmayotgan: ${profile.stuck.map((p) => p.sound.display).join(", ")}',
+                        'Rivojlanmayotgan: ${profile.stuck.map((p) => p.sound.display).join(", ")}',
                     color: AppColors.warning,
                     backgroundColor: AppColors.warningBg,
                   ),
@@ -1101,7 +1101,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         Text(
                           '«${p.sound.display.toUpperCase()}» tovushi (${p.sound.group.label})',
                           style: TextStyle(
-                            fontSize: 13.5,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
                           ),
@@ -1239,6 +1239,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               SoundDisorder.substitution) ...[
                             const SizedBox(height: 10),
                             DropdownButtonFormField<String?>(
+                              isExpanded: true,
                               initialValue: substitutedWith,
                               decoration: const InputDecoration(
                                 labelText: 'Qaysi tovushga almashtiradi? *',
@@ -1346,7 +1347,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     'Mening Yutuqlar Pasportim',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize: 16,
+                      fontSize: 15.5,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
                     ),
@@ -1371,7 +1372,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           if (passport == null || passport.entries.isEmpty)
             Text(
               'Hozircha yutuqlar qayd etilmagan. O‘quvchi erishgan ijobiy natijalar avtomatik va qo‘lda shu yerda to‘planadi.',
-              style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+              style: TextStyle(fontSize: 13, color: AppColors.textMuted),
             )
           else
             ...passport.entries.take(6).map((a) {
@@ -1408,7 +1409,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           Text(
                             '${a.category.label} • ${DateFormat("dd.MM.yyyy").format(a.achievedAt)}${a.isAutomatic ? " (Avtomatik)" : ""}',
                             style: TextStyle(
-                              fontSize: 11.5,
+                              fontSize: 12,
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -1446,6 +1447,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         DropdownButtonFormField<AchievementCategory>(
+                          isExpanded: true,
                           initialValue: category,
                           decoration: const InputDecoration(labelText: 'Toifa'),
                           items:
@@ -1532,13 +1534,15 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             children: [
               Icon(LucideIcons.users, color: AppColors.primary, size: 20),
               SizedBox(width: 10),
-              Text(
-                'Mutaxassislar Konsiliumi (Qo‘shma muhokamalar)',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.25,
+              Flexible(
+                child: Text(
+                  'Mutaxassislar Konsiliumi (Qo‘shma muhokamalar)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15.5,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.25,
+                  ),
                 ),
               ),
             ],
@@ -1547,7 +1551,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           if (conferences.isEmpty)
             Text(
               'Ushbu o‘quvchi bo‘yicha hali qo‘shma konsilium yig‘ilishi o‘tkazilmagan.',
-              style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+              style: TextStyle(fontSize: 13, color: AppColors.textMuted),
             )
           else
             ...conferences.map((c) {
@@ -1570,7 +1574,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             c.agenda,
                             style: const TextStyle(
                               fontWeight: FontWeight.w700,
-                              fontSize: 13.5,
+                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -1594,7 +1598,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       Text(
                         'Xulosa: ${c.conclusion}',
                         style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textSecondary,
                         ),
@@ -1749,7 +1753,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 Text(
                                   'Yo‘nalish: ${a.category}',
                                   style: TextStyle(
-                                    fontSize: 12.5,
+                                    fontSize: 13,
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -1789,7 +1793,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontSize: 12.5,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.textPrimary,
                                   ),
@@ -1833,7 +1837,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             Text(
                               'Tavsiya: ${a.recommendations}',
                               style: TextStyle(
-                                fontSize: 12.5,
+                                fontSize: 13,
                                 color: AppColors.primaryDark,
                                 fontWeight: FontWeight.w600,
                                 height: 1.4,
@@ -1903,7 +1907,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                       s.topic,
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
-                                        fontSize: 14.5,
+                                        fontSize: 15.5,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
@@ -1912,9 +1916,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   StatusPill(
                                     label: s.status,
                                     color: statusColor,
-                                    backgroundColor: AppColors.surface.withValues(
-                                      alpha: 0.85,
-                                    ),
+                                    backgroundColor: AppColors.surface
+                                        .withValues(alpha: 0.85),
                                     showDot: true,
                                   ),
                                 ],
@@ -1923,7 +1926,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               Text(
                                 '${s.specialistName} • ${df.format(s.scheduledAt)}',
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 13,
                                   color: AppColors.textMuted,
                                 ),
                               ),
@@ -2021,7 +2024,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               obj.title,
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 14.5,
+                                fontSize: 15.5,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -2043,7 +2046,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       Text(
                         'Soha: ${obj.domain} • Mezon: ${obj.successCriteria ?? ''}',
                         style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           color: AppColors.textMuted,
                         ),
                       ),
@@ -2258,7 +2261,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               'Avtomatik rivojlanish dinamikasi xulosasi',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 16,
+                                fontSize: 15.5,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -2350,7 +2353,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     Text(
                                       '${m.name} (${m.unit})',
                                       style: TextStyle(
-                                        fontSize: 13.5,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.textPrimary,
                                       ),
@@ -2367,7 +2370,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 Text(
                                   dyn.reason,
                                   style: TextStyle(
-                                    fontSize: 12.5,
+                                    fontSize: 13,
                                     color: AppColors.textSecondary,
                                   ),
                                 ),
@@ -2390,7 +2393,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     Text(
                       'Hozircha birlikli o‘lchovlar kiritilmagan. "Yangi o‘lchov kiritish" tugmasi orqali o‘lchov qo‘shing.',
                       style: TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 13,
                         color: AppColors.textMuted,
                       ),
                     ),
@@ -2764,7 +2767,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       'Davlat ta’lim standartlariga (DTS) moslik va Individual daraja',
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        fontSize: 16,
+                        fontSize: 15.5,
                         color: AppColors.textPrimary,
                         letterSpacing: -0.25,
                       ),
@@ -2792,8 +2795,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color:
-                    hasGap ? AppColors.warningBg : AppColors.surfaceMuted,
+                color: hasGap ? AppColors.warningBg : AppColors.surfaceMuted,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color:
@@ -2811,14 +2813,16 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     alignment: WrapAlignment.spaceBetween,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
                             subject,
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
-                              fontSize: 14.5,
+                              fontSize: 15.5,
                               color: AppColors.textPrimary,
                             ),
                           ),
@@ -2913,7 +2917,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     Text(
                       app.describeSubjectLevel(level),
                       style: TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textSecondary,
                       ),
@@ -2952,7 +2956,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               child: Text(
                                 '[${t.levelGrade}-sinf darajasi] ${t.title}',
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textPrimary,
                                 ),
@@ -3064,7 +3068,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           'O‘quvchi: ${student.fullName} (Rasmiy sinfi: ${student.grade})',
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
-                            fontSize: 13.5,
+                            fontSize: 14,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -3074,14 +3078,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             decoration: BoxDecoration(
                               color: AppColors.primaryLight,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: AppColors.primaryTint,
-                              ),
+                              border: Border.all(color: AppColors.primaryTint),
                             ),
                             child: Text(
                               'Tizim tavsiyasi: ${preview == 0 ? "1-sinf talablariga hali yetmagan" : "$preview-sinf darajasi"}${needsLower ? " (Quyiroq sinf talablarini ham tekshiring!)" : ""}',
                               style: TextStyle(
-                                fontSize: 12.5,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.primaryDark,
                               ),
@@ -3144,7 +3146,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   Text(
                                     std.description,
                                     style: const TextStyle(
-                                      fontSize: 12.5,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -3158,7 +3160,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                             label: Text(
                                               m.label,
                                               style: const TextStyle(
-                                                fontSize: 11.5,
+                                                fontSize: 12,
                                               ),
                                             ),
                                             selected: selected,
@@ -3177,6 +3179,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         }),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<int?>(
+                          isExpanded: true,
                           initialValue: manualGrade,
                           decoration: const InputDecoration(
                             labelText:
@@ -3296,7 +3299,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               label: Text(
                                 '[${d.levelGrade}-sinf] ${d.title}',
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 11.5),
+                                style: const TextStyle(fontSize: 12),
                               ),
                               onPressed: () => titleCtrl.text = d.title,
                             ),
@@ -3384,13 +3387,15 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     size: 20,
                   ),
                   SizedBox(width: 10),
-                  Text(
-                    'O‘quvchining Imkoniyat Profili (Muloqot va sezgi)',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.25,
+                  Flexible(
+                    child: Text(
+                      'O‘quvchining Imkoniyat Profili (Muloqot va sezgi)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15.5,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.25,
+                      ),
                     ),
                   ),
                 ],
@@ -3414,7 +3419,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
           if (ap == null)
             Text(
               'Imkoniyat profili hali to‘ldirilmagan. Savollarni bolaning imkoniyatiga mos tanlash uchun uni to‘ldiring.',
-              style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+              style: TextStyle(fontSize: 13, color: AppColors.textMuted),
             )
           else
             Wrap(
@@ -3487,6 +3492,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           DropdownButtonFormField<CommunicationMode>(
+                            isExpanded: true,
                             initialValue: comm,
                             decoration: const InputDecoration(
                               labelText: 'Muloqot usuli',
@@ -3506,6 +3512,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           ),
                           const SizedBox(height: 10),
                           DropdownButtonFormField<AbilityLevel>(
+                            isExpanded: true,
                             initialValue: hearing,
                             decoration: const InputDecoration(
                               labelText: 'Eshitish',
@@ -3525,6 +3532,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           ),
                           const SizedBox(height: 10),
                           DropdownButtonFormField<AbilityLevel>(
+                            isExpanded: true,
                             initialValue: vision,
                             decoration: const InputDecoration(
                               labelText: 'Ko‘rish',
@@ -3544,6 +3552,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           ),
                           const SizedBox(height: 10),
                           DropdownButtonFormField<AbilityLevel>(
+                            isExpanded: true,
                             initialValue: motor,
                             decoration: const InputDecoration(
                               labelText: 'Qo‘l motorikasi',
@@ -3563,6 +3572,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           ),
                           const SizedBox(height: 10),
                           DropdownButtonFormField<AbilityLevel>(
+                            isExpanded: true,
                             initialValue: reading,
                             decoration: const InputDecoration(
                               labelText: 'O‘qish',
@@ -3582,6 +3592,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           ),
                           const SizedBox(height: 10),
                           DropdownButtonFormField<AbilityLevel>(
+                            isExpanded: true,
                             initialValue: writing,
                             decoration: const InputDecoration(
                               labelText: 'Yozish',
@@ -3693,7 +3704,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                       '${r.toSpecialistType}ga yo‘naltirish',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
-                                        fontSize: 14.5,
+                                        fontSize: 15.5,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
@@ -3702,9 +3713,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   StatusPill(
                                     label: r.status,
                                     color: AppColors.primary,
-                                    backgroundColor: AppColors.surface.withValues(
-                                      alpha: 0.85,
-                                    ),
+                                    backgroundColor: AppColors.surface
+                                        .withValues(alpha: 0.85),
                                   ),
                                 ],
                               ),
@@ -3712,7 +3722,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               Text(
                                 'Yuborgan: ${r.fromSpecialistName}',
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 13,
                                   color: AppColors.textMuted,
                                 ),
                               ),
@@ -3778,7 +3788,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 doc.title,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
-                                  fontSize: 14.5,
+                                  fontSize: 15.5,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
@@ -3786,7 +3796,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               Text(
                                 doc.subtitle,
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 13,
                                   color: AppColors.textMuted,
                                 ),
                               ),
@@ -3858,7 +3868,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               Text(
                                 log.details,
                                 style: TextStyle(
-                                  fontSize: 13.5,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
                                   height: 1.35,
@@ -3881,7 +3891,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                       'dd.MM HH:mm',
                                     ).format(log.timestamp),
                                     style: TextStyle(
-                                      fontSize: 11.5,
+                                      fontSize: 12,
                                       color: AppColors.textSubtle,
                                       fontWeight: FontWeight.w600,
                                       fontFeatures: [

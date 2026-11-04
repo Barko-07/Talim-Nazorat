@@ -20,13 +20,16 @@ class AchievementService {
   final _access = AccessControlService();
 
   /// Shaxsiy rekord yutuq deb hisoblanishi uchun birinchi natijaga nisbatan yaxshilanish
-  static const double personalBestThreshold = DynamicsService.defaultRelativeThreshold;
+  static const double personalBestThreshold =
+      DynamicsService.defaultRelativeThreshold;
 
   AchievementPassport passportFor(String studentId, UserModel viewer) {
     final student = _db.getStudentById(studentId);
     if (student == null) throw const NotFoundException('O‘quvchi topilmadi.');
     if (!_access.canViewStudent(viewer, student)) {
-      throw const PermissionDeniedException('bu o‘quvchi ma’lumotlarini ko‘rish huquqi yo‘q.');
+      throw const PermissionDeniedException(
+        'bu o‘quvchi ma’lumotlarini ko‘rish huquqi yo‘q.',
+      );
     }
 
     final entries = <Achievement>[
@@ -55,17 +58,20 @@ class AchievementService {
         final prev = series[i - 1].confirmedGrade;
         final cur = series[i].confirmedGrade;
         if (cur > prev) {
-          result.add(Achievement(
-            id: 'auto_level_${series[i].id}',
-            studentId: studentId,
-            category: AchievementCategory.subject,
-            title: '$subject: ${_gradeText(prev)} → ${_gradeText(cur)}',
-            description: 'Bilim darajasi davlat ta’lim standarti talablari bo‘yicha ko‘tarildi.',
-            achievedAt: series[i].assessedAt,
-            isAutomatic: true,
-            recordedById: series[i].assessedById,
-            recordedByName: series[i].assessedByName,
-          ));
+          result.add(
+            Achievement(
+              id: 'auto_level_${series[i].id}',
+              studentId: studentId,
+              category: AchievementCategory.subject,
+              title: '$subject: ${_gradeText(prev)} → ${_gradeText(cur)}',
+              description:
+                  'Bilim darajasi davlat ta’lim standarti talablari bo‘yicha ko‘tarildi.',
+              achievedAt: series[i].assessedAt,
+              isAutomatic: true,
+              recordedById: series[i].assessedById,
+              recordedByName: series[i].assessedByName,
+            ),
+          );
         }
       }
     }
@@ -81,7 +87,8 @@ class AchievementService {
           studentId: studentId,
           category: AchievementCategory.task,
           title: '${t.subject}: ${t.title}',
-          description: '${t.levelGrade}-sinf darajasidagi topshiriq to‘liq o‘zlashtirildi.',
+          description:
+              '${t.levelGrade}-sinf darajasidagi topshiriq to‘liq o‘zlashtirildi.',
           achievedAt: t.completedAt ?? t.assignedAt,
           isAutomatic: true,
           recordedById: t.assignedById,
@@ -110,7 +117,10 @@ class AchievementService {
   /// Har bir ko'rsatkich bo'yicha shaxsiy rekord (birinchi natijaga nisbatan sezilarli yaxshilanish)
   List<Achievement> _personalBests(String studentId) {
     final result = <Achievement>[];
-    final measurements = _db.getMeasurements(forUser: _system, studentId: studentId);
+    final measurements = _db.getMeasurements(
+      forUser: _system,
+      studentId: studentId,
+    );
     for (final metricId in measurements.map((m) => m.metricId).toSet()) {
       final metric = _db.getProgressMetric(metricId);
       if (metric == null) continue;
@@ -118,23 +128,30 @@ class AchievementService {
       if (series.length < 2) continue;
       final first = series.first;
       final best = series.reduce((a, b) {
-        final better = metric.higherIsBetter ? b.value > a.value : b.value < a.value;
+        final better =
+            metric.higherIsBetter ? b.value > a.value : b.value < a.value;
         return better ? b : a;
       });
-      final gain = metric.higherIsBetter ? best.value - first.value : first.value - best.value;
+      final gain =
+          metric.higherIsBetter
+              ? best.value - first.value
+              : first.value - best.value;
       final base = first.value.abs() > 0 ? first.value.abs() : 1;
       if (best.id == first.id || gain / base < personalBestThreshold) continue;
-      result.add(Achievement(
-        id: 'auto_best_${best.id}',
-        studentId: studentId,
-        category: AchievementCategory.progress,
-        title: '${metric.name}: ${_num(first.value)} → ${_num(best.value)} ${metric.unit}',
-        description: 'Shaxsiy eng yaxshi natija.',
-        achievedAt: best.measuredAt,
-        isAutomatic: true,
-        recordedById: best.recordedById,
-        recordedByName: best.recordedByName,
-      ));
+      result.add(
+        Achievement(
+          id: 'auto_best_${best.id}',
+          studentId: studentId,
+          category: AchievementCategory.progress,
+          title:
+              '${metric.name}: ${_num(first.value)} → ${_num(best.value)} ${metric.unit}',
+          description: 'Shaxsiy eng yaxshi natija.',
+          achievedAt: best.measuredAt,
+          isAutomatic: true,
+          recordedById: best.recordedById,
+          recordedByName: best.recordedByName,
+        ),
+      );
     }
     return result;
   }
@@ -150,33 +167,49 @@ class AchievementService {
       if (!history.first.stage.isSet) {
         final set = history.where((e) => e.stage.isSet);
         if (set.isNotEmpty) {
-          result.add(_soundAchievement(set.first, 'set',
-              '"$display" tovushi qo‘yildi', 'Tovush alohida to‘g‘ri talaffuz qilinmoqda.'));
+          result.add(
+            _soundAchievement(
+              set.first,
+              'set',
+              '"$display" tovushi qo‘yildi',
+              'Tovush alohida to‘g‘ri talaffuz qilinmoqda.',
+            ),
+          );
         }
       }
       if (!history.first.stage.isMastered) {
         final mastered = history.where((e) => e.stage.isMastered);
         if (mastered.isNotEmpty) {
-          result.add(_soundAchievement(mastered.first, 'mastered',
-              '"$display" tovushi erkin nutqda to‘g‘ri', 'Tovush kundalik nutqda to‘g‘ri talaffuz qilinmoqda.'));
+          result.add(
+            _soundAchievement(
+              mastered.first,
+              'mastered',
+              '"$display" tovushi erkin nutqda to‘g‘ri',
+              'Tovush kundalik nutqda to‘g‘ri talaffuz qilinmoqda.',
+            ),
+          );
         }
       }
     }
     return result;
   }
 
-  Achievement _soundAchievement(SoundEntry e, String kind, String title, String description) =>
-      Achievement(
-        id: 'auto_sound_${kind}_${e.id}',
-        studentId: e.studentId,
-        category: AchievementCategory.skill,
-        title: title,
-        description: description,
-        achievedAt: e.recordedAt,
-        isAutomatic: true,
-        recordedById: e.recordedById,
-        recordedByName: e.recordedByName,
-      );
+  Achievement _soundAchievement(
+    SoundEntry e,
+    String kind,
+    String title,
+    String description,
+  ) => Achievement(
+    id: 'auto_sound_${kind}_${e.id}',
+    studentId: e.studentId,
+    category: AchievementCategory.skill,
+    title: title,
+    description: description,
+    achievedAt: e.recordedAt,
+    isAutomatic: true,
+    recordedById: e.recordedById,
+    recordedByName: e.recordedByName,
+  );
 
   String _gradeText(int g) => g == 0 ? '1-sinfgacha' : '$g-sinf darajasi';
 

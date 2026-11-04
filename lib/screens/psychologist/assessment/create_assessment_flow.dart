@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -269,7 +270,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
         actions: [
           if (_currentStep == 2 && _selectedQuestions.isNotEmpty)
             TextButton.icon(
-              icon: const Icon(Icons.bookmark_outline_rounded, size: 18),
+              icon: const Icon(LucideIcons.bookmark, size: 18),
               label: const Text('Qoralama saqlash'),
               onPressed: _saveAsDraft,
             ),
@@ -333,7 +334,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
               children: [
                 if (_currentStep > 0)
                   OutlinedButton.icon(
-                    icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                    icon: const Icon(LucideIcons.arrowLeft, size: 16),
                     label: const Text('Ortga'),
                     onPressed: details.onStepCancel,
                   ),
@@ -356,8 +357,8 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                   ),
                   icon: Icon(
                     _currentStep == 2
-                        ? Icons.play_arrow_rounded
-                        : Icons.arrow_forward_rounded,
+                        ? LucideIcons.play
+                        : LucideIcons.arrowRight,
                     size: 18,
                   ),
                   label: Text(
@@ -402,7 +403,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
       children: [
         const Text(
           '1-bosqich: Baholash o‘tkaziladigan o‘quvchi va umumiy ma’lumotlar',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
         Text(
@@ -421,7 +422,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
           isExpanded: true,
           decoration: const InputDecoration(
             labelText: 'O‘quvchini tanlang *',
-            prefixIcon: Icon(Icons.person_search_rounded),
+            prefixIcon: Icon(LucideIcons.userSearch),
           ),
           items:
               students.map((s) {
@@ -507,7 +508,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
           isExpanded: true,
           decoration: const InputDecoration(
             labelText: 'Diagnostika yo‘nalishi *',
-            prefixIcon: Icon(Icons.category_outlined),
+            prefixIcon: Icon(LucideIcons.shapes),
           ),
           items:
               _categories.map((c) {
@@ -525,7 +526,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
           decoration: const InputDecoration(
             labelText: 'Baholash sarlavhasi / Mavzusi *',
             hintText: 'Masalan: 1-chorak kognitiv diagnostikasi',
-            prefixIcon: Icon(Icons.edit_note_rounded),
+            prefixIcon: Icon(LucideIcons.notebookPen),
           ),
         ),
       ],
@@ -561,7 +562,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
               children: [
                 const Text(
                   '2-bosqich: Savollar kutubxonasidan savollarni tanlang',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600),
                 ),
                 Text(
                   'Tanlandi: ${_selectedQuestions.length} ta savol',
@@ -586,7 +587,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.auto_awesome,
+                      LucideIcons.sparkles,
                       size: 14,
                       color: AppColors.success,
                     ),
@@ -615,7 +616,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                 onChanged: (v) => setState(() => _questionSearch = v.trim()),
                 decoration: InputDecoration(
                   hintText: 'Savol matni yoki mavzusi bo‘yicha qidiruv...',
-                  prefixIcon: const Icon(Icons.search, size: 18),
+                  prefixIcon: const Icon(LucideIcons.search, size: 18),
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -687,8 +688,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                   side: BorderSide(
-                    color:
-                        isSelected ? AppColors.primary : AppColors.border,
+                    color: isSelected ? AppColors.primary : AppColors.border,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -717,7 +717,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                                       q.questionTitle,
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
-                                        fontSize: 13.5,
+                                        fontSize: 14,
                                         color:
                                             isSelected
                                                 ? AppColors.primary
@@ -808,7 +808,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
       children: [
         const Text(
           '3-bosqich: Tanlangan savollarni tekshirish va tartibini belgilash',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
         Text(
@@ -831,17 +831,17 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
               _buildMetricItem(
                 'O‘quvchi',
                 _selectedStudent?.fullName ?? '-',
-                Icons.person_outline,
+                LucideIcons.user,
               ),
               _buildMetricItem(
                 'Savollar soni',
                 '${_selectedQuestions.length} ta',
-                Icons.quiz_outlined,
+                LucideIcons.fileQuestion,
               ),
               _buildMetricItem(
                 'Umumiy maksimal ball',
                 '${_selectedQuestions.fold(0.0, (s, q) => s + q.maxScore).toStringAsFixed(0)} ball',
-                Icons.star_outline_rounded,
+                LucideIcons.star,
               ),
             ],
           ),
@@ -907,7 +907,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                     children: [
                       IconButton(
                         icon: const Icon(
-                          Icons.delete_outline_rounded,
+                          LucideIcons.trash2,
                           color: Colors.red,
                           size: 20,
                         ),
@@ -916,7 +916,10 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                         },
                         tooltip: 'Chiqarib tashlash',
                       ),
-                      const Icon(Icons.drag_handle_rounded, color: Colors.grey),
+                      const Icon(
+                        LucideIcons.gripHorizontal,
+                        color: Colors.grey,
+                      ),
                     ],
                   ),
                 ),
@@ -937,10 +940,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
           value,
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         ),
-        Text(
-          label,
-          style: TextStyle(fontSize: 11, color: AppColors.textMuted),
-        ),
+        Text(label, style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
       ],
     );
   }

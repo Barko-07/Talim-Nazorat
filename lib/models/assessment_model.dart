@@ -37,8 +37,10 @@ class AssessmentModel {
   final String specialistName;
   final String specialistRole;
   final DateTime assessmentDate;
-  final String type; // Standart balli (Rubrikali), Savollar kutubxonasi asosida, Sifatli pedagogik kuzatuv
-  final String category; // Kognitiv va intellekt, Diqqat va xotira, Emotsional va xavotir, Ijtimoiy moslashuv, Kompleks
+  final String
+  type; // Standart balli (Rubrikali), Savollar kutubxonasi asosida, Sifatli pedagogik kuzatuv
+  final String
+  category; // Kognitiv va intellekt, Diqqat va xotira, Emotsional va xavotir, Ijtimoiy moslashuv, Kompleks
   final String title;
   final String notes;
   final String recommendations;
@@ -185,62 +187,65 @@ class AssessmentModel {
     'createdAt': createdAt?.toIso8601String(),
   };
 
-  factory AssessmentModel.fromJson(Map<String, dynamic> json) =>
-      AssessmentModel(
-        id: json['id'] as String,
-        studentId: json['studentId'] as String,
-        studentName: json['studentName'] as String? ?? '',
-        specialistId: json['specialistId'] as String,
-        specialistName: json['specialistName'] as String? ?? '',
-        specialistRole: json['specialistRole'] as String? ?? '',
-        assessmentDate: DateTime.parse(json['assessmentDate'] as String),
-        type: json['type'] as String? ?? 'Standart balli (Rubrikali)',
-        category: json['category'] as String? ?? 'Kognitiv va intellekt',
-        title: json['title'] as String? ?? '',
-        notes: json['notes'] as String? ?? '',
-        recommendations: json['recommendations'] as String? ?? '',
-        totalScore: (json['totalScore'] as num?)?.toDouble() ?? 0.0,
-        maxScore: (json['maxScore'] as num?)?.toDouble() ?? 100.0,
-        previousScore: (json['previousScore'] as num?)?.toDouble(),
-        criteria:
-            (json['criteria'] as List<dynamic>?)
-                ?.map(
-                  (c) => AssessmentCriterionResult.fromJson(
-                    c as Map<String, dynamic>,
-                  ),
-                )
-                .toList() ??
-            [],
-        responses:
-            (json['responses'] as List<dynamic>?)
-                ?.map(
-                  (r) => AssessmentResponseModel.fromJson(
-                    r as Map<String, dynamic>,
-                  ),
-                )
-                .toList() ??
-            [],
-        questionIds:
-            (json['questionIds'] as List<dynamic>?)
-                ?.map((q) => q.toString())
-                .toList() ??
-            [],
-        status: json['status'] as String? ??
-            ((json['isDraft'] as bool? ?? false) ? 'draft' : 'completed'),
-        generalConclusion: json['generalConclusion'] as String?,
-        domainScores: (json['domainScores'] as Map<String, dynamic>?)?.map(
-          (k, v) => MapEntry(k, (v as num).toDouble()),
-        ),
-        followUpAction: json['followUpAction'] as String?,
-        reviewDate: json['reviewDate'] != null
+  factory AssessmentModel.fromJson(
+    Map<String, dynamic> json,
+  ) => AssessmentModel(
+    id: json['id'] as String,
+    studentId: json['studentId'] as String,
+    studentName: json['studentName'] as String? ?? '',
+    specialistId: json['specialistId'] as String,
+    specialistName: json['specialistName'] as String? ?? '',
+    specialistRole: json['specialistRole'] as String? ?? '',
+    assessmentDate: DateTime.parse(json['assessmentDate'] as String),
+    type: json['type'] as String? ?? 'Standart balli (Rubrikali)',
+    category: json['category'] as String? ?? 'Kognitiv va intellekt',
+    title: json['title'] as String? ?? '',
+    notes: json['notes'] as String? ?? '',
+    recommendations: json['recommendations'] as String? ?? '',
+    totalScore: (json['totalScore'] as num?)?.toDouble() ?? 0.0,
+    maxScore: (json['maxScore'] as num?)?.toDouble() ?? 100.0,
+    previousScore: (json['previousScore'] as num?)?.toDouble(),
+    criteria:
+        (json['criteria'] as List<dynamic>?)
+            ?.map(
+              (c) =>
+                  AssessmentCriterionResult.fromJson(c as Map<String, dynamic>),
+            )
+            .toList() ??
+        [],
+    responses:
+        (json['responses'] as List<dynamic>?)
+            ?.map(
+              (r) =>
+                  AssessmentResponseModel.fromJson(r as Map<String, dynamic>),
+            )
+            .toList() ??
+        [],
+    questionIds:
+        (json['questionIds'] as List<dynamic>?)
+            ?.map((q) => q.toString())
+            .toList() ??
+        [],
+    status:
+        json['status'] as String? ??
+        ((json['isDraft'] as bool? ?? false) ? 'draft' : 'completed'),
+    generalConclusion: json['generalConclusion'] as String?,
+    domainScores: (json['domainScores'] as Map<String, dynamic>?)?.map(
+      (k, v) => MapEntry(k, (v as num).toDouble()),
+    ),
+    followUpAction: json['followUpAction'] as String?,
+    reviewDate:
+        json['reviewDate'] != null
             ? DateTime.parse(json['reviewDate'] as String)
             : null,
-        isDraft: json['isDraft'] as bool? ?? false,
-        updatedAt: json['updatedAt'] != null
+    isDraft: json['isDraft'] as bool? ?? false,
+    updatedAt:
+        json['updatedAt'] != null
             ? DateTime.parse(json['updatedAt'] as String)
             : null,
-        createdAt: json['createdAt'] != null
+    createdAt:
+        json['createdAt'] != null
             ? DateTime.tryParse(json['createdAt'] as String)
             : null,
-      );
+  );
 }

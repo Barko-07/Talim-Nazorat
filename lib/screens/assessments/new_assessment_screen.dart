@@ -355,7 +355,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                   Text(
                                     user?.fullName ?? '',
                                     style: TextStyle(
-                                      fontSize: 13.5,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.textPrimary,
                                     ),
@@ -366,7 +366,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                               Text(
                                 'Ushbu baholash faqat sizning kasbiy sohangiz doirasida rasmiylashtiriladi.',
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 13,
                                   color: AppColors.textMuted,
                                   height: 1.4,
                                 ),
@@ -435,7 +435,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                 'Baholanayotgan O‘quvchi',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
-                                  fontSize: 16,
+                                  fontSize: 15.5,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
@@ -546,7 +546,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                     'Kasbiy Rubrika Mezonlari',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
-                                      fontSize: 16,
+                                      fontSize: 15.5,
                                       color: AppColors.textPrimary,
                                     ),
                                   ),
@@ -568,7 +568,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                         Text(
                           'Har bir mezon bo‘yicha bolaning haqiqiy o‘zlashtirish darajasini belgilang:',
                           style: TextStyle(
-                            fontSize: 12.5,
+                            fontSize: 13,
                             color: AppColors.textMuted,
                             height: 1.4,
                           ),
@@ -577,7 +577,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                         Text(
                           'Bu ichki pedagogik kuzatuv rubrikasi; standartlashtirilgan test yoki tibbiy tashxis o‘rnini bosmaydi. Faqat o‘tkazilgan kuzatuv natijalarini kiriting.',
                           style: TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 12,
                             color: AppColors.warning,
                             height: 1.4,
                           ),
@@ -607,7 +607,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                         '${index + 1}. $name',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 13.5,
+                                          fontSize: 14,
                                           color: AppColors.textPrimary,
                                           height: 1.35,
                                         ),
@@ -633,7 +633,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                             : 'Baholanmagan',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 11.5,
+                                          fontSize: 12,
                                           color: role.color,
                                           fontFeatures: const [
                                             FontFeature.tabularFigures(),
@@ -701,7 +701,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                                 'Mutaxassis Xulosasi va Pedagogik Tavsiyalar',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
-                                  fontSize: 16,
+                                  fontSize: 15.5,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
@@ -755,7 +755,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                     label: Text(
                       '${role.label} Baholashini Saqlash',
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 15.5,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

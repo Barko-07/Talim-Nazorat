@@ -46,22 +46,23 @@ class SubjectTask {
   bool isOverdue(DateTime now) =>
       !isCompleted && dueDate != null && now.isAfter(dueDate!);
 
-  SubjectTask complete(Mastery result, {String? note, DateTime? at}) => SubjectTask(
-    id: id,
-    studentId: studentId,
-    subject: subject,
-    levelGrade: levelGrade,
-    standardId: standardId,
-    title: title,
-    description: description,
-    assignedById: assignedById,
-    assignedByName: assignedByName,
-    assignedAt: assignedAt,
-    dueDate: dueDate,
-    result: result,
-    resultNote: note,
-    completedAt: at ?? DateTime.now(),
-  );
+  SubjectTask complete(Mastery result, {String? note, DateTime? at}) =>
+      SubjectTask(
+        id: id,
+        studentId: studentId,
+        subject: subject,
+        levelGrade: levelGrade,
+        standardId: standardId,
+        title: title,
+        description: description,
+        assignedById: assignedById,
+        assignedByName: assignedByName,
+        assignedAt: assignedAt,
+        dueDate: dueDate,
+        result: result,
+        resultNote: note,
+        completedAt: at ?? DateTime.now(),
+      );
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -91,11 +92,15 @@ class SubjectTask {
     assignedById: json['assignedById'] as String? ?? '',
     assignedByName: json['assignedByName'] as String? ?? '',
     assignedAt: DateTime.parse(json['assignedAt'] as String),
-    dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate'] as String) : null,
+    dueDate:
+        json['dueDate'] != null
+            ? DateTime.parse(json['dueDate'] as String)
+            : null,
     result: Mastery.fromName(json['result'] as String?),
     resultNote: json['resultNote'] as String?,
-    completedAt: json['completedAt'] != null
-        ? DateTime.parse(json['completedAt'] as String)
-        : null,
+    completedAt:
+        json['completedAt'] != null
+            ? DateTime.parse(json['completedAt'] as String)
+            : null,
   );
 }

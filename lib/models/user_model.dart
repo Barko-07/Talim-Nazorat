@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 
@@ -93,25 +94,25 @@ extension UserRoleExtension on UserRole {
   IconData get icon {
     switch (this) {
       case UserRole.superAdmin:
-        return Icons.admin_panel_settings_rounded;
+        return LucideIcons.shieldCheck;
       case UserRole.institutionAdmin:
-        return Icons.account_balance_rounded;
+        return LucideIcons.landmark;
       case UserRole.coordinator:
-        return Icons.assignment_turned_in_rounded;
+        return LucideIcons.clipboardCheck;
       case UserRole.psychologist:
-        return Icons.psychology_rounded;
+        return LucideIcons.brain;
       case UserRole.speechTherapist:
-        return Icons.record_voice_over_rounded;
+        return LucideIcons.mic;
       case UserRole.specialEducation:
-        return Icons.extension_rounded;
+        return LucideIcons.puzzle;
       case UserRole.specialEdTeacher:
-        return Icons.school_rounded;
+        return LucideIcons.school;
       case UserRole.teacher:
-        return Icons.menu_book_rounded;
+        return LucideIcons.bookOpen;
       case UserRole.reviewer:
-        return Icons.visibility_rounded;
+        return LucideIcons.eye;
       case UserRole.parent:
-        return Icons.family_restroom_rounded;
+        return LucideIcons.users;
     }
   }
 

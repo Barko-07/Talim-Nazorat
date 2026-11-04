@@ -70,14 +70,14 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                           'O‘quvchi: ${alert.studentName} (${alert.studentGrade})',
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
-                            fontSize: 13.5,
+                            fontSize: 14,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           alert.ruleTitle,
                           style: TextStyle(
-                            fontSize: 12.5,
+                            fontSize: 13,
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                           ),
@@ -86,7 +86,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                         Text(
                           alert.message,
                           style: TextStyle(
-                            fontSize: 12.5,
+                            fontSize: 13,
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -273,7 +273,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                               ),
                         ),
                         _buildSvetoforCounter(
-                          label: '🔴 Qizil (Ishlanmagan)',
+                          label: 'Qizil (Ishlanmagan)',
                           count: summary.count(StatusColor.red),
                           color: AppColors.error,
                           bg: AppColors.errorBg,
@@ -289,7 +289,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                               ),
                         ),
                         _buildSvetoforCounter(
-                          label: '🟡 Sariq (E’tibor talab)',
+                          label: 'Sariq (E’tibor talab)',
                           count: summary.count(StatusColor.yellow),
                           color: AppColors.warning,
                           bg: AppColors.warningBg,
@@ -306,7 +306,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                               ),
                         ),
                         _buildSvetoforCounter(
-                          label: '🟢 Yashil (Ijobiy)',
+                          label: 'Yashil (Ijobiy)',
                           count: summary.count(StatusColor.green),
                           color: AppColors.success,
                           bg: AppColors.successBg,
@@ -369,7 +369,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               'Aniqlangan signallar (${alerts.length} ta)',
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                fontSize: 16,
+                fontSize: 15.5,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -455,7 +455,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 12.5,
+                fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: selected ? Colors.white : color,
               ),
@@ -590,7 +590,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                             'Ish boshlamagan: ${st.specialistsNotStarted.join(", ")}',
                         ].join(' • '),
                         style: TextStyle(
-                          fontSize: 11.5,
+                          fontSize: 12,
                           color: AppColors.textMuted,
                         ),
                       ),
@@ -778,7 +778,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               Text(
                 'O‘quvchi: ${alt.studentName} (${alt.studentGrade})',
                 style: TextStyle(
-                  fontSize: 13.5,
+                  fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
@@ -787,7 +787,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 Text(
                   'Mas’ul: ${alt.responsiblePersonName!}',
                   style: TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 13,
                     color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
                   ),
@@ -825,7 +825,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                   child: Text(
                     'Tavsiya: ${alt.suggestedAction}',
                     style: TextStyle(
-                      fontSize: 12.5,
+                      fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: AppColors.primaryDark,
                       height: 1.4,
@@ -877,7 +877,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
               child: Text(
                 'Yechim bayonnomasi: ${alt.resolvedNotes!}',
                 style: TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 13,
                   color: AppColors.success,
                   fontWeight: FontWeight.w700,
                   height: 1.4,

@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -231,7 +232,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
-                        Icons.quiz_rounded,
+                        LucideIcons.fileQuestion,
                         color: AppColors.primary,
                         size: 22,
                       ),
@@ -246,7 +247,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                 ? 'Yangi Psixologik Savol Yaratish'
                                 : 'Savolni Tahrirlash',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 17,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                             ),
@@ -264,7 +265,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded),
+                      icon: const Icon(LucideIcons.x),
                       onPressed: () => Navigator.pop(context),
                       tooltip: 'Yopish',
                     ),
@@ -287,7 +288,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                             labelText: 'Savol nomi / Mavzusi (ixtiyoriy)',
                             hintText:
                                 'Masalan: Serial mantiqiy qatorlar tahlili',
-                            prefixIcon: Icon(Icons.label_outline, size: 20),
+                            prefixIcon: Icon(LucideIcons.tag, size: 20),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -308,7 +309,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                             alignLabelWithHint: true,
                             prefixIcon: Padding(
                               padding: EdgeInsets.only(bottom: 40),
-                              child: Icon(Icons.edit_note_rounded, size: 20),
+                              child: Icon(LucideIcons.notebookPen, size: 20),
                             ),
                           ),
                         ),
@@ -325,7 +326,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                 decoration: const InputDecoration(
                                   labelText: 'Baholash yo‘nalishi *',
                                   prefixIcon: Icon(
-                                    Icons.category_outlined,
+                                    LucideIcons.shapes,
                                     size: 20,
                                   ),
                                 ),
@@ -337,7 +338,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                             child: Text(
                                               d,
                                               style: const TextStyle(
-                                                fontSize: 12.5,
+                                                fontSize: 13,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -360,7 +361,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                   labelText: 'Yosh / Sinf oralig‘i',
                                   hintText: 'Masalan: 1-4 sinf',
                                   prefixIcon: Icon(
-                                    Icons.school_outlined,
+                                    LucideIcons.school,
                                     size: 20,
                                   ),
                                 ),
@@ -381,7 +382,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                 decoration: const InputDecoration(
                                   labelText: 'Savol turi *',
                                   prefixIcon: Icon(
-                                    Icons.tune_rounded,
+                                    LucideIcons.slidersHorizontal,
                                     size: 20,
                                   ),
                                 ),
@@ -393,7 +394,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                             child: Text(
                                               e.value,
                                               style: const TextStyle(
-                                                fontSize: 12.5,
+                                                fontSize: 13,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -411,10 +412,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   labelText: 'Holati',
-                                  prefixIcon: Icon(
-                                    Icons.flag_outlined,
-                                    size: 20,
-                                  ),
+                                  prefixIcon: Icon(LucideIcons.flag, size: 20),
                                 ),
                                 items: [
                                   DropdownMenuItem(
@@ -422,7 +420,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                     child: Row(
                                       children: [
                                         Icon(
-                                          Icons.check_circle_rounded,
+                                          LucideIcons.circleCheck,
                                           size: 16,
                                           color: AppColors.success,
                                         ),
@@ -442,7 +440,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                     child: Row(
                                       children: [
                                         Icon(
-                                          Icons.pending_outlined,
+                                          LucideIcons.hourglass,
                                           size: 16,
                                           color: AppColors.warning,
                                         ),
@@ -484,7 +482,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                 'Natijani qanday talqin qilish kerak (masalan: 3-5 ball me’yor, 1-2 ball korreksiya talab qiladi)...',
                             prefixIcon: Padding(
                               padding: EdgeInsets.only(bottom: 24),
-                              child: Icon(Icons.rule_folder_outlined, size: 20),
+                              child: Icon(LucideIcons.folderCheck, size: 20),
                             ),
                           ),
                         ),
@@ -501,10 +499,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                                 'Tekshiruv vaqtida bolaning qanday reaksiyalariga e’tibor qaratish kerak...',
                             prefixIcon: Padding(
                               padding: EdgeInsets.only(bottom: 24),
-                              child: Icon(
-                                Icons.tips_and_updates_outlined,
-                                size: 20,
-                              ),
+                              child: Icon(LucideIcons.lightbulb, size: 20),
                             ),
                           ),
                         ),
@@ -534,7 +529,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                           vertical: 12,
                         ),
                       ),
-                      icon: const Icon(Icons.save_rounded, size: 18),
+                      icon: const Icon(LucideIcons.save, size: 18),
                       label: Text(
                         isNew ? 'Savolni saqlash' : 'O‘zgarishlarni saqlash',
                       ),
@@ -561,7 +556,11 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
         ),
         child: Row(
           children: [
-            Icon(Icons.notes_rounded, color: AppColors.textMuted, size: 22),
+            Icon(
+              LucideIcons.notebookText,
+              color: AppColors.textMuted,
+              size: 22,
+            ),
             SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -603,7 +602,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
               if (!isScale && _selectedType != 'yes_no')
                 TextButton.icon(
                   onPressed: _addOption,
-                  icon: const Icon(Icons.add_circle_outline, size: 16),
+                  icon: const Icon(LucideIcons.circlePlus, size: 16),
                   label: const Text(
                     'Variant qo‘shish',
                     style: TextStyle(fontSize: 12),
@@ -689,7 +688,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                       _options.length > 2)
                     IconButton(
                       icon: const Icon(
-                        Icons.delete_outline,
+                        LucideIcons.trash2,
                         size: 20,
                         color: Colors.red,
                       ),

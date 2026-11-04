@@ -100,7 +100,7 @@ class DashboardScreen extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 13,
                               color: AppColors.textSecondary,
                               height: 1.35,
                             ),
@@ -376,7 +376,7 @@ class DashboardScreen extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 13,
                     color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
                   ),
@@ -437,17 +437,13 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                LucideIcons.activity,
-                size: 19,
-                color: AppColors.primary,
-              ),
+              Icon(LucideIcons.activity, size: 19, color: AppColors.primary),
               const SizedBox(width: 9),
               Expanded(
                 child: Text(
                   'Bolalar bilan ishlash holati (Svetofor nazorati)',
                   style: TextStyle(
-                    fontSize: 14.5,
+                    fontSize: 15.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                   ),
@@ -473,17 +469,17 @@ class DashboardScreen extends StatelessWidget {
             runSpacing: 8,
             children: [
               StatusPill(
-                label: '🔴 Ishlanmagan / kechikkan: $redCount nafar',
+                label: 'Ishlanmagan / kechikkan: $redCount nafar',
                 color: AppColors.error,
                 backgroundColor: AppColors.errorBg,
               ),
               StatusPill(
-                label: '🟡 E’tibor talab: $yellowCount nafar',
+                label: 'E’tibor talab: $yellowCount nafar',
                 color: AppColors.warning,
                 backgroundColor: AppColors.warningBg,
               ),
               StatusPill(
-                label: '🟢 Ijobiy dinamika: $greenCount nafar',
+                label: 'Ijobiy dinamika: $greenCount nafar',
                 color: AppColors.success,
                 backgroundColor: AppColors.successBg,
               ),
@@ -523,7 +519,7 @@ class DashboardScreen extends StatelessWidget {
                   Text(
                     'Oylik rivojlanish dinamikasi',
                     style: TextStyle(
-                      fontSize: 16.5,
+                      fontSize: 17,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.2,
@@ -532,10 +528,7 @@ class DashboardScreen extends StatelessWidget {
                   SizedBox(height: 2),
                   Text(
                     'Yakunlangan baholashlarning oylik o‘rtacha natijasi, %',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 13, color: AppColors.textMuted),
                   ),
                 ],
               );
@@ -580,7 +573,7 @@ class DashboardScreen extends StatelessWidget {
                     Text(
                       'Hozircha ma’lumot yo‘q',
                       style: TextStyle(
-                        fontSize: 13.5,
+                        fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textSecondary,
                       ),
@@ -680,7 +673,7 @@ class DashboardScreen extends StatelessWidget {
                                 child: Text(
                                   months[idx],
                                   style: TextStyle(
-                                    fontSize: 11.5,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.textSecondary,
                                   ),
@@ -757,7 +750,7 @@ class DashboardScreen extends StatelessWidget {
                 child: Text(
                   'So‘nggi baholashlar',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                     letterSpacing: -0.2,
@@ -773,7 +766,7 @@ class DashboardScreen extends StatelessWidget {
                     child: Text(
                       'Barchasi',
                       style: TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
                       ),
@@ -788,7 +781,7 @@ class DashboardScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Text(
                 'Hozircha baholashlar yo‘q',
-                style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+                style: TextStyle(fontSize: 13, color: AppColors.textMuted),
               ),
             )
           else
@@ -825,7 +818,7 @@ class DashboardScreen extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 13.5,
+                                fontSize: 14,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -871,7 +864,7 @@ class DashboardScreen extends StatelessWidget {
                 child: Text(
                   'Kutilayotgan mashg‘ulotlar',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                     letterSpacing: -0.2,
@@ -887,7 +880,7 @@ class DashboardScreen extends StatelessWidget {
                     child: Text(
                       'Jadval',
                       style: TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
                       ),
@@ -902,7 +895,7 @@ class DashboardScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Text(
                 'Rejalashtirilgan darslar yo‘q',
-                style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+                style: TextStyle(fontSize: 13, color: AppColors.textMuted),
               ),
             )
           else
@@ -942,7 +935,7 @@ class DashboardScreen extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 13.5,
+                                fontSize: 14,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -1162,7 +1155,7 @@ class DashboardScreen extends StatelessWidget {
               Text(
                 sectionTitle,
                 style: TextStyle(
-                  fontSize: 16.5,
+                  fontSize: 17,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                   letterSpacing: -0.2,
@@ -1172,7 +1165,7 @@ class DashboardScreen extends StatelessWidget {
               Text(
                 sectionSubtitle,
                 style: TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 13,
                   color: AppColors.textMuted,
                   height: 1.35,
                 ),
@@ -1286,7 +1279,7 @@ class DashboardScreen extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textSecondary,
                     height: 1.25,
@@ -1306,7 +1299,7 @@ class DashboardScreen extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 26,
+                  fontSize: 24,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                   letterSpacing: -0.7,
@@ -1319,7 +1312,7 @@ class DashboardScreen extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 11.5,
+                  fontSize: 12,
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w500,
                 ),

@@ -19,143 +19,158 @@ class ReportsScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(
-              LucideIcons.fileSpreadsheet,
-              color: AppColors.primary,
-              size: 21,
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Excel / CSV formatida eksport',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-              ),
-            ),
-          ],
-        ),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 460),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      builder:
+          (ctx) => AlertDialog(
+            title: Row(
               children: [
-                Text(
-                  'Qaysi toifadagi hisobotni eksport qilmoqchisiz? Barcha ma’lumotlar UTF-8 BOM bilan rasmiylashtiriladi (Excel o‘zbekcha harflarni to‘g‘ri ochadi).',
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: AppColors.textSecondary,
-                    height: 1.4,
-                  ),
+                Icon(
+                  LucideIcons.fileSpreadsheet,
+                  color: AppColors.primary,
+                  size: 21,
                 ),
-                const SizedBox(height: 16),
-                _buildExportOption(
-                  ctx,
-                  icon: LucideIcons.users,
-                  title: 'O‘quvchilar ro‘yxati (${app.students.length} ta)',
-                  onTap: () => _displayCsvPreview(
-                    context,
-                    'O‘quvchilar_hisoboti.csv',
-                    app.exportStudentsCsv(),
-                  ),
-                ),
-                _buildExportOption(
-                  ctx,
-                  icon: LucideIcons.clipboardCheck,
-                  title:
-                      'Baholashlar hisoboti (${app.assessments.length} ta)',
-                  onTap: () => _displayCsvPreview(
-                    context,
-                    'Baholashlar_hisoboti.csv',
-                    app.exportAssessmentsCsv(),
-                  ),
-                ),
-                _buildExportOption(
-                  ctx,
-                  icon: LucideIcons.calendarDays,
-                  title:
-                      'Korreksion darslar va davomat (${app.sessions.length} ta)',
-                  onTap: () => _displayCsvPreview(
-                    context,
-                    'Mashgulotlar_davomat.csv',
-                    app.exportSessionsCsv(),
-                  ),
-                ),
-                _buildExportOption(
-                  ctx,
-                  icon: LucideIcons.bookOpenCheck,
-                  title:
-                      'ITR rejalari va maqsadlar (${app.iepPlans.length} ta)',
-                  onTap: () => _displayCsvPreview(
-                    context,
-                    'ITR_rejalari.csv',
-                    app.exportIepCsv(),
-                  ),
-                ),
-                _buildExportOption(
-                  ctx,
-                  icon: LucideIcons.shieldAlert,
-                  title: 'Monitoring signallari (${app.alerts.length} ta)',
-                  onTap: () => _displayCsvPreview(
-                    context,
-                    'Monitoring_signallari.csv',
-                    app.exportAlertsCsv(),
-                  ),
-                ),
-                _buildExportOption(
-                  ctx,
-                  icon: LucideIcons.arrowLeftRight,
-                  title: 'Yo‘naltirishlar jurnali (${app.referrals.length} ta)',
-                  onTap: () => _displayCsvPreview(
-                    context,
-                    'Yonaltirishlar_jurnali.csv',
-                    app.exportReferralsCsv(),
-                  ),
-                ),
-                _buildExportOption(
-                  ctx,
-                  icon: LucideIcons.activity,
-                  title: 'Monitoring va Svetofor hisoboti (Oxirgi 30 kun CSV)',
-                  onTap: () => _displayCsvPreview(
-                    context,
-                    'Monitoring_va_Svetofor_hisoboti.csv',
-                    app.exportMonitoringReportCsv(),
-                  ),
-                ),
-                _buildExportOption(
-                  ctx,
-                  icon: LucideIcons.userCheck,
-                  title: 'Mutaxassislar faolligi va qamrov jadvali (CSV)',
-                  onTap: () => _displayCsvPreview(
-                    context,
-                    'Mutaxassislar_faolligi.csv',
-                    app.exportSpecialistActivityCsv(),
-                  ),
-                ),
-                _buildExportOption(
-                  ctx,
-                  icon: LucideIcons.databaseBackup,
-                  title: 'To‘liq ma’lumotlar bazasi zaxirasi (JSON Backup)',
-                  onTap: () => _displayCsvPreview(
-                    context,
-                    'database_backup.json',
-                    app.exportDatabaseBackupJson(),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Excel / CSV formatida eksport',
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],
             ),
+            content: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 460),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Qaysi toifadagi hisobotni eksport qilmoqchisiz? Barcha ma’lumotlar UTF-8 BOM bilan rasmiylashtiriladi (Excel o‘zbekcha harflarni to‘g‘ri ochadi).',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildExportOption(
+                      ctx,
+                      icon: LucideIcons.users,
+                      title: 'O‘quvchilar ro‘yxati (${app.students.length} ta)',
+                      onTap:
+                          () => _displayCsvPreview(
+                            context,
+                            'O‘quvchilar_hisoboti.csv',
+                            app.exportStudentsCsv(),
+                          ),
+                    ),
+                    _buildExportOption(
+                      ctx,
+                      icon: LucideIcons.clipboardCheck,
+                      title:
+                          'Baholashlar hisoboti (${app.assessments.length} ta)',
+                      onTap:
+                          () => _displayCsvPreview(
+                            context,
+                            'Baholashlar_hisoboti.csv',
+                            app.exportAssessmentsCsv(),
+                          ),
+                    ),
+                    _buildExportOption(
+                      ctx,
+                      icon: LucideIcons.calendarDays,
+                      title:
+                          'Korreksion darslar va davomat (${app.sessions.length} ta)',
+                      onTap:
+                          () => _displayCsvPreview(
+                            context,
+                            'Mashgulotlar_davomat.csv',
+                            app.exportSessionsCsv(),
+                          ),
+                    ),
+                    _buildExportOption(
+                      ctx,
+                      icon: LucideIcons.bookOpenCheck,
+                      title:
+                          'ITR rejalari va maqsadlar (${app.iepPlans.length} ta)',
+                      onTap:
+                          () => _displayCsvPreview(
+                            context,
+                            'ITR_rejalari.csv',
+                            app.exportIepCsv(),
+                          ),
+                    ),
+                    _buildExportOption(
+                      ctx,
+                      icon: LucideIcons.shieldAlert,
+                      title: 'Monitoring signallari (${app.alerts.length} ta)',
+                      onTap:
+                          () => _displayCsvPreview(
+                            context,
+                            'Monitoring_signallari.csv',
+                            app.exportAlertsCsv(),
+                          ),
+                    ),
+                    _buildExportOption(
+                      ctx,
+                      icon: LucideIcons.arrowLeftRight,
+                      title:
+                          'Yo‘naltirishlar jurnali (${app.referrals.length} ta)',
+                      onTap:
+                          () => _displayCsvPreview(
+                            context,
+                            'Yonaltirishlar_jurnali.csv',
+                            app.exportReferralsCsv(),
+                          ),
+                    ),
+                    _buildExportOption(
+                      ctx,
+                      icon: LucideIcons.activity,
+                      title:
+                          'Monitoring va Svetofor hisoboti (Oxirgi 30 kun CSV)',
+                      onTap:
+                          () => _displayCsvPreview(
+                            context,
+                            'Monitoring_va_Svetofor_hisoboti.csv',
+                            app.exportMonitoringReportCsv(),
+                          ),
+                    ),
+                    _buildExportOption(
+                      ctx,
+                      icon: LucideIcons.userCheck,
+                      title: 'Mutaxassislar faolligi va qamrov jadvali (CSV)',
+                      onTap:
+                          () => _displayCsvPreview(
+                            context,
+                            'Mutaxassislar_faolligi.csv',
+                            app.exportSpecialistActivityCsv(),
+                          ),
+                    ),
+                    _buildExportOption(
+                      ctx,
+                      icon: LucideIcons.databaseBackup,
+                      title: 'To‘liq ma’lumotlar bazasi zaxirasi (JSON Backup)',
+                      onTap:
+                          () => _displayCsvPreview(
+                            context,
+                            'database_backup.json',
+                            app.exportDatabaseBackupJson(),
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Yopish'),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Yopish'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -209,68 +224,72 @@ class ReportsScreen extends StatelessWidget {
   ) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          'CSV fayli tayyor: $filename',
-          style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700),
-        ),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Fayl mazmuni muvaffaqiyatli shakllantirildi. Ma’lumotlarni xotiraga nusxalab Excel dasturida ochishingiz mumkin:',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: AppColors.textSecondary,
-                  height: 1.4,
-                ),
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(
+              'CSV fayli tayyor: $filename',
+              style: const TextStyle(
+                fontSize: 15.5,
+                fontWeight: FontWeight.w700,
               ),
-              const SizedBox(height: 14),
-              GlassWell(
-                borderRadius: 12,
-                padding: const EdgeInsets.all(14),
-                child: SizedBox(
-                  height: 220,
-                  width: double.maxFinite,
-                  child: SingleChildScrollView(
-                    child: Text(
-                      csvData,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 11.5,
-                        height: 1.4,
+            ),
+            content: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Fayl mazmuni muvaffaqiyatli shakllantirildi. Ma’lumotlarni xotiraga nusxalab Excel dasturida ochishingiz mumkin:',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  GlassWell(
+                    borderRadius: 12,
+                    padding: const EdgeInsets.all(14),
+                    child: SizedBox(
+                      height: 220,
+                      width: double.maxFinite,
+                      child: SingleChildScrollView(
+                        child: Text(
+                          csvData,
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 12,
+                            height: 1.4,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Yopish'),
+              ),
+              FilledButton.icon(
+                icon: const Icon(LucideIcons.copy, size: 15),
+                label: const Text('Nusxa olish'),
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: csvData));
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('$filename mazmuni xotiraga nusxalandi!'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                },
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Yopish'),
-          ),
-          FilledButton.icon(
-            icon: const Icon(LucideIcons.copy, size: 15),
-            label: const Text('Nusxa olish'),
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: csvData));
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('$filename mazmuni xotiraga nusxalandi!'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
-            },
-          ),
-        ],
-      ),
     );
   }
 
@@ -296,8 +315,7 @@ class ReportsScreen extends StatelessWidget {
           children: [
             AdaptivePageHeader(
               title: 'Tahliliy hisobotlar',
-              subtitle:
-                  'Pedagogik monitoring bo‘yicha rasmiy ko‘rsatkichlar',
+              subtitle: 'Pedagogik monitoring bo‘yicha rasmiy ko‘rsatkichlar',
               action: HeaderActionButton(
                 icon: LucideIcons.download,
                 label: 'CSV / JSON eksport',
@@ -316,9 +334,10 @@ class ReportsScreen extends StatelessWidget {
                 _buildSummaryStatCard(
                   label: 'Jami ro‘yxatdagi bolalar',
                   value: '${students.length}',
-                  caption: report != null
-                      ? '${report.childrenWorkedWith} tasi bilan ishlangan • ${report.childrenNotWorkedWith} tasi kutilmoqda'
-                      : '100% inklyuziv qamrovda',
+                  caption:
+                      report != null
+                          ? '${report.childrenWorkedWith} tasi bilan ishlangan • ${report.childrenNotWorkedWith} tasi kutilmoqda'
+                          : '100% inklyuziv qamrovda',
                   icon: LucideIcons.users,
                   accent: AppColors.primary,
                 ),
@@ -367,7 +386,7 @@ class ReportsScreen extends StatelessWidget {
                           'Individual ta’lim rejalari (ITR) monitoring hisoboti',
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
-                            fontSize: 16,
+                            fontSize: 15.5,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -385,8 +404,10 @@ class ReportsScreen extends StatelessWidget {
                     )
                   else
                     ...plans.map((p) {
-                      final progress =
-                          (p.averageProgress / 100).clamp(0.0, 1.0);
+                      final progress = (p.averageProgress / 100).clamp(
+                        0.0,
+                        1.0,
+                      );
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: SurfaceCard(
@@ -399,9 +420,10 @@ class ReportsScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => StudentDetailScreen(
-                                  studentId: p.studentId,
-                                ),
+                                builder:
+                                    (_) => StudentDetailScreen(
+                                      studentId: p.studentId,
+                                    ),
                               ),
                             );
                           },
@@ -482,7 +504,7 @@ class ReportsScreen extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textMuted,
                     height: 1.3,
@@ -547,7 +569,7 @@ class ReportsScreen extends StatelessWidget {
                   'Svetofor holati va rivojlanish dinamikasi hisoboti (oxirgi 30 kun)',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    fontSize: 16,
+                    fontSize: 15.5,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -560,22 +582,22 @@ class ReportsScreen extends StatelessWidget {
             runSpacing: 10,
             children: [
               StatusPill(
-                label: '🔴 Qizil (Ishlanmagan): $redCount ta',
+                label: 'Qizil (Ishlanmagan): $redCount ta',
                 color: AppColors.error,
                 backgroundColor: AppColors.errorBg,
               ),
               StatusPill(
-                label: '🟡 Sariq (E’tibor talab): $yellowCount ta',
+                label: 'Sariq (E’tibor talab): $yellowCount ta',
                 color: AppColors.warning,
                 backgroundColor: AppColors.warningBg,
               ),
               StatusPill(
-                label: '🟢 Yashil (Ijobiy natija): $greenCount ta',
+                label: 'Yashil (Ijobiy natija): $greenCount ta',
                 color: AppColors.success,
                 backgroundColor: AppColors.successBg,
               ),
               StatusPill(
-                label: '📈 O‘sish: $growthCount',
+                label: 'O‘sish: $growthCount',
                 color: AppColors.success,
               ),
               StatusPill(
@@ -583,7 +605,8 @@ class ReportsScreen extends StatelessWidget {
                 color: AppColors.warning,
               ),
               StatusPill(
-                label: '📉 Pasayish / Samarasiz: ${declineCount + ineffectiveCount}',
+                label:
+                    'Pasayish / Samarasiz: ${declineCount + ineffectiveCount}',
                 color: AppColors.error,
               ),
             ],
@@ -601,9 +624,9 @@ class ReportsScreen extends StatelessWidget {
                 ),
               ),
               child: Text(
-                '🔴 Oxirgi 30 kunda hech qanday ish qayd etilmagan o‘quvchilar (${report.notWorkedWithNames.length} nafar): ${report.notWorkedWithNames.join(", ")}',
+                'Oxirgi 30 kunda hech qanday ish qayd etilmagan o‘quvchilar (${report.notWorkedWithNames.length} nafar): ${report.notWorkedWithNames.join(", ")}',
                 style: TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: AppColors.error,
                 ),
@@ -631,7 +654,7 @@ class ReportsScreen extends StatelessWidget {
                   'Mutaxassislar faolligi va qamrov jadvali',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    fontSize: 16,
+                    fontSize: 15.5,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -665,7 +688,7 @@ class ReportsScreen extends StatelessWidget {
                               sp.fullName,
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 13.5,
+                                fontSize: 14,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -683,11 +706,12 @@ class ReportsScreen extends StatelessWidget {
                       const SizedBox(width: 10),
                       StatusPill(
                         label: 'Qamrov: $pct%',
-                        color: pct >= 70
-                            ? AppColors.success
-                            : pct >= 30
-                            ? AppColors.warning
-                            : AppColors.error,
+                        color:
+                            pct >= 70
+                                ? AppColors.success
+                                : pct >= 30
+                                ? AppColors.warning
+                                : AppColors.error,
                       ),
                     ],
                   ),

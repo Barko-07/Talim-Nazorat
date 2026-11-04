@@ -14,7 +14,8 @@ class PsychologicalMethodItem {
   final String title;
   final String author;
   final String targetAge;
-  final String domain; // 'Kognitiv va intellekt', 'Diqqat va ishchanlik', 'Xotira jarayonlari', 'Emotsional va xavotir', 'Shaxsiyat va moslashuv'
+  final String
+  domain; // 'Kognitiv va intellekt', 'Diqqat va ishchanlik', 'Xotira jarayonlari', 'Emotsional va xavotir', 'Shaxsiyat va moslashuv'
   final int durationMinutes;
   final String purpose;
   final String instructions;
@@ -74,7 +75,8 @@ class PsychologicalMethodsData {
       normCriteria:
           'Natijalarni faqat litsenziyalangan qo‘llanmadagi me’yorlar bo‘yicha talqin qiling. Ilova me’yor jadvallarini saqlamaydi va bolaga daraja yorlig‘i qo‘ymaydi.',
       requiresLicensedMaterials: true,
-      licenseNote: 'Test materiallari va me’yorlari nashriyot litsenziyasi bilan himoyalangan.',
+      licenseNote:
+          'Test materiallari va me’yorlari nashriyot litsenziyasi bilan himoyalangan.',
     ),
     PsychologicalMethodItem(
       id: 'method_landolt',
@@ -202,7 +204,8 @@ class PsychologicalMethodsData {
       normCriteria:
           'Natijalarni faqat litsenziyalangan qo‘llanmadagi me’yorlar bo‘yicha talqin qiling. Ilova me’yor jadvallarini saqlamaydi va bolaga daraja yorlig‘i qo‘ymaydi.',
       requiresLicensedMaterials: true,
-      licenseNote: 'L.A. Yasyukova metodikasi mualliflik huquqi bilan himoyalangan nashr.',
+      licenseNote:
+          'L.A. Yasyukova metodikasi mualliflik huquqi bilan himoyalangan nashr.',
     ),
     PsychologicalMethodItem(
       id: 'method_cattell',
@@ -230,7 +233,8 @@ class PsychologicalMethodsData {
       normCriteria:
           'Natijalarni faqat litsenziyalangan qo‘llanmadagi me’yorlar bo‘yicha talqin qiling. Ilova me’yor jadvallarini saqlamaydi va bolaga daraja yorlig‘i qo‘ymaydi.',
       requiresLicensedMaterials: true,
-      licenseNote: 'CPQ so‘rovnomasi va me’yorlari mualliflik huquqi bilan himoyalangan.',
+      licenseNote:
+          'CPQ so‘rovnomasi va me’yorlari mualliflik huquqi bilan himoyalangan.',
     ),
     PsychologicalMethodItem(
       id: 'method_htp',

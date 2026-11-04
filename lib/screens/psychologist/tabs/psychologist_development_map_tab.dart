@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -40,24 +41,29 @@ class _PsychologistDevelopmentMapTabState
       );
     }
 
-    final currentStudent = _selectedStudent != null &&
-            students.any((s) => s.id == _selectedStudent!.id)
-        ? _selectedStudent!
-        : students.first;
+    final currentStudent =
+        _selectedStudent != null &&
+                students.any((s) => s.id == _selectedStudent!.id)
+            ? _selectedStudent!
+            : students.first;
 
     // Ushbu bolaning baholashlari, mashg'ulotlari va kuzatuvlari
-    final completedAssessments = app.assessments
-        .where((a) => a.studentId == currentStudent.id && a.status == 'completed')
-        .toList()
-      ..sort((a, b) => b.assessmentDate.compareTo(a.assessmentDate));
+    final completedAssessments =
+        app.assessments
+            .where(
+              (a) =>
+                  a.studentId == currentStudent.id && a.status == 'completed',
+            )
+            .toList()
+          ..sort((a, b) => b.assessmentDate.compareTo(a.assessmentDate));
 
-    final studentSessions = app.sessions
-        .where((s) => s.studentId == currentStudent.id)
-        .toList();
+    final studentSessions =
+        app.sessions.where((s) => s.studentId == currentStudent.id).toList();
 
-    final studentObservations = app.observations
-        .where((o) => o.studentId == currentStudent.id)
-        .toList();
+    final studentObservations =
+        app.observations
+            .where((o) => o.studentId == currentStudent.id)
+            .toList();
 
     // Haqiqiy ballar dinamikasini hisoblash
     final hasEnoughData = completedAssessments.length >= 2;
@@ -71,15 +77,13 @@ class _PsychologistDevelopmentMapTabState
       if (hasEnoughData) {
         baselineScore = completedAssessments[1].totalScore;
         scoreDiff = currentScore - baselineScore;
-        growthPercent = baselineScore > 0
-            ? ((scoreDiff / baselineScore) * 100).round()
-            : 0;
+        growthPercent =
+            baselineScore > 0 ? ((scoreDiff / baselineScore) * 100).round() : 0;
       } else if (completedAssessments.first.previousScore != null) {
         baselineScore = completedAssessments.first.previousScore!;
         scoreDiff = currentScore - baselineScore;
-        growthPercent = baselineScore > 0
-            ? ((scoreDiff / baselineScore) * 100).round()
-            : 0;
+        growthPercent =
+            baselineScore > 0 ? ((scoreDiff / baselineScore) * 100).round() : 0;
       }
     }
 
@@ -89,7 +93,8 @@ class _PsychologistDevelopmentMapTabState
     final Map<String, double> realDomainScores = {};
 
     if (latestAssessment != null) {
-      if (latestAssessment.domainScores != null && latestAssessment.domainScores!.isNotEmpty) {
+      if (latestAssessment.domainScores != null &&
+          latestAssessment.domainScores!.isNotEmpty) {
         realDomainScores.addAll(latestAssessment.domainScores!);
       } else if (latestAssessment.criteria.isNotEmpty) {
         for (final c in latestAssessment.criteria) {
@@ -108,23 +113,28 @@ class _PsychologistDevelopmentMapTabState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Bolaning Psixologik Rivojlanish Xaritasi',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Bolaning Psixologik Rivojlanish Xaritasi',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Kuzatuv, diagnostika va korreksiya natijalarining vaqt davomidagi dinamikasi',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
+                    SizedBox(height: 4),
+                    Text(
+                      'Kuzatuv, diagnostika va korreksiya natijalarining vaqt davomidagi dinamikasi',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               // O'quvchini tanlash
               SizedBox(
@@ -139,18 +149,19 @@ class _PsychologistDevelopmentMapTabState
                       vertical: 10,
                     ),
                   ),
-                  items: students
-                      .map(
-                        (s) => DropdownMenuItem(
-                          value: s,
-                          child: Text(
-                            '${s.fullName} (${s.grade})',
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 13),
-                          ),
-                        ),
-                      )
-                      .toList(),
+                  items:
+                      students
+                          .map(
+                            (s) => DropdownMenuItem(
+                              value: s,
+                              child: Text(
+                                '${s.fullName} (${s.grade})',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ),
+                          )
+                          .toList(),
                   onChanged: (v) {
                     if (v != null) setState(() => _selectedStudent = v);
                   },
@@ -190,12 +201,15 @@ class _PsychologistDevelopmentMapTabState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
                               currentStudent.fullName,
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
@@ -247,14 +261,16 @@ class _PsychologistDevelopmentMapTabState
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: growthPercent >= 0
-                            ? AppColors.successBg
-                            : AppColors.errorBg,
+                        color:
+                            growthPercent >= 0
+                                ? AppColors.successBg
+                                : AppColors.errorBg,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: growthPercent >= 0
-                              ? AppColors.success.withValues(alpha: 0.3)
-                              : AppColors.error.withValues(alpha: 0.3),
+                          color:
+                              growthPercent >= 0
+                                  ? AppColors.success.withValues(alpha: 0.3)
+                                  : AppColors.error.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Column(
@@ -262,11 +278,12 @@ class _PsychologistDevelopmentMapTabState
                           Text(
                             '${growthPercent >= 0 ? "+" : ""}$growthPercent%',
                             style: TextStyle(
-                              fontSize: 22,
+                              fontSize: 20,
                               fontWeight: FontWeight.w700,
-                              color: growthPercent >= 0
-                                  ? AppColors.success
-                                  : AppColors.error,
+                              color:
+                                  growthPercent >= 0
+                                      ? AppColors.success
+                                      : AppColors.error,
                             ),
                           ),
                           Text(
@@ -276,9 +293,10 @@ class _PsychologistDevelopmentMapTabState
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: growthPercent >= 0
-                                  ? AppColors.success
-                                  : AppColors.error,
+                              color:
+                                  growthPercent >= 0
+                                      ? AppColors.success
+                                      : AppColors.error,
                             ),
                           ),
                         ],
@@ -289,12 +307,13 @@ class _PsychologistDevelopmentMapTabState
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.primary,
                       ),
-                      icon: const Icon(Icons.add_task_rounded, size: 16),
+                      icon: const Icon(LucideIcons.listPlus, size: 16),
                       label: const Text('Birinchi baholashni boshlash'),
-                      onPressed: () => CreateAssessmentFlow.start(
-                        context,
-                        initialStudent: currentStudent,
-                      ),
+                      onPressed:
+                          () => CreateAssessmentFlow.start(
+                            context,
+                            initialStudent: currentStudent,
+                          ),
                     ),
                 ],
               ),
@@ -306,17 +325,19 @@ class _PsychologistDevelopmentMapTabState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Sohalar kesimida joriy psixologik ko‘rsatkichlar',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+              Flexible(
+                child: Text(
+                  'Sohalar kesimida joriy psixologik ko‘rsatkichlar',
+                  style: TextStyle(
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
               if (completedAssessments.length >= 2)
                 OutlinedButton.icon(
-                  icon: const Icon(Icons.compare_arrows_rounded, size: 16),
+                  icon: const Icon(LucideIcons.arrowLeftRight, size: 16),
                   label: const Text('Oldingi baholash bilan taqqoslash'),
                   onPressed: () {
                     AssessmentCompareDialog.show(
@@ -342,17 +363,14 @@ class _PsychologistDevelopmentMapTabState
               child: Column(
                 children: [
                   Icon(
-                    Icons.insights_rounded,
+                    LucideIcons.chartLine,
                     size: 40,
                     color: AppColors.textMuted,
                   ),
                   const SizedBox(height: 10),
                   const Text(
                     'Ushbu o‘quvchida hali rasmiy baholash ma’lumotlari mavjud emas',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -366,12 +384,13 @@ class _PsychologistDevelopmentMapTabState
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.primary,
                     ),
-                    icon: const Icon(Icons.add_task_rounded, size: 16),
+                    icon: const Icon(LucideIcons.listPlus, size: 16),
                     label: const Text('Baholash o‘tkazish'),
-                    onPressed: () => CreateAssessmentFlow.start(
-                      context,
-                      initialStudent: currentStudent,
-                    ),
+                    onPressed:
+                        () => CreateAssessmentFlow.start(
+                          context,
+                          initialStudent: currentStudent,
+                        ),
                   ),
                 ],
               ),
@@ -386,36 +405,38 @@ class _PsychologistDevelopmentMapTabState
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
-                  children: realDomainScores.entries.map((e) {
-                    final dName = e.key;
-                    final pct = e.value;
-                    final normalizedVal = (pct / 100.0).clamp(0.0, 1.0);
+                  children:
+                      realDomainScores.entries.map((e) {
+                        final dName = e.key;
+                        final pct = e.value;
+                        final normalizedVal = (pct / 100.0).clamp(0.0, 1.0);
 
-                    Color color = AppColors.primary;
-                    String statusText = 'Me’yoriy o‘sish dinamikasida';
+                        Color color = AppColors.primary;
+                        String statusText = 'Me’yoriy o‘sish dinamikasida';
 
-                    if (pct >= 80) {
-                      color = AppColors.success;
-                      statusText = 'Yuqori o‘zlashtirish va barqarorlik';
-                    } else if (pct < 50) {
-                      color = AppColors.error;
-                      statusText = 'Maxsus korreksion yordam talab etiladi';
-                    } else {
-                      color = AppColors.info;
-                      statusText = 'Rivojlanish bosqichida / Qisman mustaqil';
-                    }
+                        if (pct >= 80) {
+                          color = AppColors.success;
+                          statusText = 'Yuqori o‘zlashtirish va barqarorlik';
+                        } else if (pct < 50) {
+                          color = AppColors.error;
+                          statusText = 'Maxsus korreksion yordam talab etiladi';
+                        } else {
+                          color = AppColors.info;
+                          statusText =
+                              'Rivojlanish bosqichida / Qisman mustaqil';
+                        }
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _buildDomainProgressRow(
-                        title: dName,
-                        value: normalizedVal,
-                        percentLabel: '${pct.toStringAsFixed(0)}%',
-                        color: color,
-                        statusText: statusText,
-                      ),
-                    );
-                  }).toList(),
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: _buildDomainProgressRow(
+                            title: dName,
+                            value: normalizedVal,
+                            percentLabel: '${pct.toStringAsFixed(0)}%',
+                            color: color,
+                            statusText: statusText,
+                          ),
+                        );
+                      }).toList(),
                 ),
               ),
             ),
@@ -441,17 +462,19 @@ class _PsychologistDevelopmentMapTabState
                         Row(
                           children: [
                             Icon(
-                              Icons.history_rounded,
+                              LucideIcons.history,
                               size: 20,
                               color: AppColors.primary,
                             ),
                             SizedBox(width: 8),
-                            Text(
-                              'O‘tkazilgan baholashlar tarixi',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                            Flexible(
+                              child: Text(
+                                'O‘tkazilgan baholashlar tarixi',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ),
                           ],
@@ -475,7 +498,8 @@ class _PsychologistDevelopmentMapTabState
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: completedAssessments.length,
-                            separatorBuilder: (_, _) => const Divider(height: 16),
+                            separatorBuilder:
+                                (_, _) => const Divider(height: 16),
                             itemBuilder: (ctx, i) {
                               final a = completedAssessments[i];
                               return Row(
@@ -551,17 +575,19 @@ class _PsychologistDevelopmentMapTabState
                         Row(
                           children: [
                             Icon(
-                              Icons.timeline_rounded,
+                              LucideIcons.timeline,
                               size: 20,
                               color: AppColors.success,
                             ),
                             SizedBox(width: 8),
-                            Text(
-                              'Faollik va kuzatuv xulosasi',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                            Flexible(
+                              child: Text(
+                                'Faollik va kuzatuv xulosasi',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ),
                           ],
@@ -581,7 +607,7 @@ class _PsychologistDevelopmentMapTabState
                                     Text(
                                       '${studentSessions.length} ta',
                                       style: TextStyle(
-                                        fontSize: 18,
+                                        fontSize: 17,
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.textPrimary,
                                       ),
@@ -610,7 +636,7 @@ class _PsychologistDevelopmentMapTabState
                                     Text(
                                       '${studentObservations.length} ta',
                                       style: TextStyle(
-                                        fontSize: 18,
+                                        fontSize: 17,
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.textPrimary,
                                       ),
@@ -635,8 +661,7 @@ class _PsychologistDevelopmentMapTabState
                             color: AppColors.successBg,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: AppColors.success
-                                  .withValues(alpha: 0.2),
+                              color: AppColors.success.withValues(alpha: 0.2),
                             ),
                           ),
                           child: Text(
@@ -706,10 +731,7 @@ class _PsychologistDevelopmentMapTabState
         const SizedBox(height: 4),
         Text(
           statusText,
-          style: TextStyle(
-            fontSize: 11,
-            color: AppColors.textMuted,
-          ),
+          style: TextStyle(fontSize: 11, color: AppColors.textMuted),
         ),
       ],
     );

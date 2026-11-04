@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -216,7 +217,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
-                              Icons.task_alt_rounded,
+                              LucideIcons.circleCheckBig,
                               color: AppColors.success,
                               size: 22,
                             ),
@@ -244,7 +245,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.close_rounded),
+                            icon: const Icon(LucideIcons.x),
                             onPressed: () => Navigator.pop(ctx),
                           ),
                         ],
@@ -344,9 +345,9 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                             minHeight: 6,
                                             backgroundColor: AppColors.border,
                                             valueColor:
-                                                AlwaysStoppedAnimation<
-                                                  Color
-                                                >(AppColors.primary),
+                                                AlwaysStoppedAnimation<Color>(
+                                                  AppColors.primary,
+                                                ),
                                           ),
                                         ),
                                       ],
@@ -388,14 +389,16 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                   color: AppColors.warningBg,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: AppColors.warning.withValues(alpha: 0.3),
+                                    color: AppColors.warning.withValues(
+                                      alpha: 0.3,
+                                    ),
                                   ),
                                 ),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Icon(
-                                      Icons.info_outline_rounded,
+                                      LucideIcons.info,
                                       size: 16,
                                       color: AppColors.warning,
                                     ),
@@ -433,10 +436,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                 vertical: 12,
                               ),
                             ),
-                            icon: const Icon(
-                              Icons.check_circle_rounded,
-                              size: 18,
-                            ),
+                            icon: const Icon(LucideIcons.circleCheck, size: 18),
                             label: const Text('Baholashni to‘liq yakunlash'),
                             onPressed: () async {
                               if (conclusionCtrl.text.trim().isEmpty ||
@@ -558,7 +558,10 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
           children: [
             Text(
               widget.assessment.studentName,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                fontSize: 15.5,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Text(
               '${widget.assessment.title} • Savol ${_currentIndex + 1} / ${_questions.length}',
@@ -576,16 +579,14 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
         ),
         actions: [
           TextButton.icon(
-            icon: const Icon(Icons.bookmark_outline_rounded, size: 18),
+            icon: const Icon(LucideIcons.bookmark, size: 18),
             label: const Text('Qoralama saqlash'),
             onPressed: _saveAsDraftAndExit,
           ),
           const SizedBox(width: 8),
           FilledButton.icon(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.success,
-            ),
-            icon: const Icon(Icons.checklist_rounded, size: 18),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.success),
+            icon: const Icon(LucideIcons.listChecks, size: 18),
             label: const Text('Yakunlash'),
             onPressed: _showReviewAndFinalizeModal,
           ),
@@ -782,7 +783,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.info_outline_rounded,
+                                  LucideIcons.info,
                                   color: AppColors.warning,
                                   size: 20,
                                 ),
@@ -819,7 +820,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                 'Bolaning topshiriqqa munosabati, mimikasi, ikkilanishlari yoki xatti-harakati...',
                             prefixIcon: Padding(
                               padding: EdgeInsets.only(bottom: 24),
-                              child: Icon(Icons.comment_outlined, size: 20),
+                              child: Icon(LucideIcons.messageSquare, size: 20),
                             ),
                           ),
                         ),
@@ -838,7 +839,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.tips_and_updates_outlined,
+                                  LucideIcons.lightbulb,
                                   size: 16,
                                   color: AppColors.textMuted,
                                 ),
@@ -871,7 +872,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                           _currentIndex > 0
                               ? () => _goToIndex(_currentIndex - 1)
                               : null,
-                      icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                      icon: const Icon(LucideIcons.arrowLeft, size: 18),
                       label: const Text('Oldingi savol'),
                     ),
                     if (_currentIndex < _questions.length - 1)
@@ -884,7 +885,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                           ),
                         ),
                         onPressed: () => _goToIndex(_currentIndex + 1),
-                        icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                        icon: const Icon(LucideIcons.arrowRight, size: 18),
                         label: const Text('Keyingi savol'),
                       )
                     else
@@ -897,7 +898,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                           ),
                         ),
                         onPressed: _showReviewAndFinalizeModal,
-                        icon: const Icon(Icons.check_circle_rounded, size: 18),
+                        icon: const Icon(LucideIcons.circleCheck, size: 18),
                         label: const Text('Ko‘rib chiqish & Yakunlash'),
                       ),
                   ],
@@ -957,8 +958,8 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                         children: [
                           Icon(
                             isYes
-                                ? Icons.check_circle_outline_rounded
-                                : Icons.cancel_outlined,
+                                ? LucideIcons.circleCheck
+                                : LucideIcons.circleX,
                             size: 28,
                             color:
                                 isSelected
@@ -1011,11 +1012,11 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primaryLight : AppColors.surface,
+                  color:
+                      isSelected ? AppColors.primaryLight : AppColors.surface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color:
-                        isSelected ? AppColors.primary : AppColors.border,
+                    color: isSelected ? AppColors.primary : AppColors.border,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -1026,7 +1027,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                   title: Text(
                     opt.text,
                     style: TextStyle(
-                      fontSize: 13.5,
+                      fontSize: 14,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,
                     ),
@@ -1101,7 +1102,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                 title: Text(
                   opt.text,
                   style: TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 14,
                     fontWeight: isChecked ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
@@ -1112,9 +1113,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                   ),
                   decoration: BoxDecoration(
                     color:
-                        isChecked
-                            ? AppColors.primary
-                            : AppColors.surfaceMuted,
+                        isChecked ? AppColors.primary : AppColors.surfaceMuted,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -1209,21 +1208,16 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color:
-                            isSel
-                                ? AppColors.primary
-                                : AppColors.surfaceMuted,
+                            isSel ? AppColors.primary : AppColors.surfaceMuted,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color:
-                              isSel
-                                  ? AppColors.primary
-                                  : AppColors.border,
+                          color: isSel ? AppColors.primary : AppColors.border,
                         ),
                       ),
                       child: Text(
                         '$val',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15.5,
                           fontWeight: FontWeight.w600,
                           color: isSel ? Colors.white : AppColors.textPrimary,
                         ),
@@ -1275,16 +1269,13 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 15.5,
             fontWeight: FontWeight.w600,
             color: color,
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(fontSize: 11, color: AppColors.textMuted),
-        ),
+        Text(label, style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
       ],
     );
   }

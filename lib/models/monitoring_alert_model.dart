@@ -112,9 +112,10 @@ class MonitoringAlertModel {
             ((json['isResolved'] as bool? ?? false) ? 'Hal qilindi' : 'Ochiq'),
         isResolved: json['isResolved'] as bool? ?? false,
         resolvedNotes: json['resolvedNotes'] as String?,
-        resolvedAt: json['resolvedAt'] != null
-            ? DateTime.parse(json['resolvedAt'] as String)
-            : null,
+        resolvedAt:
+            json['resolvedAt'] != null
+                ? DateTime.parse(json['resolvedAt'] as String)
+                : null,
         createdAt: DateTime.parse(json['createdAt'] as String),
       );
 }

@@ -11,6 +11,7 @@ import '../../services/child_status_service.dart';
 import '../../providers/auth_provider.dart';
 import 'add_student_screen.dart';
 import 'student_detail_screen.dart';
+import '../../core/widgets/status_badge.dart';
 
 // Sinf filtri variantlari. Tanlangan qiymat ro'yxatda bo'lmasa, DropdownButton xato beradi —
 // shuning uchun qiymat shu ro'yxat bo'yicha tekshiriladi.
@@ -246,7 +247,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                             const SizedBox(width: 8),
                             _buildStatusFilterChip(
                               label:
-                                  '🔴 Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
+                                  'Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
                               color: AppColors.error,
                               bg: AppColors.errorBg,
                               selected: _selectedStatusColor == StatusColor.red,
@@ -263,7 +264,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                             const SizedBox(width: 8),
                             _buildStatusFilterChip(
                               label:
-                                  '🟡 Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
+                                  'Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
                               color: AppColors.warning,
                               bg: AppColors.warningBg,
                               selected:
@@ -281,7 +282,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                             const SizedBox(width: 8),
                             _buildStatusFilterChip(
                               label:
-                                  '🟢 Yashil — Ijobiy (${summary.count(StatusColor.green)})',
+                                  'Yashil — Ijobiy (${summary.count(StatusColor.green)})',
                               color: AppColors.success,
                               bg: AppColors.successBg,
                               selected:
@@ -330,7 +331,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                             Text(
                               'O‘quvchilar topilmadi',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 15.5,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
                               ),
@@ -481,16 +482,13 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                   runSpacing: 6,
                   children: [
                     if (status != null)
-                      StatusPill(
-                        label:
-                            '${status.color.label}: ${status.color == StatusColor.red
-                                ? "Ishlanmagan"
-                                : status.color == StatusColor.yellow
-                                ? "E’tibor talab"
-                                : "Ijobiy"}',
-                        color: statusColor!,
-                        backgroundColor: statusBg!,
-                        showDot: true,
+                      StatusBadge.child(
+                        status.color,
+                        '${status.color.label}: ${status.color == StatusColor.red
+                            ? "Ishlanmagan"
+                            : status.color == StatusColor.yellow
+                            ? "E’tibor talab"
+                            : "Ijobiy"}',
                       ),
                     StatusPill(
                       label: '${s.grade}-sinf',

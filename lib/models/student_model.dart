@@ -230,15 +230,17 @@ class StudentModel {
     coordinatorId: json['coordinatorId'] as String?,
     coordinatorName: json['coordinatorName'] as String?,
     deactivationReason: json['deactivationReason'] as String?,
-    deactivatedAt: json['deactivatedAt'] != null
-        ? DateTime.parse(json['deactivatedAt'] as String)
-        : null,
+    deactivatedAt:
+        json['deactivatedAt'] != null
+            ? DateTime.parse(json['deactivatedAt'] as String)
+            : null,
     createdAt: DateTime.parse(json['createdAt'] as String),
-    accessProfile: json['accessProfile'] is Map<String, dynamic>
-        ? StudentAccessProfile.fromJson(
-            json['accessProfile'] as Map<String, dynamic>,
-          )
-        : null,
+    accessProfile:
+        json['accessProfile'] is Map<String, dynamic>
+            ? StudentAccessProfile.fromJson(
+              json['accessProfile'] as Map<String, dynamic>,
+            )
+            : null,
     domainLevels: {
       for (final d
           in (json['domainLevels'] as List<dynamic>? ?? const [])

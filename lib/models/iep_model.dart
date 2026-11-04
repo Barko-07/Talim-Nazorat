@@ -10,7 +10,8 @@ class PlanObjectiveModel {
   final String? responsibleSpecialistName;
   final DateTime? startDate;
   final DateTime targetDate;
-  final String status; // 'Rejalashtirilgan', 'Jarayonda', 'Bajarildi', 'Qayta ko‘rib chiqish'
+  final String
+  status; // 'Rejalashtirilgan', 'Jarayonda', 'Bajarildi', 'Qayta ko‘rib chiqish'
   final int progressPercent; // 0 - 100
   final String? successCriteria;
   final String? evidenceNotes;
@@ -97,9 +98,10 @@ class PlanObjectiveModel {
         measurementCriteria: json['measurementCriteria'] as String?,
         responsibleSpecialistId: json['responsibleSpecialistId'] as String?,
         responsibleSpecialistName: json['responsibleSpecialistName'] as String?,
-        startDate: json['startDate'] != null
-            ? DateTime.parse(json['startDate'] as String)
-            : null,
+        startDate:
+            json['startDate'] != null
+                ? DateTime.parse(json['startDate'] as String)
+                : null,
         targetDate: DateTime.parse(json['targetDate'] as String),
         status: json['status'] as String,
         progressPercent: json['progressPercent'] as int? ?? 0,
@@ -122,7 +124,8 @@ class IndividualEducationPlanModel {
   final String responsibleTeacherName;
   final String? coordinatorId;
   final String? coordinatorName;
-  final String status; // 'Qoralamada', 'Ko‘rib chiqilmoqda', 'Faol', 'Yakunlangan', 'Arxivlangan'
+  final String
+  status; // 'Qoralamada', 'Ko‘rib chiqilmoqda', 'Faol', 'Yakunlangan', 'Arxivlangan'
   final String baselineSummary;
   final String longTermGoals;
   final String? supportStrategies;

@@ -30,7 +30,9 @@ class _IntroScreenState extends State<IntroScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _timer ??= Timer(
-      MediaQuery.of(context).disableAnimations ? Duration.zero : IntroScreen.duration,
+      MediaQuery.of(context).disableAnimations
+          ? Duration.zero
+          : IntroScreen.duration,
       _finish,
     );
   }
@@ -81,18 +83,21 @@ class _IntroScreenState extends State<IntroScreen> {
                 const BrandWordmark(fontSize: 40)
                     .animate(delay: 550.ms)
                     .fadeIn(duration: 400.ms)
-                    .slideY(begin: 0.35, end: 0, duration: 450.ms, curve: Curves.easeOutCubic),
+                    .slideY(
+                      begin: 0.35,
+                      end: 0,
+                      duration: 450.ms,
+                      curve: Curves.easeOutCubic,
+                    ),
                 const SizedBox(height: 10),
                 Text(
-                      AppBrand.tagline,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
-                      ),
-                    )
-                    .animate(delay: 900.ms)
-                    .fadeIn(duration: 450.ms),
+                  AppBrand.tagline,
+                  style: TextStyle(
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary,
+                  ),
+                ).animate(delay: 900.ms).fadeIn(duration: 450.ms),
               ],
             ),
           ),

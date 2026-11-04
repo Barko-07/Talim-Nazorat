@@ -22,7 +22,12 @@ class SpeechSound {
   /// Ko'pincha shu tovush bilan aralashtiriladigan tovushlar (differensiatsiya juftlari)
   final List<String> confusedWith;
 
-  const SpeechSound(this.id, this.display, this.group, {this.confusedWith = const []});
+  const SpeechSound(
+    this.id,
+    this.display,
+    this.group, {
+    this.confusedWith = const [],
+  });
 }
 
 /// Tovush talaffuzidagi buzilish turi
@@ -59,7 +64,9 @@ enum SoundStage {
   bool get isSet => index >= SoundStage.syllables.index;
 
   SoundStage? get next =>
-      index + 1 < SoundStage.values.length ? SoundStage.values[index + 1] : null;
+      index + 1 < SoundStage.values.length
+          ? SoundStage.values[index + 1]
+          : null;
 
   static SoundStage? fromName(String? name) {
     for (final s in values) {
@@ -120,7 +127,8 @@ class SoundEntry {
     id: json['id'] as String,
     studentId: json['studentId'] as String,
     soundId: json['soundId'] as String,
-    stage: SoundStage.fromName(json['stage'] as String?) ?? SoundStage.preparation,
+    stage:
+        SoundStage.fromName(json['stage'] as String?) ?? SoundStage.preparation,
     disorder: SoundDisorder.fromName(json['disorder'] as String?),
     substitutedWith: json['substitutedWith'] as String?,
     differentiatedFrom: json['differentiatedFrom'] as String?,

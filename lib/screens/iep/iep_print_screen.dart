@@ -24,7 +24,7 @@ class IepPrintScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Rasmiy ITR Blanki (A4)',
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700),
         ),
         actions: [
           Padding(
@@ -43,7 +43,7 @@ class IepPrintScreen extends StatelessWidget {
               label: Text(
                 isMobile ? 'Chop etish' : 'Chop etish (A4)',
                 style: const TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -84,7 +84,7 @@ class IepPrintScreen extends StatelessWidget {
                       'O‘ZBEKISTON RESPUBLIKASI MAKTABGACHA VA MAKTAB TA’LIMI VAZIRLIGI',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 12,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.4,
                         color: AppColors.textPrimary,
@@ -167,7 +167,7 @@ class IepPrintScreen extends StatelessWidget {
                     Text(
                       plan.baselineSummary,
                       style: TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 13,
                         height: 1.45,
                         color: AppColors.textPrimary,
                       ),
@@ -180,7 +180,7 @@ class IepPrintScreen extends StatelessWidget {
                     Text(
                       plan.longTermGoals,
                       style: TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 13,
                         height: 1.45,
                         color: AppColors.textPrimary,
                       ),
@@ -198,10 +198,7 @@ class IepPrintScreen extends StatelessWidget {
                         if (constraints.maxWidth < 500) {
                           return SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: SizedBox(
-                              width: 520,
-                              child: table,
-                            ),
+                            child: SizedBox(width: 520, child: table),
                           );
                         }
                         return table;
@@ -229,7 +226,7 @@ class IepPrintScreen extends StatelessWidget {
                             Text(
                               'Mas’ul o‘qituvchi: ${plan.responsibleTeacherName}',
                               style: const TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -251,7 +248,7 @@ class IepPrintScreen extends StatelessWidget {
                             Text(
                               'Maktab direktori / O‘IBDO‘:',
                               style: TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -310,40 +307,28 @@ class IepPrintScreen extends StatelessWidget {
               child: Text(
                 '№',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 11,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
               ),
             ),
             Padding(
               padding: EdgeInsets.all(7),
               child: Text(
                 'Maqsad mazmuni',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 11,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
               ),
             ),
             Padding(
               padding: EdgeInsets.all(7),
               child: Text(
                 'Soha',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 11,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
               ),
             ),
             Padding(
               padding: EdgeInsets.all(7),
               child: Text(
                 'Muddat',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 11,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
               ),
             ),
             Padding(
@@ -351,10 +336,7 @@ class IepPrintScreen extends StatelessWidget {
               child: Text(
                 'Ijro (%)',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 11,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
               ),
             ),
           ],
@@ -375,18 +357,12 @@ class IepPrintScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(7),
                 child: Text(
                   '${obj.title}\n(${obj.successCriteria ?? ''})',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    height: 1.35,
-                  ),
+                  style: const TextStyle(fontSize: 11, height: 1.35),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(7),
-                child: Text(
-                  obj.domain,
-                  style: const TextStyle(fontSize: 11),
-                ),
+                child: Text(obj.domain, style: const TextStyle(fontSize: 11)),
               ),
               Padding(
                 padding: const EdgeInsets.all(7),
@@ -475,10 +451,7 @@ class IepPrintScreen extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textPrimary,
-              ),
+              style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
             ),
           ),
         ],

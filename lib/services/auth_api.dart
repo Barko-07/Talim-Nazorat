@@ -157,10 +157,9 @@ class AuthApi {
     await _api.post('/api/auth/mfa/verify', {'code': code}),
   );
 
-  Future<AuthResult> useRecoveryCode(String code) async =>
-      AuthResult.fromJson(
-        await _api.post('/api/auth/mfa/recovery', {'code': code}),
-      );
+  Future<AuthResult> useRecoveryCode(String code) async => AuthResult.fromJson(
+    await _api.post('/api/auth/mfa/recovery', {'code': code}),
+  );
 
   Future<TotpSetup> startTotpSetup(String password) async {
     final r = await _api.post('/api/auth/mfa/setup', {'password': password});

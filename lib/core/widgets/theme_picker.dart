@@ -29,7 +29,7 @@ Future<void> showThemePicker(BuildContext context) {
                 child: Text(
                   'Ilova mavzusi',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
@@ -80,7 +80,11 @@ class _ThemeOption extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
             child: Row(
               children: [
-                Icon(icon, size: 20, color: selected ? AppColors.primary : AppColors.textSecondary),
+                Icon(
+                  icon,
+                  size: 20,
+                  color: selected ? AppColors.primary : AppColors.textSecondary,
+                ),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
@@ -97,12 +101,16 @@ class _ThemeOption extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         choice.description,
-                        style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                if (selected) Icon(LucideIcons.check, size: 20, color: AppColors.primary),
+                if (selected)
+                  Icon(LucideIcons.check, size: 20, color: AppColors.primary),
               ],
             ),
           ),

@@ -58,115 +58,78 @@ class _IepListScreenState extends State<IepListScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          final df = DateFormat('dd.MM.yyyy');
-          return AlertDialog(
-            title: const Text('Yangi Individual Ta’lim Rejasi (ITR) yaratish'),
-            content: SizedBox(
-              width: 580,
-              child: SingleChildScrollView(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isNarrow = constraints.maxWidth < 430;
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'O‘quvchini tanlang *',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        DropdownButtonFormField<String>(
-                          initialValue: selectedStudentId,
-                          isExpanded: true,
-                          items: students.map((s) {
-                            return DropdownMenuItem(
-                              value: s.id,
-                              child: Text(
-                                '${s.fullName} (${s.grade}-sinf)',
-                                overflow: TextOverflow.ellipsis,
+      builder:
+          (ctx) => StatefulBuilder(
+            builder: (context, setModalState) {
+              final df = DateFormat('dd.MM.yyyy');
+              return AlertDialog(
+                title: const Text(
+                  'Yangi Individual Ta’lim Rejasi (ITR) yaratish',
+                ),
+                content: SizedBox(
+                  width: 580,
+                  child: SingleChildScrollView(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isNarrow = constraints.maxWidth < 430;
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'O‘quvchini tanlang *',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                                color: AppColors.textPrimary,
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            if (val != null) {
-                              setModalState(() => selectedStudentId = val);
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 14),
-                        TextField(
-                          controller: titleController,
-                          decoration: const InputDecoration(
-                            labelText: 'ITR Nomi *',
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        if (isNarrow) ...[
-                          TextField(
-                            controller: academicYearController,
-                            decoration: const InputDecoration(
-                              labelText: 'O‘quv yili *',
                             ),
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton.icon(
-                              icon: const Icon(LucideIcons.calendar, size: 16),
-                              label: Text(
-                                'Ko‘rib chiqish: ${df.format(reviewDate)}',
-                                style: const TextStyle(fontSize: 12.5),
-                              ),
-                              onPressed: () async {
-                                final picked = await showDatePicker(
-                                  context: context,
-                                  initialDate: reviewDate,
-                                  firstDate: DateTime.now(),
-                                  lastDate: DateTime.now().add(
-                                    const Duration(days: 365),
-                                  ),
-                                );
-                                if (picked != null) {
-                                  setModalState(() => reviewDate = picked);
+                            const SizedBox(height: 6),
+                            DropdownButtonFormField<String>(
+                              initialValue: selectedStudentId,
+                              isExpanded: true,
+                              items:
+                                  students.map((s) {
+                                    return DropdownMenuItem(
+                                      value: s.id,
+                                      child: Text(
+                                        '${s.fullName} (${s.grade}-sinf)',
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    );
+                                  }).toList(),
+                              onChanged: (val) {
+                                if (val != null) {
+                                  setModalState(() => selectedStudentId = val);
                                 }
                               },
                             ),
-                          ),
-                        ] else
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: academicYearController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'O‘quv yili *',
-                                  ),
+                            const SizedBox(height: 14),
+                            TextField(
+                              controller: titleController,
+                              decoration: const InputDecoration(
+                                labelText: 'ITR Nomi *',
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            if (isNarrow) ...[
+                              TextField(
+                                controller: academicYearController,
+                                decoration: const InputDecoration(
+                                  labelText: 'O‘quv yili *',
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                width: double.infinity,
                                 child: OutlinedButton.icon(
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                      horizontal: 12,
-                                    ),
-                                  ),
                                   icon: const Icon(
                                     LucideIcons.calendar,
                                     size: 16,
                                   ),
                                   label: Text(
                                     'Ko‘rib chiqish: ${df.format(reviewDate)}',
-                                    style: const TextStyle(fontSize: 12),
-                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 13),
                                   ),
                                   onPressed: () async {
                                     final picked = await showDatePicker(
@@ -183,275 +146,326 @@ class _IepListScreenState extends State<IepListScreen> {
                                   },
                                 ),
                               ),
-                            ],
-                          ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: baselineController,
-                          decoration: const InputDecoration(
-                            labelText: 'Boshlang‘ich holat (Baseline) *',
-                            hintText:
-                                'Diagnostika va kuzatuvlar asosidagi joriy ta’limiy tayyorgarlik darajasi',
-                          ),
-                          maxLines: 2,
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: goalsController,
-                          decoration: const InputDecoration(
-                            labelText: 'Uzoq muddatli maqsadlar *',
-                            hintText:
-                                'O‘quv yili oxirigacha erishilishi kutilayotgan umumiy natija',
-                          ),
-                          maxLines: 2,
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: strategiesController,
-                          decoration: const InputDecoration(
-                            labelText:
-                                'Qo‘llab-quvvatlash choralari va moslashtirishlar',
-                            hintText:
-                                'Pedagogik usullar, yordamchi jihozlar, adaptatsiyalar',
-                          ),
-                          maxLines: 2,
-                        ),
-                        const SizedBox(height: 16),
-                        const Divider(),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Birinchi o‘lchanadigan oraliq maqsad:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: objTitleController,
-                          decoration: const InputDecoration(
-                            labelText: 'Oraliq maqsad tavsifi *',
-                            hintText:
-                                'Masalan: Lug‘at boyligini 20 ta so‘zga oshirish',
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        if (isNarrow) ...[
-                          DropdownButtonFormField<String>(
-                            initialValue: selectedDomain,
-                            isExpanded: true,
-                            decoration: const InputDecoration(
-                              labelText: 'Soha',
+                            ] else
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      controller: academicYearController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'O‘quv yili *',
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
+                                          horizontal: 12,
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        LucideIcons.calendar,
+                                        size: 16,
+                                      ),
+                                      label: Text(
+                                        'Ko‘rib chiqish: ${df.format(reviewDate)}',
+                                        style: const TextStyle(fontSize: 12),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      onPressed: () async {
+                                        final picked = await showDatePicker(
+                                          context: context,
+                                          initialDate: reviewDate,
+                                          firstDate: DateTime.now(),
+                                          lastDate: DateTime.now().add(
+                                            const Duration(days: 365),
+                                          ),
+                                        );
+                                        if (picked != null) {
+                                          setModalState(
+                                            () => reviewDate = picked,
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            const SizedBox(height: 12),
+                            TextField(
+                              controller: baselineController,
+                              decoration: const InputDecoration(
+                                labelText: 'Boshlang‘ich holat (Baseline) *',
+                                hintText:
+                                    'Diagnostika va kuzatuvlar asosidagi joriy ta’limiy tayyorgarlik darajasi',
+                              ),
+                              maxLines: 2,
                             ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'Kognitiv',
-                                child: Text('Kognitiv'),
+                            const SizedBox(height: 12),
+                            TextField(
+                              controller: goalsController,
+                              decoration: const InputDecoration(
+                                labelText: 'Uzoq muddatli maqsadlar *',
+                                hintText:
+                                    'O‘quv yili oxirigacha erishilishi kutilayotgan umumiy natija',
                               ),
-                              DropdownMenuItem(
-                                value: 'Nutq',
-                                child: Text('Nutq va muloqot'),
+                              maxLines: 2,
+                            ),
+                            const SizedBox(height: 12),
+                            TextField(
+                              controller: strategiesController,
+                              decoration: const InputDecoration(
+                                labelText:
+                                    'Qo‘llab-quvvatlash choralari va moslashtirishlar',
+                                hintText:
+                                    'Pedagogik usullar, yordamchi jihozlar, adaptatsiyalar',
                               ),
-                              DropdownMenuItem(
-                                value: 'O‘quv',
-                                child: Text('O‘quv ko‘nikmalari'),
+                              maxLines: 2,
+                            ),
+                            const SizedBox(height: 16),
+                            const Divider(),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Birinchi o‘lchanadigan oraliq maqsad:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                                color: AppColors.primary,
                               ),
-                              DropdownMenuItem(
-                                value: 'Ijtimoiy-hissiy',
-                                child: Text('Ijtimoiy-hissiy'),
+                            ),
+                            const SizedBox(height: 10),
+                            TextField(
+                              controller: objTitleController,
+                              decoration: const InputDecoration(
+                                labelText: 'Oraliq maqsad tavsifi *',
+                                hintText:
+                                    'Masalan: Lug‘at boyligini 20 ta so‘zga oshirish',
                               ),
-                              DropdownMenuItem(
-                                value: 'Sensor-motorika',
-                                child: Text('Sensor-motorika'),
-                              ),
-                            ],
-                            onChanged: (val) {
-                              if (val != null) {
-                                setModalState(() => selectedDomain = val);
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: objStartingLevelController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Boshlang‘ich',
-                                  ),
+                            ),
+                            const SizedBox(height: 10),
+                            if (isNarrow) ...[
+                              DropdownButtonFormField<String>(
+                                initialValue: selectedDomain,
+                                isExpanded: true,
+                                decoration: const InputDecoration(
+                                  labelText: 'Soha',
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: TextField(
-                                  controller: objTargetLevelController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Maqsadli',
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 'Kognitiv',
+                                    child: Text('Kognitiv'),
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ] else
-                          Row(
-                            children: [
-                              Expanded(
-                                child: DropdownButtonFormField<String>(
-                                  initialValue: selectedDomain,
-                                  isExpanded: true,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Soha',
+                                  DropdownMenuItem(
+                                    value: 'Nutq',
+                                    child: Text('Nutq va muloqot'),
                                   ),
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'Kognitiv',
-                                      child: Text('Kognitiv'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'Nutq',
-                                      child: Text('Nutq va muloqot'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'O‘quv',
-                                      child: Text('O‘quv ko‘nikmalari'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'Ijtimoiy-hissiy',
-                                      child: Text('Ijtimoiy-hissiy'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'Sensor-motorika',
-                                      child: Text('Sensor-motorika'),
-                                    ),
-                                  ],
-                                  onChanged: (val) {
-                                    if (val != null) {
-                                      setModalState(() => selectedDomain = val);
-                                    }
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: TextField(
-                                  controller: objStartingLevelController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Boshlang‘ich daraja',
+                                  DropdownMenuItem(
+                                    value: 'O‘quv',
+                                    child: Text('O‘quv ko‘nikmalari'),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: TextField(
-                                  controller: objTargetLevelController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Maqsadli daraja',
+                                  DropdownMenuItem(
+                                    value: 'Ijtimoiy-hissiy',
+                                    child: Text('Ijtimoiy-hissiy'),
                                   ),
-                                ),
+                                  DropdownMenuItem(
+                                    value: 'Sensor-motorika',
+                                    child: Text('Sensor-motorika'),
+                                  ),
+                                ],
+                                onChanged: (val) {
+                                  if (val != null) {
+                                    setModalState(() => selectedDomain = val);
+                                  }
+                                },
                               ),
-                            ],
-                          ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: objCriteriaController,
-                          decoration: const InputDecoration(
-                            labelText: 'Muvaffaqiyat o‘lchov mezoni *',
-                            hintText: 'Natijani aniq tekshirish mezoni',
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      controller: objStartingLevelController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Boshlang‘ich',
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: objTargetLevelController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Maqsadli',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ] else
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: DropdownButtonFormField<String>(
+                                      initialValue: selectedDomain,
+                                      isExpanded: true,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Soha',
+                                      ),
+                                      items: const [
+                                        DropdownMenuItem(
+                                          value: 'Kognitiv',
+                                          child: Text('Kognitiv'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'Nutq',
+                                          child: Text('Nutq va muloqot'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'O‘quv',
+                                          child: Text('O‘quv ko‘nikmalari'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'Ijtimoiy-hissiy',
+                                          child: Text('Ijtimoiy-hissiy'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'Sensor-motorika',
+                                          child: Text('Sensor-motorika'),
+                                        ),
+                                      ],
+                                      onChanged: (val) {
+                                        if (val != null) {
+                                          setModalState(
+                                            () => selectedDomain = val,
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: objStartingLevelController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Boshlang‘ich daraja',
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: objTargetLevelController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Maqsadli daraja',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            const SizedBox(height: 10),
+                            TextField(
+                              controller: objCriteriaController,
+                              decoration: const InputDecoration(
+                                labelText: 'Muvaffaqiyat o‘lchov mezoni *',
+                                hintText: 'Natijani aniq tekshirish mezoni',
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Bekor qilish'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  if (titleController.text.trim().isEmpty ||
-                      baselineController.text.trim().isEmpty ||
-                      goalsController.text.trim().isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Iltimos, barcha majburiy maydonlarni to‘ldiring',
-                        ),
-                      ),
-                    );
-                    return;
-                  }
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Bekor qilish'),
+                  ),
+                  FilledButton(
+                    onPressed: () async {
+                      if (titleController.text.trim().isEmpty ||
+                          baselineController.text.trim().isEmpty ||
+                          goalsController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Iltimos, barcha majburiy maydonlarni to‘ldiring',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
 
-                  final targetStudent = students.firstWhere(
-                    (s) => s.id == selectedStudentId,
-                  );
-                  final planId = 'iep_${DateTime.now().millisecondsSinceEpoch}';
+                      final targetStudent = students.firstWhere(
+                        (s) => s.id == selectedStudentId,
+                      );
+                      final planId =
+                          'iep_${DateTime.now().millisecondsSinceEpoch}';
 
-                  final initialObjective = PlanObjectiveModel(
-                    id: 'obj_${DateTime.now().millisecondsSinceEpoch}',
-                    title: objTitleController.text.trim().isNotEmpty
-                        ? objTitleController.text.trim()
-                        : 'Dastlabki o‘quv ko‘nikmalarini shakllantirish',
-                    domain: selectedDomain,
-                    startingLevel: objStartingLevelController.text.trim(),
-                    targetLevel: objTargetLevelController.text.trim(),
-                    measurementCriteria: objCriteriaController.text.trim(),
-                    responsibleSpecialistId: currentUser.id,
-                    responsibleSpecialistName: currentUser.fullName,
-                    startDate: startDate,
-                    targetDate: reviewDate,
-                    status: 'Jarayonda',
-                    progressPercent: 0,
-                    successCriteria: objCriteriaController.text.trim(),
-                  );
+                      final initialObjective = PlanObjectiveModel(
+                        id: 'obj_${DateTime.now().millisecondsSinceEpoch}',
+                        title:
+                            objTitleController.text.trim().isNotEmpty
+                                ? objTitleController.text.trim()
+                                : 'Dastlabki o‘quv ko‘nikmalarini shakllantirish',
+                        domain: selectedDomain,
+                        startingLevel: objStartingLevelController.text.trim(),
+                        targetLevel: objTargetLevelController.text.trim(),
+                        measurementCriteria: objCriteriaController.text.trim(),
+                        responsibleSpecialistId: currentUser.id,
+                        responsibleSpecialistName: currentUser.fullName,
+                        startDate: startDate,
+                        targetDate: reviewDate,
+                        status: 'Jarayonda',
+                        progressPercent: 0,
+                        successCriteria: objCriteriaController.text.trim(),
+                      );
 
-                  final newPlan = IndividualEducationPlanModel(
-                    id: planId,
-                    studentId: targetStudent.id,
-                    studentName: targetStudent.fullName,
-                    studentGrade: targetStudent.grade,
-                    institutionName: targetStudent.institutionName,
-                    title: titleController.text.trim(),
-                    academicYear: academicYearController.text.trim(),
-                    startDate: startDate,
-                    reviewDate: reviewDate,
-                    responsibleTeacherId: currentUser.id,
-                    responsibleTeacherName: currentUser.fullName,
-                    coordinatorId:
-                        targetStudent.coordinatorId ?? currentUser.id,
-                    coordinatorName:
-                        targetStudent.coordinatorName ?? currentUser.fullName,
-                    status: 'Faol',
-                    baselineSummary: baselineController.text.trim(),
-                    longTermGoals: goalsController.text.trim(),
-                    supportStrategies: strategiesController.text.trim(),
-                    objectives: [initialObjective],
-                  );
+                      final newPlan = IndividualEducationPlanModel(
+                        id: planId,
+                        studentId: targetStudent.id,
+                        studentName: targetStudent.fullName,
+                        studentGrade: targetStudent.grade,
+                        institutionName: targetStudent.institutionName,
+                        title: titleController.text.trim(),
+                        academicYear: academicYearController.text.trim(),
+                        startDate: startDate,
+                        reviewDate: reviewDate,
+                        responsibleTeacherId: currentUser.id,
+                        responsibleTeacherName: currentUser.fullName,
+                        coordinatorId:
+                            targetStudent.coordinatorId ?? currentUser.id,
+                        coordinatorName:
+                            targetStudent.coordinatorName ??
+                            currentUser.fullName,
+                        status: 'Faol',
+                        baselineSummary: baselineController.text.trim(),
+                        longTermGoals: goalsController.text.trim(),
+                        supportStrategies: strategiesController.text.trim(),
+                        objectives: [initialObjective],
+                      );
 
-                  final scaffoldMessenger = ScaffoldMessenger.of(context);
-                  Navigator.pop(ctx);
-                  await app.addIepPlan(newPlan, byUser: currentUser);
-                  if (mounted) {
-                    scaffoldMessenger.showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Individual Ta’lim Rejasi muvaffaqiyatli yaratildi',
-                        ),
-                      ),
-                    );
-                  }
-                },
-                child: const Text('Saqlash va Tasdiqlash'),
-              ),
-            ],
-          );
-        },
-      ),
+                      final scaffoldMessenger = ScaffoldMessenger.of(context);
+                      Navigator.pop(ctx);
+                      await app.addIepPlan(newPlan, byUser: currentUser);
+                      if (mounted) {
+                        scaffoldMessenger.showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Individual Ta’lim Rejasi muvaffaqiyatli yaratildi',
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text('Saqlash va Tasdiqlash'),
+                  ),
+                ],
+              );
+            },
+          ),
     );
   }
 
@@ -468,142 +482,147 @@ class _IepListScreenState extends State<IepListScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          return AlertDialog(
-            title: Text('${plan.studentName} uchun oraliq maqsad qo‘shish'),
-            content: SizedBox(
-              width: 480,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Maqsad nomi *',
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedDomain,
-                      isExpanded: true,
-                      decoration: const InputDecoration(labelText: 'Soha'),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Kognitiv',
-                          child: Text('Kognitiv'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Nutq',
-                          child: Text('Nutq va muloqot'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'O‘quv',
-                          child: Text('O‘quv ko‘nikmalari'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Ijtimoiy-hissiy',
-                          child: Text('Ijtimoiy-hissiy'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Sensor-motorika',
-                          child: Text('Sensor-motorika'),
-                        ),
-                      ],
-                      onChanged: (val) {
-                        if (val != null) {
-                          setModalState(() => selectedDomain = val);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
+      builder:
+          (ctx) => StatefulBuilder(
+            builder: (context, setModalState) {
+              return AlertDialog(
+                title: Text('${plan.studentName} uchun oraliq maqsad qo‘shish'),
+                content: SizedBox(
+                  width: 480,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Expanded(
-                          child: TextField(
-                            controller: startLevelController,
-                            decoration: const InputDecoration(
-                              labelText: 'Boshlang‘ich daraja',
-                            ),
+                        TextField(
+                          controller: titleController,
+                          decoration: const InputDecoration(
+                            labelText: 'Maqsad nomi *',
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: TextField(
-                            controller: targetLevelController,
-                            decoration: const InputDecoration(
-                              labelText: 'Maqsadli daraja',
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<String>(
+                          initialValue: selectedDomain,
+                          isExpanded: true,
+                          decoration: const InputDecoration(labelText: 'Soha'),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'Kognitiv',
+                              child: Text('Kognitiv'),
                             ),
+                            DropdownMenuItem(
+                              value: 'Nutq',
+                              child: Text('Nutq va muloqot'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'O‘quv',
+                              child: Text('O‘quv ko‘nikmalari'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Ijtimoiy-hissiy',
+                              child: Text('Ijtimoiy-hissiy'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Sensor-motorika',
+                              child: Text('Sensor-motorika'),
+                            ),
+                          ],
+                          onChanged: (val) {
+                            if (val != null) {
+                              setModalState(() => selectedDomain = val);
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: startLevelController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Boshlang‘ich daraja',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: targetLevelController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Maqsadli daraja',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: criteriaController,
+                          decoration: const InputDecoration(
+                            labelText: 'Muvaffaqiyat o‘lchov mezoni *',
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: criteriaController,
-                      decoration: const InputDecoration(
-                        labelText: 'Muvaffaqiyat o‘lchov mezoni *',
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Bekor qilish'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  if (titleController.text.trim().isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Maqsad nomini kiriting')),
-                    );
-                    return;
-                  }
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Bekor qilish'),
+                  ),
+                  FilledButton(
+                    onPressed: () async {
+                      if (titleController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Maqsad nomini kiriting'),
+                          ),
+                        );
+                        return;
+                      }
 
-                  final newObj = PlanObjectiveModel(
-                    id: 'obj_${DateTime.now().millisecondsSinceEpoch}',
-                    title: titleController.text.trim(),
-                    domain: selectedDomain,
-                    startingLevel: startLevelController.text.trim(),
-                    targetLevel: targetLevelController.text.trim(),
-                    measurementCriteria: criteriaController.text.trim(),
-                    responsibleSpecialistId: currentUser.id,
-                    responsibleSpecialistName: currentUser.fullName,
-                    startDate: DateTime.now(),
-                    targetDate: plan.reviewDate,
-                    status: 'Jarayonda',
-                    progressPercent: 0,
-                    successCriteria: criteriaController.text.trim(),
-                  );
+                      final newObj = PlanObjectiveModel(
+                        id: 'obj_${DateTime.now().millisecondsSinceEpoch}',
+                        title: titleController.text.trim(),
+                        domain: selectedDomain,
+                        startingLevel: startLevelController.text.trim(),
+                        targetLevel: targetLevelController.text.trim(),
+                        measurementCriteria: criteriaController.text.trim(),
+                        responsibleSpecialistId: currentUser.id,
+                        responsibleSpecialistName: currentUser.fullName,
+                        startDate: DateTime.now(),
+                        targetDate: plan.reviewDate,
+                        status: 'Jarayonda',
+                        progressPercent: 0,
+                        successCriteria: criteriaController.text.trim(),
+                      );
 
-                  final updated = plan.copyWith(
-                    objectives: [...plan.objectives, newObj],
-                  );
+                      final updated = plan.copyWith(
+                        objectives: [...plan.objectives, newObj],
+                      );
 
-                  final scaffoldMessenger = ScaffoldMessenger.of(context);
-                  Navigator.pop(ctx);
-                  await context.read<AppProvider>().updateIepPlan(
-                    updated,
-                    byUser: currentUser,
-                  );
-                  if (mounted) {
-                    scaffoldMessenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('Yangi oraliq maqsad ITRga qo‘shildi'),
-                      ),
-                    );
-                  }
-                },
-                child: const Text('Qo‘shish'),
-              ),
-            ],
-          );
-        },
-      ),
+                      final scaffoldMessenger = ScaffoldMessenger.of(context);
+                      Navigator.pop(ctx);
+                      await context.read<AppProvider>().updateIepPlan(
+                        updated,
+                        byUser: currentUser,
+                      );
+                      if (mounted) {
+                        scaffoldMessenger.showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Yangi oraliq maqsad ITRga qo‘shildi',
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text('Qo‘shish'),
+                  ),
+                ],
+              );
+            },
+          ),
     );
   }
 
@@ -630,11 +649,12 @@ class _IepListScreenState extends State<IepListScreen> {
       'Yakunlangan': allPlans.where((p) => p.averageProgress >= 100).length,
     };
 
-    final plans = allPlans.where((p) {
-      if (_selectedStatus == 'Faol') return p.averageProgress < 100;
-      if (_selectedStatus == 'Yakunlangan') return p.averageProgress >= 100;
-      return true;
-    }).toList();
+    final plans =
+        allPlans.where((p) {
+          if (_selectedStatus == 'Faol') return p.averageProgress < 100;
+          if (_selectedStatus == 'Yakunlangan') return p.averageProgress >= 100;
+          return true;
+        }).toList();
 
     final width = MediaQuery.sizeOf(context).width;
     final mediaPadding = MediaQuery.paddingOf(context);
@@ -648,13 +668,15 @@ class _IepListScreenState extends State<IepListScreen> {
             title: 'Individual rejalar (ITR)',
             subtitle:
                 'Shaxsiy o‘quv rejalari va maqsadlar • ${allPlans.length} ta',
-            action: canCreateIep
-                ? HeaderActionButton(
-                    icon: LucideIcons.plus,
-                    label: 'Yangi ITR',
-                    onPressed: () => _showCreateIepDialog(context, currentUser),
-                  )
-                : null,
+            action:
+                canCreateIep
+                    ? HeaderActionButton(
+                      icon: LucideIcons.plus,
+                      label: 'Yangi ITR',
+                      onPressed:
+                          () => _showCreateIepDialog(context, currentUser),
+                    )
+                    : null,
           ),
           const SizedBox(height: 9),
           ModernPillFilterBar(
@@ -665,79 +687,87 @@ class _IepListScreenState extends State<IepListScreen> {
           ),
           const SizedBox(height: 9),
           Expanded(
-            child: plans.isEmpty
-                ? Center(
-                    child: SurfaceCard(
-                      borderRadius: 26,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 36,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            LucideIcons.bookOpen,
-                            size: 34,
-                            color: AppColors.primary,
-                          ),
-                          const SizedBox(height: 14),
-                          Text(
-                            'Tanlangan filtr bo‘yicha ITR rejalari topilmadi',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15.5,
-                              color: AppColors.textPrimary,
+            child:
+                plans.isEmpty
+                    ? Center(
+                      child: SurfaceCard(
+                        borderRadius: 26,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 36,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              LucideIcons.bookOpen,
+                              size: 34,
+                              color: AppColors.primary,
                             ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            'O‘quvchi uchun yangi individual ta’lim rejasini shakllantirishingiz mumkin.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textMuted,
-                              height: 1.4,
+                            const SizedBox(height: 14),
+                            Text(
+                              'Tanlangan filtr bo‘yicha ITR rejalari topilmadi',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15.5,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
-                          ),
-                          if (canCreateIep) ...[
-                            const SizedBox(height: 18),
-                            OutlinedButton.icon(
-                              icon: const Icon(LucideIcons.plus, size: 16),
-                              label: const Text('ITR rejasi tuzish'),
-                              onPressed: () =>
-                                  _showCreateIepDialog(context, currentUser),
+                            const SizedBox(height: 5),
+                            Text(
+                              'O‘quvchi uchun yangi individual ta’lim rejasini shakllantirishingiz mumkin.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textMuted,
+                                height: 1.4,
+                              ),
                             ),
+                            if (canCreateIep) ...[
+                              const SizedBox(height: 18),
+                              OutlinedButton.icon(
+                                icon: const Icon(LucideIcons.plus, size: 16),
+                                label: const Text('ITR rejasi tuzish'),
+                                onPressed:
+                                    () => _showCreateIepDialog(
+                                      context,
+                                      currentUser,
+                                    ),
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
+                    )
+                    : ListView.separated(
+                      padding: EdgeInsets.fromLTRB(
+                        0,
+                        0,
+                        0,
+                        width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
+                      ),
+                      itemCount: plans.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final p = plans[index];
+                        final student = app.students.firstWhere(
+                          (s) => s.id == p.studentId,
+                          orElse:
+                              () => app.allStudentsIncludingArchived.firstWhere(
+                                (s) => s.id == p.studentId,
+                                orElse:
+                                    () =>
+                                        app.students.isNotEmpty
+                                            ? app.students.first
+                                            : app
+                                                .allStudentsIncludingArchived
+                                                .first,
+                              ),
+                        );
+                        return _buildIepCard(context, p, student, currentUser);
+                      },
                     ),
-                  )
-                : ListView.separated(
-                    padding: EdgeInsets.fromLTRB(
-                      0,
-                      0,
-                      0,
-                      width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
-                    ),
-                    itemCount: plans.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      final p = plans[index];
-                      final student = app.students.firstWhere(
-                        (s) => s.id == p.studentId,
-                        orElse: () =>
-                            app.allStudentsIncludingArchived.firstWhere(
-                              (s) => s.id == p.studentId,
-                              orElse: () => app.students.isNotEmpty
-                                  ? app.students.first
-                                  : app.allStudentsIncludingArchived.first,
-                            ),
-                      );
-                      return _buildIepCard(context, p, student, currentUser);
-                    },
-                  ),
           ),
         ],
       ),
@@ -751,10 +781,7 @@ class _IepListScreenState extends State<IepListScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: content,
-    );
+    return Scaffold(backgroundColor: Colors.transparent, body: content);
   }
 
   Widget _buildIepCard(
@@ -773,9 +800,10 @@ class _IepListScreenState extends State<IepListScreen> {
             p.responsibleTeacherId == currentUser.id);
 
     final avg = p.averageProgress;
-    final progressColor = avg >= 75
-        ? AppColors.success
-        : avg >= 40
+    final progressColor =
+        avg >= 75
+            ? AppColors.success
+            : avg >= 40
             ? AppColors.primary
             : AppColors.warning;
 
@@ -796,7 +824,7 @@ class _IepListScreenState extends State<IepListScreen> {
             icon: const Icon(LucideIcons.printer, size: 15),
             label: const Text(
               'Rasmiy Blank',
-              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
             ),
             onPressed: () {
               Navigator.push(
@@ -820,7 +848,7 @@ class _IepListScreenState extends State<IepListScreen> {
                     p.title,
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize: 16.5,
+                      fontSize: 17,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.25,
                     ),
@@ -844,8 +872,8 @@ class _IepListScreenState extends State<IepListScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              StudentDetailScreen(studentId: student.id),
+                          builder:
+                              (_) => StudentDetailScreen(studentId: student.id),
                         ),
                       );
                     },
@@ -861,17 +889,14 @@ class _IepListScreenState extends State<IepListScreen> {
                   Text(
                     'O‘quv yili: ${p.academicYear}',
                     style: TextStyle(
-                      fontSize: 12.5,
+                      fontSize: 13,
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   Text(
                     'Mas’ul: ${p.responsibleTeacherName}',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 13, color: AppColors.textMuted),
                   ),
                   Text(
                     '${df.format(p.startDate)} — ${df.format(p.reviewDate)}',
@@ -956,7 +981,7 @@ class _IepListScreenState extends State<IepListScreen> {
                       Text(
                         'Qo‘llab-quvvatlash: ${p.supportStrategies!}',
                         style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           color: AppColors.textMuted,
                           height: 1.4,
                         ),
@@ -988,7 +1013,7 @@ class _IepListScreenState extends State<IepListScreen> {
                           'O‘lchanadigan maqsadlar (${p.completedObjectivesCount}/${p.totalObjectivesCount} bajarildi)',
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
-                            fontSize: 13.5,
+                            fontSize: 14,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -1009,12 +1034,13 @@ class _IepListScreenState extends State<IepListScreen> {
                       label: const Text(
                         'Maqsad qo‘shish',
                         style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      onPressed: () =>
-                          _showAddObjectiveDialog(context, p, currentUser),
+                      onPressed:
+                          () =>
+                              _showAddObjectiveDialog(context, p, currentUser),
                     ),
                 ],
               ),
@@ -1022,9 +1048,10 @@ class _IepListScreenState extends State<IepListScreen> {
 
               ...p.objectives.map((obj) {
                 final objPercent = obj.progressPercent;
-                final objColor = objPercent >= 80
-                    ? AppColors.success
-                    : objPercent >= 40
+                final objColor =
+                    objPercent >= 80
+                        ? AppColors.success
+                        : objPercent >= 40
                         ? AppColors.primary
                         : AppColors.warning;
 
@@ -1049,16 +1076,17 @@ class _IepListScreenState extends State<IepListScreen> {
                           activeColor: objColor,
                           inactiveColor: objColor.withValues(alpha: 0.16),
                           label: '$objPercent%',
-                          onChanged: canEdit
-                              ? (val) {
-                                  app.updateObjectiveProgress(
-                                    p.id,
-                                    obj.id,
-                                    val.toInt(),
-                                    byUser: currentUser,
-                                  );
-                                }
-                              : null,
+                          onChanged:
+                              canEdit
+                                  ? (val) {
+                                    app.updateObjectiveProgress(
+                                      p.id,
+                                      obj.id,
+                                      val.toInt(),
+                                      byUser: currentUser,
+                                    );
+                                  }
+                                  : null,
                         ),
                       ),
                     ),
@@ -1084,7 +1112,7 @@ class _IepListScreenState extends State<IepListScreen> {
                     Text(
                       obj.title,
                       style: TextStyle(
-                        fontSize: 13.5,
+                        fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
                         height: 1.35,
@@ -1109,22 +1137,23 @@ class _IepListScreenState extends State<IepListScreen> {
                     horizontal: 16,
                     vertical: 13,
                   ),
-                  child: isCompact
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            objectiveInfo,
-                            const SizedBox(height: 8),
-                            sliderRow,
-                          ],
-                        )
-                      : Row(
-                          children: [
-                            Expanded(flex: 5, child: objectiveInfo),
-                            const SizedBox(width: 14),
-                            Expanded(flex: 4, child: sliderRow),
-                          ],
-                        ),
+                  child:
+                      isCompact
+                          ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              objectiveInfo,
+                              const SizedBox(height: 8),
+                              sliderRow,
+                            ],
+                          )
+                          : Row(
+                            children: [
+                              Expanded(flex: 5, child: objectiveInfo),
+                              const SizedBox(width: 14),
+                              Expanded(flex: 4, child: sliderRow),
+                            ],
+                          ),
                 );
               }),
             ],

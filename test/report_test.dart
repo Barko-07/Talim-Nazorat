@@ -23,10 +23,19 @@ void main() {
   const school = '5-sonli umumiy o‘rta ta’lim maktabi';
 
   final director = UserModel(
-    id: 'rep_dir', email: 'rep.dir@talim.uz', fullName: 'Direktor',
-    role: UserRole.institutionAdmin, institutionId: 'inst_chortoq_5', institutionName: school,
+    id: 'rep_dir',
+    email: 'rep.dir@talim.uz',
+    fullName: 'Direktor',
+    role: UserRole.institutionAdmin,
+    institutionId: 'inst_chortoq_5',
+    institutionName: school,
   );
-  final parent = UserModel(id: 'rep_parent', email: 'p@talim.uz', fullName: 'Ota-ona', role: UserRole.parent);
+  final parent = UserModel(
+    id: 'rep_parent',
+    email: 'p@talim.uz',
+    fullName: 'Ota-ona',
+    role: UserRole.parent,
+  );
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
@@ -34,11 +43,16 @@ void main() {
     await db.init();
   });
 
-  Future<void> measure(String child, double v, DateTime at) => db.addMeasurement(
+  Future<void> measure(String child, double v, DateTime at) =>
+      db.addMeasurement(
         ProgressMeasurement(
-          id: '${child}_${at.millisecondsSinceEpoch}', studentId: child,
-          metricId: ProgressMetrics.attentionSpan.id, value: v, measuredAt: at,
-          recordedById: '', recordedByName: '',
+          id: '${child}_${at.millisecondsSinceEpoch}',
+          studentId: child,
+          metricId: ProgressMetrics.attentionSpan.id,
+          value: v,
+          measuredAt: at,
+          recordedById: '',
+          recordedByName: '',
         ),
         byUser: db.getUserById('user_psychologist')!,
       );
@@ -60,7 +74,11 @@ void main() {
 
   test('period filter: work outside the period is not counted', () async {
     await measure('student_02', 2, DateTime(2026, 1, 10));
-    final r = reports.build(director, from: DateTime(2026, 3, 1), to: DateTime(2026, 3, 31));
+    final r = reports.build(
+      director,
+      from: DateTime(2026, 3, 1),
+      to: DateTime(2026, 3, 31),
+    );
     expect(r.workCounts[WorkKind.measurement] ?? 0, 0);
   });
 
@@ -72,16 +90,21 @@ void main() {
     expect(r.dynamicsCounts[DynamicsStatus.growth], 1);
   });
 
-  test('specialist activity: who worked with how many of their children', () async {
-    final now = DateTime.now();
-    await measure('student_02', 2, now.subtract(const Duration(days: 3)));
-    final r = reports.build(director, to: now);
-    final psy = r.specialists.firstWhere((s) => s.userId == 'user_psychologist');
-    expect(psy.childrenWorkedWith, greaterThanOrEqualTo(1));
-    expect(psy.childrenAssigned, greaterThanOrEqualTo(1));
-    expect(psy.recordsByKind[WorkKind.measurement], 1);
-    expect(psy.lastActivity, isNotNull);
-  });
+  test(
+    'specialist activity: who worked with how many of their children',
+    () async {
+      final now = DateTime.now();
+      await measure('student_02', 2, now.subtract(const Duration(days: 3)));
+      final r = reports.build(director, to: now);
+      final psy = r.specialists.firstWhere(
+        (s) => s.userId == 'user_psychologist',
+      );
+      expect(psy.childrenWorkedWith, greaterThanOrEqualTo(1));
+      expect(psy.childrenAssigned, greaterThanOrEqualTo(1));
+      expect(psy.recordsByKind[WorkKind.measurement], 1);
+      expect(psy.lastActivity, isNotNull);
+    },
+  );
 
   test('a specialist sees only their own activity and their own children', () {
     final psy = db.getUserById('user_psychologist')!;
@@ -91,33 +114,48 @@ void main() {
   });
 
   test('roles without the reports module cannot build reports', () {
-    expect(() => reports.build(parent), throwsA(isA<PermissionDeniedException>()));
+    expect(
+      () => reports.build(parent),
+      throwsA(isA<PermissionDeniedException>()),
+    );
   });
 
   test('invalid period is rejected', () {
     expect(
-      () => reports.build(director, from: DateTime(2026, 5, 1), to: DateTime(2026, 4, 1)),
+      () => reports.build(
+        director,
+        from: DateTime(2026, 5, 1),
+        to: DateTime(2026, 4, 1),
+      ),
       throwsA(isA<ValidationException>()),
     );
   });
 
-  test('CSV exports contain the key figures and open correctly in Excel', () async {
-    final r = reports.build(director);
-    final summary = export.generateMonitoringReportCsv(r);
-    expect(summary.startsWith(ReportExportService.utf8Bom), true);
-    expect(summary, contains('Jami bolalar'));
-    expect(summary, contains('Hali ishlanmagan'));
-    expect(summary, contains('Holat: ${StatusColor.red.label}'));
+  test(
+    'CSV exports contain the key figures and open correctly in Excel',
+    () async {
+      final r = reports.build(director);
+      final summary = export.generateMonitoringReportCsv(r);
+      expect(summary.startsWith(ReportExportService.utf8Bom), true);
+      expect(summary, contains('Jami bolalar'));
+      expect(summary, contains('Hali ishlanmagan'));
+      expect(summary, contains('Holat: ${StatusColor.red.label}'));
 
-    final activity = export.generateSpecialistActivityCsv(r);
-    expect(activity, contains('Qamrov (%)'));
-    expect(activity.split('\n').where((l) => l.trim().isNotEmpty).length, r.specialists.length + 1);
-  });
+      final activity = export.generateSpecialistActivityCsv(r);
+      expect(activity, contains('Qamrov (%)'));
+      expect(
+        activity.split('\n').where((l) => l.trim().isNotEmpty).length,
+        r.specialists.length + 1,
+      );
+    },
+  );
 
   test('CSV formula injection is neutralised', () async {
     final s = db.getStudentById('student_01')!;
     final csv = export.generateStudentsCsv([
-      StudentModel.fromJson(s.toJson()).copyWith(lastName: '=HYPERLINK("http://evil")'),
+      StudentModel.fromJson(
+        s.toJson(),
+      ).copyWith(lastName: '=HYPERLINK("http://evil")'),
     ]);
     expect(csv, isNot(contains(',"=HYPERLINK')));
     expect(csv, contains("'=HYPERLINK"));

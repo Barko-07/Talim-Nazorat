@@ -175,7 +175,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       context.read<AuthProvider>().currentUser?.role == UserRole.psychologist;
 
   /// Menyuda bandlarning ko'rinish tartibi (yon panel guruhlari shu tartibda)
-  static const List<int> _menuOrder = [0, 1, 2, 3, 4, 5, 8, 6, 7, 9, 10, 11, 12];
+  static const List<int> _menuOrder = [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    8,
+    6,
+    7,
+    9,
+    10,
+    11,
+    12,
+  ];
 
   UserRole? get _role => context.read<AuthProvider>().currentUser?.role;
 
@@ -253,7 +267,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   /// Yon panel guruhi nomi: "Boshqaruv va tizim" faqat rahbariyat uchun ma'noli
   String _groupLabel(String group) {
     final leadership = _canSee(7);
-    if (group == 'BOSHQARUV VA TIZIM' && !leadership) return 'HISOBOT VA SOZLAMALAR';
+    if (group == 'BOSHQARUV VA TIZIM' && !leadership)
+      return 'HISOBOT VA SOZLAMALAR';
     return group;
   }
 
@@ -293,7 +308,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final key = ValueKey('psy_tab_$_selectedIndex');
     switch (_selectedIndex) {
       case 0:
-        return PsychologistDashboardTab(key: key, onNavigateToTab: _openPsychTab);
+        return PsychologistDashboardTab(
+          key: key,
+          onNavigateToTab: _openPsychTab,
+        );
       case 1:
         return PsychologistStudentsTab(
           key: key,
@@ -302,17 +320,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           onSelectStudentForSession: (s) => _openPsychTab(7, student: s),
         );
       case 2:
-        return PsychologistAssessmentsTab(key: key, preselectedStudent: _preselectedStudent);
+        return PsychologistAssessmentsTab(
+          key: key,
+          preselectedStudent: _preselectedStudent,
+        );
       case 3:
         return PsychologistSessionsTab(key: key);
       case 4:
-        return PsychologistSupportPlansTab(key: key, preselectedStudent: _preselectedStudent);
+        return PsychologistSupportPlansTab(
+          key: key,
+          preselectedStudent: _preselectedStudent,
+        );
       case 6:
         return PsychologistReportsTab(key: key);
       case 10:
-        return PsychologistObservationsTab(key: key, preselectedStudent: _preselectedStudent);
+        return PsychologistObservationsTab(
+          key: key,
+          preselectedStudent: _preselectedStudent,
+        );
       case 11:
-        return PsychologistDevelopmentMapTab(key: key, initialStudent: _preselectedStudent);
+        return PsychologistDevelopmentMapTab(
+          key: key,
+          initialStudent: _preselectedStudent,
+        );
       case 12:
         return PsychologistMethodsTab(key: key, onNavigateToTab: _openPsychTab);
       default:
@@ -393,157 +423,173 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     showDialog(
       context: context,
       barrierColor: const Color(0x420A1A3F),
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          final results = app.students.where((s) {
-            if (query.trim().isEmpty) return true;
-            final q = query.toLowerCase();
-            return s.fullName.toLowerCase().contains(q) ||
-                s.grade.toLowerCase().contains(q) ||
-                s.primaryNeed.toLowerCase().contains(q);
-          }).take(8).toList();
+      builder:
+          (ctx) => StatefulBuilder(
+            builder: (context, setModalState) {
+              final results =
+                  app.students
+                      .where((s) {
+                        if (query.trim().isEmpty) return true;
+                        final q = query.toLowerCase();
+                        return s.fullName.toLowerCase().contains(q) ||
+                            s.grade.toLowerCase().contains(q) ||
+                            s.primaryNeed.toLowerCase().contains(q);
+                      })
+                      .take(8)
+                      .toList();
 
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            insetPadding: const EdgeInsets.symmetric(
-              horizontal: 18,
-              vertical: 32,
-            ),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560, maxHeight: 500),
-              child: GlassSurface(
-                borderRadius: 20,
-                blur: 18,
-                opacity: 0.96,
-                boxShadow: AppColors.elevatedShadow,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      autofocus: true,
-                      onChanged: (v) => setModalState(() => query = v),
-                      decoration: InputDecoration(
-                        hintText:
-                            'O‘quvchi F.I.Sh., sinfi yoki yo‘nalishini qidiring...',
-                        prefixIcon: Icon(
-                          LucideIcons.search,
-                          size: 18,
-                          color: AppColors.primary,
+              return Dialog(
+                backgroundColor: Colors.transparent,
+                insetPadding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 32,
+                ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 560,
+                    maxHeight: 500,
+                  ),
+                  child: GlassSurface(
+                    borderRadius: 20,
+                    blur: 18,
+                    opacity: 0.96,
+                    boxShadow: AppColors.elevatedShadow,
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          autofocus: true,
+                          onChanged: (v) => setModalState(() => query = v),
+                          decoration: InputDecoration(
+                            hintText:
+                                'O‘quvchi F.I.Sh., sinfi yoki yo‘nalishini qidiring...',
+                            prefixIcon: Icon(
+                              LucideIcons.search,
+                              size: 18,
+                              color: AppColors.primary,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: const Icon(LucideIcons.x, size: 17),
+                              onPressed: () => Navigator.pop(ctx),
+                            ),
+                          ),
                         ),
-                        suffixIcon: IconButton(
-                          icon: const Icon(LucideIcons.x, size: 17),
-                          onPressed: () => Navigator.pop(ctx),
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 6),
+                          child: Text(
+                            'TEZKOR NATIJALAR',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 6),
-                      child: Text(
-                        'TEZKOR NATIJALAR',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Flexible(
-                      child: results.isEmpty
-                          ? Padding(
-                              padding: EdgeInsets.symmetric(vertical: 34),
-                              child: Center(
-                                child: Text(
-                                  'So‘rov bo‘yicha o‘quvchi topilmadi',
-                                  style: TextStyle(
-                                    color: AppColors.textMuted,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : ListView.separated(
-                              shrinkWrap: true,
-                              itemCount: results.length,
-                              separatorBuilder: (_, _) =>
-                                  const SizedBox(height: 8),
-                              itemBuilder: (_, i) {
-                                final s = results[i];
-                                return SurfaceCard(
-                                  elevated: false,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                    vertical: 12,
-                                  ),
-                                  borderRadius: 12,
-                                  onTap: () {
-                                    Navigator.pop(ctx);
-                                    Navigator.push(
-                                      this.context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            StudentDetailScreen(studentId: s.id),
+                        const SizedBox(height: 10),
+                        Flexible(
+                          child:
+                              results.isEmpty
+                                  ? Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 34),
+                                    child: Center(
+                                      child: Text(
+                                        'So‘rov bo‘yicha o‘quvchi topilmadi',
+                                        style: TextStyle(
+                                          color: AppColors.textMuted,
+                                          fontSize: 13,
+                                        ),
                                       ),
-                                    );
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        LucideIcons.userRound,
-                                        size: 19,
-                                        color: AppColors.primary,
-                                      ),
-                                      const SizedBox(width: 13),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                    ),
+                                  )
+                                  : ListView.separated(
+                                    shrinkWrap: true,
+                                    itemCount: results.length,
+                                    separatorBuilder:
+                                        (_, _) => const SizedBox(height: 8),
+                                    itemBuilder: (_, i) {
+                                      final s = results[i];
+                                      return SurfaceCard(
+                                        elevated: false,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 15,
+                                          vertical: 12,
+                                        ),
+                                        borderRadius: 12,
+                                        onTap: () {
+                                          Navigator.pop(ctx);
+                                          Navigator.push(
+                                            this.context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (_) => StudentDetailScreen(
+                                                    studentId: s.id,
+                                                  ),
+                                            ),
+                                          );
+                                        },
+                                        child: Row(
                                           children: [
-                                            Text(
-                                              s.fullName,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 13.5,
-                                                fontWeight: FontWeight.w700,
-                                                color: AppColors.textPrimary,
+                                            Icon(
+                                              LucideIcons.userRound,
+                                              size: 19,
+                                              color: AppColors.primary,
+                                            ),
+                                            const SizedBox(width: 13),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    s.fullName,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color:
+                                                          AppColors.textPrimary,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    '${s.grade}-sinf • ${s.primaryNeed}',
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color:
+                                                          AppColors.textMuted,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              '${s.grade}-sinf • ${s.primaryNeed}',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: AppColors.textMuted,
-                                              ),
+                                            Icon(
+                                              LucideIcons.chevronRight,
+                                              size: 16,
+                                              color: AppColors.textSubtle,
                                             ),
                                           ],
                                         ),
-                                      ),
-                                      Icon(
-                                        LucideIcons.chevronRight,
-                                        size: 16,
-                                        color: AppColors.textSubtle,
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   ),
-                                );
-                              },
-                            ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 
@@ -552,142 +598,154 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => GlassSurface(
-        borderRadius: 26,
-        blur: 18,
-        opacity: 0.97,
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 26),
-        child: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4.5,
-                    decoration: BoxDecoration(
-                      color: AppColors.borderSlate,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Row(
+      builder:
+          (ctx) => GlassSurface(
+            borderRadius: 26,
+            blur: 18,
+            opacity: 0.97,
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 26),
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      LucideIcons.layoutGrid,
-                      size: 20,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'Barcha tizim bo‘limlari',
-                        style: TextStyle(
-                          fontSize: 17.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                          letterSpacing: -0.3,
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4.5,
+                        decoration: BoxDecoration(
+                          color: AppColors.borderSlate,
+                          borderRadius: BorderRadius.circular(999),
                         ),
                       ),
                     ),
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () => Navigator.pop(ctx),
-                      icon: const Icon(LucideIcons.x, size: 18),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.layoutGrid,
+                          size: 20,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Barcha tizim bo‘limlari',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          visualDensity: VisualDensity.compact,
+                          onPressed: () => Navigator.pop(ctx),
+                          icon: const Icon(LucideIcons.x, size: 18),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    ResponsiveGlassGrid(
+                      mobileColumns: 2,
+                      tabletColumns: 2,
+                      desktopColumns: 2,
+                      spacing: 12,
+                      children:
+                          _navItems.map((item) {
+                            final isSel = _selectedIndex == item.index;
+                            final badge = _badgeForIndex(item.index, app);
+
+                            return SurfaceCard(
+                              elevated: false,
+                              borderRadius: 14,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 13,
+                              ),
+                              backgroundColor:
+                                  isSel
+                                      ? AppColors.primaryLight
+                                      : AppColors.surface,
+                              borderColor:
+                                  isSel
+                                      ? AppColors.primary.withValues(
+                                        alpha: 0.35,
+                                      )
+                                      : AppColors.border,
+                              onTap: () {
+                                Navigator.pop(ctx);
+                                _selectTab(item.index);
+                              },
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    item.icon,
+                                    size: 19,
+                                    color:
+                                        isSel
+                                            ? AppColors.primary
+                                            : AppColors.textSecondary,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      item.shortLabel,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight:
+                                            isSel
+                                                ? FontWeight.w700
+                                                : FontWeight.w600,
+                                        color:
+                                            isSel
+                                                ? AppColors.primary
+                                                : AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                  if (badge != null) ...[
+                                    const SizedBox(width: 4),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 7,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            item.index == 5
+                                                ? AppColors.errorBg
+                                                : AppColors.primaryLight,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        '$badge',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color:
+                                              item.index == 5
+                                                  ? AppColors.error
+                                                  : AppColors.primary,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            );
+                          }).toList(),
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                ResponsiveGlassGrid(
-                  mobileColumns: 2,
-                  tabletColumns: 2,
-                  desktopColumns: 2,
-                  spacing: 12,
-                  children: _navItems.map((item) {
-                    final isSel = _selectedIndex == item.index;
-                    final badge = _badgeForIndex(item.index, app);
-
-                    return SurfaceCard(
-                      elevated: false,
-                      borderRadius: 14,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 13,
-                      ),
-                      backgroundColor: isSel
-                          ? AppColors.primaryLight
-                          : AppColors.surface,
-                      borderColor: isSel
-                          ? AppColors.primary.withValues(alpha: 0.35)
-                          : AppColors.border,
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        _selectTab(item.index);
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            item.icon,
-                            size: 19,
-                            color: isSel
-                                ? AppColors.primary
-                                : AppColors.textSecondary,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              item.shortLabel,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight:
-                                    isSel ? FontWeight.w700 : FontWeight.w600,
-                                color: isSel
-                                    ? AppColors.primary
-                                    : AppColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                          if (badge != null) ...[
-                            const SizedBox(width: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 7,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: item.index == 5
-                                    ? AppColors.errorBg
-                                    : AppColors.primaryLight,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                '$badge',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: item.index == 5
-                                      ? AppColors.error
-                                      : AppColors.primary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
     );
   }
 
@@ -705,8 +763,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final size = renderBox?.size;
     final topOffset =
         (offset?.dy ?? (media.padding.top + (isDesktop ? 14.0 : 8.0) + 6.0)) +
-            (size?.height ?? 38.0) +
-            8.0;
+        (size?.height ?? 38.0) +
+        8.0;
 
     showGeneralDialog(
       context: context,
@@ -749,10 +807,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             begin: const Offset(0.12, 0),
             end: Offset.zero,
           ).animate(curved),
-          child: FadeTransition(
-            opacity: curved,
-            child: child,
-          ),
+          child: FadeTransition(opacity: curved, child: child),
         );
       },
     );
@@ -767,236 +822,259 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setSheetState) {
-          final notifications = app.myNotifications;
-          final unreadCount = app.myUnreadNotificationCount;
-          return GlassSurface(
-            borderRadius: 26,
-            blur: 18,
-            opacity: 0.97,
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-            child: SafeArea(
-              top: false,
-              child: SizedBox(
-                height: 500,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4.5,
-                        decoration: BoxDecoration(
-                          color: AppColors.borderSlate,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 8,
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
+      builder:
+          (ctx) => StatefulBuilder(
+            builder: (context, setSheetState) {
+              final notifications = app.myNotifications;
+              final unreadCount = app.myUnreadNotificationCount;
+              return GlassSurface(
+                borderRadius: 26,
+                blur: 18,
+                opacity: 0.97,
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                child: SafeArea(
+                  top: false,
+                  child: SizedBox(
+                    height: 500,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              LucideIcons.bellRing,
-                              color: AppColors.primary,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Bildirishnomalar',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 17,
-                                letterSpacing: -0.3,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            if (unreadCount > 0) ...[
-                              const SizedBox(width: 8),
-                              StatusPill(
-                                label: '$unreadCount yangi',
-                                color: AppColors.error,
-                                backgroundColor: AppColors.errorBg,
-                              ),
-                            ],
-                          ],
-                        ),
-                        if (auth.currentUser != null && unreadCount > 0)
-                          TextButton(
-                            onPressed: () async {
-                              await app.markAllNotificationsAsRead(
-                                auth.currentUser!.id,
-                              );
-                              setSheetState(() {});
-                            },
-                            child: const Text(
-                              'O‘qilgan qilish',
-                              style: TextStyle(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w700,
-                              ),
+                        Center(
+                          child: Container(
+                            width: 40,
+                            height: 4.5,
+                            decoration: BoxDecoration(
+                              color: AppColors.borderSlate,
+                              borderRadius: BorderRadius.circular(999),
                             ),
                           ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    const Divider(),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: notifications.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    LucideIcons.bellOff,
-                                    size: 36,
-                                    color: AppColors.textSubtle,
+                        ),
+                        const SizedBox(height: 16),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 8,
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  LucideIcons.bellRing,
+                                  color: AppColors.primary,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Bildirishnomalar',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 17,
+                                    letterSpacing: -0.3,
+                                    color: AppColors.textPrimary,
                                   ),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    'Hozircha yangi bildirishnomalar yo‘q',
-                                    style: TextStyle(
-                                      color: AppColors.textMuted,
-                                      fontSize: 13,
-                                    ),
+                                ),
+                                if (unreadCount > 0) ...[
+                                  const SizedBox(width: 8),
+                                  StatusPill(
+                                    label: '$unreadCount yangi',
+                                    color: AppColors.error,
+                                    backgroundColor: AppColors.errorBg,
                                   ),
                                 ],
+                              ],
+                            ),
+                            if (auth.currentUser != null && unreadCount > 0)
+                              TextButton(
+                                onPressed: () async {
+                                  await app.markAllNotificationsAsRead(
+                                    auth.currentUser!.id,
+                                  );
+                                  setSheetState(() {});
+                                },
+                                child: const Text(
+                                  'O‘qilgan qilish',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
-                            )
-                          : ListView.separated(
-                              itemCount: notifications.length,
-                              separatorBuilder: (_, _) =>
-                                  const SizedBox(height: 10),
-                              itemBuilder: (c, i) {
-                                final notif = notifications[i];
-                                final isAlert = notif.type == 'ALERT';
-                                final accent = isAlert
-                                    ? AppColors.error
-                                    : AppColors.primary;
-
-                                return SurfaceCard(
-                                  elevated: false,
-                                  borderRadius: 14,
-                                  padding: const EdgeInsets.all(15),
-                                  borderColor: notif.isRead
-                                      ? AppColors.border
-                                      : accent.withValues(alpha: 0.35),
-                                  onTap: () async {
-                                    final navigator =
-                                        Navigator.of(this.context);
-                                    final sheetNav = Navigator.of(ctx);
-                                    final studentId = notif.relatedStudentId;
-                                    if (!notif.isRead) {
-                                      await app.markNotificationAsRead(
-                                        notif.id,
-                                      );
-                                      setSheetState(() {});
-                                    }
-                                    if (studentId != null) {
-                                      sheetNav.pop();
-                                      navigator.push(
-                                        MaterialPageRoute(
-                                          builder: (_) => StudentDetailScreen(
-                                            studentId: studentId,
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        const Divider(),
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child:
+                              notifications.isEmpty
+                                  ? Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          LucideIcons.bellOff,
+                                          size: 36,
+                                          color: AppColors.textSubtle,
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          'Hozircha yangi bildirishnomalar yo‘q',
+                                          style: TextStyle(
+                                            color: AppColors.textMuted,
+                                            fontSize: 13,
                                           ),
                                         ),
-                                      );
-                                    }
-                                  },
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 2),
-                                        child: Icon(
+                                      ],
+                                    ),
+                                  )
+                                  : ListView.separated(
+                                    itemCount: notifications.length,
+                                    separatorBuilder:
+                                        (_, _) => const SizedBox(height: 10),
+                                    itemBuilder: (c, i) {
+                                      final notif = notifications[i];
+                                      final isAlert = notif.type == 'ALERT';
+                                      final accent =
                                           isAlert
-                                              ? LucideIcons.triangleAlert
-                                              : notif.type == 'REFERRAL'
-                                                  ? LucideIcons.arrowLeftRight
-                                                  : LucideIcons.clipboardList,
-                                          color: notif.isRead
-                                              ? AppColors.textMuted
-                                              : accent,
-                                          size: 20,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 13),
-                                      Expanded(
-                                        child: Column(
+                                              ? AppColors.error
+                                              : AppColors.primary;
+
+                                      return SurfaceCard(
+                                        elevated: false,
+                                        borderRadius: 14,
+                                        padding: const EdgeInsets.all(15),
+                                        borderColor:
+                                            notif.isRead
+                                                ? AppColors.border
+                                                : accent.withValues(
+                                                  alpha: 0.35,
+                                                ),
+                                        onTap: () async {
+                                          final navigator = Navigator.of(
+                                            this.context,
+                                          );
+                                          final sheetNav = Navigator.of(ctx);
+                                          final studentId =
+                                              notif.relatedStudentId;
+                                          if (!notif.isRead) {
+                                            await app.markNotificationAsRead(
+                                              notif.id,
+                                            );
+                                            setSheetState(() {});
+                                          }
+                                          if (studentId != null) {
+                                            sheetNav.pop();
+                                            navigator.push(
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (_) => StudentDetailScreen(
+                                                      studentId: studentId,
+                                                    ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        child: Row(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    notif.title,
-                                                    style: TextStyle(
-                                                      fontWeight: notif.isRead
-                                                          ? FontWeight.w600
-                                                          : FontWeight.w700,
-                                                      fontSize: 13.5,
-                                                      color:
-                                                          AppColors.textPrimary,
-                                                    ),
-                                                  ),
-                                                ),
-                                                if (!notif.isRead)
-                                                  Container(
-                                                    width: 7.5,
-                                                    height: 7.5,
-                                                    decoration: BoxDecoration(
-                                                      color: accent,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              notif.body,
-                                              style: TextStyle(
-                                                fontSize: 12.5,
-                                                color: AppColors.textSecondary,
-                                                height: 1.4,
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 2,
+                                              ),
+                                              child: Icon(
+                                                isAlert
+                                                    ? LucideIcons.triangleAlert
+                                                    : notif.type == 'REFERRAL'
+                                                    ? LucideIcons.arrowLeftRight
+                                                    : LucideIcons.clipboardList,
+                                                color:
+                                                    notif.isRead
+                                                        ? AppColors.textMuted
+                                                        : accent,
+                                                size: 20,
                                               ),
                                             ),
-                                            const SizedBox(height: 5),
-                                            Text(
-                                              df.format(notif.createdAt),
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                color: AppColors.textMuted,
-                                                fontFeatures: [
-                                                  FontFeature.tabularFigures(),
+                                            const SizedBox(width: 13),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          notif.title,
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                notif.isRead
+                                                                    ? FontWeight
+                                                                        .w600
+                                                                    : FontWeight
+                                                                        .w700,
+                                                            fontSize: 14,
+                                                            color:
+                                                                AppColors
+                                                                    .textPrimary,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      if (!notif.isRead)
+                                                        Container(
+                                                          width: 7.5,
+                                                          height: 7.5,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                color: accent,
+                                                                shape:
+                                                                    BoxShape
+                                                                        .circle,
+                                                              ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    notif.body,
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      color:
+                                                          AppColors
+                                                              .textSecondary,
+                                                      height: 1.4,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  Text(
+                                                    df.format(notif.createdAt),
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                      color:
+                                                          AppColors.textMuted,
+                                                      fontFeatures: [
+                                                        FontFeature.tabularFigures(),
+                                                      ],
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   ),
-                                );
-                              },
-                            ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 
@@ -1028,8 +1106,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     child: PageTransitionSwitcher(
                       duration: const Duration(milliseconds: 280),
                       reverse: !_isMovingForward,
-                      transitionBuilder:
-                          (child, primaryAnimation, secondaryAnimation) {
+                      transitionBuilder: (
+                        child,
+                        primaryAnimation,
+                        secondaryAnimation,
+                      ) {
                         return SharedAxisTransition(
                           animation: primaryAnimation,
                           secondaryAnimation: secondaryAnimation,
@@ -1079,11 +1160,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           width: 35,
           height: 35,
           child: Center(
-            child: Icon(
-              icon,
-              size: 18.5,
-              color: AppColors.textSecondary,
-            ),
+            child: Icon(icon, size: 18.5, color: AppColors.textSecondary),
           ),
         ),
       ),
@@ -1207,14 +1284,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 15.5,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: -0.3,
                                     color: AppColors.textPrimary,
                                   ),
                                 )
                               else
-                                const BrandWordmark(fontSize: 15),
+                                const BrandWordmark(fontSize: 15.5),
                               Text(
                                 user?.institutionName ??
                                     '9-sonli inklyuziv ta’lim tayanch maktabi',
@@ -1261,7 +1338,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                     Text(
                                       'O‘quvchi qidirish...',
                                       style: TextStyle(
-                                        fontSize: 12.5,
+                                        fontSize: 13,
                                         color: AppColors.textMuted,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -1326,7 +1403,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         const SizedBox(width: 5),
                         TactileBounce(
                           key: _profileMenuKey,
-                          onTap: () => _showProfileRightMenu(context, user, auth),
+                          onTap:
+                              () => _showProfileRightMenu(context, user, auth),
                           pressedScale: 0.95,
                           child: Container(
                             padding: EdgeInsets.symmetric(
@@ -1448,11 +1526,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            BrandWordmark(fontSize: 18),
+                            BrandWordmark(fontSize: 17),
                             Text(
                               'Inklyuziv monitoring',
                               style: TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 12,
                                 color: AppColors.textMuted,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -1463,8 +1541,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       _buildHeaderIconAction(
                         icon: LucideIcons.panelLeftClose,
                         tooltip: 'Menyuni yig‘ish',
-                        onTap: () =>
-                            setState(() => _isDesktopSidebarOpen = false),
+                        onTap:
+                            () => setState(() => _isDesktopSidebarOpen = false),
                       ),
                     ],
                   ),
@@ -1477,130 +1555,154 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       horizontal: 14,
                       vertical: 16,
                     ),
-                    children: groups.entries.map((entry) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                              child: Text(
-                                entry.key,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.9,
-                                  color: AppColors.textSubtle,
-                                ),
-                              ),
-                            ),
-                            ...entry.value.map((item) {
-                              final isSelected = _selectedIndex == item.index;
-                              final badge = _badgeForIndex(item.index, app);
-                              final isAlertBadge = item.index == 5;
-
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 4),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(12),
-                                    onTap: () => _selectTab(item.index),
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                        milliseconds: 160,
-                                      ),
-                                      curve: Curves.easeOutCubic,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 13,
-                                        vertical: 10.5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isSelected
-                                            ? AppColors.primaryLight
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: isSelected
-                                              ? AppColors.primaryTint
-                                              : Colors.transparent,
-                                          width: 1.0,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            item.icon,
-                                            size: 18.5,
-                                            color: isSelected
-                                                ? AppColors.primary
-                                                : AppColors.textMuted,
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Text(
-                                              item.title,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                fontWeight: isSelected
-                                                    ? FontWeight.w700
-                                                    : FontWeight.w600,
-                                                color: isSelected
-                                                    ? AppColors.primary
-                                                    : AppColors.textSecondary,
-                                                letterSpacing: -0.1,
-                                              ),
-                                            ),
-                                          ),
-                                          if (badge != null)
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 7.5,
-                                                vertical: 2,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: isAlertBadge
-                                                    ? AppColors.errorBg
-                                                    : AppColors.surface,
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                border: Border.all(
-                                                  color: isAlertBadge
-                                                      ? AppColors.errorBorder
-                                                      : AppColors.border,
-                                                  width: 0.85,
-                                                ),
-                                              ),
-                                              child: Text(
-                                                '$badge',
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w700,
-                                                  fontFeatures: const [
-                                                    FontFeature
-                                                        .tabularFigures(),
-                                                  ],
-                                                  color: isAlertBadge
-                                                      ? AppColors.error
-                                                      : AppColors.primary,
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
+                    children:
+                        groups.entries.map((entry) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 18),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    12,
+                                    0,
+                                    12,
+                                    8,
+                                  ),
+                                  child: Text(
+                                    entry.key,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.9,
+                                      color: AppColors.textSubtle,
                                     ),
                                   ),
                                 ),
-                              );
-                            }),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                                ...entry.value.map((item) {
+                                  final isSelected =
+                                      _selectedIndex == item.index;
+                                  final badge = _badgeForIndex(item.index, app);
+                                  final isAlertBadge = item.index == 5;
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 4),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(12),
+                                        onTap: () => _selectTab(item.index),
+                                        child: AnimatedContainer(
+                                          duration: const Duration(
+                                            milliseconds: 160,
+                                          ),
+                                          curve: Curves.easeOutCubic,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 13,
+                                            vertical: 10.5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                isSelected
+                                                    ? AppColors.primaryLight
+                                                    : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            border: Border.all(
+                                              color:
+                                                  isSelected
+                                                      ? AppColors.primaryTint
+                                                      : Colors.transparent,
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                item.icon,
+                                                size: 18.5,
+                                                color:
+                                                    isSelected
+                                                        ? AppColors.primary
+                                                        : AppColors.textMuted,
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Text(
+                                                  item.title,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight:
+                                                        isSelected
+                                                            ? FontWeight.w700
+                                                            : FontWeight.w600,
+                                                    color:
+                                                        isSelected
+                                                            ? AppColors.primary
+                                                            : AppColors
+                                                                .textSecondary,
+                                                    letterSpacing: -0.1,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (badge != null)
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 7.5,
+                                                        vertical: 2,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        isAlertBadge
+                                                            ? AppColors.errorBg
+                                                            : AppColors.surface,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          6,
+                                                        ),
+                                                    border: Border.all(
+                                                      color:
+                                                          isAlertBadge
+                                                              ? AppColors
+                                                                  .errorBorder
+                                                              : AppColors
+                                                                  .border,
+                                                      width: 0.85,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    '$badge',
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontFeatures: const [
+                                                        FontFeature.tabularFigures(),
+                                                      ],
+                                                      color:
+                                                          isAlertBadge
+                                                              ? AppColors.error
+                                                              : AppColors
+                                                                  .primary,
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          );
+                        }).toList(),
                   ),
                 ),
 
@@ -1694,106 +1796,105 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   blur: 24,
                   opacity: AppColors.navGlassOpacity,
                   boxShadow: AppColors.navShadow,
-                  padding: EdgeInsets.fromLTRB(
-                    mediaPadding.left + 5,
-                    5,
-                    5,
-                    5,
-                  ),
+                  padding: EdgeInsets.fromLTRB(mediaPadding.left + 5, 5, 5, 5),
                   child: ClipRRect(
                     borderRadius: leftIslandRadius,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: quickTabs.map((item) {
-                        final isSelected =
-                            !isMoreActive && _selectedIndex == item.index;
-                        const pillRadius = BorderRadius.all(Radius.circular(20));
+                      children:
+                          quickTabs.map((item) {
+                            final isSelected =
+                                !isMoreActive && _selectedIndex == item.index;
+                            const pillRadius = BorderRadius.all(
+                              Radius.circular(20),
+                            );
 
-                        return Expanded(
-                          flex: isSelected ? 22 : 10,
-                          child: TactileBounce(
-                            onTap: () => _selectTab(item.index),
-                            pressedScale: 0.92,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 220),
-                              curve: Curves.easeOutCubic,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isSelected ? 12 : 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.primary
-                                        .withValues(alpha: 0.12)
-                                    : Colors.transparent,
-                                borderRadius: pillRadius,
-                                border: isSelected
-                                    ? Border.all(
-                                        color: AppColors.primary
-                                            .withValues(alpha: 0.22),
-                                        width: 1.0,
-                                      )
-                                    : null,
-                              ),
-                              child: isSelected
-                                  ? Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          item.icon,
-                                          size: 19,
-                                          color: AppColors.primary,
-                                        ),
-                                        const SizedBox(width: 7),
-                                        Flexible(
-                                          child: Text(
-                                            item.shortLabel,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 12.5,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColors.primary,
-                                              letterSpacing: -0.2,
+                            return Expanded(
+                              flex: isSelected ? 22 : 10,
+                              child: TactileBounce(
+                                onTap: () => _selectTab(item.index),
+                                pressedScale: 0.92,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 220),
+                                  curve: Curves.easeOutCubic,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: isSelected ? 12 : 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        isSelected
+                                            ? AppColors.primary.withValues(
+                                              alpha: 0.12,
+                                            )
+                                            : Colors.transparent,
+                                    borderRadius: pillRadius,
+                                    border:
+                                        isSelected
+                                            ? Border.all(
+                                              color: AppColors.primary
+                                                  .withValues(alpha: 0.22),
+                                              width: 1.0,
+                                            )
+                                            : null,
+                                  ),
+                                  child:
+                                      isSelected
+                                          ? Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                item.icon,
+                                                size: 19,
+                                                color: AppColors.primary,
+                                              ),
+                                              const SizedBox(width: 7),
+                                              Flexible(
+                                                child: Text(
+                                                  item.shortLabel,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: AppColors.primary,
+                                                    letterSpacing: -0.2,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                          : Center(
+                                            child: Icon(
+                                              item.icon,
+                                              size: 19.5,
+                                              color: AppColors.textMuted,
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    )
-                                  : Center(
-                                      child: Icon(
-                                        item.icon,
-                                        size: 19.5,
-                                        color: AppColors.textMuted,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        );
-                        }).toList(),
-                      ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
                     ),
                   ),
                 ),
+              ),
               const SizedBox(width: 10),
               // 2. O'ng tarafga yopishgan "Barchasi" Island
               Expanded(
                 flex: isMoreActive ? 16 : 7,
                 child: GlassSurface(
                   customBorderRadius: rightIslandRadius,
-                  borderColor: isMoreActive
-                      ? AppColors.primary.withValues(alpha: 0.28)
-                      : AppColors.navGlassBorder,
+                  borderColor:
+                      isMoreActive
+                          ? AppColors.primary.withValues(alpha: 0.28)
+                          : AppColors.navGlassBorder,
                   useBlur: true,
                   blur: 24,
                   opacity: AppColors.navGlassOpacity,
                   boxShadow: AppColors.navShadow,
-                  padding: EdgeInsets.fromLTRB(
-                    5,
-                    5,
-                    mediaPadding.right + 5,
-                    5,
-                  ),
+                  padding: EdgeInsets.fromLTRB(5, 5, mediaPadding.right + 5, 5),
                   child: ClipRRect(
                     borderRadius: rightIslandRadius,
                     child: TactileBounce(
@@ -1806,21 +1907,26 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           horizontal: isMoreActive ? 12 : 6,
                         ),
                         decoration: BoxDecoration(
-                          color: isMoreActive
-                              ? AppColors.primary.withValues(alpha: 0.12)
-                              : Colors.transparent,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20)),
-                          border: isMoreActive
-                              ? Border.all(
-                                  color: AppColors.primary
-                                      .withValues(alpha: 0.22),
-                                  width: 1.0,
-                                )
-                              : null,
+                          color:
+                              isMoreActive
+                                  ? AppColors.primary.withValues(alpha: 0.12)
+                                  : Colors.transparent,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(20),
+                          ),
+                          border:
+                              isMoreActive
+                                  ? Border.all(
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.22,
+                                    ),
+                                    width: 1.0,
+                                  )
+                                  : null,
                         ),
-                          child: isMoreActive
-                              ? Row(
+                        child:
+                            isMoreActive
+                                ? Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
@@ -1835,7 +1941,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          fontSize: 12.5,
+                                          fontSize: 13,
                                           fontWeight: FontWeight.w700,
                                           color: AppColors.primary,
                                           letterSpacing: -0.2,
@@ -1844,7 +1950,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                     ),
                                   ],
                                 )
-                              : Center(
+                                : Center(
                                   child: Stack(
                                     clipBehavior: Clip.none,
                                     children: [
@@ -1869,11 +1975,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                     ],
                                   ),
                                 ),
-                        ),
                       ),
                     ),
                   ),
                 ),
+              ),
             ],
           ),
         ),
@@ -1909,11 +2015,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            BrandWordmark(fontSize: 18),
+                            BrandWordmark(fontSize: 17),
                             Text(
                               AppBrand.tagline,
                               style: TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 12,
                                 color: AppColors.textMuted,
                               ),
                             ),
@@ -1937,7 +2043,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             style: TextStyle(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w700,
-                              fontSize: 13.5,
+                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -1962,7 +2068,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: 11.5,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.primary,
                                 ),
@@ -1978,7 +2084,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 itemCount: _navItems.length,
                 itemBuilder: (ctx, idx) {
                   final item = _navItems[idx];
@@ -1991,35 +2100,33 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      tileColor: isSel
-                          ? AppColors.primaryLight
-                          : Colors.transparent,
+                      tileColor:
+                          isSel ? AppColors.primaryLight : Colors.transparent,
                       leading: Icon(
                         item.icon,
-                        color: isSel
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
+                        color:
+                            isSel ? AppColors.primary : AppColors.textSecondary,
                         size: 19,
                       ),
                       title: Text(
                         item.title,
                         style: TextStyle(
-                          fontWeight:
-                              isSel ? FontWeight.w700 : FontWeight.w600,
-                          color: isSel
-                              ? AppColors.primary
-                              : AppColors.textPrimary,
+                          fontWeight: isSel ? FontWeight.w700 : FontWeight.w600,
+                          color:
+                              isSel ? AppColors.primary : AppColors.textPrimary,
                           fontSize: 13,
                         ),
                       ),
-                      trailing: badge != null
-                          ? StatusPill(
-                              label: '$badge',
-                              color: item.index == 5
-                                  ? AppColors.error
-                                  : AppColors.primary,
-                            )
-                          : null,
+                      trailing:
+                          badge != null
+                              ? StatusPill(
+                                label: '$badge',
+                                color:
+                                    item.index == 5
+                                        ? AppColors.error
+                                        : AppColors.primary,
+                              )
+                              : null,
                       onTap: () {
                         Navigator.pop(context);
                         _selectTab(item.index);
@@ -2037,7 +2144,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     child: Text(
                       '${AppBrand.name} • v1.0.0',
                       style: TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 12,
                         color: AppColors.textMuted,
                         fontWeight: FontWeight.w600,
                       ),
@@ -2054,7 +2161,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       'Chiqish',
                       style: TextStyle(
                         color: AppColors.error,
-                        fontSize: 12.5,
+                        fontSize: 13,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -2120,7 +2227,7 @@ class _ProfileRightDropdownMenu extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 13.5,
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.2,
@@ -2133,7 +2240,7 @@ class _ProfileRightDropdownMenu extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 11.5,
+                      fontSize: 12,
                       color: AppColors.textMuted,
                       fontWeight: FontWeight.w500,
                     ),

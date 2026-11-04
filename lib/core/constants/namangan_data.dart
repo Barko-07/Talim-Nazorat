@@ -21,7 +21,7 @@ class NamanganData {
 
   static const String defaultDistrict = 'Chortoq tumani';
 
-  static const String customSchoolOption = '➕ Boshqa maktab (Qo‘lda yozish)';
+  static const String customSchoolOption = 'Boshqa maktab (Qo‘lda yozish)';
 
   // Har bir tuman bo'yicha namunaviy va inklyuziv maktablar ro'yxati
   static const Map<String, List<String>> districtSchools = {

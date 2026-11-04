@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -64,7 +65,7 @@ class AssessmentResultScreen extends StatelessWidget {
                 side: BorderSide(color: AppColors.primary),
               ),
               icon: Icon(
-                Icons.compare_arrows_rounded,
+                LucideIcons.arrowLeftRight,
                 size: 18,
                 color: AppColors.primary,
               ),
@@ -108,7 +109,7 @@ class AssessmentResultScreen extends StatelessWidget {
                               radius: 28,
                               backgroundColor: AppColors.primaryLight,
                               child: Icon(
-                                Icons.psychology_rounded,
+                                LucideIcons.brain,
                                 color: AppColors.primary,
                                 size: 30,
                               ),
@@ -123,7 +124,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                       Text(
                                         assessment.studentName,
                                         style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: 17,
                                           fontWeight: FontWeight.w600,
                                           color: AppColors.textPrimary,
                                         ),
@@ -226,22 +227,22 @@ class AssessmentResultScreen extends StatelessWidget {
                             _buildSummaryItem(
                               'Jami savollar',
                               '${assessment.responses.length} ta',
-                              Icons.quiz_outlined,
+                              LucideIcons.fileQuestion,
                             ),
                             _buildSummaryItem(
                               'Baholandi',
                               '${evaluatedResponses.length} ta',
-                              Icons.check_circle_outline,
+                              LucideIcons.circleCheck,
                             ),
                             _buildSummaryItem(
                               'Baholanmadi (O‘tkazildi)',
                               '${skippedResponses.length} ta',
-                              Icons.remove_circle_outline,
+                              LucideIcons.circleMinus,
                             ),
                             _buildSummaryItem(
                               'Protokol ID',
                               assessment.id.replaceAll('ass_psy_', '#'),
-                              Icons.fingerprint,
+                              LucideIcons.fingerprint,
                             ),
                           ],
                         ),
@@ -296,7 +297,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                 ),
                               );
                             },
-                            icon: const Icon(Icons.forward_to_inbox_outlined),
+                            icon: const Icon(LucideIcons.mailCheck),
                             label: const Text('Yo‘naltirish'),
                           ),
                         ),
@@ -312,7 +313,7 @@ class AssessmentResultScreen extends StatelessWidget {
                   Text(
                     'Baholash Yo‘nalishlari Bo‘yicha Natijalar',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -396,7 +397,7 @@ class AssessmentResultScreen extends StatelessWidget {
                         Row(
                           children: [
                             Icon(
-                              Icons.psychology_alt_outlined,
+                              LucideIcons.brain,
                               color: AppColors.primary,
                               size: 20,
                             ),
@@ -404,7 +405,7 @@ class AssessmentResultScreen extends StatelessWidget {
                             Text(
                               '${assessment.specialistRole} xulosasi',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 15.5,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
@@ -419,7 +420,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                   ? assessment.notes
                                   : 'Xulosa kiritilmagan'),
                           style: TextStyle(
-                            fontSize: 13.5,
+                            fontSize: 14,
                             color: AppColors.textSecondary,
                             height: 1.4,
                           ),
@@ -431,7 +432,7 @@ class AssessmentResultScreen extends StatelessWidget {
                           Row(
                             children: [
                               Icon(
-                                Icons.lightbulb_outline,
+                                LucideIcons.lightbulb,
                                 color: AppColors.success,
                                 size: 18,
                               ),
@@ -470,7 +471,7 @@ class AssessmentResultScreen extends StatelessWidget {
                       Text(
                         'Ishlatilgan Savollar va Javoblar Protokoli',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
@@ -530,7 +531,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                         : r.questionText,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 13.5,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 ),
@@ -544,7 +545,9 @@ class AssessmentResultScreen extends StatelessWidget {
                                       color: AppColors.warningBg,
                                       borderRadius: BorderRadius.circular(4),
                                       border: Border.all(
-                                        color: AppColors.warning.withValues(alpha: 0.3),
+                                        color: AppColors.warning.withValues(
+                                          alpha: 0.3,
+                                        ),
                                       ),
                                     ),
                                     child: Text(
@@ -601,7 +604,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                   Text(
                                     'Berilgan javob / Natija: ',
                                     style: TextStyle(
-                                      fontSize: 11.5,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textMuted,
                                     ),
@@ -635,7 +638,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Icon(
-                                    Icons.comment_outlined,
+                                    LucideIcons.messageSquare,
                                     size: 14,
                                     color: AppColors.textMuted,
                                   ),
@@ -644,7 +647,7 @@ class AssessmentResultScreen extends StatelessWidget {
                                     child: Text(
                                       'Psixolog kuzatuvi: ${r.psychologistNotes!}',
                                       style: TextStyle(
-                                        fontSize: 11.5,
+                                        fontSize: 12,
                                         color: AppColors.textMuted,
                                         fontStyle: FontStyle.italic,
                                       ),
@@ -662,7 +665,7 @@ class AssessmentResultScreen extends StatelessWidget {
                   Text(
                     'Baholangan mezonlar',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -714,7 +717,7 @@ class AssessmentResultScreen extends StatelessWidget {
                               Text(
                                 criterion.notes!,
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 13,
                                   color: AppColors.textSecondary,
                                 ),
                               ),
@@ -741,7 +744,7 @@ class AssessmentResultScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.shield_outlined,
+                        LucideIcons.shield,
                         size: 20,
                         color: AppColors.warning,
                       ),
@@ -776,10 +779,7 @@ class AssessmentResultScreen extends StatelessWidget {
           value,
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         ),
-        Text(
-          label,
-          style: TextStyle(fontSize: 11, color: AppColors.textMuted),
-        ),
+        Text(label, style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
       ],
     );
   }

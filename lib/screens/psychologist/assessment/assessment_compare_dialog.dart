@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -91,7 +92,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
-                      Icons.compare_arrows_rounded,
+                      LucideIcons.arrowLeftRight,
                       color: AppColors.primary,
                       size: 22,
                     ),
@@ -120,7 +121,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded),
+                    icon: const Icon(LucideIcons.x),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -134,7 +135,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.query_builder_rounded,
+                          LucideIcons.clock,
                           size: 48,
                           color: AppColors.textMuted,
                         ),
@@ -142,7 +143,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                         const Text(
                           'Taqqoslovchi boshqa yakunlangan baholash mavjud emas',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 15.5,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -208,7 +209,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Icon(
-                                Icons.swap_horiz_rounded,
+                                LucideIcons.arrowLeftRight,
                                 size: 28,
                                 color: AppColors.textMuted,
                               ),
@@ -305,23 +306,17 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color:
-                      isPositive
-                          ? AppColors.successBg
-                          : AppColors.errorBg,
+                  color: isPositive ? AppColors.successBg : AppColors.errorBg,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       isPositive
-                          ? Icons.trending_up_rounded
-                          : Icons.trending_down_rounded,
+                          ? LucideIcons.trendingUp
+                          : LucideIcons.trendingDown,
                       size: 16,
-                      color:
-                          isPositive
-                              ? AppColors.success
-                              : AppColors.error,
+                      color: isPositive ? AppColors.success : AppColors.error,
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -329,10 +324,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color:
-                            isPositive
-                                ? AppColors.success
-                                : AppColors.error,
+                        color: isPositive ? AppColors.success : AppColors.error,
                       ),
                     ),
                   ],
@@ -341,10 +333,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
               const SizedBox(height: 4),
               Text(
                 isPositive ? 'Ijobiy o‘sish' : 'Pasayish / Regressiya',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textMuted,
-                ),
+                style: TextStyle(fontSize: 11, color: AppColors.textMuted),
               ),
             ],
           ),
@@ -367,15 +356,12 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
   ) {
     return Column(
       children: [
-        Text(
-          label,
-          style: TextStyle(fontSize: 11, color: AppColors.textMuted),
-        ),
+        Text(label, style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
         const SizedBox(height: 2),
         Text(
           percent,
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: color,
           ),
@@ -466,10 +452,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color:
-                              isPos
-                                  ? AppColors.success
-                                  : AppColors.error,
+                          color: isPos ? AppColors.success : AppColors.error,
                         ),
                         textAlign: TextAlign.end,
                       ),
