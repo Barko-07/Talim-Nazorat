@@ -26,7 +26,7 @@ API docs (development only): http://127.0.0.1:8000/api/docs
 5. Tables: `DATABASE_URL=<owner DSN> python -m app.cli init-db`, then `sudo -u postgres psql -d individ < deploy/postgres/grants.sql`.
 6. Your admin account: `python -m app.cli create-admin --email you@domain --name "Ism Familiya"`. The password is typed, never stored in plain text. At first login, two-factor authentication must be set up.
 7. Service: install `deploy/systemd/individ-api.service`, then `systemctl enable --now individ-api`.
-8. Web: `flutter build web --release --pwa-strategy=none --no-web-resources-cdn`, then copy `build/web/*` to `/srv/individ/web`.
+8. Web: `flutter build web --release --pwa-strategy=none --no-web-resources-cdn`, then copy `build/web/*` to `/srv/individ/web` and precompress it for `gzip_static` (about 10 MB down to 3.5 MB): `find /srv/individ/web -type f \( -name '*.js' -o -name '*.wasm' -o -name '*.json' -o -name '*.otf' -o -name '*.ttf' \) -exec gzip -k -9 -f {} \;`
 9. nginx: `individ.conf` needs the certificate to exist, so get it first through a temporary HTTP-only site that serves `/.well-known/acme-challenge/` from `/var/www/certbot`: `certbot certonly --webroot -w /var/www/certbot -d individ.uz -d www.individ.uz`. Then remove the temporary site and the `default` site, install `individ.conf` in `sites-enabled` and `individ_proxy.conf` plus `individ_headers.conf` in `/etc/nginx/`, then `nginx -t && systemctl reload nginx`. Renewals use the same webroot, which `individ.conf` keeps serving.
 10. Backups: create an age key pair on your own computer, put only the public key on the server at `/etc/individ/backup.pub`, and install `deploy/scripts/backup.sh` as a daily cron job. Test a restore.
 
