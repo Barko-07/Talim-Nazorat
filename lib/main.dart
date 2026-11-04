@@ -39,7 +39,9 @@ class TalimNazoratApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       home: Consumer<AuthProvider>(
         builder: (context, auth, _) {
-          if (auth.isLoading) {
+          // Faqat ilova ochilayotganda. Kirish tugmasi bosilganda ham yuklanish
+          // ekrani ko'rsatilsa, kirish sahifasi yopilib, kod oynasi ochilmay qoladi.
+          if (auth.isInitializing) {
             return const _AppLoadingScreen();
           }
           if (auth.initializationError != null) {

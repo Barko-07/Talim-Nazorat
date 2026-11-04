@@ -24,6 +24,10 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   UserModel? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
   bool get isLoading => _isLoading;
+
+  /// Ilova ochilib, saqlangan sessiya tekshirilayotgan payt (kirish tugmasi emas).
+  bool get isInitializing => _initializing;
+  bool _initializing = true;
   String? get initializationError => _initializationError;
 
   UserRole get currentRole => _currentUser?.role ?? UserRole.reviewer;
@@ -84,6 +88,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> _checkSavedSession() async {
+    _initializing = true;
     _isLoading = true;
     _initializationError = null;
     notifyListeners();
@@ -117,6 +122,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
       _initializationError = 'Local storage initialization failed.';
     } finally {
       _isLoading = false;
+      _initializing = false;
       notifyListeners();
     }
   }

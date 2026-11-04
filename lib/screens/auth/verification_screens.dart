@@ -11,7 +11,6 @@ import '../../core/widgets/brand_logo.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/auth_api.dart';
-import '../main_navigation_screen.dart';
 
 // ============================================================================
 // Server rejimidagi kirish bosqichlari: emailga kelgan kod, Authenticator kodi,
@@ -41,12 +40,10 @@ class PasswordRules {
   }
 }
 
-/// Kirish tugagach — asosiy sahifaga (orqaga qaytib bo'lmaydi).
+/// Kirish tugagach — ilovaning ildiz oynasiga qaytamiz: u rolga qarab
+/// administrator portalini yoki asosiy sahifani ko'rsatadi (main.dart).
 void _openApp(BuildContext context) {
-  Navigator.of(context).pushAndRemoveUntil(
-    MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-    (route) => false,
-  );
+  Navigator.of(context).popUntil((route) => route.isFirst);
 }
 
 void _snack(BuildContext context, String text, {bool error = false}) {
