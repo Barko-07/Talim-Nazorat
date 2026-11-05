@@ -94,7 +94,7 @@ class _ServerInstitutionsTabState extends State<ServerInstitutionsTab> {
                     if (ctx.mounted) Navigator.pop(ctx, true);
                   } on ApiException catch (e) {
                     if (ctx.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      ScaffoldMessenger.of(ctx).showSnackBar(
                         SnackBar(
                           content: Text(e.message),
                           backgroundColor: AppColors.error,

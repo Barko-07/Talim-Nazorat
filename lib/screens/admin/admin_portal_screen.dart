@@ -13,6 +13,7 @@ import '../auth/logout_dialog.dart';
 import '../referrals/referrals_screen.dart';
 
 import 'server/server_institutions_tab.dart';
+import 'server/server_history_tab.dart';
 import 'server/server_users_tab.dart';
 import 'tabs/admin_overview_tab.dart';
 import 'tabs/admin_users_tab.dart';
@@ -186,7 +187,8 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
       const AdminReportsTab(),
       const AdminMonitoringTab(),
       const AdminSettingsTab(),
-      const AdminAuditTab(),
+      // Server rejimida: har bir o'zgarish tarixi va xavfsizlik jurnali serverdan.
+      AppConfig.serverMode ? const ServerHistoryTab() : const AdminAuditTab(),
       const ReferralsScreen(),
     ];
 

@@ -73,12 +73,12 @@ def test_only_an_administrator_can_give_a_colleague_access(app):
         from app.models import User
         t2_id = db.scalar(select(User.id).where(User.email == "t2@1-maktab.uz"))
     _put(t1, ("student", "s1", {"firstName": "Ali"}))
-    # A teacher cannot widen access by editing the assignment list...
-    r = _put(t1, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": [t2_id],
-                                    "institutionId": "f" * 32}))
-    assert r.status_code == 200
-    assert r.json()["items"][0]["data"]["assignedSpecialistIds"] != [t2_id]
-    assert r.json()["items"][0]["data"]["institutionId"] == inst
+    # A teacher cannot widen access by editing the assignment list (refused
+    # openly), nor move the child to another school (ignored).
+    r = _put(t1, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": [t2_id]}))
+    assert r.status_code == 403
+    r = _put(t1, ("student", "s1", {"firstName": "Ali", "institutionId": "f" * 32}))
+    assert r.status_code == 200 and r.json()["items"][0]["data"]["institutionId"] == inst
     assert _items(t2, "student") == []
     # ...the school administrator can.
     d = _as(app, "dir@1-maktab.uz")

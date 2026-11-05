@@ -77,6 +77,87 @@ class Institution {
   );
 }
 
+/// Ish ma'lumotidagi bitta o'zgarish: kim, qachon, nimani, qanday qiymatdan
+/// qanday qiymatga o'zgartirgan.
+class DataChange {
+  final int id;
+  final DateTime at;
+  final String action; // create | update | delete
+  final String kind;
+  final String recordId;
+  final String? studentId;
+  final String studentName;
+  final String userId;
+  final String userName;
+  final List<String> fields;
+  final Map<String, dynamic>? before;
+  final Map<String, dynamic>? after;
+
+  const DataChange({
+    required this.id,
+    required this.at,
+    required this.action,
+    required this.kind,
+    required this.recordId,
+    this.studentId,
+    this.studentName = '',
+    required this.userId,
+    this.userName = '',
+    this.fields = const [],
+    this.before,
+    this.after,
+  });
+
+  factory DataChange.fromJson(Map<String, dynamic> j) => DataChange(
+    id: (j['id'] as num).toInt(),
+    at: DateTime.parse(j['at'] as String).toLocal(),
+    action: j['action'] as String? ?? '',
+    kind: j['kind'] as String? ?? '',
+    recordId: j['record_id'] as String? ?? '',
+    studentId: j['student_id'] as String?,
+    studentName: j['student_name'] as String? ?? '',
+    userId: j['user_id'] as String? ?? '',
+    userName: j['user_name'] as String? ?? '',
+    fields: [for (final f in (j['fields'] as List? ?? const [])) f.toString()],
+    before: (j['before'] as Map?)?.cast<String, dynamic>(),
+    after: (j['after'] as Map?)?.cast<String, dynamic>(),
+  );
+}
+
+/// Xavfsizlik jurnalidagi yozuv (kirishlar, rad etilgan urinishlar va h.k.).
+class SecurityEvent {
+  final int id;
+  final DateTime at;
+  final String action;
+  final String severity; // info | warning | alert
+  final String? userId;
+  final String subject;
+  final String ip;
+  final String detail;
+
+  const SecurityEvent({
+    required this.id,
+    required this.at,
+    required this.action,
+    required this.severity,
+    this.userId,
+    this.subject = '',
+    this.ip = '',
+    this.detail = '',
+  });
+
+  factory SecurityEvent.fromJson(Map<String, dynamic> j) => SecurityEvent(
+    id: (j['id'] as num?)?.toInt() ?? 0,
+    at: DateTime.parse(j['at'] as String).toLocal(),
+    action: j['action'] as String? ?? '',
+    severity: j['severity'] as String? ?? 'info',
+    userId: j['user_id'] as String?,
+    subject: j['subject'] as String? ?? '',
+    ip: j['ip'] as String? ?? '',
+    detail: j['detail'] as String? ?? '',
+  );
+}
+
 /// /api/admin endpoint'lari. Ularni faqat tizim administratori (emailga kelgan
 /// kod bilan kirgan) chaqira oladi; boshqalarga server 404 qaytaradi.
 class AdminApi {
@@ -139,6 +220,43 @@ class AdminApi {
       (await _api.getList(
         '/api/admin/institutions',
       )).map((e) => Institution.fromJson(e as Map<String, dynamic>)).toList();
+
+  /// O'zgarishlar tarixi, eng yangisi birinchi. [beforeId] — keyingi sahifa.
+  Future<List<DataChange>> changes({
+    String? kind,
+    String? studentId,
+    int? beforeId,
+    int limit = 100,
+  }) async {
+    final q = <String, String>{
+      'limit': '$limit',
+      if (kind != null) 'kind': kind,
+      if (studentId != null) 'student_id': studentId,
+      if (beforeId != null) 'before_id': '$beforeId',
+    };
+    final path = Uri(path: '/api/admin/changes', queryParameters: q).toString();
+    return [
+      for (final e in await _api.getList(path))
+        DataChange.fromJson((e as Map).cast<String, dynamic>()),
+    ];
+  }
+
+  Future<List<SecurityEvent>> securityEvents({
+    String? severity,
+    int? beforeId,
+    int limit = 200,
+  }) async {
+    final q = <String, String>{
+      'limit': '$limit',
+      if (severity != null) 'severity': severity,
+      if (beforeId != null) 'before_id': '$beforeId',
+    };
+    final path = Uri(path: '/api/admin/audit', queryParameters: q).toString();
+    return [
+      for (final e in await _api.getList(path))
+        SecurityEvent.fromJson((e as Map).cast<String, dynamic>()),
+    ];
+  }
 
   Future<Institution> createInstitution(
     String name, {

@@ -36,6 +36,8 @@ import 'password_hasher.dart';
 import '../core/config/app_config.dart';
 import 'monitoring_rule_engine.dart';
 import 'seed_data.dart';
+import 'api_client.dart';
+import 'records_api.dart';
 import '../core/constants/namangan_data.dart';
 
 class LocalDbService {
@@ -122,6 +124,10 @@ class LocalDbService {
     if (_isInitialized) return;
 
     final prefs = await SharedPreferences.getInstance();
+    if (AppConfig.serverMode) {
+      await _initServerMode(prefs);
+      return;
+    }
     final isSeeded = prefs.getBool('app_db_seeded_v2') ?? false;
     _clearMemory();
 
@@ -333,6 +339,7 @@ class LocalDbService {
   }
 
   Future<void> _persistAll() async {
+    if (AppConfig.serverMode) return _syncToServer();
     final prefs = await SharedPreferences.getInstance();
     await _writeTable(prefs, 'db_users', _users.map((e) => e.toJson()));
     await _writeTable(prefs, 'db_students', _students.map((e) => e.toJson()));
@@ -409,6 +416,9 @@ class LocalDbService {
     String key,
     Iterable<Map<String, dynamic>> rows,
   ) async {
+    // Server rejimida qurilmaga hech qachon ish ma'lumoti yozilmaydi (himoyaning
+    // oxirgi qatlami: qaysi yo'ldan chaqirilmasin).
+    if (AppConfig.serverMode) return;
     // Buzilgan jadval ustidan yozilmaydi — asl ma'lumotni tiklash imkoniyati saqlanadi
     if (_corruptedKeys.contains(key)) return;
     final saved = await prefs.setString(key, jsonEncode(rows.toList()));
@@ -417,6 +427,299 @@ class LocalDbService {
         'Ma’lumot saqlanmadi. Qurilmada bo‘sh joyni tekshiring; eski saqlangan ma’lumot o‘zgartirilmadi.',
       );
     }
+  }
+
+  // ======================================================================
+  // SERVER REJIMI (AppConfig.serverMode): ish ma'lumotlarining yagona manbai
+  // — server. Qurilmada (brauzer xotirasida) hech narsa saqlanmaydi: kirishda
+  // serverdan o'qiladi, har bir saqlash serverga yuboriladi, chiqishda
+  // xotiradan o'chiriladi. Kim nimani ko'rishini server hal qiladi.
+  // ======================================================================
+
+  RecordsApi? _recordsApiOverride;
+  late final RecordsApi _defaultRecordsApi = RecordsApi();
+  RecordsApi get _recordsApi => _recordsApiOverride ?? _defaultRecordsApi;
+
+  /// Testlar uchun: soxta server bilan ishlash.
+  @visibleForTesting
+  set recordsApi(RecordsApi api) => _recordsApiOverride = api;
+
+  /// Serverga yozish faqat kirib, ma'lumot yuklangandan keyin yoqiladi.
+  bool _serverReady = false;
+
+  /// Serverdagi oxirgi holat: tur -> (id -> JSON). O'zgarishlar shu bilan solishtiriladi.
+  Map<String, Map<String, String>> _serverSnapshot = {};
+
+  /// Ilova bilan birga keladigan metodik kontent (savollar, DTS standartlari) —
+  /// serverga yuborilmaydi.
+  Map<String, Set<String>> _builtinIds = {};
+
+  /// Ketma-ket saqlashlar navbat bilan yuboriladi.
+  Future<void> _syncQueue = Future.value();
+
+  bool get isServerDataLoaded => _serverReady;
+
+  static List<T> _decodeRows<T>(
+    List<Map<String, dynamic>> rows,
+    T Function(Map<String, dynamic>) fromJson,
+  ) {
+    final out = <T>[];
+    for (final r in rows) {
+      try {
+        out.add(fromJson(r));
+      } catch (e) {
+        debugPrint('LocalDbService: serverdan kelgan yozuv o‘qilmadi: $e');
+      }
+    }
+    return out;
+  }
+
+  /// Serverga yuboriladigan jadvallar. Tartib muhim: bola kartasi undagi
+  /// yozuvlardan oldin saqlanadi.
+  late final List<_SyncTable> _syncTables = [
+    _SyncTable(
+      'student',
+      () => _students.map((e) => e.toJson()),
+      (r) => _students = _decodeRows(r, StudentModel.fromJson),
+    ),
+    _SyncTable(
+      'assessment',
+      () => _assessments.map((e) => e.toJson()),
+      (r) => _assessments = _decodeRows(r, AssessmentModel.fromJson),
+    ),
+    _SyncTable(
+      'session',
+      () => _sessions.map((e) => e.toJson()),
+      (r) => _sessions = _decodeRows(r, SessionModel.fromJson),
+    ),
+    _SyncTable(
+      'iep',
+      () => _iepPlans.map((e) => e.toJson()),
+      (r) => _iepPlans = _decodeRows(r, IndividualEducationPlanModel.fromJson),
+    ),
+    _SyncTable(
+      'referral',
+      () => _referrals.map((e) => e.toJson()),
+      (r) => _referrals = _decodeRows(r, ReferralModel.fromJson),
+    ),
+    _SyncTable(
+      'observation',
+      () => _observations.map((e) => e.toJson()),
+      (r) =>
+          _observations = _decodeRows(
+            r,
+            PsychologicalObservationModel.fromJson,
+          ),
+    ),
+    _SyncTable(
+      'assessment_plan',
+      () => _plans.map((e) => e.toJson()),
+      (r) => _plans = _decodeRows(r, AssessmentPlanModel.fromJson),
+    ),
+    _SyncTable(
+      'subject_level',
+      () => _subjectLevelRecords.map((e) => e.toJson()),
+      (r) =>
+          _subjectLevelRecords = _decodeRows(
+            r,
+            SubjectLevelAssessment.fromJson,
+          ),
+    ),
+    _SyncTable(
+      'measurement',
+      () => _measurements.map((e) => e.toJson()),
+      (r) => _measurements = _decodeRows(r, ProgressMeasurement.fromJson),
+    ),
+    _SyncTable(
+      'subject_task',
+      () => _subjectTasks.map((e) => e.toJson()),
+      (r) => _subjectTasks = _decodeRows(r, SubjectTask.fromJson),
+    ),
+    _SyncTable(
+      'achievement',
+      () => _achievements.map((e) => e.toJson()),
+      (r) => _achievements = _decodeRows(r, Achievement.fromJson),
+    ),
+    _SyncTable(
+      'conference',
+      () => _conferences.map((e) => e.toJson()),
+      (r) => _conferences = _decodeRows(r, CaseConference.fromJson),
+    ),
+    _SyncTable(
+      'sound_entry',
+      () => _soundEntries.map((e) => e.toJson()),
+      (r) => _soundEntries = _decodeRows(r, SoundEntry.fromJson),
+    ),
+    _SyncTable(
+      'notification',
+      () => _notifications.map((e) => e.toJson()),
+      (r) => _notifications = _decodeRows(r, NotificationModel.fromJson),
+    ),
+    _SyncTable(
+      'question',
+      () => _questions.map((e) => e.toJson()),
+      (r) => _questions = _decodeRows(r, AssessmentQuestionModel.fromJson),
+    ),
+    _SyncTable(
+      'curriculum',
+      () => _curriculum.map((e) => e.toJson()),
+      (r) => _curriculum = _decodeRows(r, CurriculumStandard.fromJson),
+    ),
+    _SyncTable(
+      'custom_metric',
+      () => _customMetrics.map((e) => e.toJson()),
+      (r) => _customMetrics = _decodeRows(r, ProgressMetric.fromJson),
+    ),
+  ];
+
+  /// Ilova ochilganda (server rejimi): qurilmadagi eski nusxalar o'chiriladi,
+  /// faqat ilovaning o'z metodik kontenti xotiraga olinadi.
+  Future<void> _initServerMode(SharedPreferences prefs) async {
+    _clearMemory();
+    _serverReady = false;
+    _serverSnapshot = {};
+    final stale =
+        prefs
+            .getKeys()
+            .where((k) => k.startsWith('db_') || k == 'app_db_seeded_v2')
+            .toList();
+    for (final key in stale) {
+      await prefs.remove(key);
+    }
+    _questions = List.from(PsychologicalQuestionsSeed.initialQuestions);
+    await _syncStandardQuestions();
+    await _syncCurriculumSeed();
+    _builtinIds = {
+      'question': _questions.map((e) => e.id).toSet(),
+      'curriculum': _curriculum.map((e) => e.id).toSet(),
+      'custom_metric': _customMetrics.map((e) => e.id).toSet(),
+    };
+    _reEvaluateRules();
+    _isInitialized = true;
+  }
+
+  Map<String, String> _currentRows(_SyncTable t) {
+    final builtin = _builtinIds[t.kind] ?? const <String>{};
+    final out = <String, String>{};
+    for (final row in t.rows()) {
+      final id = row['id']?.toString() ?? '';
+      if (id.isEmpty || builtin.contains(id)) continue;
+      out[id] = jsonEncode(row);
+    }
+    return out;
+  }
+
+  /// Jadvalni berilgan qatorlar bilan almashtiradi (ilovaning o'z kontenti saqlanadi).
+  void _replaceTable(_SyncTable t, Iterable<Map<String, dynamic>> rows) {
+    final builtin = _builtinIds[t.kind] ?? const <String>{};
+    final keep =
+        t.rows().where((r) => builtin.contains(r['id']?.toString())).toList();
+    t.replace([...keep, ...rows]);
+  }
+
+  /// Kirgandan keyin: foydalanuvchi ko'ra oladigan hamma narsa serverdan.
+  Future<void> loadFromServer() async {
+    final data = await _recordsApi.load();
+    final people = await _recordsApi.directory();
+    final snapshot = <String, Map<String, String>>{};
+    for (final t in _syncTables) {
+      _replaceTable(t, data[t.kind] ?? const []);
+      snapshot[t.kind] = _currentRows(t);
+    }
+    _users = [
+      for (final p in people)
+        UserModel(
+          id: p.id,
+          email: '',
+          fullName: p.fullName,
+          role: UserRoleExtension.fromCode(p.role),
+          institutionId: p.institutionId,
+        ),
+    ];
+    _auditLogs = [];
+    _serverSnapshot = snapshot;
+    _reEvaluateRules();
+    _serverReady = true;
+  }
+
+  /// Chiqishda: boshqa birov shu qurilmada hech narsa ko'rmasin.
+  void clearServerData() {
+    _serverReady = false;
+    for (final t in _syncTables) {
+      _replaceTable(t, const []);
+    }
+    _users = [];
+    _alerts = [];
+    _auditLogs = [];
+    _serverSnapshot = {};
+  }
+
+  Future<void> _syncToServer() {
+    final next = _syncQueue.then((_) => _pushChanges());
+    // Navbat xatodan keyin ham davom etadi; xato chaqiruvchiga qaytariladi.
+    _syncQueue = next.catchError((_) {});
+    return next;
+  }
+
+  Future<void> _pushChanges() async {
+    if (!_serverReady) return;
+    final ops = <RecordOp>[];
+    final deletes = <RecordOp>[];
+    final next = <String, Map<String, String>>{};
+    for (final t in _syncTables) {
+      final cur = _currentRows(t);
+      final prev = _serverSnapshot[t.kind] ?? const <String, String>{};
+      cur.forEach((id, json) {
+        if (prev[id] != json) {
+          ops.add(
+            RecordOp.put(t.kind, id, jsonDecode(json) as Map<String, dynamic>),
+          );
+        }
+      });
+      for (final id in prev.keys) {
+        if (!cur.containsKey(id)) deletes.add(RecordOp.delete(t.kind, id));
+      }
+      next[t.kind] = cur;
+    }
+    // Avval bolaga tegishli yozuvlar, keyin bola kartasi o'chiriladi.
+    ops.addAll(deletes.reversed);
+    if (ops.isEmpty) return;
+
+    final List<({String kind, Map<String, dynamic> data})> saved;
+    try {
+      saved = await _recordsApi.apply(ops);
+    } on ApiException catch (e) {
+      _restoreFromSnapshot();
+      throw StorageWriteException(
+        e.isUnauthenticated
+            ? 'Sessiya tugagan. Qaytadan kiring — o‘zgarish saqlanmadi.'
+            : 'Saqlanmadi: ${e.message}',
+      );
+    }
+    // Server tuzatgan qiymatlar (masalan biriktirilgan mutaxassislar) qabul qilinadi.
+    final byKind = <String, Map<String, Map<String, dynamic>>>{};
+    for (final item in saved) {
+      byKind.putIfAbsent(item.kind, () => {})[item.data['id'].toString()] =
+          item.data;
+    }
+    for (final t in _syncTables) {
+      final fixed = byKind[t.kind];
+      if (fixed == null) continue;
+      final rows = [for (final r in t.rows()) fixed[r['id']?.toString()] ?? r];
+      t.replace(rows);
+      next[t.kind] = _currentRows(t);
+    }
+    _serverSnapshot = next;
+  }
+
+  /// Saqlash rad etilsa — ekrandagi holat serverdagisiga qaytariladi.
+  void _restoreFromSnapshot() {
+    for (final t in _syncTables) {
+      final rows = (_serverSnapshot[t.kind] ?? const <String, String>{}).values
+          .map((j) => jsonDecode(j) as Map<String, dynamic>);
+      _replaceTable(t, rows);
+    }
+    _reEvaluateRules();
   }
 
   void _reEvaluateRules() {
@@ -2977,6 +3280,8 @@ class LocalDbService {
     if (_auditLogs.length > maxAuditEntries) {
       _auditLogs.removeRange(maxAuditEntries, _auditLogs.length);
     }
+    // Server rejimida jurnalni server yuritadi (har bir o'zgarish tarixi bilan).
+    if (AppConfig.serverMode) return;
     // Faqat audit jadvali yoziladi — har bir amalda butun bazani qayta yozmaslik uchun
     final prefs = await SharedPreferences.getInstance();
     await _writeTable(prefs, 'db_audit', _auditLogs.map((e) => e.toJson()));
@@ -3217,4 +3522,13 @@ class LocalDbService {
       );
     }
   }
+}
+
+/// Serverga yuboriladigan bitta jadval: joriy qatorlar va ularni almashtirish.
+class _SyncTable {
+  final String kind;
+  final Iterable<Map<String, dynamic>> Function() rows;
+  final void Function(List<Map<String, dynamic>>) replace;
+
+  _SyncTable(this.kind, this.rows, this.replace);
 }

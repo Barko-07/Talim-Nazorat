@@ -217,6 +217,14 @@ def _put_student(db: Session, p: Principal, rec: Record | None, rid: str, data: 
         assigned = {sa.user_id for sa in db.scalars(select(StudentAccess).where(
             StudentAccess.student_id == rid, StudentAccess.via == "assigned"))}
         coordinator = _coordinator(db, rid)
+        if not access.admin_for(u, rec.institution_id):
+            # Only an administrator decides who works with a child: an attempt
+            # to change it is refused openly, not silently ignored.
+            wants = set(data.get("assignedSpecialistIds") or [])
+            wants_coord = data.get("coordinatorId") or None
+            if ("assignedSpecialistIds" in data and wants != assigned) or (
+                    "coordinatorId" in data and wants_coord != coordinator):
+                raise _denied(db, p, "change assignments", rid, index)
         if access.admin_for(u, rec.institution_id):
             assigned = set(data.get("assignedSpecialistIds") or [])
             coordinator = data.get("coordinatorId") or None

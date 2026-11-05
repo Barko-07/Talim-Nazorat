@@ -10,4 +10,3 @@ void downloadFile(
 void triggerBrowserPrint() {
   // Non-web stub
 }
-

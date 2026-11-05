@@ -1,9 +1,12 @@
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import 'core/feedback/app_messenger.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/app_brand.dart';
 import 'core/constants/app_colors.dart';
@@ -20,6 +23,8 @@ import 'screens/admin/admin_portal_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  // Ekranlar ushlamagan saqlash/ruxsat xatolari ham foydalanuvchiga ko'rsatiladi.
+  PlatformDispatcher.instance.onError = reportUncaughtError;
 
   // Ilovani bazaning boshlang'ich yuklanishini kutib turmasdan ko'rsatamiz.
   // AuthProvider tayyor holatda bo'lguncha foydalanuvchiga yuklanish ekrani chiqadi.
@@ -88,6 +93,7 @@ class _TalimNazoratAppState extends State<TalimNazoratApp>
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: MaterialApp(
+        scaffoldMessengerKey: rootMessengerKey,
         title: AppBrand.name,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.current,

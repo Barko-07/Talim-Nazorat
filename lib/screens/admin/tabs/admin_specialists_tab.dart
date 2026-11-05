@@ -641,6 +641,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                             specialist.id,
                             byUser: byUser,
                           );
+                          if (!dlgCtx.mounted) return;
                           Navigator.pop(dlgCtx);
                           onAssigned();
                         }

@@ -381,7 +381,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
     if (AppConfig.serverMode) {
       try {
-        _apply(
+        await _apply(
           await _authApi.changePassword(
             currentPassword,
             newPassword,
@@ -463,6 +463,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (AppConfig.serverMode) {
       _pending = null;
       _staySignedIn = false;
+      _db.clearServerData();
       try {
         await _authApi.logout();
       } on ApiException catch (_) {
@@ -537,8 +538,11 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   /// Server javobini qo'llaydi: kirish tugagan bo'lsa — foydalanuvchi faollashadi,
   /// aks holda keyingi bosqich eslab qolinadi.
-  void _apply(AuthResult result) {
+  Future<void> _apply(AuthResult result) async {
     if (result.step == AuthStep.ok) {
+      // Kirish faqat ma'lumot yuklangach yakunlanadi: yuklanmasa — xato
+      // ko'rsatiladi (ApiException chaqiruvchiga qaytadi), yarim holat qolmaydi.
+      await _db.loadFromServer();
       _db.cacheSignedInUser(result.user);
       _currentUser = result.user;
       _staySignedIn = result.remembered;
@@ -554,7 +558,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     try {
       final me = await _authApi.me();
       if (me != null && me.step == AuthStep.ok) {
-        _apply(me);
+        await _apply(me);
       } else if (me != null) {
         // Yarim qolgan kirish (masalan kod kiritilmagan) — boshidan boshlanadi.
         await _authApi.logout();
@@ -570,6 +574,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
       if (me == null || me.step != AuthStep.ok) {
         _currentUser = null;
         _pending = null;
+        _db.clearServerData();
         notifyListeners();
       }
     } on ApiException catch (_) {
@@ -586,7 +591,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
       return _fail('Elektron pochtangizni kiriting (masalan: ism@maktab.uz).');
     }
     try {
-      _apply(await _authApi.login(email, password, remember: remember));
+      await _apply(await _authApi.login(email, password, remember: remember));
       return _ok('Xush kelibsiz!');
     } on ApiException catch (e) {
       return _apiFail(e);
@@ -596,7 +601,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// Faqat administratorlar: emailga kelgan kirish kodi.
   Future<Map<String, dynamic>> verifyEmailCode(String code) async {
     try {
-      _apply(await _authApi.verifyEmailCode(code));
+      await _apply(await _authApi.verifyEmailCode(code));
       return _ok();
     } on ApiException catch (e) {
       return _apiFail(e);
@@ -615,7 +620,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<Map<String, dynamic>> verifyTotp(String code) async {
     try {
-      _apply(await _authApi.verifyTotp(code));
+      await _apply(await _authApi.verifyTotp(code));
       return _ok();
     } on ApiException catch (e) {
       return _apiFail(e);
@@ -626,7 +631,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   Future<Map<String, dynamic>> useRecoveryCode(String code) async {
     try {
       final result = await _authApi.useRecoveryCode(code);
-      _apply(result);
+      await _apply(result);
       return _ok('', result.recoveryCodesLeft);
     } on ApiException catch (e) {
       return _apiFail(e);
@@ -656,10 +661,10 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   AuthResult? _enabledTotp;
 
   /// Foydalanuvchi zaxira kodlarini saqlab olganini tasdiqladi — kirish yakunlanadi.
-  void finishTotpSetup() {
+  Future<void> finishTotpSetup() async {
     final result = _enabledTotp;
     _enabledTotp = null;
-    if (result != null) _apply(result);
+    if (result != null) await _apply(result);
   }
 
   /// Vaqtinchalik parolni birinchi kirishda almashtirish (qo'shimcha kod so'ralmaydi).
@@ -668,7 +673,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     String newPassword,
   ) async {
     try {
-      _apply(await _authApi.changePassword(currentPassword, newPassword));
+      await _apply(await _authApi.changePassword(currentPassword, newPassword));
       return _ok('Parolingiz yangilandi');
     } on ApiException catch (e) {
       return _apiFail(e);

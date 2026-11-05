@@ -305,7 +305,7 @@ class _PsychologistObservationsTabState
 
                       await app.addObservation(newObs, byUser: currentUser);
                       if (dlgCtx.mounted) Navigator.pop(dlgCtx);
-                      if (mounted) {
+                      if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(

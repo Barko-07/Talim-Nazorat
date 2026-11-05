@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talim_nazorat/core/theme/app_theme.dart';
 import 'package:talim_nazorat/providers/auth_provider.dart';
+import 'package:talim_nazorat/screens/admin/server/server_history_tab.dart';
 import 'package:talim_nazorat/screens/admin/server/server_institutions_tab.dart';
 import 'package:talim_nazorat/screens/admin/server/server_users_tab.dart';
 import 'package:talim_nazorat/services/admin_api.dart';
@@ -55,6 +56,52 @@ class _FakeAdminServer {
       expect(req.headers['X-Requested-With'], 'XMLHttpRequest');
     }
     if (path == '/api/admin/users' && req.method == 'GET') return _json(users);
+    if (path == '/api/admin/changes') {
+      return _json([
+        {
+          'id': 2,
+          'at': '2026-11-05T16:40:00+00:00',
+          'action': 'update',
+          'kind': 'assessment',
+          'record_id': 'a1',
+          'student_id': 's1',
+          'student_name': 'Valiyev Ali',
+          'user_id': 'u2',
+          'user_name': 'Aliyev Bobur',
+          'fields': ['score'],
+          'before': {'score': 7},
+          'after': {'score': 9},
+        },
+        {
+          'id': 1,
+          'at': '2026-11-05T16:30:00+00:00',
+          'action': 'create',
+          'kind': 'student',
+          'record_id': 's1',
+          'student_id': 's1',
+          'student_name': 'Valiyev Ali',
+          'user_id': 'u2',
+          'user_name': 'Aliyev Bobur',
+          'fields': ['firstName', 'lastName'],
+          'before': null,
+          'after': {'firstName': 'Ali', 'lastName': 'Valiyev'},
+        },
+      ]);
+    }
+    if (path == '/api/admin/audit') {
+      return _json([
+        {
+          'id': 5,
+          'at': '2026-11-05T16:00:00+00:00',
+          'action': 'ACCESS_DENIED',
+          'severity': 'warning',
+          'user_id': 'u2',
+          'subject': 's9',
+          'ip': '203.0.113.9',
+          'detail': 'change student',
+        },
+      ]);
+    }
     if (path == '/api/admin/institutions' && req.method == 'GET') {
       return _json(_institutions);
     }
@@ -152,6 +199,28 @@ void main() {
     await done();
   });
 
+  testWidgets('history shows who changed what, with the old and new value', (
+    tester,
+  ) async {
+    final api = AdminApi(
+      ApiClient(client: _FakeAdminServer().client, baseUrl: 'https://individ.uz'),
+    );
+    final done = await _pump(tester, ServerHistoryTab(api: api));
+    expect(find.text('Valiyev Ali · Baholash'), findsOneWidget);
+    expect(find.text('O‘zgartirildi'), findsOneWidget);
+    expect(find.text('Qo‘shildi'), findsOneWidget);
+    await tester.tap(find.text('Valiyev Ali · Baholash'));
+    await tester.pumpAndSettle();
+    expect(find.text('score'), findsOneWidget);
+    expect(find.textContaining('→'), findsOneWidget);
+
+    await tester.tap(find.text('Xavfsizlik'));
+    await tester.pumpAndSettle();
+    expect(find.text('ACCESS_DENIED'), findsOneWidget);
+    expect(find.text('Ogohlantirish'), findsWidgets);
+    await done();
+  });
+
   for (final width in [375.0, 1280.0]) {
     testWidgets('admin server tabs fit at ${width.toInt()}px', (tester) async {
       final server = _FakeAdminServer();
@@ -162,6 +231,9 @@ void main() {
       done = await _pump(tester, ServerInstitutionsTab(api: api), width: width, height: 844);
       expect(tester.takeException(), isNull);
       expect(find.text('2 ta hisob'), findsOneWidget);
+      await done();
+      done = await _pump(tester, ServerHistoryTab(api: api), width: width, height: 844);
+      expect(tester.takeException(), isNull);
       await done();
     });
   }

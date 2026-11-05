@@ -1253,6 +1253,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                               final res = await context
                                   .read<AppProvider>()
                                   .addSession(newSession, byUser: currentUser);
+                              if (!ctx.mounted || !context.mounted) return;
 
                               if (res['success'] == true) {
                                 Navigator.pop(ctx);
@@ -1468,6 +1469,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                     ? nextStepsController.text.trim()
                                     : null,
                           );
+                          if (!ctx.mounted || !context.mounted) return;
 
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -1565,6 +1567,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                               ? notesController.text.trim()
                               : null,
                     );
+                    if (!ctx.mounted) return;
                     Navigator.pop(ctx);
                   },
                   child: const Text('Saqlash'),
@@ -1598,6 +1601,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
               ),
               onPressed: () async {
                 await context.read<AppProvider>().deleteSession(session.id);
+                if (!ctx.mounted || !context.mounted) return;
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Mashg‘ulot o‘chirildi.')),

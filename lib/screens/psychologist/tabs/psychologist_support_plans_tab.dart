@@ -112,7 +112,7 @@ class _PsychologistSupportPlansTabState
                           byUser: auth.currentUser,
                         );
                         if (dlgCtx.mounted) Navigator.pop(dlgCtx);
-                        if (mounted) {
+                        if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Maqsad progressi yangilandi!'),
@@ -250,7 +250,7 @@ class _PsychologistSupportPlansTabState
 
                       await app.updateIepPlan(updatedPlan);
                       if (dlgCtx.mounted) Navigator.pop(dlgCtx);
-                      if (mounted) {
+                      if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
