@@ -267,8 +267,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   /// Yon panel guruhi nomi: "Boshqaruv va tizim" faqat rahbariyat uchun ma'noli
   String _groupLabel(String group) {
     final leadership = _canSee(7);
-    if (group == 'BOSHQARUV VA TIZIM' && !leadership)
+    if (group == 'BOSHQARUV VA TIZIM' && !leadership) {
       return 'HISOBOT VA SOZLAMALAR';
+    }
     return group;
   }
 

@@ -125,11 +125,13 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       {'id': 'Barchasi', 'name': 'Barcha mutaxassislar'},
     ];
     for (final sp in app.specialists) {
-      if (_selectedDistrict != 'Barchasi' && sp.district != _selectedDistrict)
+      if (_selectedDistrict != 'Barchasi' && sp.district != _selectedDistrict) {
         continue;
+      }
       if (_selectedInstitution != 'Barchasi' &&
-          sp.institutionName != _selectedInstitution)
+          sp.institutionName != _selectedInstitution) {
         continue;
+      }
       specialistOptions.add({
         'id': sp.id,
         'name': '${sp.fullName} (${sp.role.label})',
@@ -177,14 +179,17 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     final filteredSpecialists =
         app.specialists.where((sp) {
           if (_selectedDistrict != 'Barchasi' &&
-              sp.district != _selectedDistrict)
+              sp.district != _selectedDistrict) {
             return false;
+          }
           if (_selectedInstitution != 'Barchasi' &&
-              sp.institutionName != _selectedInstitution)
+              sp.institutionName != _selectedInstitution) {
             return false;
+          }
           if (_selectedSpecialistId != 'Barchasi' &&
-              sp.id != _selectedSpecialistId)
+              sp.id != _selectedSpecialistId) {
             return false;
+          }
           return true;
         }).toList();
 
@@ -235,11 +240,13 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     // Tartiblash: qizillar oldinda, keyin kechikish kunlari bo'yicha
     attentionCases.sort((a, b) {
       if (a.status.color == StatusColor.red &&
-          b.status.color != StatusColor.red)
+          b.status.color != StatusColor.red) {
         return -1;
+      }
       if (a.status.color != StatusColor.red &&
-          b.status.color == StatusColor.red)
+          b.status.color == StatusColor.red) {
         return 1;
+      }
       return b.delayDays.compareTo(a.delayDays);
     });
 
@@ -633,8 +640,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -710,7 +717,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 SizedBox(
                   width: 210,
                   child: DropdownButtonFormField<String>(
-                    value:
+                    initialValue:
                         districtOptions.contains(_selectedDistrict)
                             ? _selectedDistrict
                             : 'Barchasi',
@@ -756,7 +763,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 SizedBox(
                   width: 250,
                   child: DropdownButtonFormField<String>(
-                    value:
+                    initialValue:
                         institutionOptions.contains(_selectedInstitution)
                             ? _selectedInstitution
                             : 'Barchasi',
@@ -789,8 +796,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         isInstitutionAdmin
                             ? null
                             : (val) {
-                              if (val != null)
+                              if (val != null) {
                                 setState(() => _selectedInstitution = val);
+                              }
                             },
                   ),
                 ),
@@ -799,7 +807,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 SizedBox(
                   width: 240,
                   child: DropdownButtonFormField<String>(
-                    value:
+                    initialValue:
                         specialistOptions.any(
                               (s) => s['id'] == _selectedSpecialistId,
                             )
@@ -831,8 +839,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                           );
                         }).toList(),
                     onChanged: (val) {
-                      if (val != null)
+                      if (val != null) {
                         setState(() => _selectedSpecialistId = val);
+                      }
                     },
                   ),
                 ),
@@ -841,7 +850,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 SizedBox(
                   width: 170,
                   child: DropdownButtonFormField<String>(
-                    value: _selectedPeriod,
+                    initialValue: _selectedPeriod,
                     isExpanded: true,
                     isDense: true,
                     decoration: InputDecoration(
@@ -896,7 +905,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 SizedBox(
                   width: 200,
                   child: DropdownButtonFormField<String>(
-                    value: _selectedDomain,
+                    initialValue: _selectedDomain,
                     isExpanded: true,
                     isDense: true,
                     decoration: InputDecoration(
@@ -1079,8 +1088,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -1153,8 +1162,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1535,8 +1544,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1682,8 +1691,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1892,8 +1901,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -2116,8 +2125,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         // Ishlanmagan bolalar
                         final unworkedWithThisSpec =
                             filteredStudents.where((s) {
-                              if (!s.assignedSpecialistIds.contains(sp.id))
+                              if (!s.assignedSpecialistIds.contains(sp.id)) {
                                 return false;
+                              }
                               final st = app.childStatus(s);
                               return st.specialistsNotStarted.contains(
                                 sp.fullName,
@@ -2275,8 +2285,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -2397,8 +2407,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),

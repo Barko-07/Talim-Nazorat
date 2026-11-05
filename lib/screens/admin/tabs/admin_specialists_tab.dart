@@ -120,9 +120,9 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -149,7 +149,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<UserRole?>(
-                      value: _filterRole,
+                      initialValue: _filterRole,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: 'Yo‘nalish / Rol',
@@ -191,7 +191,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
-                      value: _filterCategory,
+                      initialValue: _filterCategory,
                       decoration: InputDecoration(
                         labelText: 'Toifasi',
                         contentPadding: const EdgeInsets.symmetric(
@@ -259,9 +259,9 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
               return Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: AppColors.border),
-                ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
                   child: LayoutBuilder(
@@ -622,7 +622,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       DropdownButtonFormField<StudentModel>(
-                        value: selectedStudent,
+                        initialValue: selectedStudent,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           labelText: 'O‘quvchini tanlang',
@@ -658,12 +658,13 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                       ),
                       onPressed: () async {
                         if (selectedStudent != null) {
+                          final nav = Navigator.of(dlgCtx);
                           await app.assignSpecialistToStudent(
                             selectedStudent!.id,
                             specialist.id,
                             byUser: byUser,
                           );
-                          Navigator.pop(dlgCtx);
+                          nav.pop();
                           onAssigned();
                         }
                       },

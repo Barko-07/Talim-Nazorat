@@ -65,8 +65,8 @@ class AppTheme {
         color: AppColors.surfaceRaised,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: AppColors.navGlassBorder, width: 1.0),
         ),
       ),
       hoverColor: Colors.transparent,
@@ -91,8 +91,8 @@ class AppTheme {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: AppColors.border, width: 1.0),
+          borderRadius: BorderRadius.circular(26),
+          side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -101,8 +101,8 @@ class AppTheme {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: AppColors.border, width: 1.0),
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
         ),
         titleTextStyle: TextStyle(
           fontFamily: baseFont,
@@ -118,8 +118,8 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-          side: BorderSide(color: AppColors.border, width: 1.0),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          side: BorderSide(color: AppColors.navGlassBorder, width: 1.0),
         ),
       ),
       snackBarTheme: SnackBarThemeData(

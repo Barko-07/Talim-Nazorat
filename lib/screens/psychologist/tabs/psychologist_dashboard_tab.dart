@@ -399,8 +399,8 @@ class PsychologistDashboardTab extends StatelessWidget {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -559,8 +559,8 @@ class PsychologistDashboardTab extends StatelessWidget {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),

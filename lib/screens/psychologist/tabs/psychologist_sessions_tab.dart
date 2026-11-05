@@ -98,7 +98,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 border: Border.all(color: AppColors.border),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -110,7 +110,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                     width: 52,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -135,7 +135,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                         'O‘quvchilar bilan individual va kichik guruhdagi psixologik korreksiya, suhbat va mashg‘ulotlar jadvali.',
                         style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary.withOpacity(0.9),
+                          color: AppColors.textSecondary.withValues(alpha: 0.9),
                         ),
                       ),
                     ],
@@ -319,11 +319,12 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                   label: Text(st),
                                   selected: isSelected,
                                   onSelected: (val) {
-                                    if (val)
+                                    if (val) {
                                       setState(() => _selectedStatus = st);
+                                    }
                                   },
-                                  selectedColor: AppColors.primary.withOpacity(
-                                    0.12,
+                                  selectedColor: AppColors.primary.withValues(
+                                    alpha: 0.12,
                                   ),
                                   backgroundColor: AppColors.surfaceMuted,
                                   labelStyle: TextStyle(
@@ -371,8 +372,8 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                   onSelected: (val) {
                                     if (val) setState(() => _selectedType = tp);
                                   },
-                                  selectedColor: AppColors.primary.withOpacity(
-                                    0.12,
+                                  selectedColor: AppColors.primary.withValues(
+                                    alpha: 0.12,
                                   ),
                                   backgroundColor: AppColors.surfaceMuted,
                                   labelStyle: TextStyle(
@@ -567,7 +568,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.015),
+            color: Colors.black.withValues(alpha: 0.015),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -675,7 +676,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 decoration: BoxDecoration(
                   color: statusBgColor,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: statusColor.withOpacity(0.3)),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -702,7 +703,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor: AppColors.primary.withOpacity(0.12),
+                backgroundColor: AppColors.primary.withValues(alpha: 0.12),
                 child: Text(
                   session.studentName.isNotEmpty ? session.studentName[0] : 'O',
                   style: TextStyle(
@@ -947,7 +948,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.1),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
@@ -985,7 +986,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<StudentModel>(
-                        value: selectedStudent,
+                        initialValue: selectedStudent,
                         isExpanded: true,
                         decoration: InputDecoration(
                           filled: true,
@@ -1078,7 +1079,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                 ),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<String>(
-                                  value: sessionType,
+                                  initialValue: sessionType,
                                   isExpanded: true,
                                   decoration: InputDecoration(
                                     filled: true,
@@ -1095,8 +1096,9 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                         );
                                       }).toList(),
                                   onChanged: (val) {
-                                    if (val != null)
+                                    if (val != null) {
                                       setDialogState(() => sessionType = val);
+                                    }
                                   },
                                 ),
                               ],
@@ -1117,7 +1119,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                 ),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<int>(
-                                  value: duration,
+                                  initialValue: duration,
                                   isExpanded: true,
                                   decoration: InputDecoration(
                                     filled: true,
@@ -1134,8 +1136,9 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                         );
                                       }).toList(),
                                   onChanged: (val) {
-                                    if (val != null)
+                                    if (val != null) {
                                       setDialogState(() => duration = val);
+                                    }
                                   },
                                 ),
                               ],
@@ -1252,13 +1255,15 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                         : null,
                               );
 
+                              final sm = ScaffoldMessenger.of(context);
+                              final nav = Navigator.of(ctx);
                               final res = await context
                                   .read<AppProvider>()
                                   .addSession(newSession, byUser: currentUser);
 
                               if (res['success'] == true) {
-                                Navigator.pop(ctx);
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                nav.pop();
+                                sm.showSnackBar(
                                   SnackBar(
                                     content: Text(
                                       'Mashg‘ulot muvaffaqiyatli rejalashtirildi.',
@@ -1267,7 +1272,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                   ),
                                 );
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                sm.showSnackBar(
                                   SnackBar(
                                     content: Text(
                                       res['message'] ?? 'Xatolik yuz berdi',
@@ -1462,6 +1467,8 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                             return;
                           }
 
+                          final sm = ScaffoldMessenger.of(context);
+                          final nav = Navigator.of(ctx);
                           await context.read<AppProvider>().completeSession(
                             session.id,
                             observations: obs,
@@ -1471,8 +1478,8 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                     : null,
                           );
 
-                          Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          nav.pop();
+                          sm.showSnackBar(
                             SnackBar(
                               content: Text(
                                 'Mashg‘ulot natijasi muvaffaqiyatli saqlandi.',
@@ -1520,7 +1527,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                   Text('O‘quvchi: ${session.studentName}'),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: selectedStatus,
+                    initialValue: selectedStatus,
                     isExpanded: true,
                     decoration: InputDecoration(
                       filled: true,
@@ -1538,8 +1545,9 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                           return DropdownMenuItem(value: st, child: Text(st));
                         }).toList(),
                     onChanged: (val) {
-                      if (val != null)
+                      if (val != null) {
                         setDialogState(() => selectedStatus = val);
+                      }
                     },
                   ),
                   const SizedBox(height: 12),
@@ -1559,6 +1567,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
+                    final nav = Navigator.of(ctx);
                     await context.read<AppProvider>().updateSessionStatus(
                       session.id,
                       selectedStatus,
@@ -1567,7 +1576,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                               ? notesController.text.trim()
                               : null,
                     );
-                    Navigator.pop(ctx);
+                    nav.pop();
                   },
                   child: const Text('Saqlash'),
                 ),
@@ -1599,9 +1608,11 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 foregroundColor: AppColors.onPrimary,
               ),
               onPressed: () async {
+                final nav = Navigator.of(ctx);
+                final sm = ScaffoldMessenger.of(context);
                 await context.read<AppProvider>().deleteSession(session.id);
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
+                nav.pop();
+                sm.showSnackBar(
                   const SnackBar(content: Text('Mashg‘ulot o‘chirildi.')),
                 );
               },

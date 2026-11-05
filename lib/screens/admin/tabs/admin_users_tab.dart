@@ -49,8 +49,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
             }
           }
           if (_filterRole != null && u.role != _filterRole) return false;
-          if (_filterActive != null && u.isActive != _filterActive)
+          if (_filterActive != null && u.isActive != _filterActive) {
             return false;
+          }
           if (_filterDistrict != null &&
               _filterDistrict!.isNotEmpty &&
               u.district != _filterDistrict) {
@@ -162,9 +163,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -201,7 +202,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                       Expanded(
                         flex: 2,
                         child: DropdownButtonFormField<UserRole?>(
-                          value: _filterRole,
+                          initialValue: _filterRole,
                           isExpanded: true,
                           decoration: InputDecoration(
                             labelText: 'Roli bo‘yicha',
@@ -236,7 +237,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                         flex: 2,
                         child: DropdownButtonFormField<bool?>(
                           isExpanded: true,
-                          value: _filterActive,
+                          initialValue: _filterActive,
                           decoration: InputDecoration(
                             labelText: 'Holati',
                             contentPadding: const EdgeInsets.symmetric(
@@ -292,9 +293,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child:
                 filteredUsers.isEmpty
                     ? Padding(
@@ -390,7 +391,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               runSpacing: 4,
                               children: [
                                 Text(
-                                  '${u.email}',
+                                  u.email,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textSecondary,
@@ -405,7 +406,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                     ),
                                   ),
                                 Text(
-                                  '${u.institutionName ?? 'Muassasa yo‘q'}',
+                                  u.institutionName ?? 'Muassasa yo‘q',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textMuted,
@@ -690,7 +691,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               Expanded(
                                 child: DropdownButtonFormField<UserRole>(
                                   isExpanded: true,
-                                  value: selectedRole,
+                                  initialValue: selectedRole,
                                   decoration: const InputDecoration(
                                     labelText: 'Roli va Lavozimi *',
                                   ),
@@ -726,7 +727,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               Expanded(
                                 child: DropdownButtonFormField<String>(
                                   isExpanded: true,
-                                  value: category,
+                                  initialValue: category,
                                   decoration: const InputDecoration(
                                     labelText: 'Malaka toifasi',
                                   ),
@@ -749,8 +750,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                     ),
                                   ],
                                   onChanged: (v) {
-                                    if (v != null)
+                                    if (v != null) {
                                       setDlgState(() => category = v);
+                                    }
                                   },
                                 ),
                               ),
@@ -796,7 +798,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               Expanded(
                                 child: DropdownButtonFormField<String>(
                                   isExpanded: true,
-                                  value: selectedDistrict,
+                                  initialValue: selectedDistrict,
                                   decoration: const InputDecoration(
                                     labelText: 'Hudud / Tuman *',
                                   ),
@@ -830,7 +832,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: DropdownButtonFormField<String>(
-                                  value:
+                                  initialValue:
                                       schools.contains(selectedSchool)
                                           ? selectedSchool
                                           : schools.first,
@@ -879,7 +881,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                 flex: 1,
                                 child: DropdownButtonFormField<int>(
                                   isExpanded: true,
-                                  value: expYears,
+                                  initialValue: expYears,
                                   decoration: const InputDecoration(
                                     labelText: 'Ish staji',
                                   ),
@@ -891,8 +893,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                     ),
                                   ),
                                   onChanged: (v) {
-                                    if (v != null)
+                                    if (v != null) {
                                       setDlgState(() => expYears = v);
+                                    }
                                   },
                                 ),
                               ),
@@ -1042,7 +1045,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                             const SizedBox(height: 12),
                             DropdownButtonFormField<UserRole>(
                               isExpanded: true,
-                              value: selectedRole,
+                              initialValue: selectedRole,
                               decoration: const InputDecoration(
                                 labelText: 'Lavozim va Rol',
                               ),
@@ -1056,8 +1059,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                       )
                                       .toList(),
                               onChanged: (v) {
-                                if (v != null)
+                                if (v != null) {
                                   setDlgState(() => selectedRole = v);
+                                }
                               },
                             ),
                             const SizedBox(height: 12),
@@ -1066,7 +1070,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                 Expanded(
                                   child: DropdownButtonFormField<String>(
                                     isExpanded: true,
-                                    value: category,
+                                    initialValue: category,
                                     decoration: const InputDecoration(
                                       labelText: 'Toifa',
                                     ),
@@ -1089,8 +1093,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                       ),
                                     ],
                                     onChanged: (v) {
-                                      if (v != null)
+                                      if (v != null) {
                                         setDlgState(() => category = v);
+                                      }
                                     },
                                   ),
                                 ),
@@ -1098,7 +1103,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                 Expanded(
                                   child: DropdownButtonFormField<int>(
                                     isExpanded: true,
-                                    value: expYears,
+                                    initialValue: expYears,
                                     decoration: const InputDecoration(
                                       labelText: 'Ish staji',
                                     ),
@@ -1110,8 +1115,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                       ),
                                     ),
                                     onChanged: (v) {
-                                      if (v != null)
+                                      if (v != null) {
                                         setDlgState(() => expYears = v);
+                                      }
                                     },
                                   ),
                                 ),

@@ -303,7 +303,7 @@ class SurfaceCard extends StatefulWidget {
     this.backgroundColor,
     this.borderColor,
     this.elevated = true,
-    this.useBlur = false,
+    this.useBlur = true,
     this.blur = 20,
   });
 
@@ -323,8 +323,10 @@ class _SurfaceCardState extends State<SurfaceCard> {
         widget.borderColor ?? AppColors.cardGlassBorder;
 
     final hasCustomBg = widget.backgroundColor != null;
-    const topAlpha = 0.97;
-    const bottomAlpha = 0.93;
+    final topAlpha = AppColors.isDark ? 0.92 : 0.96;
+    final bottomAlpha = AppColors.isDark ? 0.80 : 0.86;
+    final baseSurfaceColor =
+        AppColors.isDark ? AppColors.surface : Colors.white;
 
     Widget cardInner = Container(
       decoration: BoxDecoration(
@@ -336,8 +338,8 @@ class _SurfaceCardState extends State<SurfaceCard> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.surface.withValues(alpha: topAlpha),
-                    AppColors.surface.withValues(alpha: bottomAlpha),
+                    baseSurfaceColor.withValues(alpha: topAlpha),
+                    baseSurfaceColor.withValues(alpha: bottomAlpha),
                   ],
                 ),
         borderRadius: radius,

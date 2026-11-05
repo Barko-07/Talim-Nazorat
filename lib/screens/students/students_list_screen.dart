@@ -432,9 +432,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       backgroundColor: isRed ? AppColors.errorBg : null,
       borderColor:
-          statusColor != null
-              ? statusColor.withValues(alpha: isRed ? 0.55 : 0.32)
-              : null,
+          statusColor?.withValues(alpha: isRed ? 0.55 : 0.32),
       onTap: () {
         Navigator.push(
           context,

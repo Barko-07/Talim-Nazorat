@@ -142,9 +142,9 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -172,7 +172,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
-                      value: _filterAction,
+                      initialValue: _filterAction,
                       decoration: InputDecoration(
                         labelText: 'Amal turi',
                         contentPadding: const EdgeInsets.symmetric(
@@ -229,7 +229,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
-                      value: _filterEntity,
+                      initialValue: _filterEntity,
                       decoration: InputDecoration(
                         labelText: 'Ob’ekt',
                         contentPadding: const EdgeInsets.symmetric(
@@ -279,9 +279,9 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child:
                 filtered.isEmpty
                     ? const Padding(

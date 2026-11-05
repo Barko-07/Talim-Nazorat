@@ -321,7 +321,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                             Expanded(
                               flex: 3,
                               child: DropdownButtonFormField<String>(
-                                value: _selectedDomain,
+                                initialValue: _selectedDomain,
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   labelText: 'Baholash yo‘nalishi *',
@@ -377,7 +377,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                             Expanded(
                               flex: 3,
                               child: DropdownButtonFormField<String>(
-                                value: _selectedType,
+                                initialValue: _selectedType,
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   labelText: 'Savol turi *',
@@ -408,7 +408,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                             Expanded(
                               flex: 2,
                               child: DropdownButtonFormField<String>(
-                                value: _selectedStatus,
+                                initialValue: _selectedStatus,
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   labelText: 'Holati',

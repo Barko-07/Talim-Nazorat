@@ -116,9 +116,9 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -145,7 +145,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
-                      value: _filterDistrict,
+                      initialValue: _filterDistrict,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: 'Hudud / Tuman',
@@ -177,7 +177,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
-                      value: _filterType,
+                      initialValue: _filterType,
                       decoration: InputDecoration(
                         labelText: 'Muassasa turi',
                         contentPadding: const EdgeInsets.symmetric(
@@ -250,9 +250,9 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
               return Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: AppColors.border),
-                ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
                   child: LayoutBuilder(

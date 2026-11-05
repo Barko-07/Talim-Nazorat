@@ -108,9 +108,9 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: TextField(
@@ -157,9 +157,9 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
               return Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: AppColors.border),
-                ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
                   child: LayoutBuilder(

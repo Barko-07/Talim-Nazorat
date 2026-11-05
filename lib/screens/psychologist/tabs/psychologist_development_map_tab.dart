@@ -140,7 +140,7 @@ class _PsychologistDevelopmentMapTabState
               SizedBox(
                 width: 280,
                 child: DropdownButtonFormField<StudentModel>(
-                  value: currentStudent,
+                  initialValue: currentStudent,
                   isExpanded: true,
                   decoration: const InputDecoration(
                     labelText: 'O‘quvchini tanlang',
@@ -175,9 +175,9 @@ class _PsychologistDevelopmentMapTabState
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: LayoutBuilder(
@@ -424,9 +424,9 @@ class _PsychologistDevelopmentMapTabState
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-                side: BorderSide(color: AppColors.border),
-              ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -475,9 +475,9 @@ class _PsychologistDevelopmentMapTabState
               final historyCard = Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    side: BorderSide(color: AppColors.border),
-                  ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                   child: Padding(
                     padding: const EdgeInsets.all(18),
                     child: Column(
@@ -584,9 +584,9 @@ class _PsychologistDevelopmentMapTabState
               final activityCard = Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    side: BorderSide(color: AppColors.border),
-                  ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                   child: Padding(
                     padding: const EdgeInsets.all(18),
                     child: Column(

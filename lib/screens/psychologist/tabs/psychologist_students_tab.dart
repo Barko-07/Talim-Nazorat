@@ -193,9 +193,9 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -217,7 +217,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         ),
                       );
                       final grade = DropdownButtonFormField<String?>(
-                        value: _gradeFilter,
+                        initialValue: _gradeFilter,
                         isExpanded: true,
                         decoration: InputDecoration(
                           labelText: 'Sinfi',
@@ -258,7 +258,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         onChanged: (v) => setState(() => _gradeFilter = v),
                       );
                       final support = DropdownButtonFormField<String?>(
-                        value: _levelFilter,
+                        initialValue: _levelFilter,
                         isExpanded: true,
                         decoration: InputDecoration(
                           labelText: 'Yordam darajasi',

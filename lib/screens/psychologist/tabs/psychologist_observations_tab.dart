@@ -116,7 +116,7 @@ class _PsychologistObservationsTabState
                       children: [
                         // O'quvchi
                         DropdownButtonFormField<StudentModel>(
-                          value:
+                          initialValue:
                               students.contains(selectedStudent)
                                   ? selectedStudent
                                   : students.first,
@@ -137,8 +137,9 @@ class _PsychologistObservationsTabState
                                   )
                                   .toList(),
                           onChanged: (v) {
-                            if (v != null)
+                            if (v != null) {
                               setDlgState(() => selectedStudent = v);
+                            }
                           },
                         ),
                         const SizedBox(height: 12),
@@ -174,7 +175,7 @@ class _PsychologistObservationsTabState
                             const SizedBox(width: 12),
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                value: selectedState,
+                                initialValue: selectedState,
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   labelText: 'Emotsional holati *',
@@ -194,8 +195,9 @@ class _PsychologistObservationsTabState
                                         )
                                         .toList(),
                                 onChanged: (v) {
-                                  if (v != null)
+                                  if (v != null) {
                                     setDlgState(() => selectedState = v);
+                                  }
                                 },
                               ),
                             ),
@@ -205,7 +207,7 @@ class _PsychologistObservationsTabState
 
                         // Kategoriya
                         DropdownButtonFormField<String>(
-                          value: selectedCategory,
+                          initialValue: selectedCategory,
                           isExpanded: true,
                           decoration: const InputDecoration(
                             labelText: 'Kuzatuv toifasi *',
@@ -220,8 +222,9 @@ class _PsychologistObservationsTabState
                                   )
                                   .toList(),
                           onChanged: (v) {
-                            if (v != null)
+                            if (v != null) {
                               setDlgState(() => selectedCategory = v);
+                            }
                           },
                         ),
                         const SizedBox(height: 12),
@@ -303,18 +306,17 @@ class _PsychologistObservationsTabState
                         createdAt: DateTime.now(),
                       );
 
+                      final sm = ScaffoldMessenger.of(context);
                       await app.addObservation(newObs, byUser: currentUser);
                       if (dlgCtx.mounted) Navigator.pop(dlgCtx);
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${selectedStudent.fullName} uchun kuzatuv qayd etildi!',
-                            ),
-                            backgroundColor: AppColors.success,
+                      sm.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '${selectedStudent.fullName} uchun kuzatuv qayd etildi!',
                           ),
-                        );
-                      }
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -447,9 +449,9 @@ class _PsychologistObservationsTabState
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -475,7 +477,7 @@ class _PsychologistObservationsTabState
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
-                      value: _categoryFilter,
+                      initialValue: _categoryFilter,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: 'Toifa',
@@ -503,7 +505,7 @@ class _PsychologistObservationsTabState
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
-                      value: _stateFilter,
+                      initialValue: _stateFilter,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: 'Emotsional holat',
@@ -573,9 +575,9 @@ class _PsychologistObservationsTabState
                 return Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: AppColors.border),
-                  ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                   child: Padding(
                     padding: const EdgeInsets.all(18),
                     child: Column(

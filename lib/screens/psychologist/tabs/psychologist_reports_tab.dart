@@ -197,7 +197,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 border: Border.all(color: AppColors.border),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -209,7 +209,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     width: 52,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -236,7 +236,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                           'Maktab amaliyotchi psixologi faoliyat ko‘rsatkichlari, diagnostika natijalari va bolalar dinamikasi.',
                           style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.textSecondary.withOpacity(0.9),
+                            color: AppColors.textSecondary.withValues(alpha: 0.9),
                           ),
                         ),
                       ],
@@ -271,8 +271,9 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                                 );
                               }).toList(),
                           onChanged: (val) {
-                            if (val != null)
+                            if (val != null) {
                               setState(() => _selectedPeriod = val);
+                            }
                           },
                         ),
                       ),
@@ -620,7 +621,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: DataTable(
-                        headingRowColor: MaterialStateProperty.all(
+                        headingRowColor: WidgetStateProperty.all(
                           AppColors.surfaceMuted,
                         ),
                         headingTextStyle: TextStyle(
@@ -662,10 +663,12 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                               }
 
                               Color trendColor = AppColors.primaryDark;
-                              if (trend == 'Yaxshilanish')
+                              if (trend == 'Yaxshilanish') {
                                 trendColor = AppColors.success;
-                              if (trend == 'Qo‘shimcha e’tibor talab')
+                              }
+                              if (trend == 'Qo‘shimcha e’tibor talab') {
                                 trendColor = AppColors.warning;
+                              }
 
                               return DataRow(
                                 cells: [
@@ -675,7 +678,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                                         CircleAvatar(
                                           radius: 12,
                                           backgroundColor: AppColors.primary
-                                              .withOpacity(0.1),
+                                              .withValues(alpha: 0.1),
                                           child: Text(
                                             s.fullName.isNotEmpty
                                                 ? s.fullName[0]
@@ -713,10 +716,10 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                                         vertical: 3,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: trendColor.withOpacity(0.1),
+                                        color: trendColor.withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
-                                          color: trendColor.withOpacity(0.3),
+                                          color: trendColor.withValues(alpha: 0.3),
                                         ),
                                       ),
                                       child: Text(
@@ -877,7 +880,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: AppColors.primary, size: 20),

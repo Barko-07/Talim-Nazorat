@@ -102,7 +102,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                 border: Border.all(color: AppColors.border),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -119,7 +119,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                         width: 52,
                         height: 52,
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -146,7 +146,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                               'Maktab amaliyotchi psixologi faoliyatida tasdiqlangan diagnostik metodikalar, ko‘rsatmalar va me’yoriy talqinlar.',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: AppColors.textSecondary.withOpacity(0.9),
+                                color: AppColors.textSecondary.withValues(alpha: 0.9),
                               ),
                             ),
                           ],
@@ -287,8 +287,8 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                     });
                                   }
                                 },
-                                selectedColor: AppColors.primary.withOpacity(
-                                  0.12,
+                                selectedColor: AppColors.primary.withValues(
+                                  alpha: 0.12,
                                 ),
                                 backgroundColor: AppColors.surfaceMuted,
                                 labelStyle: TextStyle(
@@ -413,7 +413,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -437,9 +437,9 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: domainColor.withOpacity(0.1),
+                      color: domainColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: domainColor.withOpacity(0.3)),
+                      border: Border.all(color: domainColor.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       m.code,
@@ -707,7 +707,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: domainColor.withOpacity(0.1),
+                        color: domainColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -729,7 +729,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: domainColor.withOpacity(0.12),
+                                  color: domainColor.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -937,7 +937,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: AppColors.warningBg.withOpacity(0.3),
+                            color: AppColors.warningBg.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: AppColors.warningBorder),
                           ),

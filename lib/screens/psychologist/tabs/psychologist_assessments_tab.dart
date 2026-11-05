@@ -290,9 +290,9 @@ class _PsychologistAssessmentsTabState
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: AppColors.border),
-              ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Wrap(
@@ -323,7 +323,7 @@ class _PsychologistAssessmentsTabState
                     SizedBox(
                       width: 220,
                       child: DropdownButtonFormField<StudentModel?>(
-                        value: _filterStudent,
+                        initialValue: _filterStudent,
                         isExpanded: true,
                         decoration: InputDecoration(
                           labelText: 'O‘quvchi',
@@ -362,7 +362,7 @@ class _PsychologistAssessmentsTabState
                     SizedBox(
                       width: 220,
                       child: DropdownButtonFormField<String?>(
-                        value: _categoryFilter,
+                        initialValue: _categoryFilter,
                         isExpanded: true,
                         decoration: InputDecoration(
                           labelText: 'Yo‘nalish',
@@ -401,7 +401,7 @@ class _PsychologistAssessmentsTabState
                       width: 170,
                       child: DropdownButtonFormField<String?>(
                         isExpanded: true,
-                        value: _statusFilter,
+                        initialValue: _statusFilter,
                         decoration: InputDecoration(
                           labelText: 'Holat',
                           isDense: true,

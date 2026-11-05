@@ -190,9 +190,9 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -219,7 +219,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
-                      value: _filterStatus,
+                      initialValue: _filterStatus,
                       decoration: InputDecoration(
                         labelText: 'Holati',
                         contentPadding: const EdgeInsets.symmetric(
@@ -252,7 +252,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
-                      value: _filterLevel,
+                      initialValue: _filterLevel,
                       decoration: InputDecoration(
                         labelText: 'Yordam darajasi',
                         contentPadding: const EdgeInsets.symmetric(
@@ -382,12 +382,12 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                 elevation: 0,
                 color: isRed ? AppColors.errorBg : AppColors.surface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(22),
                   side: BorderSide(
                     color:
                         !isArchived && stColor != null
                             ? stColor.withValues(alpha: isRed ? 0.55 : 0.35)
-                            : AppColors.border,
+                            : AppColors.cardGlassBorder,
                     width: isRed ? 1.5 : 1.0,
                   ),
                 ),

@@ -1191,8 +1191,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     )
                                     .toList(),
                             onChanged: (v) {
-                              if (v != null)
+                              if (v != null) {
                                 setModalState(() => selectedSound = v);
+                              }
                             },
                           ),
                           const SizedBox(height: 10),
@@ -1215,8 +1216,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     )
                                     .toList(),
                             onChanged: (v) {
-                              if (v != null)
+                              if (v != null) {
                                 setModalState(() => selectedStage = v);
+                              }
                             },
                           ),
                           const SizedBox(height: 10),
@@ -1236,8 +1238,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     )
                                     .toList(),
                             onChanged: (v) {
-                              if (v != null)
+                              if (v != null) {
                                 setModalState(() => selectedDisorder = v);
+                              }
                             },
                           ),
                           if (selectedDisorder ==
@@ -2673,8 +2676,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   )
                                   .toList(),
                           onChanged: (v) {
-                            if (v != null)
+                            if (v != null) {
                               setModalState(() => selectedMetric = v);
+                            }
                           },
                         ),
                         const SizedBox(height: 12),

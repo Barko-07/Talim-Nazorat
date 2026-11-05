@@ -308,11 +308,12 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
               decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.border),
+                color: AppColors.surface.withValues(alpha: 0.85),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.cardGlassBorder, width: 1.0),
+                boxShadow: AppColors.softShadow,
               ),
               child: Row(
                 children: [

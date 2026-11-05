@@ -531,9 +531,9 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
         Card(
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: AppColors.border),
-          ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Wrap(
@@ -564,7 +564,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                 SizedBox(
                   width: 210,
                   child: DropdownButtonFormField<String?>(
-                    value: _selectedDomain,
+                    initialValue: _selectedDomain,
                     isExpanded: true,
                     decoration: InputDecoration(
                       labelText: 'Yo‘nalish',
@@ -599,7 +599,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                 SizedBox(
                   width: 170,
                   child: DropdownButtonFormField<String?>(
-                    value: _selectedType,
+                    initialValue: _selectedType,
                     isExpanded: true,
                     decoration: InputDecoration(
                       labelText: 'Savol turi',
@@ -638,7 +638,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                   width: 150,
                   child: DropdownButtonFormField<String?>(
                     isExpanded: true,
-                    value: _selectedStatus,
+                    initialValue: _selectedStatus,
                     decoration: InputDecoration(
                       labelText: 'Holat',
                       isDense: true,
@@ -745,8 +745,8 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: InkWell(
         onTap: () => _showQuestionDetails(q),

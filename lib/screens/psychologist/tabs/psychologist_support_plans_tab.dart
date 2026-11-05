@@ -104,6 +104,7 @@ class _PsychologistSupportPlansTabState
                     ),
                     FilledButton(
                       onPressed: () async {
+                        final sm = ScaffoldMessenger.of(context);
                         await app.updateObjectiveProgress(
                           plan.id,
                           objective.id,
@@ -112,14 +113,12 @@ class _PsychologistSupportPlansTabState
                           byUser: auth.currentUser,
                         );
                         if (dlgCtx.mounted) Navigator.pop(dlgCtx);
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Maqsad progressi yangilandi!'),
-                              backgroundColor: AppColors.success,
-                            ),
-                          );
-                        }
+                        sm.showSnackBar(
+                          SnackBar(
+                            content: Text('Maqsad progressi yangilandi!'),
+                            backgroundColor: AppColors.success,
+                          ),
+                        );
                       },
                       child: const Text('Saqlash'),
                     ),
@@ -166,7 +165,7 @@ class _PsychologistSupportPlansTabState
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
                         isExpanded: true,
-                        value: domain,
+                        initialValue: domain,
                         decoration: const InputDecoration(labelText: 'Soha'),
                         items: const [
                           DropdownMenuItem(
@@ -244,22 +243,21 @@ class _PsychologistSupportPlansTabState
                         progressPercent: 30,
                       );
 
+                      final sm = ScaffoldMessenger.of(context);
                       final updatedPlan = plan.copyWith(
                         objectives: [...plan.objectives, newObj],
                       );
 
                       await app.updateIepPlan(updatedPlan);
                       if (dlgCtx.mounted) Navigator.pop(dlgCtx);
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Yangi psixologik maqsad rejaga kiritildi!',
-                            ),
-                            backgroundColor: AppColors.success,
+                      sm.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Yangi psixologik maqsad rejaga kiritildi!',
                           ),
-                        );
-                      }
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
                     },
                     child: const Text('Rejaga qo‘shish'),
                   ),
@@ -356,9 +354,9 @@ class _PsychologistSupportPlansTabState
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -366,7 +364,7 @@ class _PsychologistSupportPlansTabState
                   Expanded(
                     flex: 3,
                     child: DropdownButtonFormField<String?>(
-                      value: _selectedStudentId,
+                      initialValue: _selectedStudentId,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         labelText: 'O‘quvchi bo‘yicha filter',
@@ -397,7 +395,7 @@ class _PsychologistSupportPlansTabState
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
-                      value: _selectedStatus,
+                      initialValue: _selectedStatus,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         labelText: 'Holati',
@@ -465,9 +463,9 @@ class _PsychologistSupportPlansTabState
                 return Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    side: BorderSide(color: AppColors.border),
-                  ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
