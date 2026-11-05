@@ -142,3 +142,28 @@ def test_cannot_create_student_in_another_school(api, app):
     api.login("coord@a.uz")
     r = api.post("/api/students", {"full_name": "Bola Bir", "birth_date": "2016-01-01", "institution_id": b})
     assert r.status_code == 201 and r.json()["institution_id"] == a  # forced to own school
+
+
+def test_institutions_list_counts_active_accounts_and_refuses_duplicates(api, app):
+    a = _admin(app)
+    api.login("boss@maktab.uz", mfa_secret=a.mfa_secret)
+    r = api.post("/api/admin/institutions", {"name": "14-sonli maktab", "region": "Namangan"})
+    assert r.status_code == 201
+    inst = r.json()["id"]
+    add_user(app, "t1@maktab.uz", Role.TEACHER, inst)
+    assert api.post("/api/admin/institutions", {"name": "14-SONLI MAKTAB"}).status_code == 409
+    rows = api.get("/api/admin/institutions").json()
+    assert rows == [{"id": inst, "name": "14-sonli maktab", "region": "Namangan", "users": 1}]
+
+
+def test_moving_a_user_to_another_school_signs_them_out(api, app, client):
+    a = _admin(app)
+    first, second = add_institution(app, "1-maktab"), add_institution(app, "2-maktab")
+    u = add_user(app, "mv@maktab.uz", Role.PSYCHOLOGIST, first)
+    other = Api(type(client)(app))
+    other.login("mv@maktab.uz")
+    api.login("boss@maktab.uz", mfa_secret=a.mfa_secret)
+    r = api.patch(f"/api/admin/users/{u.id}", {"institution_id": second})
+    assert r.status_code == 200 and r.json()["institution_id"] == second
+    assert other.get("/api/auth/me").status_code == 401
+    assert api.patch(f"/api/admin/users/{u.id}", {"institution_id": "f" * 32}).status_code == 422

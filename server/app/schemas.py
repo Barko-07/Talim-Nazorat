@@ -130,6 +130,7 @@ class UserUpdateIn(Strict):
     full_name: PlainStr | None = Field(default=None, min_length=3, max_length=120)
     role: Role | None = None
     is_active: bool | None = None
+    institution_id: str | None = Field(default=None, pattern=r"^[a-f0-9]{32}$")
 
 
 class ApproveIn(Strict):

@@ -2,6 +2,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/config/app_config.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/brand_logo.dart';
 import '../../core/widgets/status_badge.dart';
@@ -12,6 +13,8 @@ import '../main_navigation_screen.dart';
 import '../auth/logout_dialog.dart';
 import '../referrals/referrals_screen.dart';
 
+import 'server/server_institutions_tab.dart';
+import 'server/server_users_tab.dart';
 import 'tabs/admin_overview_tab.dart';
 import 'tabs/admin_users_tab.dart';
 import 'tabs/admin_specialists_tab.dart';
@@ -172,10 +175,13 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
       AdminOverviewTab(
         onNavigateTab: (idx) => setState(() => _selectedIndex = idx),
       ),
-      const AdminUsersTab(),
+      // Server rejimida hisoblar va muassasalar serverdan boshqariladi.
+      AppConfig.serverMode ? const ServerUsersTab() : const AdminUsersTab(),
       const AdminSpecialistsTab(),
       const AdminStudentsTab(),
-      const AdminInstitutionsTab(),
+      AppConfig.serverMode
+          ? const ServerInstitutionsTab()
+          : const AdminInstitutionsTab(),
       const AdminClassesTab(),
       const AdminRolesTab(),
       const AdminReportsTab(),

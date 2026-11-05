@@ -94,8 +94,14 @@ def update_user(user_id: str, body: UserUpdateIn, p: Principal = Depends(require
         u.role = body.role.value
     if body.is_active is not None:
         u.is_active = body.is_active
+    moved = body.institution_id is not None and body.institution_id != u.institution_id
+    if moved:
+        if db.get(Institution, body.institution_id) is None:
+            raise ApiError(422, "bad_institution", "Muassasa topilmadi")
+        u.institution_id = body.institution_id
     db.commit()
-    if body.is_active is False or body.role is not None:
+    # Role, block and school changes apply at once: what a user may see depends on them.
+    if body.is_active is False or body.role is not None or moved:
         sessions.revoke_all(db, u.id)  # changes apply immediately
     audit.record(db, "ADMIN_USER_UPDATED", user_id=p.user.id, subject=u.id, ip=p.ip,
                  detail=body.model_dump_json(exclude_none=True)[:400])
@@ -180,9 +186,25 @@ def active_sessions(_: Principal = Depends(require_admin), db: Session = Depends
              "mfa_verified": s.mfa_verified, "last_seen_at": s.last_seen_at.isoformat()} for s in rows]
 
 
+@router.get("/institutions")
+def list_institutions(_: Principal = Depends(require_admin), db: Session = Depends(get_db)):
+    """Schools with how many active accounts each has (for approving sign-ups)."""
+    counts = dict(
+        db.execute(
+            select(User.institution_id, func.count())
+            .where(User.institution_id.is_not(None), User.pending_approval.is_(False))
+            .group_by(User.institution_id)
+        ).all()
+    )
+    rows = db.scalars(select(Institution).order_by(Institution.name)).all()
+    return [{"id": i.id, "name": i.name, "region": i.region, "users": counts.get(i.id, 0)} for i in rows]
+
+
 @router.post("/institutions", status_code=201)
 def create_institution(body: InstitutionIn, p: Principal = Depends(require_admin),
                        db: Session = Depends(get_db)):
+    if db.scalar(select(Institution).where(func.lower(Institution.name) == body.name.lower())):
+        raise ApiError(409, "exists", "Bu nomdagi muassasa allaqachon bor")
     inst = Institution(name=body.name, region=body.region)
     db.add(inst)
     db.commit()

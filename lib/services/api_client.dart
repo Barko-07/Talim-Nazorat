@@ -64,6 +64,13 @@ class ApiClient {
     Map<String, dynamic>? body,
   ]) => _send('POST', path, body);
 
+  Future<Map<String, dynamic>> patch(String path, Map<String, dynamic> body) =>
+      _send('PATCH', path, body);
+
+  /// Javobi ro'yxat bo'lgan so'rovlar uchun (masalan /api/admin/users).
+  Future<List<dynamic>> getList(String path) async =>
+      (await _send('GET', path))['items'] as List<dynamic>;
+
   Future<Map<String, dynamic>> _send(
     String method,
     String path, [
@@ -112,6 +119,8 @@ class ApiClient {
       try {
         final decoded = jsonDecode(utf8.decode(response.bodyBytes));
         if (decoded is Map<String, dynamic>) data = decoded;
+        // Ro'yxat qaytaradigan endpoint'lar: {'items': [...]} ko'rinishiga keltiriladi.
+        if (decoded is List) data = {'items': decoded};
       } catch (_) {}
     }
     final token = data['csrf_token'];
