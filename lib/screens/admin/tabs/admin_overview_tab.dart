@@ -13,6 +13,7 @@ import '../../../services/child_status_service.dart';
 import '../../../services/dynamics_service.dart';
 import '../../students/student_detail_screen.dart';
 import '../../../core/widgets/status_badge.dart';
+import 'admin_home_blocks.dart';
 
 class _AttentionItem {
   final StudentModel student;
@@ -93,7 +94,6 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     final dateOnlyDf = DateFormat('dd.MM.yyyy');
 
     final isInstitutionAdmin = user?.role == UserRole.institutionAdmin;
-    final isReviewer = user?.role == UserRole.reviewer;
 
     // 1. FILTRLAR RO'YXATI
     final districtOptions = ['Barchasi', ...NamanganData.districts];
@@ -381,33 +381,71 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. DAVLAT STANDARTI ASOSIDAGI RASMIY BOSH SHAPKA BANNERI (my.gov.uz uslubida)
-          _buildGovernmentHeader(user, isInstitutionAdmin, isReviewer),
-          const SizedBox(height: 20),
-
-          // 2. GLOBAL FILTRLAR PANELI (Hudud, Muassasa, Mutaxassis, Davr, Soha)
-          _buildGlobalFiltersCard(
-            districtOptions: districtOptions,
-            institutionOptions: institutionOptions,
-            specialistOptions: specialistOptions,
-            activeFiltersCount: activeFiltersCount,
+          // 1. Salomlashuv va ism (my.gov.uz uslubida)
+          AdminWelcome(
             user: user,
-            isInstitutionAdmin: isInstitutionAdmin,
+            scope:
+                isInstitutionAdmin
+                    ? (user?.institutionName ?? 'Ta’lim muassasasi')
+                    : 'Namangan viloyati',
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          // 3. ASOSIY STATISTIK KO'RSATKICHLAR (KPI DASHBOARD)
-          _buildKpiOverviewGrid(
-            totalChildren: totalChildren,
-            activeSpecialistsCount: activeSpecialistsCount,
-            unworkedRedCount: unworkedRedCount,
-            incompleteAssessmentsCount: incompleteAssessmentsCount,
-            activeIepPlansCount: activeIepPlansCount,
-            pendingReferralsCount: pendingReferralsCount,
+          // 2. Eng muhim topilma va uni hal qiladigan amal
+          AdminAttentionCard(
+            unworked: unworkedRedCount,
+            pendingReferrals: pendingReferralsCount,
+            incompleteAssessments: incompleteAssessmentsCount,
+            onOpen: () => widget.onNavigateTab(8), // Monitoring
+          ),
+          const SizedBox(height: 24),
+
+          // 3. Ko'rsatkichlar — bitta bo'lingan karta
+          const AdminSectionTitle('Ko‘rsatkichlar'),
+          AdminMetricsCard(
+            metrics: [
+              AdminMetric(
+                'Ro‘yxatdagi bolalar',
+                totalChildren,
+                'nafar',
+                onTap: () => widget.onNavigateTab(3),
+              ),
+              AdminMetric(
+                'Faol mutaxassislar',
+                activeSpecialistsCount,
+                'nafar',
+                onTap: () => widget.onNavigateTab(2),
+              ),
+              AdminMetric(
+                'Ishlanmagan bolalar',
+                unworkedRedCount,
+                'nafar',
+                alert: true,
+                onTap: () => widget.onNavigateTab(8),
+              ),
+              AdminMetric(
+                'Tugallanmagan baholashlar',
+                incompleteAssessmentsCount,
+                'ta',
+                onTap: () => widget.onNavigateTab(8),
+              ),
+              AdminMetric(
+                'Faol ITR rejalari',
+                activeIepPlansCount,
+                'ta',
+                onTap: () => widget.onNavigateTab(7),
+              ),
+              AdminMetric(
+                'Kutilayotgan yo‘naltirishlar',
+                pendingReferralsCount,
+                'ta',
+                onTap: () => widget.onNavigateTab(11),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
 
-          // SVETOFOR TEZKOR MONITORING TASMASI
+          // Svetofor holati
           _buildSvetoforStrip(
             redCount: unworkedRedCount,
             yellowCount: yellowAttentionCount,
@@ -416,6 +454,97 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 filteredStudents
                     .where((s) => s.assignedSpecialistIds.isEmpty)
                     .length,
+          ),
+          const SizedBox(height: 24),
+
+          // 4. Bo'limlar — my.gov.uz "Sohalar" plitkalari kabi
+          const AdminSectionTitle('Bo‘limlar'),
+          AdminSectionsGrid(
+            sections: [
+              AdminSection(
+                'Foydalanuvchilar',
+                LucideIcons.userCog,
+                () => widget.onNavigateTab(1),
+              ),
+              AdminSection(
+                'Ta’lim muassasalari',
+                LucideIcons.building2,
+                () => widget.onNavigateTab(4),
+              ),
+              AdminSection(
+                'O‘quvchilar reyestri',
+                LucideIcons.users,
+                () => widget.onNavigateTab(3),
+              ),
+              AdminSection(
+                'Mutaxassislar',
+                LucideIcons.contact,
+                () => widget.onNavigateTab(2),
+              ),
+              AdminSection(
+                'Monitoring',
+                LucideIcons.activity,
+                () => widget.onNavigateTab(8),
+              ),
+              AdminSection(
+                'Yo‘naltirishlar',
+                LucideIcons.route,
+                () => widget.onNavigateTab(11),
+              ),
+              AdminSection(
+                'Hisobotlar',
+                LucideIcons.chartColumn,
+                () => widget.onNavigateTab(7),
+              ),
+              AdminSection(
+                'Audit jurnali',
+                LucideIcons.scrollText,
+                () => widget.onNavigateTab(10),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // 5. Filtrlar (telefonda yig'ilgan holda)
+          LayoutBuilder(
+            builder: (context, c) {
+              final card = _buildGlobalFiltersCard(
+                districtOptions: districtOptions,
+                institutionOptions: institutionOptions,
+                specialistOptions: specialistOptions,
+                activeFiltersCount: activeFiltersCount,
+                user: user,
+                isInstitutionAdmin: isInstitutionAdmin,
+              );
+              if (c.maxWidth >= 700) return card;
+              return Theme(
+                data: Theme.of(
+                  context,
+                ).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  tilePadding: const EdgeInsets.symmetric(horizontal: 4),
+                  leading: Icon(
+                    LucideIcons.listFilter,
+                    color: AppColors.textSecondary,
+                  ),
+                  title: Text(
+                    'Filtrlar',
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  subtitle: Text(
+                    activeFiltersCount == 0
+                        ? 'Hamma hudud va muassasalar'
+                        : '$activeFiltersCount ta filtr tanlangan',
+                    style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                  ),
+                  children: [card],
+                ),
+              );
+            },
           ),
           const SizedBox(height: 24),
 
@@ -463,160 +592,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
           ),
           const SizedBox(height: 24),
 
-          // 8. BOSHQARUV VA MA'MURIY AMALLAR (8 TA MODUL TEZKOR O'TISH)
-          _buildManagementFeaturesSection(),
-          const SizedBox(height: 24),
-
           // 9. SO'NGGI TIZIM FAOLLIGI VA AUDIT JURNALI
           _buildRecentActivitySection(app: app, df: df),
         ],
-      ),
-    );
-  }
-
-  // ==================== 1. RASMIY SHAPKA BANNERI ====================
-  Widget _buildGovernmentHeader(
-    UserModel? user,
-    bool isInstitutionAdmin,
-    bool isReviewer,
-  ) {
-    final String titleText;
-    final String subtitleText;
-    final String badgeText;
-
-    if (isInstitutionAdmin) {
-      titleText =
-          '${user?.institutionName ?? 'Ta’lim muassasasi'} — Boshqaruv Paneli';
-      subtitleText =
-          'Muassasa o‘quvchilari monitoringi, biriktirilgan mutaxassislar faoliyati va ITR nazorati';
-      badgeText = 'MUASSASA DARAJASI • ${user?.district ?? 'Chortoq tumani'}';
-    } else if (isReviewer) {
-      titleText =
-          'Viloyat Ta’lim Sifatini Monitoring Qilish va Metodik Nazorat';
-      subtitleText =
-          'Hududlararo qiyosiy tahlil, davlat standartlariga moslik va tahliliy hisobotlar markazi';
-      badgeText = 'METODIK NAZORAT • NAMANGAN VILOYATI';
-    } else {
-      titleText = 'Individ — Milliy va Hududiy Boshqaruv Markazi';
-      subtitleText =
-          'Alohida ta’lim ehtiyojlari bo‘lgan bolalar yagona davlat reyestri, 14 ta tuman monitoringi va idoralararo nazorat';
-      badgeText = 'RESPUBLIKA / VILOYAT BOSHQARUVI • 14 TA TUMAN';
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        gradient: AppColors.brandGradient,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryDark.withValues(alpha: 0.25),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final icon = Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
-            ),
-            child: const Icon(
-              LucideIcons.landmark,
-              color: Colors.white,
-              size: 30,
-            ),
-          );
-          final status = Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(radius: 4, backgroundColor: AppColors.brandGreen),
-                SizedBox(width: 6),
-                Text(
-                  'Tizim faol',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          );
-          final texts = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                badgeText,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.85),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.4,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                titleText,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  height: 1.25,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                subtitleText,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.9),
-                  fontSize: 14,
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Mas’ul: ${user?.fullName ?? 'Administrator'}',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.85),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          );
-          if (constraints.maxWidth < 640) {
-            // Telefon: belgi va holat tepada, matn butun kenglikda
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(children: [icon, const Spacer(), status]),
-                const SizedBox(height: 16),
-                texts,
-              ],
-            );
-          }
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              icon,
-              const SizedBox(width: 18),
-              Expanded(child: texts),
-              const SizedBox(width: 16),
-              status,
-            ],
-          );
-        },
       ),
     );
   }
@@ -968,107 +946,6 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     );
   }
 
-  // ==================== 3. KPI STATISTIK KO'RSATKICHLARI ====================
-  Widget _buildKpiOverviewGrid({
-    required int totalChildren,
-    required int activeSpecialistsCount,
-    required int unworkedRedCount,
-    required int incompleteAssessmentsCount,
-    required int activeIepPlansCount,
-    required int pendingReferralsCount,
-  }) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final crossAxisCount =
-            constraints.maxWidth >= 1100
-                ? 3
-                : constraints.maxWidth >= 650
-                ? 2
-                : 1;
-
-        return GridView.count(
-          crossAxisCount: crossAxisCount,
-          crossAxisSpacing: 14,
-          mainAxisSpacing: 14,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          childAspectRatio: 2.3,
-          children: [
-            // 1. Jami ro'yxatdagi bolalar
-            _buildStatCard(
-              title: 'JAMI RO‘YXATDAGI BOLALAR',
-              value: '$totalChildren nafar',
-              subtitle: 'Filtr bo‘yicha hisoblangan ATEB o‘quvchilar',
-              icon: LucideIcons.users,
-              color: AppColors.primary,
-              bgColor: AppColors.primaryLight,
-              onTap: () => widget.onNavigateTab(3), // O'quvchilar tabi
-            ),
-
-            // 2. Faol mutaxassislar
-            _buildStatCard(
-              title: 'FAOL MUTAXASSISLAR',
-              value: '$activeSpecialistsCount nafar',
-              subtitle: 'Psixolog, logoped, defektolog va o‘qituvchilar',
-              icon: LucideIcons.brain,
-              color: AppColors.purple,
-              bgColor: AppColors.purpleBg,
-              onTap: () => widget.onNavigateTab(2), // Mutaxassislar tabi
-            ),
-
-            // 3. Ishlanmagan bolalar (Qizil)
-            _buildStatCard(
-              title: 'ISHLANMAGAN BOLALAR (QIZIL)',
-              value: '$unworkedRedCount nafar',
-              subtitle:
-                  'Zudlik bilan mutaxassis biriktirish va faoliyat talab etiladi',
-              icon: LucideIcons.triangleAlert,
-              color: AppColors.error,
-              bgColor: AppColors.errorBg,
-              onTap: () => widget.onNavigateTab(8), // Monitoring tabi
-            ),
-
-            // 4. Tugallanmagan baholashlar
-            _buildStatCard(
-              title: 'TUGALLANMAGAN BAHOLASHLAR',
-              value: '$incompleteAssessmentsCount ta',
-              subtitle:
-                  'Boshlang‘ich diagnostika o‘tkazilmagan yoki qoralamalar',
-              icon: LucideIcons.clipboardX,
-              color: AppColors.warning,
-              bgColor: AppColors.warningBg,
-              onTap: () => widget.onNavigateTab(8), // Monitoring tabi
-            ),
-
-            // 5. Faol ITR rejalari
-            _buildStatCard(
-              title: 'FAOL ITR REJALARI',
-              value: '$activeIepPlansCount ta',
-              subtitle:
-                  'Tasdiqlangan individual ta’lim va rivojlanish rejalari',
-              icon: LucideIcons.bookOpen,
-              color: AppColors.success,
-              bgColor: AppColors.successBg,
-              onTap: () => widget.onNavigateTab(7), // Hisobotlar tabi
-            ),
-
-            // 6. Kutilayotgan yo‘naltirishlar
-            _buildStatCard(
-              title: 'KUTILAYOTGAN YO‘NALTIRISHLAR',
-              value: '$pendingReferralsCount ta',
-              subtitle:
-                  'Mutaxassislar ko‘rib chiqishi kutilayotgan yo‘llanmalar',
-              icon: LucideIcons.route,
-              color: AppColors.info,
-              bgColor: AppColors.infoBg,
-              onTap: () => widget.onNavigateTab(11), // Yo'naltirishlar tabi
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   // ==================== SVETOFOR TASMASI ====================
   Widget _buildSvetoforStrip({
     required int redCount,
@@ -1076,65 +953,42 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     required int greenCount,
     required int unassignedCount,
   }) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.border),
+    // Bolalar holati: o'quvchilar filtridagi Qizil / Sariq / Yashil ranglari,
+    // "Faol" belgisi uslubidagi ixcham belgilar va bitta havola bir qatorda.
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Wrap(
-              spacing: 8,
-              runSpacing: 6,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Text(
-                  'Svetofor statusi:',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                _buildBadge(
-                  label: 'Qizil (Ishlanmagan): $redCount',
-                  color: AppColors.error,
-                  bgColor: AppColors.errorBg,
-                ),
-                _buildBadge(
-                  label: 'Sariq (E’tibor talab): $yellowCount',
-                  color: AppColors.warning,
-                  bgColor: AppColors.warningBg,
-                ),
-                _buildBadge(
-                  label: 'Yashil (Faol / Ijobiy): $greenCount',
-                  color: AppColors.success,
-                  bgColor: AppColors.successBg,
-                ),
-                if (unassignedCount > 0)
-                  _buildBadge(
-                    label: 'Mutaxassis biriktirilmagan: $unassignedCount',
-                    color: AppColors.purple,
-                    bgColor: AppColors.purpleBg,
-                  ),
-              ],
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text(
+            'Bolalar holati',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: AppColors.textPrimary,
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => widget.onNavigateTab(3),
-                child: const Text(
-                  'Barcha o‘quvchilar →',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                ),
-              ),
+          ),
+          StatusBadge.child(StatusColor.red, 'Qizil $redCount'),
+          StatusBadge.child(StatusColor.yellow, 'Sariq $yellowCount'),
+          StatusBadge.child(StatusColor.green, 'Yashil $greenCount'),
+          if (unassignedCount > 0)
+            StatusBadge(
+              'Mutaxassissiz $unassignedCount',
+              tone: StatusTone.neutral,
             ),
-          ],
-        ),
+          TextButton(
+            onPressed: () => widget.onNavigateTab(3),
+            child: const Text('Barcha o‘quvchilar'),
+          ),
+        ],
       ),
     );
   }
@@ -2213,123 +2067,6 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     );
   }
 
-  // ==================== 8. BOSHQARUV VA MA'MURIY AMALLAR ====================
-  Widget _buildManagementFeaturesSection() {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  LucideIcons.slidersHorizontal,
-                  color: AppColors.primary,
-                  size: 22,
-                ),
-                SizedBox(width: 10),
-                Flexible(
-                  child: Text(
-                    'Tizim Boshqaruvi va Ma’muriy Funksiyalar',
-                    style: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 20),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final crossAxisCount =
-                    constraints.maxWidth >= 1000
-                        ? 4
-                        : constraints.maxWidth >= 600
-                        ? 2
-                        : 1;
-
-                return GridView.count(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 2.2,
-                  children: [
-                    _buildManagementTile(
-                      title: 'Ta’lim Muassasalari',
-                      desc: 'Maktab, internat va markazlar',
-                      icon: LucideIcons.building2,
-                      color: AppColors.info,
-                      onTap: () => widget.onNavigateTab(4),
-                    ),
-                    _buildManagementTile(
-                      title: 'Foydalanuvchilar',
-                      desc: 'Hisoblar, qabul va faollashtirish',
-                      icon: LucideIcons.userCog,
-                      color: AppColors.primary,
-                      onTap: () => widget.onNavigateTab(1),
-                    ),
-                    _buildManagementTile(
-                      title: 'Rollar va Ruxsatlar',
-                      desc: '8 ta rol matritsasi va huquqlar',
-                      icon: LucideIcons.shield,
-                      color: AppColors.purple,
-                      onTap: () => widget.onNavigateTab(6),
-                    ),
-                    _buildManagementTile(
-                      title: 'Mutaxassislarni Biriktirish',
-                      desc: 'Pedagoglar va bolalar bog‘lanishi',
-                      icon: LucideIcons.contact,
-                      color: AppColors.warning,
-                      onTap: () => widget.onNavigateTab(2),
-                    ),
-                    _buildManagementTile(
-                      title: 'Yo‘naltirishlar Jurnali',
-                      desc: 'Logoped, psixolog va tibbiyot',
-                      icon: LucideIcons.route,
-                      color: AppColors.info,
-                      onTap: () => widget.onNavigateTab(11),
-                    ),
-                    _buildManagementTile(
-                      title: 'Tizim Audit Jurnali',
-                      desc: 'Xavfsizlik va o‘zgarishlar tarixi',
-                      icon: LucideIcons.scrollText,
-                      color: AppColors.textSecondary,
-                      onTap: () => widget.onNavigateTab(10),
-                    ),
-                    _buildManagementTile(
-                      title: 'Tizim Sozlamalari',
-                      desc: 'DTS parametrlari va siyosat',
-                      icon: LucideIcons.settings2,
-                      color: AppColors.textMuted,
-                      onTap: () => widget.onNavigateTab(9),
-                    ),
-                    _buildManagementTile(
-                      title: 'Hisobotlar va Zaxira',
-                      desc: 'Viloyat CSV va JSON backup',
-                      icon: LucideIcons.download,
-                      color: AppColors.success,
-                      onTap: () => widget.onNavigateTab(7),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   // ==================== 9. SO'NGGI TIZIM FAOLLIGI VA AUDIT ====================
   Widget _buildRecentActivitySection({
     required AppProvider app,
@@ -2472,85 +2209,6 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
   }
 
   // ==================== YORDAMCHI WIDGETLAR ====================
-  Widget _buildStatCard({
-    required String title,
-    required String value,
-    required String subtitle,
-    required IconData icon,
-    required Color color,
-    required Color bgColor,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: color, size: 22),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textMuted,
-                      letterSpacing: 0.5,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textSecondary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              LucideIcons.chevronRight,
-              color: AppColors.textMuted,
-              size: 18,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildMonitoringTile({
     required String title,
@@ -2669,64 +2327,6 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildManagementTile({
-    required String title,
-    required String desc,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withValues(alpha: 0.2)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: color, size: 20),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: color,
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    desc,
-                    style: TextStyle(fontSize: 11, color: AppColors.textMuted),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            Icon(LucideIcons.chevronRight, size: 12, color: color),
-          ],
-        ),
       ),
     );
   }

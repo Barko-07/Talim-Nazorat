@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../core/config/app_config.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/brand_logo.dart';
-import '../../core/widgets/status_badge.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -80,7 +79,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
   }
 
   static const List<_AdminNavCategory> _categories = [
-    _AdminNavCategory('ASOSIY BOSHQARUV', [
+    _AdminNavCategory('Asosiy', [
       _AdminNavItemData(
         index: 0,
         title: 'Boshqaruv paneli',
@@ -88,7 +87,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
         activeIcon: LucideIcons.layoutDashboard,
       ),
     ]),
-    _AdminNavCategory('MONITORING VA TAHLIL', [
+    _AdminNavCategory('Monitoring va tahlil', [
       _AdminNavItemData(
         index: 8,
         title: 'Monitoring markazi',
@@ -103,7 +102,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
         activeIcon: LucideIcons.barChart,
       ),
     ]),
-    _AdminNavCategory('REYESTRLAR VA KADRLAR', [
+    _AdminNavCategory('Reyestrlar va kadrlar', [
       _AdminNavItemData(
         index: 3,
         title: 'O‘quvchilar reyestri',
@@ -135,7 +134,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
         activeIcon: LucideIcons.route,
       ),
     ]),
-    _AdminNavCategory('XAVFSIZLIK VA MA’MURIYAT', [
+    _AdminNavCategory('Xavfsizlik va ma’muriyat', [
       _AdminNavItemData(
         index: 1,
         title: 'Foydalanuvchilar',
@@ -192,17 +191,13 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
     ];
 
     // Rolga mos sarlavha va status
-    final String roleTag;
     final String portalSubtitle;
     if (user?.role == UserRole.institutionAdmin) {
-      roleTag = 'MUASSASA ADMINI';
       portalSubtitle = user?.institutionName ?? 'Muassasa ma’muriyati';
     } else if (user?.role == UserRole.reviewer) {
-      roleTag = 'METODIK NAZORAT';
       portalSubtitle =
           'Namangan viloyat ta’lim sifatini monitoring qilish markazi';
     } else {
-      roleTag = 'TIZIM ADMINISTRATORI';
       portalSubtitle =
           'O‘zbekiston Respublikasi Maktabgacha va maktab ta’limi vazirligi • Namangan viloyati';
     }
@@ -236,13 +231,6 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                           child: BrandWordmark(fontSize: 17),
                         ),
                       ),
-                      // Telefonda rol nomi sarlavhaga sig'maydi — u profil qatorida ko'rinadi
-                      if (MediaQuery.sizeOf(context).width >= 700) ...[
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: StatusBadge(roleTag, tone: StatusTone.primary),
-                        ),
-                      ],
                     ],
                   ),
                   Text(
@@ -419,12 +407,11 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                 Icon(LucideIcons.shieldCheck, color: Colors.white, size: 28),
                 SizedBox(width: 10),
                 Text(
-                  'ADMINISTRATOR MENYUSI',
+                  'Administrator menyusi',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                    letterSpacing: 0.5,
+                    fontSize: 15,
                   ),
                 ),
               ],
@@ -448,11 +435,11 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                     ),
                     child: Text(
                       cat.title,
+                      // Guruh nomi: oddiy yozuv, kulrang, siyrak harflarsiz
                       style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
                         color: AppColors.textMuted,
-                        letterSpacing: 0.8,
                       ),
                     ),
                   ),

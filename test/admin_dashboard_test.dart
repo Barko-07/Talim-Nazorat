@@ -55,16 +55,16 @@ void main() {
         await tester.pumpAndSettle();
 
         // Check categorized sidebar headers
-        expect(find.text('ASOSIY BOSHQARUV'), findsOneWidget);
-        expect(find.text('MONITORING VA TAHLIL'), findsOneWidget);
-        expect(find.text('REYESTRLAR VA KADRLAR'), findsOneWidget);
-        expect(find.text('XAVFSIZLIK VA MA’MURIYAT'), findsOneWidget);
+        expect(find.text('Asosiy'), findsOneWidget);
+        expect(find.text('Monitoring va tahlil'), findsOneWidget);
+        expect(find.text('Reyestrlar va kadrlar'), findsOneWidget);
+        expect(find.text('Xavfsizlik va ma’muriyat'), findsOneWidget);
 
         // Check categorized items
         expect(find.text('Boshqaruv paneli'), findsOneWidget);
         expect(find.text('Monitoring markazi'), findsOneWidget);
         expect(find.text('Tahliliy hisobotlar'), findsOneWidget);
-        expect(find.text('O‘quvchilar reyestri'), findsOneWidget);
+        expect(find.text('O‘quvchilar reyestri'), findsWidgets);
         expect(find.text('Pedagog-mutaxassislar'), findsOneWidget);
         expect(find.text('Yo‘naltirishlar jurnali'), findsOneWidget);
 
@@ -108,11 +108,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // 1. Government header
-        expect(
-          find.text('Individ — Milliy va Hududiy Boshqaruv Markazi'),
-          findsOneWidget,
-        );
+        // 1. Welcome and the one thing that needs attention
+        expect(find.text('Xush kelibsiz'), findsOneWidget);
+        expect(find.text('Diqqat talab'), findsOneWidget);
 
         // 2. Global Filters Card
         expect(find.text('Global Boshqaruv Filtrlari'), findsOneWidget);
@@ -121,12 +119,12 @@ void main() {
         expect(find.text('Pedagog-mutaxassis'), findsOneWidget);
 
         // 3. KPI Statistics Grid
-        expect(find.text('JAMI RO‘YXATDAGI BOLALAR'), findsOneWidget);
-        expect(find.text('FAOL MUTAXASSISLAR'), findsOneWidget);
-        expect(find.text('ISHLANMAGAN BOLALAR (QIZIL)'), findsOneWidget);
-        expect(find.text('TUGALLANMAGAN BAHOLASHLAR'), findsOneWidget);
-        expect(find.text('FAOL ITR REJALARI'), findsOneWidget);
-        expect(find.text('KUTILAYOTGAN YO‘NALTIRISHLAR'), findsOneWidget);
+        expect(find.text('Ro‘yxatdagi bolalar'), findsOneWidget);
+        expect(find.text('Faol mutaxassislar'), findsOneWidget);
+        expect(find.text('Ishlanmagan bolalar'), findsOneWidget);
+        expect(find.text('Tugallanmagan baholashlar'), findsOneWidget);
+        expect(find.text('Faol ITR rejalari'), findsOneWidget);
+        expect(find.text('Kutilayotgan yo‘naltirishlar'), findsOneWidget);
 
         // 4. Attention Required Section
         expect(
@@ -162,11 +160,9 @@ void main() {
           findsOneWidget,
         );
 
-        // 8. Management Features
-        expect(
-          find.text('Tizim Boshqaruvi va Ma’muriy Funksiyalar'),
-          findsOneWidget,
-        );
+        // 8. Sections grid
+        expect(find.text('Bo‘limlar'), findsOneWidget);
+        expect(find.text('Audit jurnali'), findsOneWidget);
 
         // 9. Recent Activity
         expect(
@@ -175,7 +171,7 @@ void main() {
         );
 
         // Test tapping a KPI card triggers navigation
-        await tester.tap(find.text('FAOL MUTAXASSISLAR'));
+        await tester.tap(find.text('Faol mutaxassislar'));
         await tester.pumpAndSettle();
         expect(navigatedTab, 2);
 
@@ -230,12 +226,10 @@ void main() {
 
         // Should display institution-specific title and badge
         expect(
-          find.textContaining(
-            '5-sonli umumiy o‘rta ta’lim maktabi — Boshqaruv Paneli',
-          ),
+          find.text('Muassasa rahbari · 5-sonli umumiy o‘rta ta’lim maktabi'),
           findsOneWidget,
         );
-        expect(find.textContaining('MUASSASA DARAJASI'), findsOneWidget);
+        expect(find.textContaining('Namangan viloyati'), findsNothing);
 
         await tester.pumpWidget(const SizedBox());
         auth.dispose();
