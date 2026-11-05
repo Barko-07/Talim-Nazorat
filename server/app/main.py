@@ -18,7 +18,7 @@ from .context import AppContext
 from .db import Database
 from .deps import SAFE_METHODS, client_ip
 from .mailer import Mailer
-from .routes import admin, auth, students
+from .routes import admin, auth, records
 from .security import audit
 
 log = logging.getLogger("individ")
@@ -159,5 +159,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(auth.router)
     app.include_router(admin.router)
-    app.include_router(students.router)
+    app.include_router(records.router)
     return app

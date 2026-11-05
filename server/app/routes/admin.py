@@ -2,6 +2,7 @@
 two-factor verified session, optional IP allowlist. Others get 404."""
 from __future__ import annotations
 
+import json
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, Query
@@ -10,10 +11,22 @@ from sqlalchemy.orm import Session
 
 from ..context import AppContext
 from ..deps import ApiError, Principal, get_ctx, get_db, require_admin
-from ..models import AuditEvent, AuthSession, Institution, RecoveryCode, Role, User, utcnow
+from ..mailer import MailError
+from ..models import (
+    AuditEvent,
+    AuthSession,
+    Institution,
+    Record,
+    RecordChange,
+    RecoveryCode,
+    Role,
+    StudentAccess,
+    User,
+    utcnow,
+)
 from ..schemas import ApproveIn, InstitutionIn, UserCreateIn, UserUpdateIn
 from ..security import audit, passwords, sessions
-from .auth import profile_of
+from .auth import MAIL_FAILED, notify, profile_of
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -44,9 +57,10 @@ def _active_admins(db: Session) -> int:
 
 
 @router.get("/users")
-def list_users(q: str = Query(default="", max_length=100), _: Principal = Depends(require_admin),
-               db: Session = Depends(get_db)):
-    stmt = select(User).order_by(User.full_name).limit(500)
+def list_users(q: str = Query(default="", max_length=100), offset: int = Query(default=0, ge=0),
+               limit: int = Query(default=2000, ge=1, le=5000),
+               _: Principal = Depends(require_admin), db: Session = Depends(get_db)):
+    stmt = select(User).order_by(User.full_name, User.id).offset(offset).limit(limit)
     if q:
         # Bound parameter + escaped wildcards: input is data, never SQL.
         like = "%" + q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
@@ -62,16 +76,27 @@ def create_user(body: UserCreateIn, p: Principal = Depends(require_admin),
         raise ApiError(409, "exists", "Bu email bilan hisob mavjud")
     if body.institution_id and db.get(Institution, body.institution_id) is None:
         raise ApiError(422, "bad_institution", "Muassasa topilmadi")
+    if body.role != Role.SUPER_ADMIN and not body.institution_id:
+        # Everyone except the system administrator works inside one school.
+        raise ApiError(422, "institution_required", "Muassasani tanlang")
     temp = passwords.generate_temporary_password()
     u = User(email=email, full_name=body.full_name, role=body.role.value,
              institution_id=body.institution_id, phone=body.phone,
              password_hash=passwords.hash_password(temp), must_change_password=True)
     db.add(u)
     db.commit()
-    # The temporary password goes only to the user's mailbox, never to the API response.
-    ctx.mailer.send(email, "Individ: hisobingiz yaratildi",
-                    f"Sizga Individ tizimida hisob ochildi.\nLogin: {email}\nVaqtinchalik parol: {temp}\n\n"
-                    "Birinchi kirishda parolni o‘zgartirasiz. Parolni hech kimga bermang.")
+    # The temporary password goes only to the user's mailbox, never to the API
+    # response. An account whose password never arrived is useless: undo it.
+    try:
+        ctx.mailer.send(email, "Individ: hisobingiz yaratildi",
+                        f"Sizga Individ tizimida hisob ochildi.\nLogin: {email}\nVaqtinchalik parol: {temp}\n\n"
+                        "Birinchi kirishda parolni o‘zgartirasiz. Parolni hech kimga bermang.")
+    except MailError:
+        db.delete(u)
+        db.commit()
+        audit.record(db, "MAIL_FAILED", severity="alert", user_id=p.user.id, subject=audit.mask_login(email),
+                     detail="new account", webhook_url=ctx.settings.alert_webhook_url)
+        raise ApiError(503, "mail_failed", MAIL_FAILED) from None
     audit.record(db, "ADMIN_USER_CREATED", user_id=p.user.id, subject=u.id, ip=p.ip,
                  detail=f"role={u.role}")
     return _user_row(u)
@@ -99,6 +124,8 @@ def update_user(user_id: str, body: UserUpdateIn, p: Principal = Depends(require
         if db.get(Institution, body.institution_id) is None:
             raise ApiError(422, "bad_institution", "Muassasa topilmadi")
         u.institution_id = body.institution_id
+        # Children of the old school are no longer theirs to see.
+        db.execute(delete(StudentAccess).where(StudentAccess.user_id == u.id))
     db.commit()
     # Role, block and school changes apply at once: what a user may see depends on them.
     if body.is_active is False or body.role is not None or moved:
@@ -121,8 +148,8 @@ def approve_user(user_id: str, body: ApproveIn, p: Principal = Depends(require_a
     u.pending_approval = False
     db.commit()
     audit.record(db, "ADMIN_USER_APPROVED", user_id=p.user.id, subject=u.id, ip=p.ip)
-    ctx.mailer.send(u.email, "Individ: hisobingiz tasdiqlandi",
-                    "Hisobingiz administrator tomonidan tasdiqlandi. Endi Individ’ga kirishingiz mumkin.")
+    notify(db, ctx, u.email, "Individ: hisobingiz tasdiqlandi",
+           "Hisobingiz administrator tomonidan tasdiqlandi. Endi Individ’ga kirishingiz mumkin.", u.id)
     return _user_row(u)
 
 
@@ -137,9 +164,9 @@ def reject_user(user_id: str, p: Principal = Depends(require_admin), db: Session
     db.delete(u)
     db.commit()
     audit.record(db, "ADMIN_USER_REJECTED", user_id=p.user.id, subject=audit.mask_login(email), ip=p.ip)
-    ctx.mailer.send(email, "Individ: ro‘yxatdan o‘tish rad etildi",
-                    "Ro‘yxatdan o‘tish so‘rovingiz administrator tomonidan rad etildi. Savollar bo‘lsa, "
-                    "maktabingiz rahbariyatiga murojaat qiling.")
+    notify(db, ctx, email, "Individ: ro‘yxatdan o‘tish rad etildi",
+           "Ro‘yxatdan o‘tish so‘rovingiz administrator tomonidan rad etildi. Savollar bo‘lsa, "
+           "maktabingiz rahbariyatiga murojaat qiling.")
     return {"ok": True}
 
 
@@ -192,7 +219,8 @@ def list_institutions(_: Principal = Depends(require_admin), db: Session = Depen
     counts = dict(
         db.execute(
             select(User.institution_id, func.count())
-            .where(User.institution_id.is_not(None), User.pending_approval.is_(False))
+            .where(User.institution_id.is_not(None), User.pending_approval.is_(False),
+                   User.is_active.is_(True))
             .group_by(User.institution_id)
         ).all()
     )
@@ -215,12 +243,56 @@ def create_institution(body: InstitutionIn, p: Principal = Depends(require_admin
 @router.get("/audit")
 def audit_log(severity: str | None = Query(default=None, pattern=r"^(info|warning|alert)$"),
               limit: int = Query(default=200, ge=1, le=1000),
+              before_id: int | None = Query(default=None, ge=1),
               _: Principal = Depends(require_admin), db: Session = Depends(get_db)):
     stmt = select(AuditEvent).order_by(AuditEvent.id.desc()).limit(limit)
     if severity:
         stmt = stmt.where(AuditEvent.severity == severity)
-    return [{"at": e.at.isoformat(), "action": e.action, "severity": e.severity, "user_id": e.user_id,
-             "subject": e.subject, "ip": e.ip, "detail": e.detail} for e in db.scalars(stmt)]
+    if before_id:
+        stmt = stmt.where(AuditEvent.id < before_id)
+    return [{"id": e.id, "at": e.at.isoformat(), "action": e.action, "severity": e.severity,
+             "user_id": e.user_id, "subject": e.subject, "ip": e.ip, "detail": e.detail}
+            for e in db.scalars(stmt)]
+
+
+def _student_name(data: dict) -> str:
+    return " ".join(x for x in (data.get("lastName"), data.get("firstName")) if x) or "Nomsiz"
+
+
+@router.get("/changes")
+def changes(kind: str | None = Query(default=None, pattern=r"^[a-z_]{1,32}$"),
+            user_id: str | None = Query(default=None, pattern=r"^[a-f0-9]{32}$"),
+            student_id: str | None = Query(default=None, max_length=64),
+            limit: int = Query(default=100, ge=1, le=500),
+            before_id: int | None = Query(default=None, ge=1),
+            p: Principal = Depends(require_admin), db: Session = Depends(get_db)):
+    """What was added, changed or deleted, by whom and when, with the old and
+    new values. Reading the history is itself recorded."""
+    stmt = select(RecordChange).order_by(RecordChange.id.desc()).limit(limit)
+    if kind:
+        stmt = stmt.where(RecordChange.kind == kind)
+    if user_id:
+        stmt = stmt.where(RecordChange.user_id == user_id)
+    if student_id:
+        stmt = stmt.where(RecordChange.student_id == student_id)
+    if before_id:
+        stmt = stmt.where(RecordChange.id < before_id)
+    rows = db.scalars(stmt).all()
+    names = {u.id: u.full_name for u in db.scalars(select(User).where(User.id.in_({r.user_id for r in rows} or {""})))}
+    kids: dict[str, str] = {}
+    for sid in {r.student_id or (r.rid if r.kind == "student" else "") for r in rows} - {""}:
+        rec = db.get(Record, ("student", sid))
+        kids[sid] = _student_name(json.loads(rec.data)) if rec else ""
+    audit.record(db, "ADMIN_CHANGES_VIEWED", user_id=p.user.id, ip=p.ip, detail=f"{len(rows)} rows")
+    return [{
+        "id": r.id, "at": r.at.isoformat(), "action": r.action, "kind": r.kind, "record_id": r.rid,
+        "student_id": r.student_id or (r.rid if r.kind == "student" else None),
+        "student_name": kids.get(r.student_id or (r.rid if r.kind == "student" else ""), ""),
+        "user_id": r.user_id, "user_name": names.get(r.user_id, ""), "institution_id": r.institution_id,
+        "fields": [f for f in r.fields.split(",") if f],
+        "before": json.loads(r.before) if r.before else None,
+        "after": json.loads(r.after) if r.after else None,
+    } for r in rows]
 
 
 @router.post("/users/{user_id}/force-password-change")

@@ -1,10 +1,11 @@
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 
 from app.main import create_app
 from app.models import Role
 
-from conftest import Api, add_institution, add_student, add_user, db_session, make_settings
+from conftest import Api, add_institution, add_user, db_session, make_settings
 
 
 def test_security_headers_on_every_response(client):
@@ -86,7 +87,7 @@ def test_cors_closed_by_default_and_allowlist_only():
 
 
 def test_request_body_size_limit(api):
-    r = api.post("/api/auth/login", {"email": "a@b.uz", "password": "x" * 300_000})
+    r = api.post("/api/auth/login", {"email": "a@b.uz", "password": "x" * 1_100_000})
     assert r.status_code == 413
 
 
@@ -98,51 +99,56 @@ def test_validation_rejects_unknown_fields_and_never_echoes_input(api):
     assert r.status_code == 422
 
 
-def _staff(app):
+def _teacher(app):
     inst = add_institution(app)
-    add_user(app, "coord@maktab.uz", Role.COORDINATOR, inst)
+    add_user(app, "tch@maktab.uz", Role.TEACHER, inst)
     return inst
 
 
-def test_xss_markup_rejected_in_names_and_notes_returned_as_inert_json(api, app):
-    inst = _staff(app)
-    api.login("coord@maktab.uz")
-    bad = api.post("/api/students", {"full_name": "<script>alert(1)</script>", "birth_date": "2016-01-01"})
-    assert bad.status_code == 422
-    bad = api.post("/api/students", {"full_name": "Ali", "grade": "javascript:alert(1)", "birth_date": "2016-01-01"})
-    assert bad.status_code == 422
-
-    sid = api.post("/api/students", {"full_name": "Ali Valiyev", "birth_date": "2016-01-01"}).json()["id"]
+def test_markup_in_work_data_is_returned_as_inert_json(api, app):
+    _teacher(app)
+    api.login("tch@maktab.uz")
     note = '<img src=x onerror="alert(1)">'
-    r = api.post(f"/api/students/{sid}/assessments",
-                 {"title": "Test", "assessment_date": "2026-10-01", "total_score": 5, "max_score": 10, "notes": note})
-    assert r.status_code == 201
-    got = api.get(f"/api/students/{sid}/assessments")
+    r = api.post("/api/records/batch", {"ops": [
+        {"op": "put", "kind": "student", "id": "s1", "data": {"firstName": "<script>x</script>", "lastName": "Ali"}},
+        {"op": "put", "kind": "assessment", "id": "a1", "data": {"studentId": "s1", "notes": note}},
+    ]})
+    assert r.status_code == 200
+    got = api.get("/api/records")
     assert got.headers["content-type"].startswith("application/json")
     assert "default-src 'none'" in got.headers["content-security-policy"]
-    assert got.json()[0]["notes"] == note  # stored as plain text, never rendered as HTML
+    assert got.json()["items"]["assessment"][0]["notes"] == note  # text, never rendered as HTML
 
 
-def test_sql_injection_payloads_are_treated_as_data(api, app):
-    inst = _staff(app)
-    add_student(app, inst)
-    api.login("coord@maktab.uz")
-    for payload in ["' OR '1'='1", "%", "_", "'; DROP TABLE students; --", "\\"]:
-        r = api.get("/api/students", params={"q": payload})
-        assert r.status_code == 200
-        assert r.json() == [], payload
-    assert len(api.get("/api/students").json()) == 1  # table intact
+def test_injection_payloads_in_ids_are_refused_and_data_is_data(api, app):
+    _teacher(app)
+    api.login("tch@maktab.uz")
+    for bad in ["' OR '1'='1", "x; DROP TABLE records; --", "../etc", "a" * 65]:
+        r = api.post("/api/records/batch", {"ops": [{"op": "put", "kind": "student", "id": bad, "data": {}}]})
+        assert r.status_code == 422, bad
+    payload = "'; DROP TABLE records; --"
+    r = api.post("/api/records/batch", {"ops": [
+        {"op": "put", "kind": "student", "id": "s1", "data": {"firstName": payload}}]})
+    assert r.status_code == 200
+    assert api.get("/api/records").json()["items"]["student"][0]["firstName"] == payload  # table intact
     r = api.post("/api/auth/login", {"email": "x' OR 1=1 --@a.uz", "password": "x"})
     assert r.status_code in (401, 422)
 
 
-def test_sensitive_columns_encrypted_at_rest(app):
-    inst = add_institution(app)
-    add_student(app, inst, diagnosis="F84.0 autizm")
+def test_work_data_encrypted_at_rest_and_bound_to_its_column(api, app):
+    _teacher(app)
+    api.login("tch@maktab.uz")
+    api.post("/api/records/batch", {"ops": [{"op": "put", "kind": "student", "id": "s1",
+                                              "data": {"firstName": "Dilnoza", "diagnosis": "F84.0 autizm"}}]})
     with db_session(app) as db:
-        raw = db.execute(text("SELECT diagnosis, guardian_phone FROM students")).one()
-    assert raw[0].startswith("enc1:") and "F84" not in raw[0]
-    assert raw[1].startswith("enc1:") and "998" not in raw[1]
+        raw = db.execute(text("SELECT data FROM records")).scalar_one()
+        before = db.execute(text("SELECT after FROM record_changes")).scalar_one()
+    assert raw.startswith("enc2:") and "Dilnoza" not in raw and "F84" not in raw
+    assert before.startswith("enc2:") and "Dilnoza" not in before
+    from app import crypto
+    with pytest.raises(Exception):
+        crypto.decrypt(raw, "users.profile")  # moved to another column: refused
+    assert "Dilnoza" in crypto.decrypt(raw, "records.data")
 
 
 def test_unknown_routes_and_errors_leak_nothing(client):

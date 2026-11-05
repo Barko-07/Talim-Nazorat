@@ -19,6 +19,10 @@ log = logging.getLogger("individ.mail")
 LOOPBACK_HOSTS = {"127.0.0.1", "::1", "localhost"}
 
 
+class MailError(RuntimeError):
+    """The message could not be handed to the mail server."""
+
+
 @dataclass
 class SentMail:
     to: str
@@ -43,11 +47,15 @@ class Mailer:
         msg["To"] = to
         msg["Subject"] = subject
         msg.set_content(body)
-        with smtplib.SMTP(s.smtp_host, s.smtp_port, timeout=15) as smtp:
-            # A relay on this machine (loopback-only Postfix) never leaves the
-            # host, so TLS adds nothing; any other host must use STARTTLS.
-            if s.smtp_host not in LOOPBACK_HOSTS:
-                smtp.starttls(context=ssl.create_default_context())
-                if s.smtp_user:
-                    smtp.login(s.smtp_user, s.smtp_password)
-            smtp.send_message(msg)
+        try:
+            with smtplib.SMTP(s.smtp_host, s.smtp_port, timeout=15) as smtp:
+                # A relay on this machine (loopback-only Postfix) never leaves the
+                # host, so TLS adds nothing; any other host must use STARTTLS.
+                if s.smtp_host not in LOOPBACK_HOSTS:
+                    smtp.starttls(context=ssl.create_default_context())
+                    if s.smtp_user:
+                        smtp.login(s.smtp_user, s.smtp_password)
+                smtp.send_message(msg)
+        except (smtplib.SMTPException, OSError) as exc:
+            log.error("mail to %s failed: %s", to.split("@")[-1], type(exc).__name__)
+            raise MailError(str(exc)) from exc

@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 
 from ..models import RateCounter
 
-MAX_WINDOW_SECONDS = 2 * 3600
+MAX_WINDOW_SECONDS = 25 * 3600  # longest window is one day
 
 
 class DbRateLimiter:
@@ -50,10 +50,19 @@ class DbRateLimiter:
         count = db.scalar(
             select(RateCounter.count).where(RateCounter.key == key, RateCounter.window == window)
         )
-        if random.random() < 0.02:  # occasional cleanup; longest window is 1 hour
+        if random.random() < 0.02:  # occasional cleanup of windows that have ended
             db.execute(delete(RateCounter).where(RateCounter.window < now - MAX_WINDOW_SECONDS))
             db.commit()
         return (count or 0) <= limit
+
+
+    def count(self, db: Session, key: str, window_seconds: int) -> int:
+        """Attempts so far in the current window, without counting a new one."""
+        now = int(time.time())
+        window = now - now % window_seconds
+        return db.scalar(
+            select(RateCounter.count).where(RateCounter.key == key[:160], RateCounter.window == window)
+        ) or 0
 
 
 class MemoryRateLimiter:

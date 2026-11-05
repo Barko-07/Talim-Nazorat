@@ -3,7 +3,6 @@ lengths are bounded, and markup/control characters are rejected in names."""
 from __future__ import annotations
 
 import re
-from datetime import date
 from typing import Annotated
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr, Field, field_validator
@@ -142,44 +141,23 @@ class InstitutionIn(Strict):
     region: PlainStr = Field(default="", max_length=100)
 
 
-class StudentIn(Strict):
-    full_name: PlainStr = Field(min_length=3, max_length=120)
-    birth_date: date
-    grade: PlainStr = Field(default="", max_length=20)
-    diagnosis: NoteStr | None = Field(default=None, max_length=2000)
-    guardian_name: PlainStr = Field(default="", max_length=120)
-    guardian_phone: str | None = Field(default=None, pattern=r"^\+?[0-9 ()-]{7,20}$")
-    institution_id: str | None = Field(default=None, pattern=r"^[a-f0-9]{32}$")
-
-    @field_validator("birth_date")
-    @classmethod
-    def _sane_birth_date(cls, v: date) -> date:
-        if not date(1990, 1, 1) <= v <= date.today():
-            raise ValueError("tug‘ilgan sana noto‘g‘ri")
-        return v
+RECORD_KINDS = (
+    "student|assessment|session|iep|referral|observation|assessment_plan|subject_level|"
+    "measurement|subject_task|achievement|conference|sound_entry|notification|question|"
+    "curriculum|custom_metric"
+)
 
 
-class AssignIn(Strict):
-    user_id: str = Field(pattern=r"^[a-f0-9]{32}$")
+class RecordOp(BaseModel):
+    # `data` is the app's own JSON for the item; it is stored encrypted and
+    # only ever returned as JSON, so its text is never interpreted as markup.
+    model_config = ConfigDict(extra="forbid")
+    op: str = Field(pattern=r"^(put|delete)$")
+    kind: str = Field(pattern=rf"^({RECORD_KINDS})$")
+    id: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_.:-]+$")
+    data: dict | None = None
 
 
-class AssessmentIn(Strict):
-    title: PlainStr = Field(min_length=2, max_length=200)
-    category: PlainStr = Field(default="", max_length=120)
-    assessment_date: date
-    total_score: float = Field(ge=0, le=10_000)
-    max_score: float = Field(gt=0, le=10_000)
-    status: str = Field(default="completed", pattern=r"^(completed|draft)$")
-    notes: NoteStr | None = Field(default=None, max_length=5000)
-
-    @field_validator("total_score")
-    @classmethod
-    def _finite(cls, v: float) -> float:
-        if v != v or v in (float("inf"), float("-inf")):
-            raise ValueError("son noto‘g‘ri")
-        return v
-
-
-class ObservationIn(Strict):
-    text: NoteStr = Field(min_length=1, max_length=5000)
-    confidential: bool = True
+class BatchIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    ops: list[RecordOp] = Field(min_length=1, max_length=500)

@@ -46,7 +46,8 @@ class Settings:
     cookie_secure: bool = True
 
     # Login protection
-    login_max_failures: int = 5
+    login_max_failures: int = 5  # wrong passwords from one address before it is refused
+    login_account_max_failures: int = 20  # from all addresses before the account itself locks
     login_lock_minutes: int = 15
     login_ip_per_minute: int = 10
     api_per_minute: int = 120
@@ -77,7 +78,10 @@ class Settings:
     # Optional alert webhook for suspicious activity (e.g. a Telegram bot relay)
     alert_webhook_url: str = ""
 
-    max_body_bytes: int = 256 * 1024
+    # Wrong emailed codes per account per day before codes stop being accepted
+    code_daily_failures: int = 20
+
+    max_body_bytes: int = 1024 * 1024
 
     @property
     def is_production(self) -> bool:
@@ -120,6 +124,7 @@ def load_settings() -> Settings:
         session_absolute_hours=_int("SESSION_ABSOLUTE_HOURS", 8),
         cookie_secure=_bool("COOKIE_SECURE", env == "production"),
         login_max_failures=_int("LOGIN_MAX_FAILURES", 5),
+        login_account_max_failures=_int("LOGIN_ACCOUNT_MAX_FAILURES", 20),
         login_lock_minutes=_int("LOGIN_LOCK_MINUTES", 15),
         login_ip_per_minute=_int("LOGIN_IP_PER_MINUTE", 10),
         api_per_minute=_int("API_PER_MINUTE", 120),

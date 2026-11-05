@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from ..context import AppContext
 from ..crypto import constant_time_equals, keyed_hash
 from ..deps import ApiError, Principal, _authenticate, client_ip, get_ctx, get_db, require_partial
+from ..mailer import MailError
 from ..models import OneTimeCode, PendingRegistration, RecoveryCode, User, _tz, utcnow
 from ..schemas import (
     CodeIn,
@@ -63,6 +64,21 @@ def _user_out(ctx: AppContext, p_session, user: User, **extra) -> dict:
     }
 
 
+MAIL_FAILED = "Xat yuborilmadi. Birozdan so‘ng qayta urinib ko‘ring"
+
+
+def notify(db: Session, ctx: AppContext, to: str, subject: str, body: str, user_id: str | None = None) -> bool:
+    """Security notices and other mail whose loss must not undo the action:
+    a failure is logged as an alert instead of failing the request."""
+    try:
+        ctx.mailer.send(to, subject, body)
+        return True
+    except MailError:
+        audit.record(db, "MAIL_FAILED", severity="alert", user_id=user_id, subject=audit.mask_login(to),
+                     detail=subject[:120], webhook_url=ctx.settings.alert_webhook_url)
+        return False
+
+
 def _too_many(ctx: AppContext, db: Session, key: str, limit: int, window: int, ip: str, what: str) -> None:
     if not ctx.db_limiter.hit(db, key, limit, window):
         audit.record(db, "RATE_LIMITED", severity="warning", ip=ip, detail=what,
@@ -100,11 +116,23 @@ def login(
                      subject=audit.mask_login(email), ip=ip, webhook_url=s.alert_webhook_url)
         raise ApiError(401, "invalid_credentials", GENERIC_LOGIN_ERROR)
 
+    # Wrong passwords from one address shut that address out for 15 minutes;
+    # only many more from everywhere lock the account itself - so a stranger
+    # who knows someone's email cannot lock that person out from one place.
+    ip_key = f"login-fail:{user.id}:{ip}"
+    if ctx.db_limiter.count(db, ip_key, 900) >= s.login_max_failures:
+        passwords.verify_password(body.password, passwords.DUMMY_HASH)
+        audit.record(db, "LOGIN_WHILE_LOCKED", severity="warning", user_id=user.id,
+                     subject=audit.mask_login(email), ip=ip, detail="this address",
+                     webhook_url=s.alert_webhook_url)
+        raise ApiError(401, "invalid_credentials", GENERIC_LOGIN_ERROR)
+
     if not passwords.verify_password(body.password, user.password_hash):
+        ctx.db_limiter.hit(db, ip_key, s.login_max_failures, 900)
         user.failed_logins += 1
-        if user.failed_logins >= s.login_max_failures:
+        if user.failed_logins >= s.login_account_max_failures:
             # Exponential lockout: 15 min, 30 min, 60 min ... capped at 24 h
-            factor = 2 ** (user.failed_logins - s.login_max_failures)
+            factor = 2 ** (user.failed_logins - s.login_account_max_failures)
             user.locked_until = now + min(timedelta(minutes=s.login_lock_minutes * factor), MAX_LOCK)
             db.commit()
             audit.record(db, "ACCOUNT_LOCKED", severity="alert", user_id=user.id,
@@ -238,9 +266,9 @@ def mfa_recovery(body: RecoveryCodeIn, request: Request, response: Response,
                           factor="recovery")
     audit.record(db, "MFA_RECOVERY_USED", severity="warning", user_id=user.id, ip=p.ip,
                  detail=f"{left} left", webhook_url=ctx.settings.alert_webhook_url)
-    ctx.mailer.send(user.email, "Individ: zaxira kod ishlatildi",
+    notify(db, ctx, user.email, "Individ: zaxira kod ishlatildi",
                     f"Hisobingizga zaxira kod bilan kirildi. Qolgan zaxira kodlar: {left} ta.\n"
-                    "Agar bu siz bo‘lmasangiz, darhol administratorga murojaat qiling.")
+                    "Agar bu siz bo‘lmasangiz, darhol administratorga murojaat qiling.", user.id)
     return _user_out(ctx, sess, user, recovery_codes_left=left)
 
 
@@ -310,9 +338,9 @@ def mfa_enable(body: CodeIn, request: Request, response: Response,
                           factor="totp")
     sessions.revoke_all(db, user.id, except_id=sess.id)
     audit.record(db, "MFA_ENABLED", user_id=user.id, ip=p.ip)
-    ctx.mailer.send(user.email, "Individ: ikki bosqichli himoya yoqildi",
-                    "Hisobingiz uchun ikki bosqichli himoya yoqildi. Agar bu siz bo‘lmasangiz, "
-                    "darhol administratorga murojaat qiling.")
+    notify(db, ctx, user.email, "Individ: ikki bosqichli himoya yoqildi",
+           "Hisobingiz uchun ikki bosqichli himoya yoqildi. Agar bu siz bo‘lmasangiz, "
+           "darhol administratorga murojaat qiling.", user.id)
     # Shown once: only their HMACs are kept.
     return _user_out(ctx, sess, user, recovery_codes=codes)
 
@@ -355,7 +383,10 @@ def _code_cooldown(db: Session, ctx: AppContext, user: User, purpose: str) -> in
     return max(0, math.ceil(ctx.settings.code_resend_seconds - passed))
 
 
-def _issue_code(db: Session, ctx: AppContext, user: User, purpose: str) -> None:
+def _issue_code(db: Session, ctx: AppContext, user: User, purpose: str, *, quiet: bool = False) -> None:
+    """Emails a new code (older ones stop working). If the mail cannot be sent
+    the code is cancelled at once, so asking again is not blocked by the resend
+    gap; `quiet` callers must not reveal the failure (password reset)."""
     db.execute(
         update(OneTimeCode)
         .where(OneTimeCode.user_id == user.id, OneTimeCode.purpose == purpose, OneTimeCode.used.is_(False))
@@ -368,10 +399,26 @@ def _issue_code(db: Session, ctx: AppContext, user: User, purpose: str) -> None:
     ))
     db.commit()
     subject, what = CODE_PURPOSES[purpose]
-    ctx.mailer.send(user.email, _code_subject(code, subject), _code_mail(ctx, what, code))
+    try:
+        ctx.mailer.send(user.email, _code_subject(code, subject), _code_mail(ctx, what, code))
+    except MailError:
+        db.execute(delete(OneTimeCode).where(OneTimeCode.user_id == user.id, OneTimeCode.purpose == purpose,
+                                             OneTimeCode.used.is_(False)))
+        db.commit()
+        audit.record(db, "MAIL_FAILED", severity="alert", user_id=user.id, detail=purpose,
+                     webhook_url=ctx.settings.alert_webhook_url)
+        if not quiet:
+            raise ApiError(503, "mail_failed", MAIL_FAILED) from None
 
 
 def _consume_code(db: Session, ctx: AppContext, user: User, purpose: str, code: str, ip: str) -> bool:
+    # A daily cap per account on top of the per-code attempts: new codes can be
+    # requested every minute, so without it a code could be guessed over weeks.
+    daily_key = f"code-fail:{user.id}"
+    if ctx.db_limiter.count(db, daily_key, 86400) >= ctx.settings.code_daily_failures:
+        audit.record(db, "CODE_DAILY_LIMIT", severity="alert", user_id=user.id, ip=ip, detail=purpose,
+                     webhook_url=ctx.settings.alert_webhook_url)
+        return False
     otc = db.scalar(
         select(OneTimeCode)
         .where(OneTimeCode.user_id == user.id, OneTimeCode.purpose == purpose, OneTimeCode.used.is_(False))
@@ -388,6 +435,7 @@ def _consume_code(db: Session, ctx: AppContext, user: User, purpose: str, code: 
         return False
     if not constant_time_equals(otc.code_hash, keyed_hash(f"{purpose}:{user.id}:{code}")):
         db.commit()
+        ctx.db_limiter.hit(db, daily_key, ctx.settings.code_daily_failures, 86400)
         audit.record(db, "CODE_FAILED", severity="warning", user_id=user.id, ip=ip, detail=purpose,
                      webhook_url=ctx.settings.alert_webhook_url)
         return False
@@ -445,9 +493,9 @@ def password_change(body: PasswordChangeIn, request: Request, response: Response
                           factor=factor, remember=remember)
     sessions.revoke_all(db, user.id, except_id=sess.id)  # sign out every other device
     audit.record(db, "PASSWORD_CHANGED", user_id=user.id, ip=p.ip)
-    ctx.mailer.send(user.email, "Individ: parol o‘zgartirildi",
-                    "Hisobingiz paroli o‘zgartirildi va boshqa qurilmalardagi seanslar yopildi. "
-                    "Agar bu siz bo‘lmasangiz, darhol administratorga murojaat qiling.")
+    notify(db, ctx, user.email, "Individ: parol o‘zgartirildi",
+           "Hisobingiz paroli o‘zgartirildi va boshqa qurilmalardagi seanslar yopildi. "
+           "Agar bu siz bo‘lmasangiz, darhol administratorga murojaat qiling.", user.id)
     return _user_out(ctx, sess, user)
 
 
@@ -462,7 +510,7 @@ def password_reset_request(body: ResetRequestIn, request: Request, db: Session =
     _too_many(ctx, db, f"reset-ip:{ip}", 5, 900, ip, "reset per IP")
     user = db.scalar(select(User).where(User.email == email))
     if user is not None and user.is_active and ctx.db_limiter.hit(db, f"reset-user:{user.id}", 3, 3600):
-        _issue_code(db, ctx, user, "password_reset")
+        _issue_code(db, ctx, user, "password_reset", quiet=True)
         audit.record(db, "PASSWORD_RESET_CODE_SENT", user_id=user.id, subject=audit.mask_login(email), ip=ip)
     else:
         audit.record(db, "PASSWORD_RESET_IGNORED", subject=audit.mask_login(email), ip=ip)
@@ -482,9 +530,9 @@ def password_reset_confirm(body: ResetConfirmIn, request: Request, response: Res
     sessions.clear_cookie(ctx.settings, response)
     audit.record(db, "PASSWORD_RESET", severity="warning", user_id=user.id, ip=ip,
                  webhook_url=ctx.settings.alert_webhook_url)
-    ctx.mailer.send(user.email, "Individ: parol tiklandi",
-                    "Hisobingiz paroli tiklandi va barcha seanslar yopildi. Agar bu siz bo‘lmasangiz, "
-                    "darhol administratorga murojaat qiling.")
+    notify(db, ctx, user.email, "Individ: parol tiklandi",
+           "Hisobingiz paroli tiklandi va barcha seanslar yopildi. Agar bu siz bo‘lmasangiz, "
+           "darhol administratorga murojaat qiling.", user.id)
     return {"ok": True}
 
 
@@ -530,11 +578,11 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
         db.commit()
         audit.record(db, "REGISTER_EXISTING_EMAIL", severity="warning", user_id=existing.id,
                      subject=audit.mask_login(email), ip=ip, webhook_url=s.alert_webhook_url)
-        ctx.mailer.send(email, "Individ: ro‘yxatdan o‘tishga urinish",
+        notify(db, ctx, email, "Individ: ro‘yxatdan o‘tishga urinish",
                         "Kimdir ushbu email bilan Individ’da yangi hisob ochmoqchi bo‘ldi. Sizda allaqachon "
                         "hisob bor, shuning uchun yangi hisob ochilmadi.\nParolingizni unutgan bo‘lsangiz, "
                         "kirish sahifasidagi “Parolni unutdingizmi?” orqali tiklang. Agar bu siz "
-                        "bo‘lmasangiz, hech narsa qilish shart emas.")
+                        "bo‘lmasangiz, hech narsa qilish shart emas.", existing.id)
     else:
         code = _new_code()
         reg.code_hash = _registration_code(reg.id, code)
@@ -553,9 +601,16 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
             },
         })
         db.commit()
+        try:
+            ctx.mailer.send(email, _code_subject(code, "ro‘yxatdan o‘tish kodi"),
+                            _code_mail(ctx, "ro‘yxatdan o‘tish", code))
+        except MailError:
+            db.delete(reg)
+            db.commit()
+            audit.record(db, "MAIL_FAILED", severity="alert", subject=audit.mask_login(email), ip=ip,
+                         detail="register", webhook_url=s.alert_webhook_url)
+            raise ApiError(503, "mail_failed", MAIL_FAILED) from None
         audit.record(db, "REGISTER_CODE_SENT", subject=audit.mask_login(email), ip=ip)
-        ctx.mailer.send(email, _code_subject(code, "ro‘yxatdan o‘tish kodi"),
-                        _code_mail(ctx, "ro‘yxatdan o‘tish", code))
     return {"registration_id": reg.id, "resend_after": s.code_resend_seconds, "message": REGISTRATION_SENT}
 
 
@@ -592,8 +647,15 @@ def register_resend(body: RegistrationIdIn, request: Request, db: Session = Depe
         code = _new_code()
         reg.code_hash = _registration_code(reg.id, code)
         db.commit()
-        ctx.mailer.send(reg.email, _code_subject(code, "ro‘yxatdan o‘tish kodi"),
-                        _code_mail(ctx, "ro‘yxatdan o‘tish", code))
+        try:
+            ctx.mailer.send(reg.email, _code_subject(code, "ro‘yxatdan o‘tish kodi"),
+                            _code_mail(ctx, "ro‘yxatdan o‘tish", code))
+        except MailError:
+            reg.last_sent_at = utcnow() - timedelta(seconds=s.code_resend_seconds)  # may retry at once
+            db.commit()
+            audit.record(db, "MAIL_FAILED", severity="alert", subject=audit.mask_login(reg.email), ip=ip,
+                         detail="register resend", webhook_url=s.alert_webhook_url)
+            raise ApiError(503, "mail_failed", MAIL_FAILED) from None
     return {"ok": True, "resend_after": s.code_resend_seconds, "message": REGISTRATION_SENT}
 
 
@@ -630,7 +692,7 @@ def register_verify(body: RegistrationVerifyIn, request: Request, db: Session = 
     audit.record(db, "REGISTERED_PENDING_APPROVAL", user_id=user.id, subject=audit.mask_login(user.email), ip=ip)
     admins = db.scalars(select(User).where(User.role == "SUPER_ADMIN", User.is_active.is_(True))).all()
     for admin in admins:
-        ctx.mailer.send(admin.email, "Individ: yangi ro‘yxatdan o‘tish",
+        notify(db, ctx, admin.email, "Individ: yangi ro‘yxatdan o‘tish",
                         f"{user.full_name} ({data['profile'].get('institution_name', '')}) ro‘yxatdan o‘tdi va "
-                        "tasdiqlashingizni kutmoqda. Administrator panelida ko‘rib chiqing.")
+                        "tasdiqlashingizni kutmoqda. Administrator panelida ko‘rib chiqing.", admin.id)
     return {"ok": True, "message": "Email tasdiqlandi. Hisobingiz administrator tasdig‘idan so‘ng faollashadi"}

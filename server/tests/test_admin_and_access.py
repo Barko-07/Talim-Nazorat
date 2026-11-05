@@ -6,7 +6,7 @@ from sqlalchemy import select
 from app.main import create_app
 from app.models import AuditEvent, Role, User
 
-from conftest import Api, add_institution, add_student, add_user, db_session, make_settings
+from conftest import Api, add_institution, add_user, db_session, make_settings
 
 
 def _admin(app, email="boss@maktab.uz"):
@@ -52,8 +52,12 @@ def test_admin_ip_allowlist():
 
 def test_create_user_mails_temporary_password_and_never_returns_it(api, app):
     a = _admin(app)
+    inst = add_institution(app)
     api.login("boss@maktab.uz", mfa_secret=a.mfa_secret)
     r = api.post("/api/admin/users", {"email": "New@Maktab.uz", "full_name": "Yangi Xodim", "role": "TEACHER"})
+    assert r.status_code == 422  # a teacher always belongs to a school
+    r = api.post("/api/admin/users", {"email": "New@Maktab.uz", "full_name": "Yangi Xodim", "role": "TEACHER",
+                                      "institution_id": inst})
     assert r.status_code == 201
     mail = app.state.ctx.mailer.outbox[-1]
     temp = re.search(r"Vaqtinchalik parol: (\S+)", mail.body).group(1)
@@ -87,63 +91,6 @@ def test_blocking_user_revokes_their_sessions(api, app):
     assert victim.get("/api/auth/me").status_code == 401
 
 
-# ------------------------------------------------------------------ data access rules
-
-def test_other_school_students_are_invisible(api, app):
-    a, b = add_institution(app, "A"), add_institution(app, "B")
-    add_user(app, "coord@a.uz", Role.COORDINATOR, a)
-    sid = add_student(app, b)
-    api.login("coord@a.uz")
-    assert api.get(f"/api/students/{sid}").status_code == 404
-    assert api.get("/api/students").json() == []
-
-
-def test_specialist_sees_only_assigned_children(api, app):
-    inst = add_institution(app)
-    me = add_user(app, "psy@a.uz", Role.PSYCHOLOGIST, inst)
-    mine = add_student(app, inst, specialists=[me.id])
-    other = add_student(app, inst)
-    api.login("psy@a.uz")
-    ids = [s["id"] for s in api.get("/api/students").json()]
-    assert ids == [mine]
-    assert api.get(f"/api/students/{other}").status_code == 404
-
-
-def test_teacher_does_not_see_diagnosis_or_confidential_notes(api, app):
-    inst = add_institution(app)
-    psy = add_user(app, "psy@a.uz", Role.PSYCHOLOGIST, inst)
-    teacher = add_user(app, "tch@a.uz", Role.TEACHER, inst)
-    sid = add_student(app, inst, specialists=[psy.id, teacher.id])
-
-    p = Api(TestClient(app))
-    p.login("psy@a.uz")
-    assert p.post(f"/api/students/{sid}/observations", {"text": "Maxfiy kuzatuv", "confidential": True}).status_code == 201
-
-    api.login("tch@a.uz")
-    s = api.get(f"/api/students/{sid}").json()
-    assert s["diagnosis"] is None and s["guardian_phone"] is None
-    assert api.get(f"/api/students/{sid}/observations").json() == []
-    assert api.post(f"/api/students/{sid}/observations", {"text": "x"}).status_code == 403
-
-
-def test_reviewer_cannot_create_assessments(api, app):
-    inst = add_institution(app)
-    add_user(app, "rev@a.uz", Role.REVIEWER, inst)
-    sid = add_student(app, inst)
-    api.login("rev@a.uz")
-    r = api.post(f"/api/students/{sid}/assessments",
-                 {"title": "Test", "assessment_date": "2026-10-01", "total_score": 1, "max_score": 2})
-    assert r.status_code == 403
-
-
-def test_cannot_create_student_in_another_school(api, app):
-    a, b = add_institution(app, "A"), add_institution(app, "B")
-    add_user(app, "coord@a.uz", Role.COORDINATOR, a)
-    api.login("coord@a.uz")
-    r = api.post("/api/students", {"full_name": "Bola Bir", "birth_date": "2016-01-01", "institution_id": b})
-    assert r.status_code == 201 and r.json()["institution_id"] == a  # forced to own school
-
-
 def test_institutions_list_counts_active_accounts_and_refuses_duplicates(api, app):
     a = _admin(app)
     api.login("boss@maktab.uz", mfa_secret=a.mfa_secret)
@@ -151,6 +98,7 @@ def test_institutions_list_counts_active_accounts_and_refuses_duplicates(api, ap
     assert r.status_code == 201
     inst = r.json()["id"]
     add_user(app, "t1@maktab.uz", Role.TEACHER, inst)
+    add_user(app, "t2@maktab.uz", Role.TEACHER, inst, active=False)  # blocked: not counted
     assert api.post("/api/admin/institutions", {"name": "14-SONLI MAKTAB"}).status_code == 409
     rows = api.get("/api/admin/institutions").json()
     assert rows == [{"id": inst, "name": "14-sonli maktab", "region": "Namangan", "users": 1}]

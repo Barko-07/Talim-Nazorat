@@ -1,96 +1,105 @@
-"""Server-side permission rules - a port of the Flutter AccessControlService.
-The server is the authority: the app hiding a button is only convenience."""
+"""Who may see and change what. The server is the authority: the app hiding a
+button is only convenience.
+
+The rule in one sentence: administrators see their whole scope (the system
+administrator everything, a school administrator their school); everyone else
+sees only the children they are assigned to and what is recorded about them,
+and nothing at all from another school.
+"""
 from __future__ import annotations
 
-from .models import Assessment, Role, Student, User
+from .models import Record, Role, User
 
 R = Role
 
-SCHOOL_WIDE = {R.INSTITUTION_ADMIN.value, R.COORDINATOR.value, R.REVIEWER.value}
-CHILD_FACING = {
-    R.PSYCHOLOGIST.value, R.SPEECH_THERAPIST.value, R.SPECIAL_EDUCATION.value,
-    R.SPECIAL_ED_TEACHER.value, R.TEACHER.value,
+# Kinds of work data the app stores. Each one is tied to a child, to one
+# person (notifications), or shared inside a school (question bank etc.).
+STUDENT = "student"
+CHILD_KINDS = {
+    "assessment", "session", "iep", "referral", "observation", "assessment_plan",
+    "subject_level", "measurement", "subject_task", "achievement", "conference",
+    "sound_entry",
 }
-SENSITIVE_MEDICAL = {
-    R.SUPER_ADMIN.value, R.INSTITUTION_ADMIN.value, R.PSYCHOLOGIST.value,
-    R.SPEECH_THERAPIST.value, R.SPECIAL_EDUCATION.value, R.COORDINATOR.value,
-}
-ASSIGNERS = {R.INSTITUTION_ADMIN.value, R.COORDINATOR.value}
+PERSONAL_KINDS = {"notification"}
+SCHOOL_KINDS = {"question", "curriculum", "custom_metric"}
+ALL_KINDS = {STUDENT} | CHILD_KINDS | PERSONAL_KINDS | SCHOOL_KINDS
+
+# Read-only roles: they may look at what they are assigned to, never write.
+READ_ONLY = {R.REVIEWER.value, R.PARENT.value}
 
 
 def is_super(u: User) -> bool:
     return u.is_active and u.role == R.SUPER_ADMIN.value
 
 
+def is_admin(u: User) -> bool:
+    return u.is_active and u.role in {R.SUPER_ADMIN.value, R.INSTITUTION_ADMIN.value}
+
+
 def same_school(u: User, institution_id: str | None) -> bool:
     return u.institution_id is not None and u.institution_id == institution_id
 
 
-def is_assigned(u: User, s: Student) -> bool:
-    return s.coordinator_id == u.id or any(sp.id == u.id for sp in s.specialists)
-
-
-def can_view_student(u: User, s: Student) -> bool:
-    if not u.is_active:
-        return False
+def admin_for(u: User, institution_id: str | None) -> bool:
+    """Administrator whose scope includes this school."""
     if is_super(u):
         return True
-    if not same_school(u, s.institution_id):
+    return u.is_active and u.role == R.INSTITUTION_ADMIN.value and same_school(u, institution_id)
+
+
+def can_write(u: User) -> bool:
+    return u.is_active and u.role not in READ_ONLY
+
+
+def can_see_student(u: User, student: Record, assigned: set[str]) -> bool:
+    if not u.is_active or student.deleted:
         return False
-    if u.role in SCHOOL_WIDE:
+    if admin_for(u, student.institution_id):
         return True
-    if u.role in CHILD_FACING:
-        return is_assigned(u, s)
+    return same_school(u, student.institution_id) and u.id in assigned
+
+
+def can_see(u: User, rec: Record, student_visible: bool) -> bool:
+    """Any record other than a child's own card. `student_visible` is the
+    answer of can_see_student for the child the record belongs to."""
+    if not u.is_active or rec.deleted:
+        return False
+    if rec.kind in CHILD_KINDS:
+        if not student_visible:
+            return False
+        # A psychologist's confidential note: its author and administrators only.
+        return not rec.confidential or rec.owner_id == u.id or admin_for(u, rec.institution_id)
+    if rec.kind in PERSONAL_KINDS:
+        return rec.owner_id == u.id or rec.recipient_id == u.id or admin_for(u, rec.institution_id)
+    if rec.kind in SCHOOL_KINDS:
+        return is_super(u) or same_school(u, rec.institution_id)
     return False
 
 
-def can_view_sensitive(u: User) -> bool:
-    return u.is_active and u.role in SENSITIVE_MEDICAL
-
-
-def can_edit_student(u: User, institution_id: str | None) -> bool:
-    if is_super(u):
+def can_change(u: User, rec: Record) -> bool:
+    """Edit or delete a record the user can already see. Everyone on a child's
+    team edits the child's work (each edit is kept in the history); deletes and
+    confidential notes stay with the author and administrators."""
+    if admin_for(u, rec.institution_id):
         return True
-    return (
-        u.is_active
-        and u.role in {R.INSTITUTION_ADMIN.value, R.COORDINATOR.value}
-        and same_school(u, institution_id)
-    )
-
-
-def can_assign(u: User, s: Student) -> bool:
-    if is_super(u):
-        return True
-    return u.is_active and u.role in ASSIGNERS and same_school(u, s.institution_id)
-
-
-def can_be_assigned(specialist: User, s: Student) -> bool:
-    return (
-        specialist.is_active
-        and specialist.role in CHILD_FACING
-        and same_school(specialist, s.institution_id)
-    )
-
-
-def can_create_assessment(u: User, s: Student) -> bool:
-    if not u.is_active or u.role in {R.REVIEWER.value, R.PARENT.value}:
+    if not can_write(u):
         return False
-    return is_super(u) or can_view_student(u, s)
+    if rec.kind in PERSONAL_KINDS:
+        return rec.owner_id == u.id or rec.recipient_id == u.id
+    if rec.kind in SCHOOL_KINDS or rec.confidential:
+        return rec.owner_id == u.id
+    return True
 
 
-def can_modify_assessment(u: User, a: Assessment) -> bool:
-    if is_super(u):
+def can_delete(u: User, rec: Record) -> bool:
+    if rec.kind == STUDENT:
+        return admin_for(u, rec.institution_id)
+    if admin_for(u, rec.institution_id):
         return True
-    return u.is_active and (a.specialist_id == u.id or u.role == R.INSTITUTION_ADMIN.value)
+    if rec.kind in PERSONAL_KINDS:
+        return rec.owner_id == u.id or rec.recipient_id == u.id
+    return can_write(u) and rec.owner_id == u.id
 
 
-def can_write_observation(u: User, s: Student) -> bool:
-    if is_super(u):
-        return True
-    return u.is_active and u.role == R.PSYCHOLOGIST.value and can_view_student(u, s)
-
-
-def can_view_confidential_observation(u: User, psychologist_id: str) -> bool:
-    if not u.is_active:
-        return False
-    return u.id == psychologist_id or u.role in {R.PSYCHOLOGIST.value, R.SUPER_ADMIN.value}
+def can_write_observation(u: User) -> bool:
+    return is_admin(u) or (u.is_active and u.role == R.PSYCHOLOGIST.value)

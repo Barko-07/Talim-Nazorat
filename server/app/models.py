@@ -4,18 +4,15 @@ from __future__ import annotations
 
 import enum
 import uuid
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 
 from sqlalchemy import (
     Boolean,
-    Column,
     Date,
     DateTime,
-    Float,
     ForeignKey,
     Integer,
     String,
-    Table,
     UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -78,10 +75,10 @@ class User(Base):
     pending_approval: Mapped[bool] = mapped_column(Boolean, default=False)
     # Profile details from the app (region, district, school name, specialization,
     # qualification, experience) as encrypted JSON.
-    profile: Mapped[str | None] = mapped_column(EncryptedText, nullable=True)
+    profile: Mapped[str | None] = mapped_column(EncryptedText("users.profile"), nullable=True)
 
     # Two-factor authentication (TOTP). Secret is encrypted at rest.
-    mfa_secret: Mapped[str | None] = mapped_column(EncryptedText, nullable=True)
+    mfa_secret: Mapped[str | None] = mapped_column(EncryptedText("users.mfa_secret"), nullable=True)
     mfa_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
     mfa_last_step: Mapped[int] = mapped_column(Integer, default=0)  # replay guard
 
@@ -150,7 +147,7 @@ class PendingRegistration(Base):
     __tablename__ = "pending_registrations"
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
     email: Mapped[str] = mapped_column(String(254), index=True)
-    data: Mapped[str] = mapped_column(EncryptedText)
+    data: Mapped[str] = mapped_column(EncryptedText("pending_registrations.data"))
     code_hash: Mapped[str] = mapped_column(String(64))
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     attempts: Mapped[int] = mapped_column(Integer, default=0)
@@ -174,54 +171,54 @@ class AuditEvent(Base):
     detail: Mapped[str] = mapped_column(String(500), default="")
 
 
-student_specialists = Table(
-    "student_specialists",
-    Base.metadata,
-    Column("student_id", ForeignKey("students.id", ondelete="CASCADE"), primary_key=True),
-    Column("user_id", ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
-)
+class Record(Base):
+    """Every piece of work data the app keeps - children, assessments, sessions,
+    plans, notes, referrals and the rest - one row per item. The item itself is
+    encrypted JSON (`data`); only what the server needs to decide who may see it
+    is stored in the clear: the school, the child it belongs to, its author."""
 
-
-class Student(Base):
-    __tablename__ = "students"
-    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
-    institution_id: Mapped[str] = mapped_column(ForeignKey("institutions.id"), index=True)
-    full_name: Mapped[str] = mapped_column(String(120))
-    birth_date: Mapped[date] = mapped_column(Date)
-    grade: Mapped[str] = mapped_column(String(20), default="")
-    diagnosis: Mapped[str | None] = mapped_column(EncryptedText, nullable=True)
-    guardian_name: Mapped[str] = mapped_column(String(120), default="")
-    guardian_phone: Mapped[str | None] = mapped_column(EncryptedText, nullable=True)
-    coordinator_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True)
-    archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    __tablename__ = "records"
+    kind: Mapped[str] = mapped_column(String(32), primary_key=True)
+    rid: Mapped[str] = mapped_column(String(64), primary_key=True)
+    institution_id: Mapped[str | None] = mapped_column(ForeignKey("institutions.id"), nullable=True, index=True)
+    student_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    recipient_id: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    confidential: Mapped[bool] = mapped_column(Boolean, default=False)
+    data: Mapped[str] = mapped_column(EncryptedText("records.data"))
+    deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
-
-    specialists: Mapped[list[User]] = relationship(secondary=student_specialists)
-
-
-class Assessment(Base):
-    __tablename__ = "assessments"
-    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
-    student_id: Mapped[str] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), index=True)
-    specialist_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
-    title: Mapped[str] = mapped_column(String(200))
-    category: Mapped[str] = mapped_column(String(120), default="")
-    assessment_date: Mapped[date] = mapped_column(Date)
-    total_score: Mapped[float] = mapped_column(Float)
-    max_score: Mapped[float] = mapped_column(Float)
-    status: Mapped[str] = mapped_column(String(16), default="completed")
-    notes: Mapped[str | None] = mapped_column(EncryptedText, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_by: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
 
-class Observation(Base):
-    __tablename__ = "observations"
-    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
-    student_id: Mapped[str] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), index=True)
-    psychologist_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
-    confidential: Mapped[bool] = mapped_column(Boolean, default=True)
-    text: Mapped[str] = mapped_column(EncryptedText)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+class StudentAccess(Base):
+    """Who works with a child. Apart from administrators, only these people
+    can see the child and anything recorded about them."""
+
+    __tablename__ = "student_access"
+    student_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True, index=True)
+    via: Mapped[str] = mapped_column(String(16), default="assigned")  # assigned | coordinator
+
+
+class RecordChange(Base):
+    """Append-only history of every add, edit and delete, for administrators.
+    Field names are in the clear; old and new values are encrypted."""
+
+    __tablename__ = "record_changes"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
+    user_id: Mapped[str] = mapped_column(String(32), index=True)
+    kind: Mapped[str] = mapped_column(String(32))
+    rid: Mapped[str] = mapped_column(String(64))
+    student_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    institution_id: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    action: Mapped[str] = mapped_column(String(16))  # create | update | delete
+    fields: Mapped[str] = mapped_column(String(1000), default="")
+    before: Mapped[str | None] = mapped_column(EncryptedText("record_changes.before"), nullable=True)
+    after: Mapped[str | None] = mapped_column(EncryptedText("record_changes.after"), nullable=True)
 
 
 class RateCounter(Base):
@@ -236,6 +233,6 @@ class RateCounter(Base):
 
 
 __all__ = [
-    "Assessment", "AuditEvent", "AuthSession", "Institution", "Observation",
-    "OneTimeCode", "RateCounter", "Role", "Student", "User", "utcnow", "_tz",
+    "AuditEvent", "AuthSession", "Institution", "OneTimeCode", "RateCounter", "Record",
+    "RecordChange", "Role", "StudentAccess", "User", "utcnow", "_tz",
 ]

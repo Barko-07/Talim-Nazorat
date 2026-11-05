@@ -14,7 +14,7 @@ os.environ.setdefault("DATABASE_URL", "sqlite://")
 
 from app.config import load_settings  # noqa: E402
 from app.main import create_app  # noqa: E402
-from app.models import Institution, Role, Student, User  # noqa: E402
+from app.models import Institution, Role, User  # noqa: E402
 from app.security import passwords  # noqa: E402
 
 PASSWORD = "Xavfsiz-Parol-2026"
@@ -67,19 +67,6 @@ def add_user(app, email, role=Role.PSYCHOLOGIST, institution_id=None, *, mfa=Fal
         db.commit()
         db.refresh(u)
         return u
-
-
-def add_student(app, institution_id, *, specialists=(), diagnosis="F84.0") -> str:
-    from datetime import date
-
-    with db_session(app) as db:
-        s = Student(institution_id=institution_id, full_name="Bola Test", birth_date=date(2016, 5, 1),
-                    diagnosis=diagnosis, guardian_phone="+998901234567")
-        for uid in specialists:
-            s.specialists.append(db.get(User, uid))
-        db.add(s)
-        db.commit()
-        return s.id
 
 
 def totp_now(secret: str, offset_steps: int = 0) -> str:

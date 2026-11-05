@@ -11,3 +11,6 @@ REVOKE UPDATE, DELETE, TRUNCATE ON audit_events FROM individ_app;
 --   host    individ  individ_app    127.0.0.1/32  scram-sha-256
 --   host    individ  individ_owner  127.0.0.1/32  scram-sha-256
 --   (no other host lines)
+
+-- The history of changes to work data is append-only as well.
+REVOKE UPDATE, DELETE, TRUNCATE ON record_changes FROM individ_app;

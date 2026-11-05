@@ -47,10 +47,25 @@ def test_lockout_after_repeated_failures_blocks_even_correct_password(api, app):
     add_user(app, "lock@maktab.uz")
     for _ in range(5):
         assert api.login("lock@maktab.uz", "Notogri-Parol-1").status_code == 401
-    assert api.login("lock@maktab.uz").status_code == 401  # correct password, still locked
+    assert api.login("lock@maktab.uz").status_code == 401  # correct password, this address still refused
     with db_session(app) as db:
         actions = [e.action for e in db.scalars(select(AuditEvent))]
-    assert "ACCOUNT_LOCKED" in actions and "LOGIN_WHILE_LOCKED" in actions
+    assert "LOGIN_WHILE_LOCKED" in actions
+
+
+def test_account_locks_after_many_failures_from_many_addresses():
+    app = create_app(make_settings(trusted_proxies=["testclient"], login_account_max_failures=6))
+    add_user(app, "lock@maktab.uz")
+    c = TestClient(app)
+    for i in range(6):
+        c.post("/api/auth/login", json={"email": "lock@maktab.uz", "password": "Notogri-Parol-1"},
+               headers={"X-Requested-With": "XMLHttpRequest", "X-Real-IP": f"203.0.113.{i}"})
+    r = c.post("/api/auth/login", json={"email": "lock@maktab.uz", "password": PASSWORD},
+               headers={"X-Requested-With": "XMLHttpRequest", "X-Real-IP": "198.51.100.1"})
+    assert r.status_code == 401
+    with db_session(app) as db:
+        actions = [e.action for e in db.scalars(select(AuditEvent))]
+    assert "ACCOUNT_LOCKED" in actions
 
 
 def test_login_rate_limited_per_ip(api, app):
@@ -127,7 +142,7 @@ def test_authenticator_can_still_be_made_mandatory_by_config():
     add_user(app, "boss@maktab.uz", Role.SUPER_ADMIN)
     r = api.login("boss@maktab.uz")
     assert r.json()["state"] == "mfa_setup_required"
-    assert api.get("/api/students").status_code == 403
+    assert api.get("/api/records").status_code == 403
     assert api.get("/api/admin/users").status_code == 403
 
     setup = api.post("/api/auth/mfa/setup", {"password": PASSWORD})
@@ -143,7 +158,7 @@ def test_mfa_required_at_login_and_codes_cannot_be_replayed(api, app, client):
     u = add_user(app, "mfa@maktab.uz", mfa=True)
     r = api.login("mfa@maktab.uz")
     assert r.json()["state"] == "mfa_required"
-    assert api.get("/api/students").status_code == 403
+    assert api.get("/api/records").status_code == 403
     code = totp_now(u.mfa_secret)
     assert api.post("/api/auth/mfa/verify", {"code": code}).status_code == 200
     api.post("/api/auth/logout")
@@ -161,7 +176,7 @@ def test_mfa_verify_brute_force_limited(api, app):
 def test_temporary_password_forces_change_first(api, app):
     add_user(app, "new@maktab.uz", must_change=True)
     assert api.login("new@maktab.uz").json()["state"] == "password_change_required"
-    assert api.get("/api/students").status_code == 403
+    assert api.get("/api/records").status_code == 403
 
 
 def test_admins_sign_in_with_the_emailed_code_by_default(api, app):
