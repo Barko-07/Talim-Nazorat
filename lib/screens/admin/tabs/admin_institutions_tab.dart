@@ -255,9 +255,11 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
-                  child: Row(
-                    children: [
-                      Container(
+                  child: LayoutBuilder(
+                    builder: (context, cardConstraints) {
+                      final isCompact = cardConstraints.maxWidth < 560;
+
+                      final iconBadge = Container(
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
@@ -272,98 +274,96 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                           color: AppColors.info,
                           size: 26,
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 6,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(
-                                  name,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15.5,
-                                    color: AppColors.textPrimary,
-                                  ),
+                      );
+
+                      final instInfo = Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15.5,
+                                  color: AppColors.textPrimary,
                                 ),
-                                const SizedBox(width: 10),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryLight,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    type,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '$district • Namangan viloyati',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
                               ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryLight,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  type,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '$district • Namangan viloyati',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
                             ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 12,
-                              children: [
-                                Text(
-                                  'O‘quvchilar: $studentsCount nafar',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        studentsCount > 0
-                                            ? AppColors.primary
-                                            : AppColors.textMuted,
-                                  ),
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 4,
+                            children: [
+                              Text(
+                                'O‘quvchilar: $studentsCount nafar',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      studentsCount > 0
+                                          ? AppColors.primary
+                                          : AppColors.textMuted,
                                 ),
-                                Text(
-                                  'Kadrlar: $specialistsCount ta',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        specialistsCount > 0
-                                            ? AppColors.purple
-                                            : AppColors.textMuted,
-                                  ),
+                              ),
+                              Text(
+                                'Kadrlar: $specialistsCount ta',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      specialistsCount > 0
+                                          ? AppColors.purple
+                                          : AppColors.textMuted,
                                 ),
-                                Text(
-                                  'Faol ITR: $iepCount ta',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        iepCount > 0
-                                            ? AppColors.success
-                                            : AppColors.textMuted,
-                                  ),
+                              ),
+                              Text(
+                                'Faol ITR: $iepCount ta',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      iepCount > 0
+                                          ? AppColors.success
+                                          : AppColors.textMuted,
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      ElevatedButton.icon(
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+
+                      final actionBtn = ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.surfaceMuted,
                           foregroundColor: AppColors.textPrimary,
@@ -385,8 +385,36 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                         },
                         icon: const Icon(LucideIcons.eye, size: 16),
                         label: const Text('Tarkibini ko‘rish'),
-                      ),
-                    ],
+                      );
+
+                      if (isCompact) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                iconBadge,
+                                const SizedBox(width: 14),
+                                Expanded(child: instInfo),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            SizedBox(width: double.infinity, child: actionBtn),
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          iconBadge,
+                          const SizedBox(width: 16),
+                          Expanded(child: instInfo),
+                          const SizedBox(width: 16),
+                          actionBtn,
+                        ],
+                      );
+                    },
                   ),
                 ),
               );

@@ -44,60 +44,58 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. HEADER
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          'Tizim Davlat Audit Jurnali',
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 640;
+              final headerTexts = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        'Tizim Davlat Audit Jurnali',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceMuted,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Text(
+                          '${filtered.length} ta yozuv',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceMuted,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Text(
-                            '${filtered.length} ta yozuv',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Barcha ma’muriy o‘zgarishlar, tizimga kirishlar, ma’lumotlarni tahrirlash va xavfsizlik hodisalari to‘liq qaydnomasi',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Barcha ma’muriy o‘zgarishlar, tizimga kirishlar, ma’lumotlarni tahrirlash va xavfsizlik hodisalari to‘liq qaydnomasi',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
                     ),
-                  ],
-                ),
-              ),
-              ElevatedButton.icon(
+                  ),
+                ],
+              );
+
+              final exportBtn = ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.textPrimary,
                   foregroundColor: AppColors.onPrimary,
@@ -115,8 +113,28 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                 },
                 icon: const Icon(LucideIcons.download, size: 16),
                 label: const Text('Audit Jurnalini CSV Yuklab Olish'),
-              ),
-            ],
+              );
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    headerTexts,
+                    const SizedBox(height: 12),
+                    exportBtn,
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: headerTexts),
+                  const SizedBox(width: 16),
+                  exportBtn,
+                ],
+              );
+            },
           ),
           const SizedBox(height: 20),
 

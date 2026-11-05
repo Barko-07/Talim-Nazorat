@@ -1025,14 +1025,18 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(LucideIcons.mic, color: AppColors.primary, size: 20),
-                  SizedBox(width: 10),
-                  Text(
-                    'Logopedik Tovushlar Xaritasi',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15.5,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.25,
+                  const SizedBox(width: 10),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 210),
+                    child: Text(
+                      'Logopedik Tovushlar Xaritasi',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15.5,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.25,
+                      ),
                     ),
                   ),
                 ],
@@ -1343,14 +1347,18 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(LucideIcons.award, color: AppColors.success, size: 20),
-                  SizedBox(width: 10),
-                  Text(
-                    'Mening Yutuqlar Pasportim',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15.5,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.25,
+                  const SizedBox(width: 10),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 210),
+                    child: Text(
+                      'Mening Yutuqlar Pasportim',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15.5,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.25,
+                      ),
                     ),
                   ),
                 ],
@@ -3800,7 +3808,7 @@ Shifokor-pediatr xulosasi asosida berildi.''',
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 14),
                   child: SurfaceCard(
-                    borderRadius: 16,
+                    borderRadius: 26,
                     padding: const EdgeInsets.all(20),
                     onTap: () {
                       showDialog(
@@ -3839,18 +3847,10 @@ Shifokor-pediatr xulosasi asosida berildi.''',
                     },
                     child: Row(
                       children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            LucideIcons.fileText,
-                            color: AppColors.primary,
-                            size: 22,
-                          ),
+                        Icon(
+                          LucideIcons.fileText,
+                          color: AppColors.primary,
+                          size: 22,
                         ),
                         const SizedBox(width: 14),
                         Expanded(

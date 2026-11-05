@@ -147,86 +147,82 @@ class _PsychologistAssessmentsTabState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // HEADER
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          'Psixologik Baholash Tizimi',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 640;
+              final headerTexts = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        'Psixologik Baholash Tizimi',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.successBg,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppColors.success.withValues(alpha: 0.3),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        child: Text(
+                          '$completedCount ta yakunlangan',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.success,
+                          ),
+                        ),
+                      ),
+                      if (draftCount > 0)
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.successBg,
+                            color: AppColors.warningBg,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: AppColors.success.withValues(alpha: 0.3),
+                              color: AppColors.warning.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Text(
-                            '$completedCount ta yakunlangan',
+                            '$draftCount ta qoralama',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.success,
+                              color: AppColors.warning,
                             ),
                           ),
                         ),
-                        if (draftCount > 0) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.warningBg,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: AppColors.warning.withValues(alpha: 0.3),
-                              ),
-                            ),
-                            child: Text(
-                              '$draftCount ta qoralama',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.warning,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Kutubxona savollari asosida psixologik diagnostika va monitoring o‘tkazish',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Kutubxona savollari asosida psixologik diagnostika va monitoring o‘tkazish',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              FilledButton.icon(
+                  ),
+                ],
+              );
+
+              final newAssessmentBtn = FilledButton.icon(
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(
@@ -237,8 +233,28 @@ class _PsychologistAssessmentsTabState
                 onPressed: () => _startNewAssessment(),
                 icon: const Icon(LucideIcons.listPlus, size: 18),
                 label: const Text('Yangi Baholash Boshlash'),
-              ),
-            ],
+              );
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    headerTexts,
+                    const SizedBox(height: 12),
+                    newAssessmentBtn,
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: headerTexts),
+                  const SizedBox(width: 16),
+                  newAssessmentBtn,
+                ],
+              );
+            },
           ),
           const SizedBox(height: 18),
 
@@ -547,20 +563,21 @@ class _PsychologistAssessmentsTabState
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Row(
+                                          Wrap(
+                                            spacing: 8,
+                                            runSpacing: 4,
+                                            crossAxisAlignment:
+                                                WrapCrossAlignment.center,
                                             children: [
-                                              Flexible(
-                                                child: Text(
-                                                  a.studentName,
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 15.5,
-                                                    color:
-                                                        AppColors.textPrimary,
-                                                  ),
+                                              Text(
+                                                a.studentName,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 15.5,
+                                                  color:
+                                                      AppColors.textPrimary,
                                                 ),
                                               ),
-                                              const SizedBox(width: 8),
                                               Container(
                                                 padding:
                                                     const EdgeInsets.symmetric(

@@ -65,61 +65,60 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. HEADER
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            'Foydalanuvchilar Boshqaruvi',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 640;
+              final headerTexts = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        'Foydalanuvchilar Boshqaruvi',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
                         ),
-                        const SizedBox(width: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: AppColors.primary.withValues(alpha: 0.2),
-                            ),
-                          ),
-                          child: Text(
-                            '${filteredUsers.length} ta xodim',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Tizim xodimlarini ro‘yxatga olish, rollarini belgilash, ma’lumotlarini tahrirlash va hisoblarini faollashtirish/bloklash',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
                       ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: Text(
+                          '${filteredUsers.length} ta xodim',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Tizim xodimlarini ro‘yxatga olish, rollarini belgilash, ma’lumotlarini tahrirlash va hisoblarini faollashtirish/bloklash',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
                     ),
-                  ],
-                ),
-              ),
-              ElevatedButton.icon(
+                  ),
+                ],
+              );
+
+              final addBtn = ElevatedButton.icon(
                 onPressed: () => _showAddUserDialog(context, currentUser),
                 icon: const Icon(LucideIcons.userPlus, size: 18),
                 label: const Text('Yangi Foydalanuvchi'),
@@ -134,8 +133,28 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-              ),
-            ],
+              );
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    headerTexts,
+                    const SizedBox(height: 12),
+                    addBtn,
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: headerTexts),
+                  const SizedBox(width: 16),
+                  addBtn,
+                ],
+              );
+            },
           ),
           const SizedBox(height: 20),
 

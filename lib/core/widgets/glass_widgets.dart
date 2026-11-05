@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -33,7 +32,7 @@ IconData premiumRoleIcon(UserRole role) {
   }
 }
 
-/// Toza, rasmiy va davlat xizmatlari (my.gov.uz) standarti bo‘yicha orqa fon
+/// Sokin va toza minimalist orqa fon (ortiqcha yorqin ranglarsiz)
 class AmbientMeshBackground extends StatelessWidget {
   final Widget child;
   final bool intense;
@@ -46,9 +45,108 @@ class AmbientMeshBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AppColors.background,
-      child: child,
+    final subtleAlpha = intense ? 0.09 : 0.07;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        RepaintBoundary(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // 1. Asosiy yorug' va nafas oladigan fon (Fresh Porcelain & Light Sky Mist)
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    // Qorong'i mavzuda — sokin grafit, yorug'da — havorang tus
+                    colors:
+                        AppColors.isDark
+                            ? [
+                              AppColors.background,
+                              AppColors.background,
+                              AppColors.backgroundDeep,
+                              AppColors.backgroundDeep,
+                            ]
+                            : [
+                              AppColors.surfaceMuted,
+                              AppColors.primaryLight,
+                              AppColors.primaryLight,
+                              AppColors.primaryTint,
+                            ],
+                    stops: const [0.0, 0.35, 0.70, 1.0],
+                  ),
+                ),
+              ),
+              // 2. Tepa qismdan tushuvchi keng mayin yorug'lik nuri
+              Positioned(
+                top: -140,
+                left: -80,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 580,
+                    height: 580,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          AppColors.surface.withValues(alpha: 0.65),
+                          AppColors.surface.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // 3. Tepa o'ng burchakdagi juda mayin havorang havo nafasi
+              Positioned(
+                top: -180,
+                right: -120,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 540,
+                    height: 540,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          AppColors.primary.withValues(alpha: subtleAlpha),
+                          AppColors.primary.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // 4. Pastki chap tomondagi nozik binafsha-havorang jilo
+              Positioned(
+                bottom: -200,
+                left: -140,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 540,
+                    height: 540,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          AppColors.primary.withValues(
+                            alpha: subtleAlpha * 0.6,
+                          ),
+                          AppColors.primary.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        child,
+      ],
     );
   }
 }
@@ -79,15 +177,14 @@ class GlassSurface extends StatelessWidget {
     this.tintColor,
     this.borderColor,
     this.boxShadow,
-    this.useBlur = false,
+    this.useBlur = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final baseColor = tintColor ?? AppColors.surface;
     final radius = customBorderRadius ?? BorderRadius.circular(borderRadius);
-    final effectiveOpacity =
-        kIsWeb ? opacity.clamp(0.95, 1.0) : opacity.clamp(0.0, 1.0);
+    final effectiveOpacity = opacity.clamp(0.0, 1.0);
 
     Widget content = Container(
       padding: padding,
@@ -102,7 +199,7 @@ class GlassSurface extends StatelessWidget {
       child: child,
     );
 
-    if (!kIsWeb && useBlur && blur > 0) {
+    if (useBlur && blur > 0) {
       content = ClipRRect(
         borderRadius: radius,
         child: BackdropFilter(
@@ -226,12 +323,23 @@ class _SurfaceCardState extends State<SurfaceCard> {
         widget.borderColor ?? AppColors.cardGlassBorder;
 
     final hasCustomBg = widget.backgroundColor != null;
-    final effectiveBg =
-        hasCustomBg ? widget.backgroundColor! : AppColors.surface;
+    const topAlpha = 0.97;
+    const bottomAlpha = 0.93;
 
     Widget cardInner = Container(
       decoration: BoxDecoration(
-        color: effectiveBg,
+        color: hasCustomBg ? widget.backgroundColor : null,
+        gradient:
+            hasCustomBg
+                ? null
+                : LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.surface.withValues(alpha: topAlpha),
+                    AppColors.surface.withValues(alpha: bottomAlpha),
+                  ],
+                ),
         borderRadius: radius,
         border: Border.all(color: effectiveBorderColor, width: 1.0),
       ),
@@ -260,7 +368,7 @@ class _SurfaceCardState extends State<SurfaceCard> {
     );
 
     Widget frostedCard =
-        !kIsWeb && widget.useBlur && widget.blur > 0
+        widget.useBlur && widget.blur > 0
             ? ClipRRect(
               borderRadius: radius,
               child: BackdropFilter(

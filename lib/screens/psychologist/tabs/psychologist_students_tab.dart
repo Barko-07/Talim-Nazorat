@@ -164,18 +164,22 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       LucideIcons.lock,
                       size: 14,
                       color: AppColors.textMuted,
                     ),
-                    SizedBox(width: 6),
-                    Text(
-                      'Maxfiy psixologik ma’lumot',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        'Maxfiy psixologik ma’lumot',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
                   ],

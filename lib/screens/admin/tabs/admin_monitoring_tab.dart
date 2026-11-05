@@ -244,10 +244,11 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
 
                         return Padding(
                           padding: const EdgeInsets.all(18),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
+                          child: LayoutBuilder(
+                            builder: (context, cardConstraints) {
+                              final isCompact = cardConstraints.maxWidth < 560;
+
+                              final iconBadge = Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: color.withValues(alpha: 0.1),
@@ -260,141 +261,173 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                   color: color,
                                   size: 22,
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 2,
+                              );
+
+                              final alertContent = Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: color.withValues(
+                                            alpha: 0.12,
                                           ),
-                                          decoration: BoxDecoration(
-                                            color: color.withValues(
-                                              alpha: 0.12,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            a.severity,
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w600,
-                                              color: color,
-                                            ),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
                                           ),
                                         ),
-                                        const SizedBox(width: 8),
-                                        Flexible(
+                                        child: Text(
+                                          a.severity,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: color,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Flexible(
+                                        child: Text(
+                                          a.ruleTitle,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: AppColors.textPrimary,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    a.message,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.surfaceMuted,
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(
+                                        color: AppColors.border,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          LucideIcons.lightbulb,
+                                          size: 14,
+                                          color: AppColors.primary,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Expanded(
                                           child: Text(
-                                            a.ruleTitle,
+                                            'Tavsiya etilgan ma’muriy chora: ${a.suggestedAction}',
                                             style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 14,
-                                              color: AppColors.textPrimary,
+                                              fontSize: 11,
+                                              color: AppColors.textSecondary,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      a.message,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: AppColors.textPrimary,
-                                      ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'O‘quvchi: ${a.studentName} (${a.studentGrade}) • Aniqlangan vaqt: ${df.format(a.createdAt)}',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textMuted,
                                     ),
-                                    const SizedBox(height: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.surfaceMuted,
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(
-                                          color: AppColors.border,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            LucideIcons.lightbulb,
-                                            size: 14,
-                                            color: AppColors.primary,
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Expanded(
-                                            child: Text(
-                                              'Tavsiya etilgan ma’muriy chora: ${a.suggestedAction}',
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                color: AppColors.textSecondary,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
+                                  ),
+                                  if (a.isResolved) ...[
+                                    const SizedBox(height: 4),
                                     Text(
-                                      'O‘quvchi: ${a.studentName} (${a.studentGrade}) • Aniqlangan vaqt: ${df.format(a.createdAt)}',
+                                      'Hal qilindi: ${a.resolvedNotes ?? ''} (${a.resolvedAt != null ? df.format(a.resolvedAt!) : ''})',
                                       style: TextStyle(
                                         fontSize: 11,
-                                        color: AppColors.textMuted,
+                                        color: AppColors.success,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    if (a.isResolved) ...[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Hal qilindi: ${a.resolvedNotes ?? ''} (${a.resolvedAt != null ? df.format(a.resolvedAt!) : ''})',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: AppColors.success,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                  ],
+                                ],
+                              );
+
+                              final actionBtn = !a.isResolved
+                                  ? ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.success,
+                                      foregroundColor: AppColors.onPrimary,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
                                       ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      _showResolveAlertModal(
+                                        context,
+                                        a,
+                                        currentUser,
+                                      );
+                                    },
+                                    child: const Text(
+                                      'Chora ko‘rish / Hal etish',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  )
+                                  : null;
+
+                              if (isCompact) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        iconBadge,
+                                        const SizedBox(width: 14),
+                                        Expanded(child: alertContent),
+                                      ],
+                                    ),
+                                    if (actionBtn != null) ...[
+                                      const SizedBox(height: 14),
+                                      SizedBox(width: double.infinity, child: actionBtn),
                                     ],
                                   ],
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              if (!a.isResolved)
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.success,
-                                    foregroundColor: AppColors.onPrimary,
-                                    elevation: 0,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    _showResolveAlertModal(
-                                      context,
-                                      a,
-                                      currentUser,
-                                    );
-                                  },
-                                  child: const Text(
-                                    'Chora ko‘rish / Hal etish',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ),
-                            ],
+                                );
+                              }
+
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  iconBadge,
+                                  const SizedBox(width: 16),
+                                  Expanded(child: alertContent),
+                                  if (actionBtn != null) ...[
+                                    const SizedBox(width: 16),
+                                    actionBtn,
+                                  ],
+                                ],
+                              );
+                            },
                           ),
                         );
                       },

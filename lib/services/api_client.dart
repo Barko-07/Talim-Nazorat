@@ -64,6 +64,11 @@ class ApiClient {
     Map<String, dynamic>? body,
   ]) => _send('POST', path, body);
 
+  Future<Map<String, dynamic>> put(
+    String path, [
+    Map<String, dynamic>? body,
+  ]) => _send('PUT', path, body);
+
   Future<Map<String, dynamic>> patch(String path, Map<String, dynamic> body) =>
       _send('PATCH', path, body);
 

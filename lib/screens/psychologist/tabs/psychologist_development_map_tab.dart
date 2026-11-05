@@ -180,9 +180,11 @@ class _PsychologistDevelopmentMapTabState
             ),
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  CircleAvatar(
+              child: LayoutBuilder(
+                builder: (context, cardConstraints) {
+                  final isCompact = cardConstraints.maxWidth < 600;
+
+                  final avatar = CircleAvatar(
                     radius: 32,
                     backgroundColor: AppColors.primaryLight,
                     child: Text(
@@ -195,132 +197,155 @@ class _PsychologistDevelopmentMapTabState
                         color: AppColors.primary,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 18),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 6,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Text(
-                              currentStudent.fullName,
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.surfaceMuted,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '${currentStudent.grade} sinf • ${currentStudent.age} yosh',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Asosiy ehtiyoj: ${currentStudent.primaryNeed} • Qo‘llab-quvvatlash: ${currentStudent.supportLevel}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Muassasa: ${currentStudent.institutionName}',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Dinamika xulosasi yoki Baholash chaqiruvi
-                  if (completedAssessments.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            growthPercent >= 0
-                                ? AppColors.successBg
-                                : AppColors.errorBg,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color:
-                              growthPercent >= 0
-                                  ? AppColors.success.withValues(alpha: 0.3)
-                                  : AppColors.error.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Column(
+                  );
+
+                  final studentInfo = Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
-                            '${growthPercent >= 0 ? "+" : ""}$growthPercent%',
+                            currentStudent.fullName,
                             style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color:
-                                  growthPercent >= 0
-                                      ? AppColors.success
-                                      : AppColors.error,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
                             ),
                           ),
-                          Text(
-                            growthPercent >= 0
-                                ? 'Ijobiy o‘sish sur’ati'
-                                : 'Regressiya / Turg‘unlik',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color:
-                                  growthPercent >= 0
-                                      ? AppColors.success
-                                      : AppColors.error,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceMuted,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '${currentStudent.grade} sinf • ${currentStudent.age} yosh',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    )
-                  else
-                    FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                      const SizedBox(height: 6),
+                      Text(
+                        'Asosiy ehtiyoj: ${currentStudent.primaryNeed} • Qo‘llab-quvvatlash: ${currentStudent.supportLevel}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                      icon: const Icon(LucideIcons.listPlus, size: 16),
-                      label: const Text('Birinchi baholashni boshlash'),
-                      onPressed:
-                          () => CreateAssessmentFlow.start(
-                            context,
-                            initialStudent: currentStudent,
+                      const SizedBox(height: 4),
+                      Text(
+                        'Muassasa: ${currentStudent.institutionName}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  );
+
+                  final rightAction = completedAssessments.isNotEmpty
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
                           ),
-                    ),
-                ],
+                          decoration: BoxDecoration(
+                            color:
+                                growthPercent >= 0
+                                    ? AppColors.successBg
+                                    : AppColors.errorBg,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color:
+                                  growthPercent >= 0
+                                      ? AppColors.success.withValues(alpha: 0.3)
+                                      : AppColors.error.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                '${growthPercent >= 0 ? "+" : ""}$growthPercent%',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color:
+                                      growthPercent >= 0
+                                          ? AppColors.success
+                                          : AppColors.error,
+                                ),
+                              ),
+                              Text(
+                                growthPercent >= 0
+                                    ? 'Ijobiy o‘sish sur’ati'
+                                    : 'Regressiya / Turg‘unlik',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      growthPercent >= 0
+                                          ? AppColors.success
+                                          : AppColors.error,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                          ),
+                          icon: const Icon(LucideIcons.listPlus, size: 16),
+                          label: const Text('Birinchi baholashni boshlash'),
+                          onPressed:
+                              () => CreateAssessmentFlow.start(
+                                context,
+                                initialStudent: currentStudent,
+                              ),
+                        );
+
+                  if (isCompact) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            avatar,
+                            const SizedBox(width: 14),
+                            Expanded(child: studentInfo),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        rightAction,
+                      ],
+                    );
+                  }
+
+                  return Row(
+                    children: [
+                      avatar,
+                      const SizedBox(width: 18),
+                      Expanded(child: studentInfo),
+                      const SizedBox(width: 16),
+                      rightAction,
+                    ],
+                  );
+                },
               ),
             ),
           ),
           const SizedBox(height: 20),
-
           // SOHALAR KESIMIDA PSIXOLOGIK RIVOJLANISH KO'RSATKICHLARI
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -443,12 +468,11 @@ class _PsychologistDevelopmentMapTabState
           const SizedBox(height: 24),
 
           // VAQT DAVOMIDAGI DIAGNOSTIK BAHOLASHLAR VA KUZATUVLAR XRONOLOGIYASI
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Baholashlar tarixi
-              Expanded(
-                child: Card(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 720;
+
+              final historyCard = Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -555,13 +579,9 @@ class _PsychologistDevelopmentMapTabState
                       ],
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 16),
+                );
 
-              // Kuzatuv va mashg'ulotlar faolligi
-              Expanded(
-                child: Card(
+              final activityCard = Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -678,9 +698,28 @@ class _PsychologistDevelopmentMapTabState
                       ],
                     ),
                   ),
-                ),
-              ),
-            ],
+                );
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    historyCard,
+                    const SizedBox(height: 16),
+                    activityCard,
+                  ],
+                );
+              }
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: historyCard),
+                  const SizedBox(width: 16),
+                  Expanded(child: activityCard),
+                ],
+              );
+            },
           ),
         ],
       ),

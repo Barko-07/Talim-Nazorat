@@ -874,8 +874,9 @@ class _LoginScreenState extends State<LoginScreen>
     required String action,
     required VoidCallback onTap,
   }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
           question,

@@ -1,5 +1,4 @@
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -12,9 +11,7 @@ import 'providers/auth_provider.dart';
 import 'providers/app_provider.dart';
 import 'providers/theme_provider.dart';
 import 'models/user_model.dart';
-import 'screens/entry/intro_screen.dart';
-import 'screens/entry/landing_screen.dart';
-import 'screens/entry/welcome_screen.dart';
+import 'screens/auth/login_screen.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/admin/admin_portal_screen.dart';
 
@@ -97,28 +94,14 @@ class _TalimNazoratAppState extends State<TalimNazoratApp>
   }
 }
 
-/// Ilovaning ildiz oynasi. Saytda: kirmagan mehmonga landing sahifa.
-/// Telefon/desktop ilovasida: avval qisqa animatsiya, keyin "Xush kelibsiz"
-/// ekrani. Kirgan foydalanuvchiga — rolga mos bosh sahifa.
-class AppEntry extends StatefulWidget {
+/// Ilovaning asosiy kirish nuqtasi. Kirgan foydalanuvchiga — rolga mos
+/// boshqaruv paneli, kirmagan mehmonga esa to‘g‘ridan-to‘g‘ri kirish oynasi.
+class AppEntry extends StatelessWidget {
   const AppEntry({super.key});
-
-  @override
-  State<AppEntry> createState() => _AppEntryState();
-}
-
-class _AppEntryState extends State<AppEntry> {
-  // Animatsiya faqat ilovada va faqat ochilishda bir marta.
-  bool _introDone = kIsWeb;
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    if (!_introDone) {
-      return IntroScreen(onDone: () => setState(() => _introDone = true));
-    }
-    // Faqat ilova ochilayotganda. Kirish tugmasi bosilganda ham yuklanish
-    // ekrani ko'rsatilsa, kirish sahifasi yopilib, kod oynasi ochilmay qoladi.
     if (auth.isInitializing) {
       return const _AppLoadingScreen();
     }
@@ -131,7 +114,7 @@ class _AppEntryState extends State<AppEntry> {
       }
       return const MainNavigationScreen();
     }
-    return kIsWeb ? const LandingScreen() : const WelcomeScreen();
+    return const LoginScreen();
   }
 }
 

@@ -594,6 +594,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       LucideIcons.calendar,
@@ -798,6 +799,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         LucideIcons.notebookText,
@@ -805,12 +807,14 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                         color: AppColors.success,
                       ),
                       const SizedBox(width: 6),
-                      Text(
-                        'Kuzatuv va natija qaydlari:',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.success,
+                      Flexible(
+                        child: Text(
+                          'Kuzatuv va natija qaydlari:',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.success,
+                          ),
                         ),
                       ),
                     ],
@@ -861,7 +865,6 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                     textStyle: const TextStyle(fontSize: 11),
                   ),
                 ),
-                const SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: () => _showCompleteSessionDialog(context, session),
                   icon: const Icon(LucideIcons.check, size: 14),
@@ -880,7 +883,6 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                   ),
                 ),
               ],
-              const SizedBox(width: 8),
               IconButton(
                 icon: Icon(
                   LucideIcons.trash2,
