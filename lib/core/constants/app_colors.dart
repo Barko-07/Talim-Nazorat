@@ -85,18 +85,18 @@ class AppPalette {
     primaryLight: Color(0xFFEAF3FD),
     primaryTint: Color(0xFFD3E6FB),
     onPrimary: Color(0xFFFFFFFF),
-    background: Color(0xFFEEF4FB),
-    backgroundDeep: Color(0xFFDDE8F6),
+    background: Color(0xFFF8FAFC),
+    backgroundDeep: Color(0xFFF1F5F9),
     surface: Color(0xFFFFFFFF),
-    surfaceMuted: Color(0xFFF4F7FC),
+    surfaceMuted: Color(0xFFF8FAFC),
     surfaceRaised: Color(0xFFFFFFFF),
-    textPrimary: Color(0xFF0A1A3F),
-    textSecondary: Color(0xFF3A4762),
-    textMuted: Color(0xFF5E6B85),
-    textSubtle: Color(0xFF96A1B6),
-    border: Color(0xFFE3EBF5),
-    borderSlate: Color(0xFFD8E2EF),
-    borderLight: Color(0xFFF0F4FA),
+    textPrimary: Color(0xFF0F172A),
+    textSecondary: Color(0xFF334155),
+    textMuted: Color(0xFF64748B),
+    textSubtle: Color(0xFF94A3B8),
+    border: Color(0xFFE2E8F0),
+    borderSlate: Color(0xFFCBD5E1),
+    borderLight: Color(0xFFF1F5F9),
     success: Color(0xFF12803A),
     successBg: Color(0xFFEEF9EC),
     successBorder: Color(0xFFC3EBBE),
@@ -201,24 +201,19 @@ class AppColors {
   static Color get surfaceRaised => _p.surfaceRaised;
   static Color get card => _p.surface;
 
-  // Yuza qatlamlari (avvalgi "shisha" tokenlari — endi mavzuga mos)
-  static Color get glassFill => _p.surface.withValues(alpha: 0.92);
-  static Color get glassFillStrong => _p.surface.withValues(alpha: 0.96);
+  // Yuza qatlamlari — my.gov.uz davlat xizmatlari standarti: sof, aniq va mustahkam
+  static Color get glassFill => _p.surface;
+  static Color get glassFillStrong => _p.surface;
   static Color get glassWellFill => _p.surfaceMuted;
   static Color get glassRecessedFill =>
-      _p.isDark ? _p.backgroundDeep : const Color(0xFFEAF1FB);
+      _p.isDark ? _p.backgroundDeep : const Color(0xFFF1F5F9);
   static Color get glassSpecular => _p.surface;
-  static Color get glassWhiteBorder =>
-      _p.isDark ? _p.border : const Color(0xFFFFFFFF);
-  static Color get glassInnerBorder =>
-      _p.isDark ? _p.border : const Color(0xF5FFFFFF);
-  static Color get hairlineBorder =>
-      _p.isDark ? _p.border : const Color(0xF5FFFFFF);
-  static Color get cardGlassBorder =>
-      _p.isDark ? _p.border : const Color(0xFFFFFFFF);
-  static Color get navGlassBorder =>
-      _p.isDark ? _p.border : const Color(0xFFFFFFFF);
-  static double get navGlassOpacity => _p.isDark ? 0.94 : 0.78;
+  static Color get glassWhiteBorder => _p.border;
+  static Color get glassInnerBorder => _p.border;
+  static Color get hairlineBorder => _p.border;
+  static Color get cardGlassBorder => _p.border;
+  static Color get navGlassBorder => _p.border;
+  static double get navGlassOpacity => 1.0;
 
   // Matn
   static Color get textPrimary => _p.textPrimary;

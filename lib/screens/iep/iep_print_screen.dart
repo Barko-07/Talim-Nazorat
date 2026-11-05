@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/iep_model.dart';
 import '../../models/student_model.dart';
+import '../../services/file_download_service.dart';
 
 class IepPrintScreen extends StatelessWidget {
   final IndividualEducationPlanModel plan;
@@ -48,9 +49,10 @@ class IepPrintScreen extends StatelessWidget {
                 ),
               ),
               onPressed: () {
+                triggerBrowserPrint();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Hujjat printerga yuborildi (A4 formati)'),
+                    content: const Text('Chop etish darchasi ochildi (A4 formati)'),
                     backgroundColor: AppColors.primary,
                   ),
                 );

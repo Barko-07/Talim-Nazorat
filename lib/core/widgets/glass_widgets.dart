@@ -33,7 +33,7 @@ IconData premiumRoleIcon(UserRole role) {
   }
 }
 
-/// Sokin va toza minimalist orqa fon (ortiqcha yorqin ranglarsiz)
+/// Toza, rasmiy va davlat xizmatlari (my.gov.uz) standarti bo‘yicha orqa fon
 class AmbientMeshBackground extends StatelessWidget {
   final Widget child;
   final bool intense;
@@ -46,108 +46,9 @@ class AmbientMeshBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subtleAlpha = intense ? 0.09 : 0.07;
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        RepaintBoundary(
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // 1. Asosiy yorug' va nafas oladigan fon (Fresh Porcelain & Light Sky Mist)
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    // Qorong'i mavzuda — sokin grafit, yorug'da — havorang tus
-                    colors:
-                        AppColors.isDark
-                            ? [
-                              AppColors.background,
-                              AppColors.background,
-                              AppColors.backgroundDeep,
-                              AppColors.backgroundDeep,
-                            ]
-                            : [
-                              AppColors.surfaceMuted,
-                              AppColors.primaryLight,
-                              AppColors.primaryLight,
-                              AppColors.primaryTint,
-                            ],
-                    stops: [0.0, 0.35, 0.70, 1.0],
-                  ),
-                ),
-              ),
-              // 2. Tepa qismdan tushuvchi keng mayin yorug'lik nuri
-              Positioned(
-                top: -140,
-                left: -80,
-                child: IgnorePointer(
-                  child: Container(
-                    width: 580,
-                    height: 580,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          AppColors.surface.withValues(alpha: 0.65),
-                          AppColors.surface.withValues(alpha: 0.0),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // 3. Tepa o'ng burchakdagi juda mayin havorang havo nafasi
-              Positioned(
-                top: -180,
-                right: -120,
-                child: IgnorePointer(
-                  child: Container(
-                    width: 540,
-                    height: 540,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          AppColors.primary.withValues(alpha: subtleAlpha),
-                          AppColors.primary.withValues(alpha: 0.0),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // 4. Pastki chap tomondagi nozik binafsha-havorang jilo
-              Positioned(
-                bottom: -200,
-                left: -140,
-                child: IgnorePointer(
-                  child: Container(
-                    width: 540,
-                    height: 540,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          AppColors.primary.withValues(
-                            alpha: subtleAlpha * 0.6,
-                          ),
-                          AppColors.primary.withValues(alpha: 0.0),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        child,
-      ],
+    return ColoredBox(
+      color: AppColors.background,
+      child: child,
     );
   }
 }
@@ -325,23 +226,12 @@ class _SurfaceCardState extends State<SurfaceCard> {
         widget.borderColor ?? AppColors.cardGlassBorder;
 
     final hasCustomBg = widget.backgroundColor != null;
-    const topAlpha = 0.97;
-    const bottomAlpha = 0.93;
+    final effectiveBg =
+        hasCustomBg ? widget.backgroundColor! : AppColors.surface;
 
     Widget cardInner = Container(
       decoration: BoxDecoration(
-        color: hasCustomBg ? widget.backgroundColor : null,
-        gradient:
-            hasCustomBg
-                ? null
-                : LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.surface.withValues(alpha: topAlpha),
-                    AppColors.surface.withValues(alpha: bottomAlpha),
-                  ],
-                ),
+        color: effectiveBg,
         borderRadius: radius,
         border: Border.all(color: effectiveBorderColor, width: 1.0),
       ),

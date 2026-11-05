@@ -27,6 +27,7 @@ import '../../services/access_control_service.dart';
 import '../../services/app_exceptions.dart';
 import '../../services/child_status_service.dart';
 import '../../services/dynamics_service.dart';
+import '../../services/file_download_service.dart';
 import '../assessments/new_assessment_screen.dart';
 import '../iep/iep_print_screen.dart';
 
@@ -413,7 +414,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
             _buildIepTab(context, iepPlans, student),
             _buildDynamicsTab(student, assessments, app),
             _buildReferralsTab(referrals),
-            _buildDocumentsTab(),
+            _buildDocumentsTab(student),
             _buildAuditTab(auditLogs),
           ],
         ),
@@ -3749,15 +3750,44 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
   }
 
   // --- TAB 7: HUJJATLAR ---
-  Widget _buildDocumentsTab() {
+  Widget _buildDocumentsTab(StudentModel student) {
     final docs = [
       (
-        title: 'PMPK Xulosasi va Yo‘llanmasi (PDF)',
-        subtitle: 'Shahar pedagogik-tibbiy komissiyasi • 14.08.2026',
+        title: 'PMPK Xulosasi va Yo‘llanmasi (Rasmiy ma’lumotnoma)',
+        subtitle: '${student.institutionName} • 14.08.2026',
+        category: 'Tibbiy-pedagogik komissiya',
+        content: '''O‘ZBEKISTON RESPUBLIKASI MAKTABGACHA VA MAKTAB TA’LIMI VAZIRLIGI
+HUDUDIY PEDAGOGIK-TIBBIY KOMISSIYA (PMPK) XULOSASI VA YO‘LLANMASI
+
+1. O‘quvchi: ${student.fullName}
+2. ID raqami: ${student.id}
+3. Tug‘ilgan sana: ${student.dateOfBirth.year}-${student.dateOfBirth.month.toString().padLeft(2, '0')}-${student.dateOfBirth.day.toString().padLeft(2, '0')} (${student.age} yosh)
+4. Ta’lim muassasasi: ${student.institutionName}, ${student.grade}-sinf
+5. Ta’lim shakli: Inklyuziv / Maxsus qo‘llab-quvvatlash
+6. Asosiy ehtiyoj toifasi: ${student.primaryNeed}
+7. Yordam darajasi: ${student.supportLevel}
+
+KOMISSIYA XULOSASI:
+O‘quvchining jismoniy, ruhiy va intellektual rivojlanish xususiyatlarini inobatga olgan holda unga individual ta’lim dasturi (IEP) va korreksion mashg‘ulotlar tavsiya etiladi.
+Tavsiya etiladigan mutaxassislar: Amaliyotchi psixolog, Logoped-defektolog, Maxsus pedagog.
+
+Hujjat tasdiqlangan: 2026-yil 14-avgust
+Mas’ul: Hududiy PMPK Komissiyasi Raisi''',
       ),
       (
-        title: 'Tibbiy Ko‘rik Karta Ma’lumotnomasi (PDF)',
-        subtitle: '12-sonli bolalar poliklinikasi • 20.08.2026',
+        title: 'Tibbiy Ko‘rik Karta Ma’lumotnomasi',
+        subtitle: 'Bolalar poliklinikasi • 20.08.2026',
+        category: 'Sog‘liqni saqlash muassasasi',
+        content: '''O‘QUVCHINING AMBULATOR-TIBBIY KARTA MA’LUMOTNOMASI
+
+F.I.SH: ${student.fullName}
+Sinf: ${student.grade}-sinf
+Ta’lim maskani: ${student.institutionName}
+Birlamchi ehtiyoj: ${student.primaryNeed}
+Tibbiy tavsiyalar: Ta’lim jarayonida ko‘rish, eshitish va gavda holatiga individual moslashtirilgan shart-sharoitlar yaratish talab etiladi.
+
+Tibbiy ko‘rik sanasi: 2026-yil 20-avgust
+Shifokor-pediatr xulosasi asosida berildi.''',
       ),
     ];
 
@@ -3770,14 +3800,57 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 14),
                   child: SurfaceCard(
-                    borderRadius: 26,
+                    borderRadius: 16,
                     padding: const EdgeInsets.all(20),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: Text(doc.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                          content: SingleChildScrollView(
+                            child: SelectableText(
+                              doc.content,
+                              style: const TextStyle(fontSize: 13, height: 1.5),
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Yopish'),
+                            ),
+                            FilledButton.icon(
+                              icon: const Icon(LucideIcons.download, size: 15),
+                              label: const Text('Faylni yuklab olish'),
+                              onPressed: () {
+                                final filename = '${student.fullName}_${doc.category.replaceAll(' ', '_')}.txt';
+                                downloadFile(filename, doc.content);
+                                Navigator.pop(ctx);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('$filename fayli yuklab olindi!'),
+                                    backgroundColor: AppColors.success,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                     child: Row(
                       children: [
-                        Icon(
-                          LucideIcons.fileText,
-                          color: AppColors.error,
-                          size: 22,
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryLight,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            LucideIcons.fileText,
+                            color: AppColors.primary,
+                            size: 22,
+                          ),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -3809,11 +3882,14 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                             size: 19,
                             color: AppColors.primary,
                           ),
-                          tooltip: 'Yuklab olish',
+                          tooltip: 'Hujjatni yuklab olish',
                           onPressed: () {
+                            final filename = '${student.fullName}_${doc.category.replaceAll(' ', '_')}.txt';
+                            downloadFile(filename, doc.content);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Hujjat yuklab olindi.'),
+                              SnackBar(
+                                content: Text('$filename fayli kompyuteringizga yuklab olindi!'),
+                                backgroundColor: AppColors.success,
                               ),
                             );
                           },

@@ -428,8 +428,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
     final isRed = status?.color == StatusColor.red;
 
     return SurfaceCard(
-      borderRadius: 26,
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+      borderRadius: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       backgroundColor: isRed ? AppColors.errorBg : null,
       borderColor:
           statusColor != null
@@ -446,9 +446,14 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: statusBg ?? AppColors.primaryLight,
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: statusBg ?? AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            alignment: Alignment.center,
             child: Text(
               s.firstName.isNotEmpty ? s.firstName.substring(0, 1) : '?',
               style: TextStyle(

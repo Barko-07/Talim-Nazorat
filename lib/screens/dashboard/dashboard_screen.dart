@@ -298,14 +298,10 @@ class DashboardScreen extends StatelessWidget {
     final institutionName = user?.institutionName ?? '';
     final initials = _initialsFor(user?.fullName);
 
-    return GlassSurface(
-      borderRadius: 26,
-      blur: 16,
-      opacity: 0.96,
-      padding: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-        child: LayoutBuilder(
+    return SurfaceCard(
+      borderRadius: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+      child: LayoutBuilder(
           builder: (context, constraints) {
             final isCompact = constraints.maxWidth < 560;
 
@@ -411,7 +407,6 @@ class DashboardScreen extends StatelessWidget {
             );
           },
         ),
-      ),
     );
   }
 
@@ -1263,8 +1258,8 @@ class DashboardScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return SurfaceCard(
-      borderRadius: 26,
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+      borderRadius: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1280,17 +1275,25 @@ class DashboardScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                     height: 1.25,
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(icon, color: color, size: 21),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: AppColors.isDark ? 0.20 : 0.10),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 19),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

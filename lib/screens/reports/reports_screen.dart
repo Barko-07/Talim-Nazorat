@@ -9,6 +9,7 @@ import '../../providers/app_provider.dart';
 import '../../services/child_status_service.dart';
 import '../../services/dynamics_service.dart';
 import '../../services/report_service.dart';
+import '../../services/file_download_service.dart';
 import '../students/student_detail_screen.dart';
 
 class ReportsScreen extends StatelessWidget {
@@ -274,15 +275,28 @@ class ReportsScreen extends StatelessWidget {
                 onPressed: () => Navigator.pop(ctx),
                 child: const Text('Yopish'),
               ),
-              FilledButton.icon(
+              OutlinedButton.icon(
                 icon: const Icon(LucideIcons.copy, size: 15),
                 label: const Text('Nusxa olish'),
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: csvData));
-                  Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('$filename mazmuni xotiraga nusxalandi!'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                },
+              ),
+              FilledButton.icon(
+                icon: const Icon(LucideIcons.download, size: 15),
+                label: const Text('Yuklab olish'),
+                onPressed: () {
+                  downloadFile(filename, csvData, mimeType: filename.endsWith('.json') ? 'application/json;charset=utf-8' : 'text/csv;charset=utf-8');
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('$filename fayli kompyuteringizga yuklab olindi!'),
                       backgroundColor: AppColors.success,
                     ),
                   );
