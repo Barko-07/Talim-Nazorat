@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hisobni o‘chirish — Individ</title>
+  <meta name="robots" content="noindex">
+  <style>
+    :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --muted:#64748b; --line:#e2e8f0; --primary:#0062cc; --danger:#dc2626; --ok:#12803a; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#121314; --card:#1e1f21; --text:#f2f4f7; --muted:#9aa2af; --line:#303236; --primary:#7db8ff; --danger:#ff7a7a; --ok:#5bd47a; } }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    main { max-width:520px; margin:0 auto; padding:32px 16px 48px; }
+    h1 { font-size:24px; margin:0 0 8px; }
+    p, li { color:var(--muted); }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-top:20px; }
+    label { display:block; font-size:14px; margin:12px 0 4px; }
+    input { width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; background:transparent; color:var(--text); font-size:16px; }
+    button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:10px; font-size:16px; font-weight:600; color:#fff; background:var(--primary); cursor:pointer; }
+    button.danger { background:var(--danger); }
+    button:disabled { opacity:.6; cursor:default; }
+    .msg { margin-top:12px; font-size:14px; }
+    .msg.err { color:var(--danger); } .msg.ok { color:var(--ok); }
+    [hidden] { display:none !important; }
+    a { color:var(--primary); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Individ hisobini o‘chirish</h1>
+  <p>Bu sahifada Individ ilovasidagi hisobingizni butunlay o‘chirishingiz mumkin.</p>
+  <ul>
+    <li>Darhol o‘chiriladi: ismingiz, emailingiz, telefoningiz, profil ma’lumotlaringiz va kirish huquqingiz.</li>
+    <li>Saqlanib qoladi: bolalar bo‘yicha kiritgan ish yozuvlaringiz (baholash, mashg‘ulot va h.k.) — ular maktabning rasmiy hujjati. Ularda sizning ismingiz o‘rniga “O‘chirilgan foydalanuvchi” ko‘rsatiladi.</li>
+    <li>O‘chirilgan hisobni tiklab bo‘lmaydi.</li>
+  </ul>
+
+  <form class="card" id="login">
+    <strong>1. Hisobingizga kiring</strong>
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="username" required>
+    <label for="password">Parol</label>
+    <input id="password" type="password" autocomplete="current-password" required>
+    <button type="submit">Davom etish</button>
+    <div class="msg" role="status"></div>
+  </form>
+
+  <form class="card" id="code" hidden>
+    <strong>2. Emailingizga kelgan kodni kiriting</strong>
+    <label for="otp">6 xonali kod</label>
+    <input id="otp" inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code" required>
+    <button type="submit">Tasdiqlash</button>
+    <div class="msg" role="status"></div>
+  </form>
+
+  <form class="card" id="confirm" hidden>
+    <strong>Hisobni o‘chirishni tasdiqlang</strong>
+    <p id="who"></p>
+    <label for="password2">Parolingizni qayta kiriting</label>
+    <input id="password2" type="password" autocomplete="current-password" required>
+    <button type="submit" class="danger">Hisobni butunlay o‘chirish</button>
+    <div class="msg" role="status"></div>
+  </form>
+
+  <div class="card" id="done" hidden>
+    <strong>Hisobingiz o‘chirildi.</strong>
+    <p>Tasdiq emailingizga yuborildi. Agar buni siz qilmagan bo‘lsangiz, maktabingiz administratoriga murojaat qiling.</p>
+  </div>
+
+</main>
+<script src="account-deletion.js"></script>
+</body>
+</html>

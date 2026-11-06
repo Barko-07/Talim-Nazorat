@@ -15,6 +15,16 @@ sudo -u postgres pg_dump --no-owner --format=plain individ \
   | gzip -9 \
   | age -R /etc/individ/backup.pub > "$FILE"
 
-# Keep 30 days locally; copy offsite (another server / object storage in Uzbekistan).
+# Sanity check: a backup that cannot be read back is worse than none.
+[ -s "$FILE" ] && head -c 40 "$FILE" | grep -q "age-encryption.org" || { echo "backup is empty or not encrypted" >&2; exit 1; }
+
+# Offsite copy: the owner's computer pulls this folder every day over SSH
+# (deploy/scripts/pull-backups.ps1). It holds only encrypted files.
+OFFSITE=/home/mistaker0908/offsite
+install -d -o mistaker0908 -g mistaker0908 -m 700 "$OFFSITE"
+install -o mistaker0908 -g mistaker0908 -m 600 "$FILE" "$OFFSITE/"
+find "$OFFSITE" -name 'individ-*.sql.gz.age' -mtime +14 -delete
+
+# Keep 30 days on the server.
 find "$OUT" -name 'individ-*.sql.gz.age' -mtime +30 -delete
 echo "backup written: $FILE"

@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The app talks to https://individ.uz; without this the release build
+         (the one published on Google Play) cannot reach the server. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="Individ"
         android:name="${applicationName}"
