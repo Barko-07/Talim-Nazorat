@@ -93,7 +93,12 @@ void main() {
     await app.addStudent(grade7Student, byUser: superAdmin);
     await app.addStudent(unworkedStudent, byUser: superAdmin);
 
-    // 6. Assign specialists to the child
+    // 6. The coordinator joins the team of the child and links colleagues
+    await app.assignSpecialistToStudent(
+      'student_e2e_7th',
+      'user_coordinator',
+      byUser: superAdmin,
+    );
     final coordinator = db.getUserById('user_coordinator')!;
     app.setCurrentUser(coordinator);
     await app.assignSpecialistToStudent(
@@ -117,6 +122,8 @@ void main() {
       app.childStatus(db.getStudentById('student_e2e_7th')!).color,
       StatusColor.red,
     );
+    // The second child has no team yet: only the administrator sees it.
+    app.setCurrentUser(superAdmin);
     expect(
       app.childStatus(db.getStudentById('student_e2e_unworked')!).color,
       StatusColor.red,

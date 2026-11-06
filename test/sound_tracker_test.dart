@@ -239,7 +239,7 @@ void main() {
           id: 'st_coord',
           email: 'st.c@talim.uz',
           fullName: 'K',
-          role: UserRole.coordinator,
+          role: UserRole.institutionAdmin,
           institutionId: 'inst_chortoq_5',
           institutionName: '5-sonli umumiy o‘rta ta’lim maktabi',
         );

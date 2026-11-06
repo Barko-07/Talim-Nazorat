@@ -66,38 +66,71 @@ def test_other_school_sees_nothing_and_admins_see_their_scope(app):
     assert sorted(s["id"] for s in _items(_boss(app), "student")) == ["s1", "s2"]
 
 
-def test_only_an_administrator_can_give_a_colleague_access(app):
-    inst = _school(app)
-    t1, t2 = _as(app, "t1@1-maktab.uz"), _as(app, "t2@1-maktab.uz")
+def _ids(app):
     with db_session(app) as db:
         from app.models import User
-        t2_id = db.scalar(select(User.id).where(User.email == "t2@1-maktab.uz"))
-    _put(t1, ("student", "s1", {"firstName": "Ali"}))
-    # A teacher cannot widen access by editing the assignment list (refused
-    # openly), nor move the child to another school (ignored).
-    r = _put(t1, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": [t2_id]}))
-    assert r.status_code == 403
-    r = _put(t1, ("student", "s1", {"firstName": "Ali", "institutionId": "f" * 32}))
-    assert r.status_code == 200 and r.json()["items"][0]["data"]["institutionId"] == inst
-    assert _items(t2, "student") == []
-    # ...the school administrator can.
-    d = _as(app, "dir@1-maktab.uz")
-    assert _put(d, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": [t2_id]})).status_code == 200
+        return {u.email: u.id for u in db.scalars(select(User))}
+
+
+def test_specialists_build_the_team_themselves(app):
+    _school(app)
+    ids = _ids(app)
+    t1, t2, psy = _as(app, "t1@1-maktab.uz"), _as(app, "t2@1-maktab.uz"), _as(app, "psy@1-maktab.uz")
+    # The teacher adds a child and is on its team at once.
+    r = _put(t1, ("student", "s1", {"firstName": "Ali"}))
+    assert r.json()["items"][0]["data"]["assignedSpecialistIds"] == [ids["t1@1-maktab.uz"]]
+    assert r.json()["items"][0]["data"]["createdById"] == ids["t1@1-maktab.uz"]
+    assert _items(psy, "student") == []
+    # ...links the school psychologist, who now sees the child.
+    team = sorted([ids["t1@1-maktab.uz"], ids["psy@1-maktab.uz"]])
+    assert _put(t1, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": team})).status_code == 200
+    assert [s["id"] for s in _items(psy, "student")] == ["s1"]
+    # Any team member can link a further colleague.
+    team3 = sorted(team + [ids["t2@1-maktab.uz"]])
+    assert _put(psy, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": team3})).status_code == 200
     assert [s["id"] for s in _items(t2, "student")] == ["s1"]
-    # And can take it away again.
-    _put(d, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": []}))
+    # A member cannot take others off the team; only the one who added the child can.
+    assert _put(psy, ("student", "s1", {"firstName": "Ali",
+                                        "assignedSpecialistIds": [ids["psy@1-maktab.uz"]]})).status_code == 403
+    # Anyone can leave.
+    rest = sorted(set(team3) - {ids["t2@1-maktab.uz"]})
+    assert _put(t2, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": rest})).status_code == 200
     assert _items(t2, "student") == []
+    assert _put(t1, ("student", "s1", {"firstName": "Ali",
+                                       "assignedSpecialistIds": [ids["t1@1-maktab.uz"]]})).status_code == 200
+    assert _items(psy, "student") == []
 
 
-def test_staff_from_another_school_cannot_be_assigned(app):
+def test_administrators_are_not_linked_to_children(app):
+    _school(app)
+    ids = _ids(app)
+    t1 = _as(app, "t1@1-maktab.uz")
+    r = _put(t1, ("student", "s1", {"assignedSpecialistIds": [ids["dir@1-maktab.uz"]]}))
+    assert r.status_code == 422
+
+
+def test_staff_from_another_school_cannot_be_linked(app):
     _school(app, "1-maktab")
     _school(app, "2-maktab")
+    ids = _ids(app)
+    t1 = _as(app, "t1@1-maktab.uz")
+    _put(t1, ("student", "s1", {}))
+    r = _put(t1, ("student", "s1", {"assignedSpecialistIds": [ids["t1@1-maktab.uz"], ids["t1@2-maktab.uz"]]}))
+    assert r.status_code == 422
+    assert _items(_as(app, "t1@2-maktab.uz"), "student") == []
+
+
+def test_a_blocked_team_member_does_not_block_editing_the_child(app):
+    _school(app)
+    ids = _ids(app)
+    t1 = _as(app, "t1@1-maktab.uz")
+    team = sorted([ids["t1@1-maktab.uz"], ids["t2@1-maktab.uz"]])
+    _put(t1, ("student", "s1", {"assignedSpecialistIds": team}))
     with db_session(app) as db:
         from app.models import User
-        outsider = db.scalar(select(User.id).where(User.email == "t1@2-maktab.uz"))
-    d = _as(app, "dir@1-maktab.uz")
-    r = _put(d, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": [outsider]}))
-    assert r.status_code == 422
+        db.get(User, ids["t2@1-maktab.uz"]).is_active = False
+        db.commit()
+    assert _put(t1, ("student", "s1", {"firstName": "Yangi", "assignedSpecialistIds": team})).status_code == 200
 
 
 def test_confidential_notes_only_author_and_administrators(app):
@@ -138,15 +171,18 @@ def test_a_batch_is_all_or_nothing(app):
     assert _items(t1, "student") == []  # the first operation was rolled back too
 
 
-def test_deleting_children_is_for_administrators_and_hides_everything(app):
+def test_a_child_is_deleted_by_whoever_added_it_or_an_administrator(app):
     _school(app)
-    t1, d = _as(app, "t1@1-maktab.uz"), _as(app, "dir@1-maktab.uz")
-    _put(t1, ("student", "s1", {}), ("session", "x1", {"studentId": "s1"}))
+    ids = _ids(app)
+    t1, t2 = _as(app, "t1@1-maktab.uz"), _as(app, "t2@1-maktab.uz")
+    team = sorted([ids["t1@1-maktab.uz"], ids["t2@1-maktab.uz"]])
+    _put(t1, ("student", "s1", {"assignedSpecialistIds": team}), ("session", "x1", {"studentId": "s1"}))
     delete = {"ops": [{"op": "delete", "kind": "student", "id": "s1"}]}
-    assert t1.post("/api/records/batch", delete).status_code == 403
-    assert d.post("/api/records/batch", delete).status_code == 200
+    assert t2.post("/api/records/batch", delete).status_code == 403  # on the team, did not add it
+    assert t1.post("/api/records/batch", delete).status_code == 200
     assert _items(t1, "student") == [] and _items(t1, "session") == []
-    assert _items(d, "student") == []
+    assert _items(t2, "student") == []
+    assert _items(_as(app, "dir@1-maktab.uz"), "student") == []
 
 
 def test_administrator_sees_every_change_with_old_and_new_values(app):

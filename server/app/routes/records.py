@@ -91,6 +91,7 @@ def _student_out(rec: Record, assigned: set[str], coordinator: str | None) -> di
     data["institutionId"] = rec.institution_id
     data["assignedSpecialistIds"] = sorted(assigned - ({coordinator} if coordinator else set()))
     data["coordinatorId"] = coordinator
+    data["createdById"] = rec.owner_id
     return data
 
 
@@ -193,8 +194,21 @@ def _history(db: Session, p: Principal, rec: Record, action: str, before: dict |
     ))
 
 
+def _team_member_ok(db: Session, uid: str, institution_id: str | None) -> bool:
+    """Who can be linked to a child: an active, approved specialist of the same
+    school. Administrators run the system; they are not on children's teams."""
+    other = _school_user(db, uid, institution_id)
+    return other is not None and other.role in access.TEAM_ROLES
+
+
 def _put_student(db: Session, p: Principal, rec: Record | None, rid: str, data: dict, index: int) -> Record:
+    """A child's card. Specialists add children themselves and become their
+    team; any team member can link colleagues from the same school. Removing
+    someone else is for the person who added the child (or an administrator);
+    anyone can take themselves off a team."""
     u = p.user
+    wants_assigned = set(data.get("assignedSpecialistIds") or [])
+    wants_coord = data.get("coordinatorId") or None
     if rec is None:
         if not access.can_write(u):
             raise _denied(db, p, "create student", rid, index)
@@ -207,39 +221,39 @@ def _put_student(db: Session, p: Principal, rec: Record | None, rid: str, data: 
             raise _denied(db, p, "create student without school", rid, index)
         rec = Record(kind=access.STUDENT, rid=rid, institution_id=inst, owner_id=u.id, data="{}")
         db.add(rec)
-        assigned, coordinator = {u.id}, None
-        if access.admin_for(u, inst):
-            assigned = set(data.get("assignedSpecialistIds") or [])
-            coordinator = data.get("coordinatorId") or None
+        old_assigned, old_coord = set(), None
+        assigned = wants_assigned | ({u.id} if u.role in access.TEAM_ROLES else set())
+        coordinator = wants_coord
         before = None
     else:
         before = json.loads(rec.data)
-        assigned = {sa.user_id for sa in db.scalars(select(StudentAccess).where(
+        old_assigned = {sa.user_id for sa in db.scalars(select(StudentAccess).where(
             StudentAccess.student_id == rid, StudentAccess.via == "assigned"))}
-        coordinator = _coordinator(db, rid)
-        if not access.admin_for(u, rec.institution_id):
-            # Only an administrator decides who works with a child: an attempt
-            # to change it is refused openly, not silently ignored.
-            wants = set(data.get("assignedSpecialistIds") or [])
-            wants_coord = data.get("coordinatorId") or None
-            if ("assignedSpecialistIds" in data and wants != assigned) or (
-                    "coordinatorId" in data and wants_coord != coordinator):
-                raise _denied(db, p, "change assignments", rid, index)
-        if access.admin_for(u, rec.institution_id):
-            assigned = set(data.get("assignedSpecialistIds") or [])
-            coordinator = data.get("coordinatorId") or None
+        old_coord = _coordinator(db, rid)
+        assigned = wants_assigned if "assignedSpecialistIds" in data else set(old_assigned)
+        coordinator = wants_coord if "coordinatorId" in data else old_coord
+        if access.is_super(u):
             new_inst = data.get("institutionId") or rec.institution_id
             if new_inst != rec.institution_id:
-                if not access.is_super(u) or db.get(Institution, new_inst) is None:
+                if db.get(Institution, new_inst) is None:
                     raise ApiError(422, "bad_institution", "Muassasa topilmadi", index=index)
                 rec.institution_id = new_inst
-    for uid in assigned | ({coordinator} if coordinator else set()):
-        if _school_user(db, uid, rec.institution_id) is None:
-            raise ApiError(422, "bad_specialist", "Bu xodimni biriktirib bo‘lmaydi", index=index)
+        # Taking someone off the team.
+        removed = (old_assigned - assigned) | ({old_coord} if old_coord and old_coord != coordinator else set())
+        may_remove_others = rec.owner_id == u.id or access.admin_for(u, rec.institution_id)
+        if removed - {u.id} and not may_remove_others:
+            raise _denied(db, p, "remove team member", rid, index)
+    added = (assigned - old_assigned) | ({coordinator} if coordinator and coordinator != old_coord else set())
+    for uid in added:
+        if uid != u.id and not _team_member_ok(db, uid, rec.institution_id):
+            raise ApiError(422, "bad_specialist", "Bu xodimni bolaga bog‘lab bo‘lmaydi", index=index)
+        if uid == u.id and u.role not in access.TEAM_ROLES:
+            raise ApiError(422, "bad_specialist", "Bu xodimni bolaga bog‘lab bo‘lmaydi", index=index)
     _set_assignments(db, rid, assigned, coordinator)
     for k in PROTECTED_STUDENT_FIELDS:
         data.pop(k, None)
     data.pop("id", None)
+    data.pop("createdById", None)
     rec.data = json.dumps(data, ensure_ascii=False)
     _history(db, p, rec, "create" if before is None else "update", before, data)
     return rec

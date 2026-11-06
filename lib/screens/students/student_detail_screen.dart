@@ -189,6 +189,54 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     );
   }
 
+  Future<void> _confirmRemove(
+    BuildContext context,
+    StudentModel student,
+    UserModel member,
+    UserModel currentUser,
+  ) async {
+    final self = member.id == currentUser.id;
+    final app = context.read<AppProvider>();
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(
+              self ? 'Jamoadan chiqasizmi?' : 'Jamoadan chiqarilsinmi?',
+            ),
+            content: Text(
+              self
+                  ? 'Shundan keyin ${student.fullName} sizga ko‘rinmaydi.'
+                  : '${member.fullName} endi ${student.fullName}ni ko‘rmaydi.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Bekor qilish'),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(self ? 'Chiqish' : 'Chiqarish'),
+              ),
+            ],
+          ),
+    );
+    if (ok != true) return;
+    await app.unassignSpecialistFromStudent(student.id, member.id);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          self
+              ? 'Siz jamoadan chiqdingiz'
+              : '${member.fullName} jamoadan chiqarildi',
+        ),
+      ),
+    );
+    if (self && context.mounted) Navigator.of(context).maybePop();
+  }
+
   void _showAssignSpecialistDialog(
     BuildContext context,
     StudentModel student,
@@ -198,14 +246,18 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     final messenger = ScaffoldMessenger.of(context);
     final availableSpecialists =
         app.specialists
-            .where((u) => !student.assignedSpecialistIds.contains(u.id))
+            .where(
+              (u) =>
+                  !student.assignedSpecialistIds.contains(u.id) &&
+                  _access.canBeAssigned(u, student),
+            )
             .toList();
 
     showDialog(
       context: context,
       builder:
           (ctx) => AlertDialog(
-            title: const Text('Mutaxassis biriktirish'),
+            title: const Text('Jamoaga hamkasb qo‘shish'),
             content: SizedBox(
               width: 430,
               child:
@@ -213,7 +265,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       ? Padding(
                         padding: EdgeInsets.all(16),
                         child: Text(
-                          'Barcha mutaxassislar allaqachon biriktirilgan yoki mutaxassislar ro‘yxati bo‘sh.',
+                          'Maktabingizdagi barcha mutaxassislar allaqachon jamoada.',
                           style: TextStyle(
                             fontSize: 13,
                             color: AppColors.textMuted,
@@ -281,7 +333,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     messenger.showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          '${sp.fullName} ushbu o‘quvchiga biriktirildi',
+                                          '${sp.fullName} jamoaga qo‘shildi',
                                         ),
                                       ),
                                     );
@@ -479,9 +531,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     final canViewMedical =
         currentUser != null && _access.canViewSensitiveMedical(currentUser);
     final canManageAssignments =
-        currentUser != null &&
-        (_access.canManageUsers(currentUser) ||
-            currentUser.role == UserRole.coordinator);
+        currentUser != null && _access.canAssignSpecialists(currentUser, s);
 
     final assignedStaff =
         app.allUsers
@@ -835,7 +885,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           ),
                           icon: const Icon(LucideIcons.userPlus, size: 15),
                           label: const Text(
-                            'Biriktirish',
+                            'Hamkasb qo‘shish',
                             style: TextStyle(fontSize: 13),
                           ),
                           onPressed:
@@ -852,7 +902,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 6),
                       child: Text(
-                        'Ushbu o‘quvchiga hali maxsus mutaxassis biriktirilmagan',
+                        'Jamoada hali hech kim yo‘q',
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textMuted,
@@ -887,7 +937,14 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    '${staff.role.label} • Tel: ${staff.phone ?? 'Mavjud emas'}',
+                                    [
+                                      staff.role.label,
+                                      if (staff.id == s.createdById)
+                                        'bolani qo‘shgan',
+                                      if (staff.phone != null &&
+                                          staff.phone!.isNotEmpty)
+                                        'Tel: ${staff.phone}',
+                                    ].join(' • '),
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textMuted,
@@ -896,6 +953,30 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 ],
                               ),
                             ),
+                            if (currentUser != null &&
+                                _access.canRemoveFromTeam(
+                                  currentUser,
+                                  s,
+                                  staff.id,
+                                ))
+                              IconButton(
+                                tooltip:
+                                    staff.id == currentUser.id
+                                        ? 'Jamoadan chiqish'
+                                        : 'Jamoadan chiqarish',
+                                icon: Icon(
+                                  LucideIcons.userMinus,
+                                  size: 18,
+                                  color: AppColors.error,
+                                ),
+                                onPressed:
+                                    () => _confirmRemove(
+                                      context,
+                                      s,
+                                      staff,
+                                      currentUser,
+                                    ),
+                              ),
                           ],
                         ),
                       );
@@ -3756,7 +3837,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
         title: 'PMPK Xulosasi va Yo‘llanmasi (Rasmiy ma’lumotnoma)',
         subtitle: '${student.institutionName} • 14.08.2026',
         category: 'Tibbiy-pedagogik komissiya',
-        content: '''O‘ZBEKISTON RESPUBLIKASI MAKTABGACHA VA MAKTAB TA’LIMI VAZIRLIGI
+        content:
+            '''O‘ZBEKISTON RESPUBLIKASI MAKTABGACHA VA MAKTAB TA’LIMI VAZIRLIGI
 HUDUDIY PEDAGOGIK-TIBBIY KOMISSIYA (PMPK) XULOSASI VA YO‘LLANMASI
 
 1. O‘quvchi: ${student.fullName}
@@ -3805,36 +3887,52 @@ Shifokor-pediatr xulosasi asosida berildi.''',
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: Text(doc.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                          content: SingleChildScrollView(
-                            child: SelectableText(
-                              doc.content,
-                              style: const TextStyle(fontSize: 13, height: 1.5),
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx),
-                              child: const Text('Yopish'),
-                            ),
-                            FilledButton.icon(
-                              icon: const Icon(LucideIcons.download, size: 15),
-                              label: const Text('Faylni yuklab olish'),
-                              onPressed: () {
-                                final filename = '${student.fullName}_${doc.category.replaceAll(' ', '_')}.txt';
-                                downloadFile(filename, doc.content);
-                                Navigator.pop(ctx);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('$filename fayli yuklab olindi!'),
-                                    backgroundColor: AppColors.success,
+                        builder:
+                            (ctx) => AlertDialog(
+                              title: Text(
+                                doc.title,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              content: SingleChildScrollView(
+                                child: SelectableText(
+                                  doc.content,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    height: 1.5,
                                   ),
-                                );
-                              },
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: const Text('Yopish'),
+                                ),
+                                FilledButton.icon(
+                                  icon: const Icon(
+                                    LucideIcons.download,
+                                    size: 15,
+                                  ),
+                                  label: const Text('Faylni yuklab olish'),
+                                  onPressed: () {
+                                    final filename =
+                                        '${student.fullName}_${doc.category.replaceAll(' ', '_')}.txt';
+                                    downloadFile(filename, doc.content);
+                                    Navigator.pop(ctx);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          '$filename fayli yuklab olindi!',
+                                        ),
+                                        backgroundColor: AppColors.success,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
                       );
                     },
                     child: Row(
@@ -3884,11 +3982,14 @@ Shifokor-pediatr xulosasi asosida berildi.''',
                           ),
                           tooltip: 'Hujjatni yuklab olish',
                           onPressed: () {
-                            final filename = '${student.fullName}_${doc.category.replaceAll(' ', '_')}.txt';
+                            final filename =
+                                '${student.fullName}_${doc.category.replaceAll(' ', '_')}.txt';
                             downloadFile(filename, doc.content);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('$filename fayli kompyuteringizga yuklab olindi!'),
+                                content: Text(
+                                  '$filename fayli kompyuteringizga yuklab olindi!',
+                                ),
                                 backgroundColor: AppColors.success,
                               ),
                             );

@@ -1,10 +1,11 @@
 """Who may see and change what. The server is the authority: the app hiding a
 button is only convenience.
 
-The rule in one sentence: administrators see their whole scope (the system
-administrator everything, a school administrator their school); everyone else
-sees only the children they are assigned to and what is recorded about them,
-and nothing at all from another school.
+The rule: specialists add children themselves and form each child's team,
+linking colleagues from their school. Only the team sees the child and what is
+recorded about them - not other colleagues, nothing across schools.
+Administrators run the system: they see their scope for oversight (and every
+change in the history) but are not on teams.
 """
 from __future__ import annotations
 
@@ -23,6 +24,13 @@ CHILD_KINDS = {
 PERSONAL_KINDS = {"notification"}
 SCHOOL_KINDS = {"question", "curriculum", "custom_metric"}
 ALL_KINDS = {STUDENT} | CHILD_KINDS | PERSONAL_KINDS | SCHOOL_KINDS
+
+# People who work with children and can be on a child's team. Administrators
+# run the system and are not team members.
+TEAM_ROLES = {
+    R.PSYCHOLOGIST.value, R.SPEECH_THERAPIST.value, R.SPECIAL_EDUCATION.value,
+    R.SPECIAL_ED_TEACHER.value, R.TEACHER.value, R.COORDINATOR.value, R.REVIEWER.value,
+}
 
 # Read-only roles: they may look at what they are assigned to, never write.
 READ_ONLY = {R.REVIEWER.value, R.PARENT.value}
@@ -93,7 +101,8 @@ def can_change(u: User, rec: Record) -> bool:
 
 def can_delete(u: User, rec: Record) -> bool:
     if rec.kind == STUDENT:
-        return admin_for(u, rec.institution_id)
+        # The person who added the child, or an administrator.
+        return admin_for(u, rec.institution_id) or (can_write(u) and rec.owner_id == u.id)
     if admin_for(u, rec.institution_id):
         return True
     if rec.kind in PERSONAL_KINDS:

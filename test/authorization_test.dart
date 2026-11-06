@@ -34,7 +34,22 @@ void main() {
   );
 
   final superAdmin = staff('sa', UserRole.superAdmin);
-  final coordinator = staff('coord', UserRole.coordinator);
+  // Koordinator ham mutaxassis: faqat o'z jamoasidagi bolalar bilan ishlaydi.
+  // Bu testlarda u maktabning barcha namunaviy bolalari jamoasida.
+  final coordinator = staff(
+    'coord',
+    UserRole.coordinator,
+    students: const [
+      'student_01',
+      'student_02',
+      'student_03',
+      'student_04',
+      'student_05',
+      'student_06',
+    ],
+  );
+  final outsideCoordinator = staff('coord2', UserRole.coordinator);
+  final director = staff('dir', UserRole.institutionAdmin);
   final otherDirector = staff(
     'dir2',
     UserRole.institutionAdmin,
@@ -101,14 +116,15 @@ void main() {
 
   group('Children are visible only to assigned specialists', () {
     test(
-      'psychologist sees only assigned children; coordinator sees the school',
+      'specialists, coordinators included, see only their team children',
       () {
         final psy = seededPsychologist();
         final visible = db.getStudents(forUser: psy).map((s) => s.id).toSet();
         expect(visible, contains('student_02'));
         expect(visible, isNot(contains('student_04')));
+        expect(db.getStudents(forUser: outsideCoordinator), isEmpty);
         expect(
-          db.getStudents(forUser: coordinator).length,
+          db.getStudents(forUser: director).length,
           db.getStudents().length,
         );
       },
@@ -204,26 +220,82 @@ void main() {
   });
 
   group('Assignment', () {
-    test('only coordinator or director assigns specialists', () async {
-      final psy = seededPsychologist();
-      await expectLater(
-        db.assignSpecialistToStudent('student_04', psy.id, byUser: psy),
-        permissionDenied,
+    test(
+      'only the team of the child (or the school admin) links colleagues',
+      () async {
+        final psy = seededPsychologist();
+        // Not on student_04's team: cannot link anyone, not even themselves.
+        await expectLater(
+          db.assignSpecialistToStudent('student_04', psy.id, byUser: psy),
+          permissionDenied,
+        );
+        // A coordinator outside the team cannot either.
+        await expectLater(
+          db.assignSpecialistToStudent(
+            'student_04',
+            psy.id,
+            byUser: outsideCoordinator,
+          ),
+          permissionDenied,
+        );
+        await db.assignSpecialistToStudent(
+          'student_04',
+          psy.id,
+          byUser: director,
+        );
+        final updated = db.getUserById(psy.id)!;
+        expect(
+          db.getStudents(forUser: updated).map((s) => s.id),
+          contains('student_04'),
+        );
+        // Mutaxassisga bildirishnoma yuborildi
+        expect(
+          db.getNotifications(psy.id).any((n) => n.type == 'ASSIGNMENT'),
+          true,
+        );
+        // Now on the team, the psychologist links the speech therapist.
+        await db.assignSpecialistToStudent(
+          'student_04',
+          'user_speech',
+          byUser: updated,
+        );
+        expect(
+          db.getStudentById('student_04')!.assignedSpecialistIds,
+          contains('user_speech'),
+        );
+      },
+    );
+
+    test('a specialist adds a child and is on its team at once', () async {
+      final teacher = db.getUserById('user_teacher')!;
+      await db.addStudent(
+        StudentModel(
+          id: 'new_child',
+          institutionId: teacher.institutionId!,
+          institutionName: teacher.institutionName!,
+          firstName: 'Yangi',
+          lastName: 'Bola',
+          dateOfBirth: DateTime(2017),
+          gender: 'Qiz',
+          grade: '2-A',
+          status: 'Faol',
+          primaryNeed: 'x',
+          supportLevel: '1-daraja',
+          createdAt: DateTime.now(),
+        ),
+        byUser: teacher,
       );
-      await db.assignSpecialistToStudent(
-        'student_04',
-        psy.id,
-        byUser: coordinator,
-      );
-      final updated = db.getUserById(psy.id)!;
+      final child = db.getStudentById('new_child')!;
+      expect(child.createdById, teacher.id);
+      expect(child.assignedSpecialistIds, [teacher.id]);
       expect(
-        db.getStudents(forUser: updated).map((s) => s.id),
-        contains('student_04'),
+        db.getStudents(forUser: teacher).map((s) => s.id),
+        contains('new_child'),
       );
-      // Mutaxassisga bildirishnoma yuborildi
+      // Colleagues outside the team do not see it.
       expect(
-        db.getNotifications(psy.id).any((n) => n.type == 'ASSIGNMENT'),
-        true,
+        db.getStudents(forUser: seededPsychologist()).map((s) => s.id),
+        isNot(contains('new_child')),
       );
     });
 
@@ -231,7 +303,7 @@ void main() {
       await db.unassignSpecialistFromStudent(
         'student_02',
         'user_psychologist',
-        byUser: coordinator,
+        byUser: director,
       );
       final psy = db.getUserById('user_psychologist')!;
       expect(
@@ -240,12 +312,39 @@ void main() {
       );
     });
 
-    test('admins and reviewers cannot be assigned as specialists', () async {
+    test(
+      'team members can leave, but only the one who added the child removes others',
+      () async {
+        final psy = seededPsychologist();
+        final student = db.getStudentById('student_02')!;
+        final other = student.assignedSpecialistIds.firstWhere(
+          (id) => id != psy.id,
+          orElse: () => '',
+        );
+        if (other.isNotEmpty && student.createdById != psy.id) {
+          await expectLater(
+            db.unassignSpecialistFromStudent('student_02', other, byUser: psy),
+            permissionDenied,
+          );
+        }
+        await db.unassignSpecialistFromStudent(
+          'student_02',
+          psy.id,
+          byUser: psy,
+        );
+        expect(
+          db.getStudents(forUser: db.getUserById(psy.id)!).map((s) => s.id),
+          isNot(contains('student_02')),
+        );
+      },
+    );
+
+    test('administrators cannot be linked to a child', () async {
       await expectLater(
         db.assignSpecialistToStudent(
           'student_04',
           'user_admin',
-          byUser: coordinator,
+          byUser: director,
         ),
         throwsA(isA<ValidationException>()),
       );
@@ -330,7 +429,7 @@ void main() {
       await db.assignSpecialistToStudent(
         'student_04',
         'user_psychologist',
-        byUser: coordinator,
+        byUser: director,
       );
       final n = db.getNotifications('user_psychologist').first;
       await expectLater(

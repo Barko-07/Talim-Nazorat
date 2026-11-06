@@ -77,6 +77,8 @@ class StudentModel {
   final String? deactivationReason;
   final DateTime? deactivatedAt;
   final DateTime createdAt;
+  // Bolani tizimga qo'shgan mutaxassis (u jamoadan boshqalarni chiqara oladi)
+  final String? createdById;
   // Imkoniyatlar profili (psixolog to'ldiradi). null = hali to'ldirilmagan
   final StudentAccessProfile? accessProfile;
   // Yo'nalish nomi -> ishchi daraja
@@ -104,6 +106,7 @@ class StudentModel {
     this.deactivationReason,
     this.deactivatedAt,
     required this.createdAt,
+    this.createdById,
     this.accessProfile,
     this.domainLevels = const {},
   });
@@ -144,6 +147,7 @@ class StudentModel {
     String? deactivationReason,
     DateTime? deactivatedAt,
     DateTime? createdAt,
+    String? createdById,
     StudentAccessProfile? accessProfile,
     Map<String, DomainLevel>? domainLevels,
   }) {
@@ -170,6 +174,7 @@ class StudentModel {
       deactivationReason: deactivationReason ?? this.deactivationReason,
       deactivatedAt: deactivatedAt ?? this.deactivatedAt,
       createdAt: createdAt ?? this.createdAt,
+      createdById: createdById ?? this.createdById,
       accessProfile: accessProfile ?? this.accessProfile,
       domainLevels: domainLevels ?? this.domainLevels,
     );
@@ -197,6 +202,7 @@ class StudentModel {
     'deactivationReason': deactivationReason,
     'deactivatedAt': deactivatedAt?.toIso8601String(),
     'createdAt': createdAt.toIso8601String(),
+    if (createdById != null) 'createdById': createdById,
     'accessProfile': accessProfile?.toJson(),
     'domainLevels': domainLevels.values.map((d) => d.toJson()).toList(),
   };
@@ -235,6 +241,7 @@ class StudentModel {
             ? DateTime.parse(json['deactivatedAt'] as String)
             : null,
     createdAt: DateTime.parse(json['createdAt'] as String),
+    createdById: json['createdById'] as String?,
     accessProfile:
         json['accessProfile'] is Map<String, dynamic>
             ? StudentAccessProfile.fromJson(

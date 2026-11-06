@@ -6,12 +6,14 @@ import '../models/session_model.dart';
 import '../models/iep_model.dart';
 import '../models/referral_model.dart';
 
-/// Rollar bo'yicha ruxsatlar matritsasi (yagona manba).
+/// Rollar bo'yicha ruxsatlar matritsasi (yagona manba). Server ham xuddi shu
+/// qoidalarni tekshiradi (server/app/access.py) — ilova faqat qulaylik uchun.
 ///
 /// Asosiy tamoyillar:
 /// - Har bir foydalanuvchi faqat o'z muassasasi bilan ishlaydi (tizim administratoridan tashqari).
-/// - Bolalar bilan bevosita ishlaydigan mutaxassislar va o'qituvchilar faqat o'zlariga
-///   biriktirilgan bolalarni ko'radi. Koordinator, rahbariyat va kuzatuvchi — butun maktabni.
+/// - Mutaxassislar bolani o'zlari qo'shadi va bolaning jamoasini tuzadi: jamoa a'zosi
+///   o'z maktabidagi boshqa mutaxassisni bog'laydi. Bolani faqat jamoasi ko'radi.
+/// - Administrator tizimni boshqaradi (hisoblar, maktablar, jurnal); jamoaga kirmaydi.
 /// - Bola ma'lumotini o'zgartirish uchun avvalo uni ko'rish huquqi bo'lishi shart.
 /// - Bloklangan foydalanuvchi hech narsa qila olmaydi.
 class AccessControlService {
@@ -20,12 +22,9 @@ class AccessControlService {
   factory AccessControlService() => _instance;
   AccessControlService._internal();
 
-  /// Butun maktab bolalarini ko'radigan rollar
-  static const schoolWideRoles = {
-    UserRole.institutionAdmin,
-    UserRole.coordinator,
-    UserRole.reviewer,
-  };
+  /// Butun maktab bolalarini ko'radigan rollar: faqat maktab administratori
+  /// (nazorat uchun). Qolganlar — faqat o'z jamoasidagi bolalarni.
+  static const schoolWideRoles = {UserRole.institutionAdmin};
 
   /// Bolalar bilan bevosita ishlaydigan va bolalar biriktiriladigan rollar
   static const childFacingRoles = {
@@ -52,11 +51,19 @@ class AccessControlService {
     UserRole.coordinator,
   };
 
-  /// Bolalarga mutaxassis biriktira oladiganlar
-  static const specialistAssigners = {
-    UserRole.institutionAdmin,
+  /// Bolaning jamoasiga kira oladigan rollar (administratorlar emas)
+  static const teamRoles = {
+    ...childFacingRoles,
     UserRole.coordinator,
+    UserRole.reviewer,
   };
+
+  /// Faqat ko'radigan, yozmaydigan rollar
+  static const readOnlyRoles = {UserRole.reviewer, UserRole.parent};
+
+  bool _isAdminFor(UserModel user, StudentModel student) =>
+      user.role == UserRole.superAdmin ||
+      (user.role == UserRole.institutionAdmin && _sameSchool(user, student));
 
   // ==================== MAKTAB IZOLYATSIYASI ====================
   /// Foydalanuvchi va yozuv bir xil muassasaga tegishlimi?
@@ -92,8 +99,9 @@ class AccessControlService {
     if (user.role == UserRole.superAdmin) return true;
     if (!_sameSchool(user, student)) return false;
     if (schoolWideRoles.contains(user.role)) return true;
-    if (childFacingRoles.contains(user.role)) {
-      return isStudentAssignedTo(user, student);
+    if (teamRoles.contains(user.role)) {
+      return isStudentAssignedTo(user, student) ||
+          student.createdById == user.id;
     }
     return false;
   }
@@ -127,35 +135,57 @@ class AccessControlService {
 
   // ==================== O'QUVCHINI BOSHQARISH ====================
   /// O'quvchi anketasini yaratish ([student] — yangi yoki mavjud) yoki tahrirlash
+  ///
+  /// Yangi bolani ([student] == null) o'z maktabiga istalgan mutaxassis qo'shadi;
+  /// mavjud bolani uning jamoasi (va administrator) tahrirlaydi.
   bool canEditStudent(UserModel user, StudentModel? student) {
     if (!user.isActive) return false;
     if (user.role == UserRole.superAdmin) return true;
-    if (user.role != UserRole.institutionAdmin &&
-        user.role != UserRole.coordinator) {
+    if (student != null && !_sameSchool(user, student)) return false;
+    if (user.role == UserRole.institutionAdmin) return true;
+    if (!teamRoles.contains(user.role) || readOnlyRoles.contains(user.role)) {
       return false;
     }
-    return student == null || _sameSchool(user, student);
+    return student == null ||
+        isStudentAssignedTo(user, student) ||
+        student.createdById == user.id;
   }
 
-  /// O'quvchini arxivlash
+  /// O'quvchini arxivlash: uni qo'shgan mutaxassis yoki administrator
   bool canArchiveStudent(UserModel user, StudentModel student) {
     if (!user.isActive) return false;
-    if (user.role == UserRole.superAdmin) return true;
-    return user.role == UserRole.institutionAdmin && _sameSchool(user, student);
+    if (_isAdminFor(user, student)) return true;
+    return !readOnlyRoles.contains(user.role) && student.createdById == user.id;
   }
 
-  /// Bolaga mutaxassis biriktirish yoki biriktirishni bekor qilish
+  /// Bolaning jamoasiga hamkasb bog'lash: jamoa a'zosi (yoki administrator)
   bool canAssignSpecialists(UserModel user, StudentModel student) {
     if (!user.isActive) return false;
-    if (user.role == UserRole.superAdmin) return true;
-    return specialistAssigners.contains(user.role) &&
-        _sameSchool(user, student);
+    if (_isAdminFor(user, student)) return true;
+    return teamRoles.contains(user.role) &&
+        !readOnlyRoles.contains(user.role) &&
+        _sameSchool(user, student) &&
+        isStudentAssignedTo(user, student);
   }
 
-  /// [specialist] shu bolaga biriktirilishi mumkinmi (faol, bolalar bilan ishlaydi, shu maktabdan)
+  /// Jamoadan chiqarish: o'zini — har kim; boshqani — bolani qo'shgan kishi
+  /// yoki administrator.
+  bool canRemoveFromTeam(
+    UserModel user,
+    StudentModel student,
+    String memberId,
+  ) {
+    if (!user.isActive) return false;
+    if (_isAdminFor(user, student)) return true;
+    if (!isStudentAssignedTo(user, student)) return false;
+    return memberId == user.id || student.createdById == user.id;
+  }
+
+  /// [specialist] shu bolaning jamoasiga bog'lanishi mumkinmi (faol, shu maktab
+  /// mutaxassisi; administrator emas)
   bool canBeAssigned(UserModel specialist, StudentModel student) {
     return specialist.isActive &&
-        childFacingRoles.contains(specialist.role) &&
+        teamRoles.contains(specialist.role) &&
         _sameSchool(specialist, student);
   }
 

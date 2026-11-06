@@ -807,7 +807,7 @@ class LocalDbService {
     final student = _studentOrThrow(conference.studentId);
     _require(
       _accessControl.canAssignSpecialists(byUser, student),
-      'konsiliumni koordinator yoki muassasa rahbari chaqiradi.',
+      'konsiliumni bolaning jamoasi a’zosi chaqiradi.',
       actor: byUser,
     );
     if (conference.agenda.trim().isEmpty) {
@@ -1778,9 +1778,20 @@ class LocalDbService {
     StudentModel student, {
     required UserModel byUser,
   }) async {
+    // Bolani qo'shgan mutaxassis darhol uning jamoasiga kiradi.
+    final joins =
+        AccessControlService.teamRoles.contains(byUser.role) &&
+        !student.assignedSpecialistIds.contains(byUser.id);
+    student = student.copyWith(
+      createdById: student.createdById ?? byUser.id,
+      assignedSpecialistIds:
+          joins
+              ? [...student.assignedSpecialistIds, byUser.id]
+              : student.assignedSpecialistIds,
+    );
     _require(
       _accessControl.canEditStudent(byUser, student),
-      'o‘quvchini faqat muassasa rahbari yoki koordinator ro‘yxatga oladi (o‘z maktabiga).',
+      'bolani o‘z maktabingizga mutaxassis sifatida qo‘sha olasiz.',
       actor: byUser,
     );
     if (_students.any((s) => s.id == student.id)) {
@@ -1816,7 +1827,7 @@ class LocalDbService {
     _require(
       _accessControl.canEditStudent(byUser, current) &&
           _accessControl.canEditStudent(byUser, updated),
-      'o‘quvchi anketasini faqat muassasa rahbari yoki koordinator tahrirlaydi.',
+      'bola anketasini uning jamoasi tahrirlaydi.',
       actor: byUser,
     );
     _students[index] = updated.copyWith(
@@ -1867,7 +1878,7 @@ class LocalDbService {
     );
   }
 
-  /// Bolaga mutaxassis biriktirish (koordinator yoki muassasa rahbari)
+  /// Bolaning jamoasiga hamkasb bog'lash (jamoa a'zosi yoki administrator)
   Future<void> assignSpecialistToStudent(
     String studentId,
     String specialistId, {
@@ -1880,18 +1891,19 @@ class LocalDbService {
     }
     _require(
       _accessControl.canAssignSpecialists(byUser, student),
-      'mutaxassisni faqat koordinator yoki muassasa rahbari biriktiradi.',
+      'hamkasbni faqat bolaning jamoasi a’zosi bog‘laydi.',
       actor: byUser,
     );
     if (!_accessControl.canBeAssigned(specialist, student)) {
       throw const ValidationException(
-        'Bu foydalanuvchini biriktirib bo‘lmaydi: u faol, bolalar bilan ishlaydigan va shu maktab xodimi bo‘lishi kerak.',
+        'Bu foydalanuvchini bog‘lab bo‘lmaydi: u shu maktabning faol mutaxassisi bo‘lishi kerak.',
       );
     }
     await _assign(student, specialist, actor: byUser);
   }
 
-  /// Biriktirishni bekor qilish (koordinator yoki muassasa rahbari)
+  /// Jamoadan chiqarish: o'zini — har kim, boshqani — bolani qo'shgan kishi
+  /// yoki administrator.
   Future<void> unassignSpecialistFromStudent(
     String studentId,
     String specialistId, {
@@ -1900,8 +1912,8 @@ class LocalDbService {
   }) async {
     final student = _studentOrThrow(studentId);
     _require(
-      _accessControl.canAssignSpecialists(byUser, student),
-      'biriktirishni faqat koordinator yoki muassasa rahbari bekor qiladi.',
+      _accessControl.canRemoveFromTeam(byUser, student, specialistId),
+      'boshqa mutaxassisni jamoadan bolani qo‘shgan kishi chiqaradi.',
       actor: byUser,
     );
     final sIndex = _students.indexWhere((s) => s.id == studentId);

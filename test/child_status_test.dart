@@ -23,11 +23,12 @@ void main() {
     fullName: 'Admin',
     role: UserRole.superAdmin,
   );
-  final coordinator = UserModel(
-    id: 'cs_coord',
-    email: 'cs.coord@talim.uz',
-    fullName: 'Koordinator',
-    role: UserRole.coordinator,
+  // Maktab administratori butun maktab holatini ko'radi (nazorat uchun).
+  final director = UserModel(
+    id: 'cs_dir',
+    email: 'cs.dir@talim.uz',
+    fullName: 'Direktor',
+    role: UserRole.institutionAdmin,
     institutionId: 'inst_chortoq_5',
     institutionName: school,
   );
@@ -57,7 +58,7 @@ void main() {
       byUser: admin,
     );
     for (final u in assigned) {
-      await db.assignSpecialistToStudent(id, u, byUser: coordinator);
+      await db.assignSpecialistToStudent(id, u, byUser: admin);
     }
     psy = db.getUserById('user_psychologist')!;
     speech = db.getUserById('user_speech')!;
@@ -79,7 +80,7 @@ void main() {
       );
 
   ChildStatus status(String id) =>
-      service.statusFor(db.getStudentById(id)!, coordinator);
+      service.statusFor(db.getStudentById(id)!, director);
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
@@ -174,8 +175,8 @@ void main() {
     await measure('c_good', psy, 2, now.subtract(const Duration(days: 20)));
     await measure('c_good', psy, 5, now);
 
-    final summary = service.summaryFor(coordinator);
-    expect(summary.total, db.getStudents(forUser: coordinator).length);
+    final summary = service.summaryFor(director);
+    expect(summary.total, db.getStudents(forUser: director).length);
     expect(summary.statuses.first.color, StatusColor.red);
     expect(summary.count(StatusColor.green), greaterThanOrEqualTo(1));
     final colors = summary.statuses.map((s) => s.color.index).toList();

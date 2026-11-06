@@ -20,6 +20,16 @@ void main() {
     role: UserRole.coordinator,
     institutionId: 'inst_chortoq_5',
     institutionName: school,
+    // Koordinator ham bolaning jamoasida bo'lsagina konsilium chaqiradi.
+    assignedStudentIds: const ['student_02'],
+  );
+  final outsider = UserModel(
+    id: 'cc_out',
+    email: 'cc.out@talim.uz',
+    fullName: 'Begona',
+    role: UserRole.coordinator,
+    institutionId: 'inst_chortoq_5',
+    institutionName: school,
   );
 
   late UserModel psy;
@@ -123,10 +133,10 @@ void main() {
   );
 
   test(
-    'only coordinator or director can schedule; at least 2 valid specialists',
+    'only the team of the child can schedule; at least 2 valid specialists',
     () async {
       await expectLater(
-        db.scheduleConference(draft(), byUser: psy),
+        db.scheduleConference(draft(), byUser: outsider),
         throwsA(isA<PermissionDeniedException>()),
       );
       await expectLater(
@@ -201,7 +211,7 @@ void main() {
   );
 
   test(
-    'visible to participants and school leadership, not to other staff',
+    'visible to participants and the organiser, not to other staff',
     () async {
       await db.scheduleConference(draft(), byUser: coordinator);
       expect(db.getConferences(forUser: psy), hasLength(1));
