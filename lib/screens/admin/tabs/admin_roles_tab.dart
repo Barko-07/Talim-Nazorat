@@ -2,6 +2,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../services/access_control_service.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../models/user_model.dart';
 import '../../../providers/app_provider.dart';
@@ -286,20 +287,33 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                       ),
                       const SizedBox(height: 12),
                       _buildPermissionItem(
-                        title: 'O‘quvchilar bazasini ko‘rish',
+                        title: 'Bolalarni ko‘rish',
                         description:
-                            'Hududiy yoki maktab doirasidagi bolalar ro‘yxatini ko‘rish',
+                            _selectedRole == UserRole.superAdmin ||
+                                    _selectedRole == UserRole.institutionAdmin
+                                ? 'Nazorat uchun: o‘z doirasidagi barcha bolalar'
+                                : 'Faqat o‘zi jamoasida bo‘lgan bolalar',
                         allowed: _selectedRole != UserRole.parent,
                       ),
                       _buildPermissionItem(
-                        title: 'O‘quvchi anketasini yaratish / tahrirlash',
+                        title: 'Bola qo‘shish va anketasini tahrirlash',
                         description:
-                            'Yangi bola kiritish, anketasini o‘zgartirish',
+                            'Mutaxassis bolani o‘zi qo‘shadi va uning jamoasiga kiradi',
                         allowed:
-                            _selectedRole == UserRole.superAdmin ||
-                            _selectedRole == UserRole.institutionAdmin ||
-                            _selectedRole == UserRole.coordinator ||
-                            _selectedRole == UserRole.teacher,
+                            AccessControlService.teamRoles.contains(
+                              _selectedRole,
+                            ) &&
+                            _selectedRole != UserRole.reviewer,
+                      ),
+                      _buildPermissionItem(
+                        title: 'Hamkasbni bolaga bog‘lash',
+                        description:
+                            'Jamoa a’zosi o‘z maktabidagi mutaxassisni bog‘laydi',
+                        allowed:
+                            AccessControlService.teamRoles.contains(
+                              _selectedRole,
+                            ) &&
+                            _selectedRole != UserRole.reviewer,
                       ),
                       _buildPermissionItem(
                         title: 'Maxfiy tibbiy ma’lumotlarni ko‘rish',
