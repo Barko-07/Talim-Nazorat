@@ -1,5 +1,8 @@
-"""System administration. Every route requires require_admin: SUPER_ADMIN role,
-two-factor verified session, optional IP allowlist. Others get 404."""
+"""Administration. Every route requires require_admin (emailed-code login,
+optional IP allowlist; others get 404). The system administrator works on
+everything; a school administrator only on their own school: its staff, the
+sign-ups that name it, its history. They cannot create or manage
+administrators, move people to other schools or add schools."""
 from __future__ import annotations
 
 import json
@@ -10,7 +13,7 @@ from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
 from ..context import AppContext
-from ..deps import ApiError, Principal, get_ctx, get_db, require_admin
+from ..deps import ADMIN_ROLES, ApiError, Principal, get_ctx, get_db, require_admin, require_super
 from ..mailer import MailError
 from ..models import (
     AuditEvent,
@@ -48,6 +51,41 @@ def _get_user(db: Session, user_id: str) -> User:
     return u
 
 
+def _scope(p: Principal) -> str | None:
+    """None for the system administrator, otherwise the admin's own school."""
+    return None if p.user.role == Role.SUPER_ADMIN.value else p.user.institution_id
+
+
+def _norm(name: str) -> str:
+    keep = "".join(c for c in (name or "").lower() if c.isalnum() or c.isspace())
+    return " ".join(keep.split())
+
+
+def _names_school(u: User, school_name: str) -> bool:
+    """A sign-up that wrote this school's name when registering."""
+    stated = profile_of(u).get("institution_name") or ""
+    return bool(stated) and _norm(stated) == _norm(school_name)
+
+
+def _managed(db: Session, p: Principal, user_id: str, *, pending: bool = False) -> User:
+    """A user this administrator may act on; anyone else looks like "not found"."""
+    u = _get_user(db, user_id)
+    scope = _scope(p)
+    if scope is None:
+        return u
+    if pending and u.pending_approval:
+        inst = db.get(Institution, scope)
+        if inst is not None and _names_school(u, inst.name):
+            return u
+    elif u.institution_id == scope and u.role not in ADMIN_ROLES:
+        return u
+    raise ApiError(404, "not_found", "Foydalanuvchi topilmadi")
+
+
+def _school_users(scope: str):
+    return select(User.id).where(User.institution_id == scope)
+
+
 def _active_admins(db: Session) -> int:
     return db.scalar(
         select(func.count()).select_from(User).where(
@@ -59,13 +97,21 @@ def _active_admins(db: Session) -> int:
 @router.get("/users")
 def list_users(q: str = Query(default="", max_length=100), offset: int = Query(default=0, ge=0),
                limit: int = Query(default=2000, ge=1, le=5000),
-               _: Principal = Depends(require_admin), db: Session = Depends(get_db)):
-    stmt = select(User).order_by(User.full_name, User.id).offset(offset).limit(limit)
+               p: Principal = Depends(require_admin), db: Session = Depends(get_db)):
+    stmt = select(User).order_by(User.full_name, User.id)
     if q:
         # Bound parameter + escaped wildcards: input is data, never SQL.
         like = "%" + q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
         stmt = stmt.where(User.full_name.ilike(like, escape="\\") | User.email.ilike(like, escape="\\"))
-    return [_user_row(u) for u in db.scalars(stmt)]
+    scope = _scope(p)
+    if scope is None:
+        return [_user_row(u) for u in db.scalars(stmt.offset(offset).limit(limit))]
+    inst = db.get(Institution, scope)
+    own = db.scalars(stmt.where(User.institution_id == scope)).all()
+    asking = [u for u in db.scalars(stmt.where(User.pending_approval.is_(True)))
+              if inst is not None and _names_school(u, inst.name)]
+    rows = sorted({u.id: u for u in [*own, *asking]}.values(), key=lambda u: (u.full_name, u.id))
+    return [_user_row(u) for u in rows[offset:offset + limit]]
 
 
 @router.post("/users", status_code=201)
@@ -76,6 +122,13 @@ def create_user(body: UserCreateIn, p: Principal = Depends(require_admin),
         raise ApiError(409, "exists", "Bu email bilan hisob mavjud")
     if body.institution_id and db.get(Institution, body.institution_id) is None:
         raise ApiError(422, "bad_institution", "Muassasa topilmadi")
+    scope = _scope(p)
+    if scope is not None:
+        if body.role.value in ADMIN_ROLES:
+            raise ApiError(403, "forbidden", "Administrator hisobini faqat tizim administratori ochadi")
+        if body.institution_id not in (None, scope):
+            raise ApiError(403, "forbidden", "Faqat o‘z maktabingizga xodim qo‘sha olasiz")
+        body.institution_id = scope
     if body.role != Role.SUPER_ADMIN and not body.institution_id:
         # Everyone except the system administrator works inside one school.
         raise ApiError(422, "institution_required", "Muassasani tanlang")
@@ -105,7 +158,14 @@ def create_user(body: UserCreateIn, p: Principal = Depends(require_admin),
 @router.patch("/users/{user_id}")
 def update_user(user_id: str, body: UserUpdateIn, p: Principal = Depends(require_admin),
                 db: Session = Depends(get_db)):
-    u = _get_user(db, user_id)
+    u = _managed(db, p, user_id) if p.user.id != user_id else _get_user(db, user_id)
+    if _scope(p) is not None:
+        if u.id == p.user.id:
+            raise ApiError(409, "self_change", "O‘z hisobingizni profil sahifasida o‘zgartiring")
+        if body.role is not None and body.role.value in ADMIN_ROLES:
+            raise ApiError(403, "forbidden", "Administrator rolini faqat tizim administratori beradi")
+        if body.institution_id is not None and body.institution_id != _scope(p):
+            raise ApiError(403, "forbidden", "Xodimni boshqa maktabga faqat tizim administratori o‘tkazadi")
     if u.id == p.user.id and (body.role is not None or body.is_active is False):
         raise ApiError(409, "self_change", "O‘z rolingizni o‘zgartira yoki o‘zingizni bloklay olmaysiz")
     demoting = u.role == Role.SUPER_ADMIN.value and (
@@ -138,8 +198,11 @@ def update_user(user_id: str, body: UserUpdateIn, p: Principal = Depends(require
 @router.post("/users/{user_id}/approve")
 def approve_user(user_id: str, body: ApproveIn, p: Principal = Depends(require_admin),
                  db: Session = Depends(get_db), ctx: AppContext = Depends(get_ctx)):
-    """Lets a self-registered account in, attached to the school the admin picks."""
-    u = _get_user(db, user_id)
+    """Lets a self-registered account in, attached to the school the admin picks
+    (a school administrator: to their own school)."""
+    u = _managed(db, p, user_id, pending=True)
+    if _scope(p) is not None and body.institution_id != _scope(p):
+        raise ApiError(403, "forbidden", "Faqat o‘z maktabingizga qabul qila olasiz")
     if not u.pending_approval:
         raise ApiError(409, "not_pending", "Bu hisob tasdiq kutmayapti")
     if db.get(Institution, body.institution_id) is None:
@@ -157,7 +220,7 @@ def approve_user(user_id: str, body: ApproveIn, p: Principal = Depends(require_a
 def reject_user(user_id: str, p: Principal = Depends(require_admin), db: Session = Depends(get_db),
                 ctx: AppContext = Depends(get_ctx)):
     """Deletes a sign-up that was never approved (it owns no data yet)."""
-    u = _get_user(db, user_id)
+    u = _managed(db, p, user_id, pending=True)
     if not u.pending_approval:
         raise ApiError(409, "not_pending", "Faqat tasdiq kutayotgan hisobni rad etish mumkin")
     email = u.email
@@ -172,7 +235,7 @@ def reject_user(user_id: str, p: Principal = Depends(require_admin), db: Session
 
 @router.post("/users/{user_id}/unlock")
 def unlock_user(user_id: str, p: Principal = Depends(require_admin), db: Session = Depends(get_db)):
-    u = _get_user(db, user_id)
+    u = _managed(db, p, user_id)
     u.failed_logins = 0
     u.locked_until = None
     db.commit()
@@ -182,7 +245,7 @@ def unlock_user(user_id: str, p: Principal = Depends(require_admin), db: Session
 
 @router.post("/users/{user_id}/reset-mfa")
 def reset_mfa(user_id: str, p: Principal = Depends(require_admin), db: Session = Depends(get_db)):
-    u = _get_user(db, user_id)
+    u = _managed(db, p, user_id) if p.user.id != user_id else _get_user(db, user_id)
     if u.id == p.user.id:
         raise ApiError(409, "self_change", "O‘z ikki bosqichli himoyangizni bu yerda o‘chira olmaysiz")
     u.mfa_enabled = False
@@ -196,25 +259,26 @@ def reset_mfa(user_id: str, p: Principal = Depends(require_admin), db: Session =
 
 @router.post("/users/{user_id}/revoke-sessions")
 def revoke_sessions(user_id: str, p: Principal = Depends(require_admin), db: Session = Depends(get_db)):
-    u = _get_user(db, user_id)
+    u = _managed(db, p, user_id) if p.user.id != user_id else _get_user(db, user_id)
     sessions.revoke_all(db, u.id, except_id=p.session.id if u.id == p.user.id else None)
     audit.record(db, "ADMIN_SESSIONS_REVOKED", user_id=p.user.id, subject=u.id, ip=p.ip)
     return {"ok": True}
 
 
 @router.get("/sessions")
-def active_sessions(_: Principal = Depends(require_admin), db: Session = Depends(get_db)):
+def active_sessions(p: Principal = Depends(require_admin), db: Session = Depends(get_db)):
     since = utcnow() - timedelta(hours=24)
-    rows = db.scalars(
-        select(AuthSession).where(AuthSession.revoked.is_(False), AuthSession.last_seen_at >= since)
-        .order_by(AuthSession.last_seen_at.desc()).limit(500)
-    )
+    stmt = (select(AuthSession).where(AuthSession.revoked.is_(False), AuthSession.last_seen_at >= since)
+            .order_by(AuthSession.last_seen_at.desc()).limit(500))
+    if _scope(p) is not None:
+        stmt = stmt.where(AuthSession.user_id.in_(_school_users(_scope(p))))
+    rows = db.scalars(stmt)
     return [{"id": s.id, "user_id": s.user_id, "ip": s.ip, "user_agent": s.user_agent,
              "mfa_verified": s.mfa_verified, "last_seen_at": s.last_seen_at.isoformat()} for s in rows]
 
 
 @router.get("/institutions")
-def list_institutions(_: Principal = Depends(require_admin), db: Session = Depends(get_db)):
+def list_institutions(p: Principal = Depends(require_admin), db: Session = Depends(get_db)):
     """Schools with how many active accounts each has (for approving sign-ups)."""
     counts = dict(
         db.execute(
@@ -224,12 +288,15 @@ def list_institutions(_: Principal = Depends(require_admin), db: Session = Depen
             .group_by(User.institution_id)
         ).all()
     )
-    rows = db.scalars(select(Institution).order_by(Institution.name)).all()
+    stmt = select(Institution).order_by(Institution.name)
+    if _scope(p) is not None:
+        stmt = stmt.where(Institution.id == _scope(p))
+    rows = db.scalars(stmt).all()
     return [{"id": i.id, "name": i.name, "region": i.region, "users": counts.get(i.id, 0)} for i in rows]
 
 
 @router.post("/institutions", status_code=201)
-def create_institution(body: InstitutionIn, p: Principal = Depends(require_admin),
+def create_institution(body: InstitutionIn, p: Principal = Depends(require_super),
                        db: Session = Depends(get_db)):
     if db.scalar(select(Institution).where(func.lower(Institution.name) == body.name.lower())):
         raise ApiError(409, "exists", "Bu nomdagi muassasa allaqachon bor")
@@ -244,8 +311,10 @@ def create_institution(body: InstitutionIn, p: Principal = Depends(require_admin
 def audit_log(severity: str | None = Query(default=None, pattern=r"^(info|warning|alert)$"),
               limit: int = Query(default=200, ge=1, le=1000),
               before_id: int | None = Query(default=None, ge=1),
-              _: Principal = Depends(require_admin), db: Session = Depends(get_db)):
+              p: Principal = Depends(require_admin), db: Session = Depends(get_db)):
     stmt = select(AuditEvent).order_by(AuditEvent.id.desc()).limit(limit)
+    if _scope(p) is not None:
+        stmt = stmt.where(AuditEvent.user_id.in_(_school_users(_scope(p))))
     if severity:
         stmt = stmt.where(AuditEvent.severity == severity)
     if before_id:
@@ -269,6 +338,8 @@ def changes(kind: str | None = Query(default=None, pattern=r"^[a-z_]{1,32}$"),
     """What was added, changed or deleted, by whom and when, with the old and
     new values. Reading the history is itself recorded."""
     stmt = select(RecordChange).order_by(RecordChange.id.desc()).limit(limit)
+    if _scope(p) is not None:
+        stmt = stmt.where(RecordChange.institution_id == _scope(p))
     if kind:
         stmt = stmt.where(RecordChange.kind == kind)
     if user_id:
@@ -298,7 +369,7 @@ def changes(kind: str | None = Query(default=None, pattern=r"^[a-z_]{1,32}$"),
 @router.post("/users/{user_id}/force-password-change")
 def force_password_change(user_id: str, p: Principal = Depends(require_admin),
                           db: Session = Depends(get_db)):
-    u = _get_user(db, user_id)
+    u = _managed(db, p, user_id)
     db.execute(update(User).where(User.id == u.id).values(must_change_password=True))
     db.commit()
     sessions.revoke_all(db, u.id)

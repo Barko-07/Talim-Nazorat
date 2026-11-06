@@ -12,6 +12,7 @@ import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/logout_dialog.dart';
 import '../auth/verification_screens.dart';
+import 'profile_edit_dialog.dart';
 import '../../core/widgets/status_badge.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -189,6 +190,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Column(
                 children: [
+                  if (AppConfig.serverMode && user != null)
+                    _buildMyGovMenuItem(
+                      icon: LucideIcons.userPen,
+                      title: 'Profilni tahrirlash',
+                      subtitle: 'Ism, telefon va kasbiy ma’lumotlar',
+                      onTap: () => showProfileEditDialog(context, user),
+                    ),
                   _buildMyGovMenuItem(
                     icon: LucideIcons.idCard,
                     title: 'Shaxsiy ma’lumotlar',
@@ -458,7 +466,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       rows: const [
         ('Platforma nomi', 'Individ'),
         ('Talqin', '1.0.0'),
-        ('Ma’lumotlar bazasi', 'Mahalliy himoyalangan xotira'),
+        (
+          'Ma’lumotlar saqlanadi',
+          AppConfig.serverMode
+              ? 'Individ serveri (O‘zbekiston), shifrlangan'
+              : 'Shu qurilma (sinov rejimi)',
+        ),
         ('Huquqiy me’yor', 'O‘RQ-547 ("Shaxsga doir ma’lumotlar to‘g‘risida")'),
       ],
     );

@@ -291,3 +291,22 @@ def test_wrong_passwords_from_one_address_do_not_lock_the_owner_out():
     owner = TestClient(app).post("/api/auth/login", json={"email": "t@m.uz", "password": "Xavfsiz-Parol-2026"},
                                  headers={**h, "X-Real-IP": "198.51.100.7"})
     assert owner.status_code == 200
+
+
+def test_offline_edits_detect_changes_made_meanwhile(app):
+    _school(app)
+    ids = _ids(app)
+    t1 = _as(app, "t1@1-maktab.uz")
+    team = sorted([ids["t1@1-maktab.uz"], ids["t2@1-maktab.uz"]])
+    _put(t1, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": team}))
+    v = t1.get("/api/records").json()["versions"]["student"]["s1"]
+    # Colleague edits while t1 is offline.
+    _put(_as(app, "t2@1-maktab.uz"), ("student", "s1", {"firstName": "Alisher", "assignedSpecialistIds": team}))
+    r = t1.post("/api/records/batch", {"ops": [{"op": "put", "kind": "student", "id": "s1", "base_version": v,
+                                                "data": {"firstName": "Aliyor", "assignedSpecialistIds": team}}]})
+    assert r.status_code == 409
+    assert r.json()["current"]["firstName"] == "Alisher" and r.json()["version"] == v + 1
+    # With the current version the edit goes through.
+    r = t1.post("/api/records/batch", {"ops": [{"op": "put", "kind": "student", "id": "s1", "base_version": v + 1,
+                                                "data": {"firstName": "Aliyor", "assignedSpecialistIds": team}}]})
+    assert r.status_code == 200 and r.json()["items"][0]["version"] == v + 2

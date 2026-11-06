@@ -132,6 +132,20 @@ class UserUpdateIn(Strict):
     institution_id: str | None = Field(default=None, pattern=r"^[a-f0-9]{32}$")
 
 
+class ProfileUpdateIn(Strict):
+    """What a person may change about themselves. Email (the login), role and
+    school are not here: those go through an administrator."""
+    first_name: PlainStr | None = Field(default=None, min_length=2, max_length=60)
+    last_name: PlainStr | None = Field(default=None, min_length=2, max_length=60)
+    middle_name: PlainStr | None = Field(default=None, max_length=60)
+    phone: str | None = Field(default=None, pattern=r"^\+?[0-9 ()-]{7,20}$")
+    specialization: PlainStr | None = Field(default=None, max_length=120)
+    qualification_category: PlainStr | None = Field(default=None, max_length=60)
+    experience_years: int | None = Field(default=None, ge=0, le=60)
+    region: PlainStr | None = Field(default=None, max_length=100)
+    district: PlainStr | None = Field(default=None, max_length=100)
+
+
 class ApproveIn(Strict):
     institution_id: str = Field(pattern=r"^[a-f0-9]{32}$")
 
@@ -156,6 +170,9 @@ class RecordOp(BaseModel):
     kind: str = Field(pattern=rf"^({RECORD_KINDS})$")
     id: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_.:-]+$")
     data: dict | None = None
+    # Offline edits: the version the device last saw. If the record has changed
+    # since, the batch is refused with 409 instead of overwriting someone's work.
+    base_version: int | None = Field(default=None, ge=1)
 
 
 class BatchIn(BaseModel):

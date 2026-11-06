@@ -39,6 +39,7 @@ const kindLabels = {
   'question': 'Savol',
   'curriculum': 'DTS standarti',
   'custom_metric': 'Ko‘rsatkich',
+  'profile': 'Xodim profili',
 };
 
 class _ServerHistoryTabState extends State<ServerHistoryTab> {

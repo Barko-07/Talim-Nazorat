@@ -126,6 +126,8 @@ def list_records(p: Principal = Depends(require_user), db: Session = Depends(get
             conds.append(Record.kind.in_(access.PERSONAL_KINDS) & (Record.institution_id == u.institution_id))
 
     items: dict[str, list[dict]] = {k: [] for k in access.ALL_KINDS}
+    # Version of every item, so an offline device can detect edits made meanwhile.
+    versions: dict[str, dict[str, int]] = {k: {} for k in access.ALL_KINDS}
     coordinators = {
         sa.student_id: sa.user_id
         for sa in db.scalars(select(StudentAccess).where(StudentAccess.via == "coordinator",
@@ -134,16 +136,18 @@ def list_records(p: Principal = Depends(require_user), db: Session = Depends(get
     for sid in visible_students:
         s = view.students[sid]
         items[access.STUDENT].append(_student_out(s, view.assigned.get(sid, set()), coordinators.get(sid)))
+        versions[access.STUDENT][sid] = s.version
     count = len(visible_students)
     for rec in db.scalars(select(Record).where(Record.deleted.is_(False), or_(*conds))):
         if access.can_see(u, rec, view.student_visible(rec.student_id)):
             data = json.loads(rec.data)
             data["id"] = rec.rid
             items[rec.kind].append(data)
+            versions[rec.kind][rec.rid] = rec.version
             count += 1
     # Reading the whole set is logged too: who pulled how much, and when.
     audit.record(db, "RECORDS_READ", user_id=u.id, ip=p.ip, detail=f"{count} items")
-    return {"items": items, "count": count}
+    return {"items": items, "versions": versions, "count": count}
 
 
 # ------------------------------------------------------------------ writing
@@ -328,6 +332,13 @@ def batch(body: BatchIn, p: Principal = Depends(require_user), db: Session = Dep
             rec = existing.get((op.kind, op.id))
             if rec is not None and rec.deleted:
                 raise _not_found(i)
+            if op.base_version is not None and rec is not None and rec.version != op.base_version:
+                visible = (view.student_visible(rec.rid) if op.kind == access.STUDENT
+                           else access.can_see(u, rec, view.student_visible(rec.student_id)))
+                if not visible:
+                    raise _not_found(i)
+                raise ApiError(409, "conflict", "Bu yozuvni siz oflayn bo‘lganingizda boshqa kishi o‘zgartirgan",
+                               index=i, version=rec.version, current=_out(db, rec, view))
             if op.kind == access.STUDENT and rec is not None and not view.student_visible(rec.rid):
                 raise _not_found(i)
             if op.op == "delete":
@@ -358,7 +369,7 @@ def batch(body: BatchIn, p: Principal = Depends(require_user), db: Session = Dep
             rec.updated_at, rec.updated_by = utcnow(), u.id
             existing[(op.kind, op.id)] = rec
             db.flush()
-            out.append({"kind": op.kind, "data": _out(db, rec, view)})
+            out.append({"kind": op.kind, "data": _out(db, rec, view), "version": rec.version})
         db.commit()
     except Exception:
         db.rollback()

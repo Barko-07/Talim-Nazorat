@@ -87,18 +87,24 @@ def require_partial(request: Request, db: Session = Depends(get_db)) -> Principa
     )
 
 
+ADMIN_ROLES = {Role.SUPER_ADMIN.value, Role.INSTITUTION_ADMIN.value}
+
+
 def require_admin(
     request: Request,
     principal: Principal = Depends(require_user),
     db: Session = Depends(get_db),
 ) -> Principal:
-    """System administrator only: role SUPER_ADMIN, two-factor verified in this
-    session and (if configured) connecting from an allowed IP address."""
+    """An administrator: the system administrator (everything) or a school
+    administrator (their own school only - routes narrow the scope). Both must
+    have confirmed this login with the emailed code and, if configured, come
+    from an allowed IP address."""
     ctx: AppContext = request.app.state.ctx
     u = principal.user
     allowlist = ctx.settings.admin_ip_allowlist
     ip_ok = not allowlist or _ip_allowed(principal.ip, allowlist)
-    if u.role != Role.SUPER_ADMIN.value or not principal.session.mfa_verified or not ip_ok:
+    school_ok = u.role == Role.SUPER_ADMIN.value or u.institution_id is not None
+    if u.role not in ADMIN_ROLES or not school_ok or not principal.session.mfa_verified or not ip_ok:
         audit.record(
             db, "ADMIN_ACCESS_DENIED", severity="warning", user_id=u.id, ip=principal.ip,
             detail=f"{request.method} {request.url.path}",
@@ -106,6 +112,19 @@ def require_admin(
         )
         # 404, not 403: admin routes are not advertised to other users.
         raise ApiError(404, "not_found", "Topilmadi")
+    return principal
+
+
+def require_super(
+    request: Request,
+    principal: Principal = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> Principal:
+    """System-wide actions (e.g. adding a school): the system administrator only."""
+    if principal.user.role != Role.SUPER_ADMIN.value:
+        audit.record(db, "ADMIN_ACCESS_DENIED", severity="warning", user_id=principal.user.id,
+                     ip=principal.ip, detail=f"{request.method} {request.url.path}")
+        raise ApiError(403, "forbidden", "Bu amalni faqat tizim administratori bajaradi")
     return principal
 
 

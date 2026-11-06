@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'package:provider/provider.dart';
+
 import '../../../core/constants/app_colors.dart';
+import '../../../models/user_model.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../services/admin_api.dart';
 import '../../../services/api_client.dart';
 
 /// Server rejimidagi "Muassasalar": maktablar ro'yxati va har biridagi
 /// tasdiqlangan hisoblar soni, yangi muassasa qo'shish.
 class ServerInstitutionsTab extends StatefulWidget {
-  const ServerInstitutionsTab({super.key, this.api});
+  const ServerInstitutionsTab({super.key, this.api, this.canAdd});
 
   final AdminApi? api;
+
+  /// Testlar uchun; odatda joriy foydalanuvchi rolidan aniqlanadi.
+  final bool? canAdd;
 
   @override
   State<ServerInstitutionsTab> createState() => _ServerInstitutionsTabState();
@@ -144,11 +151,15 @@ class _ServerInstitutionsTabState extends State<ServerInstitutionsTab> {
                   ),
                 ],
               ),
-              FilledButton.icon(
-                onPressed: _loading ? null : _add,
-                icon: const Icon(LucideIcons.plus, size: 18),
-                label: const Text('Yangi muassasa'),
-              ),
+              // Maktab qo'shish — faqat tizim administratori.
+              if (widget.canAdd ??
+                  context.read<AuthProvider>().currentUser?.role ==
+                      UserRole.superAdmin)
+                FilledButton.icon(
+                  onPressed: _loading ? null : _add,
+                  icon: const Icon(LucideIcons.plus, size: 18),
+                  label: const Text('Yangi muassasa'),
+                ),
             ],
           ),
           const SizedBox(height: 20),

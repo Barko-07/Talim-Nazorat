@@ -228,7 +228,7 @@ void main() {
       var done = await _pump(tester, ServerUsersTab(api: api), width: width, height: 844);
       expect(tester.takeException(), isNull);
       await done();
-      done = await _pump(tester, ServerInstitutionsTab(api: api), width: width, height: 844);
+      done = await _pump(tester, ServerInstitutionsTab(api: api, canAdd: true), width: width, height: 844);
       expect(tester.takeException(), isNull);
       expect(find.text('2 ta hisob'), findsOneWidget);
       await done();

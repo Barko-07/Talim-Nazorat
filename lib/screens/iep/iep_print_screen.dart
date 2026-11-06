@@ -52,7 +52,9 @@ class IepPrintScreen extends StatelessWidget {
                 triggerBrowserPrint();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Chop etish darchasi ochildi (A4 formati)'),
+                    content: const Text(
+                      'Chop etish darchasi ochildi (A4 formati)',
+                    ),
                     backgroundColor: AppColors.primary,
                   ),
                 );

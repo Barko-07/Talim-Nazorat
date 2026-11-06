@@ -292,11 +292,20 @@ class ReportsScreen extends StatelessWidget {
                 icon: const Icon(LucideIcons.download, size: 15),
                 label: const Text('Yuklab olish'),
                 onPressed: () {
-                  downloadFile(filename, csvData, mimeType: filename.endsWith('.json') ? 'application/json;charset=utf-8' : 'text/csv;charset=utf-8');
+                  downloadFile(
+                    filename,
+                    csvData,
+                    mimeType:
+                        filename.endsWith('.json')
+                            ? 'application/json;charset=utf-8'
+                            : 'text/csv;charset=utf-8',
+                  );
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('$filename fayli kompyuteringizga yuklab olindi!'),
+                      content: Text(
+                        '$filename fayli kompyuteringizga yuklab olindi!',
+                      ),
                       backgroundColor: AppColors.success,
                     ),
                   );

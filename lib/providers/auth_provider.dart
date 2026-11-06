@@ -598,6 +598,22 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  /// O'z profilini yangilash (server rejimi). Faqat o'zgargan maydonlar yuboriladi.
+  Future<Map<String, dynamic>> updateOwnProfile(
+    Map<String, dynamic> changes,
+  ) async {
+    if (changes.isEmpty) return _ok('O‘zgarish yo‘q');
+    try {
+      final result = await _authApi.updateProfile(changes);
+      _db.cacheSignedInUser(result.user);
+      _currentUser = result.user;
+      notifyListeners();
+      return _ok('Profil yangilandi');
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+  }
+
   /// Faqat administratorlar: emailga kelgan kirish kodi.
   Future<Map<String, dynamic>> verifyEmailCode(String code) async {
     try {

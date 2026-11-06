@@ -7,20 +7,30 @@ import secrets
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, Request, Response
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
 from ..context import AppContext
 from ..crypto import constant_time_equals, keyed_hash
-from ..deps import ApiError, Principal, _authenticate, client_ip, get_ctx, get_db, require_partial
+from ..deps import ApiError, Principal, _authenticate, client_ip, get_ctx, get_db, require_partial, require_user
 from ..mailer import MailError
-from ..models import OneTimeCode, PendingRegistration, RecoveryCode, User, _tz, utcnow
+from ..models import (
+    OneTimeCode,
+    PendingRegistration,
+    RecordChange,
+    RecoveryCode,
+    StudentAccess,
+    User,
+    _tz,
+    utcnow,
+)
 from ..schemas import (
     CodeIn,
     EmailCodeIn,
     LoginIn,
     PasswordChangeIn,
     PasswordConfirmIn,
+    ProfileUpdateIn,
     RecoveryCodeIn,
     RegisterIn,
     RegistrationIdIn,
@@ -292,6 +302,95 @@ def me(request: Request, db: Session = Depends(get_db), ctx: AppContext = Depend
     if sessions.session_state(ctx.settings, p.session) == "email_code_required":
         extra["resend_after"] = _code_cooldown(db, ctx, p.user, "login")
     return _user_out(ctx, p.session, p.user, **extra)
+
+
+# ------------------------------------------------------------------ own profile
+
+
+def _split_name(full_name: str) -> tuple[str, str]:
+    parts = full_name.split(maxsplit=1)
+    return (parts[0], parts[1]) if len(parts) == 2 else (full_name, "")
+
+
+@router.patch("/profile")
+def update_profile(body: ProfileUpdateIn, p: Principal = Depends(require_user), db: Session = Depends(get_db),
+                   ctx: AppContext = Depends(get_ctx)):
+    """A person updates their own details - nobody else's. Each change is kept
+    in the history administrators read (old and new values, encrypted)."""
+    user = p.user
+    profile = profile_of(user)
+    last, first = _split_name(user.full_name)
+    before = {**profile, "full_name": user.full_name, "phone": user.phone}
+    changes = body.model_dump(exclude_unset=True)
+    for key in ("specialization", "qualification_category", "experience_years", "region", "district",
+                "middle_name"):
+        if key in changes:
+            profile[key] = changes[key]
+    first = changes.get("first_name") or profile.get("first_name") or first
+    last = changes.get("last_name") or profile.get("last_name") or last
+    profile["first_name"], profile["last_name"] = first, last
+    user.full_name = f"{last} {first}".strip()[:120]
+    if "phone" in changes:
+        user.phone = changes["phone"]
+    user.profile = json.dumps(profile, ensure_ascii=False)
+    after = {**profile, "full_name": user.full_name, "phone": user.phone}
+    keys = sorted(k for k in set(before) | set(after) if before.get(k) != after.get(k))
+    if keys:
+        db.add(RecordChange(
+            user_id=user.id, kind="profile", rid=user.id, institution_id=user.institution_id,
+            action="update", fields=",".join(keys)[:1000],
+            before=json.dumps({k: before.get(k) for k in keys}, ensure_ascii=False),
+            after=json.dumps({k: after.get(k) for k in keys}, ensure_ascii=False),
+        ))
+    db.commit()
+    audit.record(db, "PROFILE_UPDATED", user_id=user.id, ip=p.ip, detail=",".join(keys)[:400])
+    return _user_out(ctx, p.session, user)
+
+
+# ------------------------------------------------------------------ deleting one's account
+
+
+@router.post("/account/delete")
+def delete_account(body: PasswordConfirmIn, request: Request, response: Response,
+                   p: Principal = Depends(require_user), db: Session = Depends(get_db),
+                   ctx: AppContext = Depends(get_ctx)):
+    """The person closes their own account (required by app stores). Personal
+    data - name, email, phone, profile, 2FA - is erased at once and the login
+    stops working. Work recorded about children stays with the school (it is
+    the school's record, kept by law), attributed to "deleted user"."""
+    _too_many(ctx, db, f"account-delete:{p.user.id}", 5, 900, p.ip, "account delete")
+    user = p.user
+    if not passwords.verify_password(body.password, user.password_hash):
+        audit.record(db, "ACCOUNT_DELETE_BAD_PASSWORD", severity="warning", user_id=user.id, ip=p.ip,
+                     webhook_url=ctx.settings.alert_webhook_url)
+        raise ApiError(401, "invalid_credentials", "Parol noto‘g‘ri")
+    if user.role == "SUPER_ADMIN":
+        others = db.scalar(select(func.count()).select_from(User).where(
+            User.role == "SUPER_ADMIN", User.is_active.is_(True), User.id != user.id))
+        if not others:
+            raise ApiError(409, "last_admin", "Oxirgi tizim administratori hisobini o‘chirib bo‘lmaydi")
+    email = user.email
+    notify(db, ctx, email, "Individ: hisobingiz o‘chirildi",
+           "Hisobingiz va shaxsiy ma’lumotlaringiz o‘chirildi. Bolalar bo‘yicha kiritgan ish yozuvlaringiz "
+           "maktab hujjati sifatida saqlanib qoladi. Agar bu siz bo‘lmasangiz, darhol administratorga "
+           "murojaat qiling.", user.id)
+    user.full_name = "O‘chirilgan foydalanuvchi"
+    user.email = f"deleted-{user.id}@deleted.invalid"
+    user.phone = None
+    user.profile = None
+    user.mfa_enabled, user.mfa_secret = False, None
+    user.password_hash = passwords.hash_password(secrets.token_urlsafe(32))
+    user.is_active = False
+    user.pending_approval = False
+    db.execute(delete(RecoveryCode).where(RecoveryCode.user_id == user.id))
+    db.execute(delete(StudentAccess).where(StudentAccess.user_id == user.id))
+    db.execute(delete(OneTimeCode).where(OneTimeCode.user_id == user.id))
+    db.commit()
+    sessions.revoke_all(db, user.id)
+    sessions.clear_cookie(ctx.settings, response)
+    audit.record(db, "ACCOUNT_DELETED", severity="warning", user_id=user.id, ip=p.ip,
+                 subject=audit.mask_login(email))
+    return {"ok": True}
 
 
 # ------------------------------------------------------------------ MFA setup

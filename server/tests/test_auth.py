@@ -184,3 +184,26 @@ def test_admins_sign_in_with_the_emailed_code_by_default(api, app):
     add_user(app, "dir@maktab.uz", Role.INSTITUTION_ADMIN, inst)
     assert api.login("dir@maktab.uz", email_code=False).json()["state"] == "email_code_required"
     assert api.login("dir@maktab.uz").json()["state"] == "ok"
+
+
+def test_a_person_can_delete_their_own_account(api, app):
+    inst = add_institution(app)
+    u = add_user(app, "del@maktab.uz", Role.TEACHER, inst)
+    api.login("del@maktab.uz")
+    api.post("/api/records/batch", {"ops": [{"op": "put", "kind": "student", "id": "s1", "data": {}}]})
+    assert api.post("/api/auth/account/delete", {"password": "wrong-password"}).status_code == 401
+    assert api.post("/api/auth/account/delete", {"password": PASSWORD}).status_code == 200
+    with db_session(app) as db:
+        gone = db.get(User, u.id)
+        assert gone.email.startswith("deleted-") and gone.phone is None and gone.profile is None
+        assert gone.full_name == "O‘chirilgan foydalanuvchi" and not gone.is_active
+        from app.models import Record
+        assert db.get(Record, ("student", "s1")) is not None  # the school's record stays
+    assert api.get("/api/auth/me").status_code == 401
+    assert api.login("del@maktab.uz").status_code == 401
+
+
+def test_the_last_system_administrator_cannot_delete_their_account(api, app):
+    add_user(app, "boss@maktab.uz", Role.SUPER_ADMIN)
+    api.login("boss@maktab.uz")
+    assert api.post("/api/auth/account/delete", {"password": PASSWORD}).status_code == 409

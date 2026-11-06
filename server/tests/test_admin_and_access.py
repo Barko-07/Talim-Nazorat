@@ -115,3 +115,106 @@ def test_moving_a_user_to_another_school_signs_them_out(api, app, client):
     assert r.status_code == 200 and r.json()["institution_id"] == second
     assert other.get("/api/auth/me").status_code == 401
     assert api.patch(f"/api/admin/users/{u.id}", {"institution_id": "f" * 32}).status_code == 422
+
+
+# ------------------------------------------------------------------ school administrators
+
+
+def _dir(app, inst, email="dir@a.uz"):
+    add_user(app, email, Role.INSTITUTION_ADMIN, inst)
+    a = Api(TestClient(app))
+    assert a.login(email).json()["state"] == "ok"
+    return a
+
+
+def _register(app, email, school_name):
+    """A sign-up waiting for approval that named `school_name`."""
+    from app.models import User as U
+    import json as _json
+    with db_session(app) as db:
+        u = U(email=email, full_name="Ariza Beruvchi", role=Role.TEACHER.value,
+              password_hash="x", pending_approval=True, must_change_password=False,
+              profile=_json.dumps({"institution_name": school_name}))
+        db.add(u)
+        db.commit()
+        return u.id
+
+
+def test_school_admin_sees_and_manages_only_their_school(app):
+    a, b = add_institution(app, "1-sonli maktab"), add_institution(app, "2-sonli maktab")
+    mine = add_user(app, "t@a.uz", Role.TEACHER, a)
+    theirs = add_user(app, "t@b.uz", Role.TEACHER, b)
+    other_admin = add_user(app, "dir2@a.uz", Role.INSTITUTION_ADMIN, a)
+    asking_mine = _register(app, "new1@x.uz", "1-sonli  Maktab")
+    asking_theirs = _register(app, "new2@x.uz", "2-sonli maktab")
+    d = _dir(app, a)
+
+    emails = {u["email"] for u in d.get("/api/admin/users").json()}
+    assert {"t@a.uz", "new1@x.uz"} <= emails
+    assert "t@b.uz" not in emails and "new2@x.uz" not in emails
+
+    assert d.patch(f"/api/admin/users/{mine.id}", {"is_active": False}).status_code == 200
+    assert d.patch(f"/api/admin/users/{theirs.id}", {"is_active": False}).status_code == 404
+    assert d.patch(f"/api/admin/users/{other_admin.id}", {"is_active": False}).status_code == 404
+    assert d.patch(f"/api/admin/users/{mine.id}", {"role": "SUPER_ADMIN"}).status_code == 403
+    assert d.patch(f"/api/admin/users/{mine.id}", {"institution_id": b}).status_code == 403
+
+    assert d.post(f"/api/admin/users/{asking_theirs}/approve", {"institution_id": a}).status_code == 404
+    assert d.post(f"/api/admin/users/{asking_mine}/approve", {"institution_id": b}).status_code == 403
+    assert d.post(f"/api/admin/users/{asking_mine}/approve", {"institution_id": a}).status_code == 200
+
+    assert [i["id"] for i in d.get("/api/admin/institutions").json()] == [a]
+    assert d.post("/api/admin/institutions", {"name": "3-sonli maktab"}).status_code == 403
+
+
+def test_school_admin_creates_staff_only_for_their_school_and_never_admins(app):
+    a, b = add_institution(app, "A"), add_institution(app, "B")
+    d = _dir(app, a)
+    r = d.post("/api/admin/users", {"email": "n@a.uz", "full_name": "Yangi Xodim", "role": "TEACHER"})
+    assert r.status_code == 201 and r.json()["institution_id"] == a
+    assert d.post("/api/admin/users", {"email": "x@a.uz", "full_name": "Yangi Xodim", "role": "TEACHER",
+                                       "institution_id": b}).status_code == 403
+    assert d.post("/api/admin/users", {"email": "y@a.uz", "full_name": "Yangi Admin",
+                                       "role": "INSTITUTION_ADMIN"}).status_code == 403
+
+
+def test_school_admin_history_and_audit_cover_only_their_school(app):
+    a, b = add_institution(app, "A"), add_institution(app, "B")
+    add_user(app, "t@a.uz", Role.TEACHER, a)
+    add_user(app, "t@b.uz", Role.TEACHER, b)
+    for email, rid in (("t@a.uz", "sa"), ("t@b.uz", "sb")):
+        t = Api(TestClient(app))
+        t.login(email)
+        assert t.post("/api/records/batch", {"ops": [{"op": "put", "kind": "student", "id": rid,
+                                                       "data": {"firstName": rid}}]}).status_code == 200
+    d = _dir(app, a)
+    assert [c["record_id"] for c in d.get("/api/admin/changes").json()] == ["sa"]
+    users = {e["user_id"] for e in d.get("/api/admin/audit").json()}
+    with db_session(app) as db:
+        b_ids = {u.id for u in db.scalars(select(User).where(User.institution_id == b))}
+    assert not users & b_ids
+
+
+# ------------------------------------------------------------------ own profile
+
+
+def test_people_edit_only_their_own_profile_and_admins_see_the_change(app):
+    inst = add_institution(app)
+    add_user(app, "t@a.uz", Role.TEACHER, inst)
+    t = Api(TestClient(app))
+    t.login("t@a.uz")
+    r = t.patch("/api/auth/profile", {"first_name": "Dilnoza", "last_name": "Karimova",
+                                      "phone": "+998 90 111-22-33", "specialization": "Matematika",
+                                      "experience_years": 7})
+    assert r.status_code == 200
+    me = r.json()["user"]
+    assert me["full_name"] == "Karimova Dilnoza" and me["phone"] == "+998 90 111-22-33"
+    assert me["profile"]["specialization"] == "Matematika" and me["profile"]["experience_years"] == 7
+    # Email, role and school cannot be changed this way.
+    for bad in ({"email": "x@y.uz"}, {"role": "SUPER_ADMIN"}, {"institution_id": "f" * 32}):
+        assert t.patch("/api/auth/profile", bad).status_code == 422
+    assert t.patch("/api/auth/profile", {"first_name": "<b>x</b>"}).status_code == 422
+    # The school administrator sees what changed.
+    d = _dir(app, inst)
+    row = next(c for c in d.get("/api/admin/changes").json() if c["kind"] == "profile")
+    assert row["after"]["full_name"] == "Karimova Dilnoza" and "phone" in row["fields"]

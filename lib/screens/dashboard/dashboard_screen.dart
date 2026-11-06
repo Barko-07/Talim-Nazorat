@@ -302,111 +302,110 @@ class DashboardScreen extends StatelessWidget {
       borderRadius: 16,
       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
       child: LayoutBuilder(
-          builder: (context, constraints) {
-            final isCompact = constraints.maxWidth < 560;
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < 560;
 
-            // Bola qo'shish faqat ruxsati bor rollarga (koordinator, rahbariyat)
-            final canAddStudent =
-                user != null &&
-                AccessControlService().canEditStudent(user, null);
-            final addBtn = HeaderActionButton(
-              icon: LucideIcons.plus,
-              label: 'Bola qo‘shish',
-              compactLabel: 'Qo‘shish',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AddStudentScreen()),
-                );
-              },
-            );
+          // Bola qo'shish faqat ruxsati bor rollarga (koordinator, rahbariyat)
+          final canAddStudent =
+              user != null && AccessControlService().canEditStudent(user, null);
+          final addBtn = HeaderActionButton(
+            icon: LucideIcons.plus,
+            label: 'Bola qo‘shish',
+            compactLabel: 'Qo‘shish',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AddStudentScreen()),
+              );
+            },
+          );
 
-            final monogram = Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.primaryLight,
-                borderRadius: BorderRadius.circular(13),
-                border: Border.all(color: AppColors.primaryTint, width: 1.0),
+          final monogram = Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(13),
+              border: Border.all(color: AppColors.primaryTint, width: 1.0),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              initials,
+              style: TextStyle(
+                fontSize: 15.5,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+                letterSpacing: 0.2,
               ),
-              alignment: Alignment.center,
-              child: Text(
-                initials,
+            ),
+          );
+
+          final userInfo = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    fullName,
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  StatusPill(
+                    label: roleLabel,
+                    color: AppColors.primary,
+                    backgroundColor: AppColors.primaryLight,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 3),
+              Text(
+                institutionName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 15.5,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
-                  letterSpacing: 0.2,
+                  fontSize: 13,
+                  color: AppColors.textMuted,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            );
+            ],
+          );
 
-            final userInfo = Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+          if (isCompact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  crossAxisAlignment: WrapCrossAlignment.center,
+                Row(
                   children: [
-                    Text(
-                      fullName,
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    StatusPill(
-                      label: roleLabel,
-                      color: AppColors.primary,
-                      backgroundColor: AppColors.primaryLight,
-                    ),
+                    monogram,
+                    const SizedBox(width: 13),
+                    Expanded(child: userInfo),
                   ],
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  institutionName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textMuted,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                if (canAddStudent) ...[const SizedBox(height: 14), addBtn],
               ],
             );
+          }
 
-            if (isCompact) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      monogram,
-                      const SizedBox(width: 13),
-                      Expanded(child: userInfo),
-                    ],
-                  ),
-                  if (canAddStudent) ...[const SizedBox(height: 14), addBtn],
-                ],
-              );
-            }
-
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                monogram,
-                const SizedBox(width: 15),
-                Expanded(child: userInfo),
-                if (canAddStudent) ...[const SizedBox(width: 16), addBtn],
-              ],
-            );
-          },
-        ),
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              monogram,
+              const SizedBox(width: 15),
+              Expanded(child: userInfo),
+              if (canAddStudent) ...[const SizedBox(width: 16), addBtn],
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -1286,7 +1285,9 @@ class DashboardScreen extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: AppColors.isDark ? 0.20 : 0.10),
+                  color: color.withValues(
+                    alpha: AppColors.isDark ? 0.20 : 0.10,
+                  ),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 19),

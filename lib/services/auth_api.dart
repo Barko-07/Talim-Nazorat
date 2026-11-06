@@ -170,6 +170,15 @@ class AuthApi {
     await _api.post('/api/auth/mfa/enable', {'code': code}),
   );
 
+  /// O'z profilini yangilash (faqat berilgan maydonlar). Email, rol va maktab
+  /// bu yerda o'zgarmaydi.
+  Future<AuthResult> updateProfile(Map<String, dynamic> changes) async =>
+      AuthResult.fromJson(await _api.patch('/api/auth/profile', changes));
+
+  /// Hisobni o'chirish (parol bilan tasdiqlanadi).
+  Future<void> deleteAccount(String password) =>
+      _api.post('/api/auth/account/delete', {'password': password});
+
   Future<void> requestPasswordChangeCode() =>
       _api.post('/api/auth/password/change/request');
 
