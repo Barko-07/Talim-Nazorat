@@ -22,8 +22,8 @@ Holat: 2026-11-06. ✅ — tayyor, ⏳ — sizdan kerak, 🛠 — keyingi ish (i
 |---|---|---|
 | ✅ | Hisobni o‘chirish — **veb orqali**: https://individ.uz/account-deletion.html | ishlaydi |
 | 🛠 | Hisobni o‘chirish — **ilova ichida** | yuqoridagi 🛠 |
-| ⏳ | Maxfiylik siyosati sahifasi (ochiq havola) — matn qoralamasi pastda; operator nomi va aloqa emaili kerak | sizdan |
-| ⏳ | Google Play Developer hisobi (bir martalik $25), tashkilot nomidan ochish tavsiya etiladi | sizdan |
+| ⏳ | Maxfiylik siyosati sahifasi: `web/privacy.html` tayyor, manzili https://individ.uz/privacy.html. Operator (mijoz tashkiloti) nomi, STIR, manzil, email kerak — `{{...}}` joylari to‘ldirilgach e’lon qilinadi | sizdan |
+| ✅ | Google Play Developer hisobi ochilgan (to‘langan). Topshirishda ilova mijoz hisobiga App transfer orqali o‘tadi — `docs/handover.md` | — |
 | ⏳ | Ilova sahifasi: qisqa/to‘liq tavsif, ikonka 512×512, kamida 2 ta skrinshot, feature graphic 1024×500 | keyin (store-screenshots skill bilan tayyorlayman) |
 | ⏳ | Kontent reytingi so‘rovnomasi, maqsadli auditoriya: **kattalar (o‘qituvchi va mutaxassislar)** — ilova bolalar uchun emas, bolalar haqida | Play Console’da |
 | ⏳ | Ichki sinov (Internal testing) → yopiq sinov: yangi shaxsiy hisoblar uchun 12 ta sinovchi 14 kun talab qilinadi; tashkilot hisobida bu talab yo‘q | Play Console’da |

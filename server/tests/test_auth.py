@@ -69,7 +69,7 @@ def test_account_locks_after_many_failures_from_many_addresses():
 
 
 def test_login_rate_limited_per_ip(api, app):
-    codes = [api.login(f"x{i}@maktab.uz", "Notogri-Parol-1").status_code for i in range(12)]
+    codes = [api.login(f"x{i}@maktab.uz", "Notogri-Parol-1").status_code for i in range(65)]
     assert 429 in codes
 
 

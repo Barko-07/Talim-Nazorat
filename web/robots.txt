@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /account-deletion.html
+
+Sitemap: https://individ.uz/sitemap.xml

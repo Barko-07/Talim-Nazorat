@@ -1,6 +1,7 @@
 """Individ API application factory and security middleware."""
 from __future__ import annotations
 
+import hashlib
 import logging
 from urllib.parse import urlsplit
 
@@ -19,7 +20,7 @@ from .db import Database
 from .deps import SAFE_METHODS, client_ip
 from .mailer import Mailer
 from .routes import admin, auth, records
-from .security import audit
+from .security import audit, sessions
 
 log = logging.getLogger("individ")
 
@@ -74,9 +75,16 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         if length and (not length.isdigit() or int(length) > s.max_body_bytes):
             return deny(413, "too_large", "So‘rov hajmi juda katta", "REQUEST_TOO_LARGE")
 
-        # 3. General API rate limit per client IP.
-        if path.startswith("/api/") and not ctx.mem_limiter.hit(f"api:{ip}", s.api_per_minute):
-            return deny(429, "rate_limited", "Juda ko‘p so‘rov. Birozdan so‘ng urinib ko‘ring", "RATE_LIMITED")
+        # 3. General API rate limit. A whole school often reaches us through one
+        #    address (NAT), so signed-in users are counted per session and the
+        #    address only has a much higher ceiling. Anonymous requests are
+        #    counted per address. The cookie is not verified here: a forged one
+        #    only buys a fresh per-session bucket, still under the address cap.
+        if path.startswith("/api/"):
+            token = request.cookies.get(sessions.cookie_name(s), "")
+            key = f"api:s:{hashlib.sha256(token.encode()).hexdigest()[:32]}" if token else f"api:{ip}"
+            if not ctx.mem_limiter.hit(f"api-ip:{ip}", s.api_ip_per_minute) or                     not ctx.mem_limiter.hit(key, s.api_per_minute):
+                return deny(429, "rate_limited", "Juda ko‘p so‘rov. Birozdan so‘ng urinib ko‘ring", "RATE_LIMITED")
 
         # 4. CSRF defence for state-changing requests: a custom header (forces a
         #    CORS preflight, which foreign sites fail) and an Origin allowlist.

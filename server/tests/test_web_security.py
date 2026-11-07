@@ -161,3 +161,20 @@ def test_general_api_rate_limit(app):
     c = TestClient(create_app(make_settings(api_per_minute=5)))
     codes = [c.get("/api/health").status_code for _ in range(8)]
     assert 429 in codes
+
+
+def test_rate_limit_counts_signed_in_users_per_session_not_per_address(app):
+    # A school behind one NAT: many signed-in users share one address.
+    c = TestClient(create_app(make_settings(api_per_minute=5, api_ip_per_minute=100)))
+    for n in range(10):
+        c.cookies.set("individ_session", f"session-{n}")
+        assert all(c.get("/api/health").status_code != 429 for _ in range(5))
+    # One session alone is still held to its own limit...
+    c.cookies.set("individ_session", "session-0")
+    assert c.get("/api/health").status_code == 429
+    # ...and the address as a whole has a ceiling that forged cookies cannot pass.
+    codes = []
+    for n in range(100, 160):
+        c.cookies.set("individ_session", f"session-{n}")
+        codes.append(c.get("/api/health").status_code)
+    assert 429 in codes

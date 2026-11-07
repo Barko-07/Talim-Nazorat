@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maxfiylik siyosati — Individ</title>
+  <meta name="description" content="Individ ilovasi qanday ma’lumot yig‘adi, kim ko‘radi, qayerda va qancha saqlanadi.">
+  <link rel="canonical" href="https://individ.uz/privacy.html">
+  <style>
+    :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --muted:#475569; --line:#e2e8f0; --primary:#0062cc; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#121314; --card:#1e1f21; --text:#f2f4f7; --muted:#b4bbc6; --line:#303236; --primary:#7db8ff; } }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    main { max-width:720px; margin:0 auto; padding:32px 16px 64px; }
+    h1 { font-size:28px; line-height:1.25; margin:0 0 4px; }
+    h2 { font-size:19px; margin:32px 0 8px; }
+    p, li { color:var(--muted); }
+    ul { padding-left:20px; }
+    .meta { font-size:14px; color:var(--muted); margin:0 0 24px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 20px; }
+    a { color:var(--primary); }
+    table { width:100%; border-collapse:collapse; font-size:15px; }
+    th, td { text-align:left; vertical-align:top; padding:8px 8px 8px 0; border-bottom:1px solid var(--line); }
+    th { font-weight:600; }
+    td { color:var(--muted); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Individ maxfiylik siyosati</h1>
+  <p class="meta">Kuchga kirgan sana: {{EFFECTIVE_DATE}}</p>
+
+  <div class="card">
+    <p><strong>Operator:</strong> {{OPERATOR_NAME}}, STIR {{OPERATOR_TIN}}.<br>
+    Manzil: {{OPERATOR_ADDRESS}}.<br>
+    Aloqa: <a href="mailto:{{OPERATOR_EMAIL}}">{{OPERATOR_EMAIL}}</a></p>
+  </div>
+
+  <h2>Individ nima</h2>
+  <p>Individ — alohida ta’lim ehtiyojli bolalar bilan ishlaydigan pedagog va mutaxassislar uchun ish vositasi. Undan faqat ta’lim muassasalarining ro‘yxatdan o‘tgan xodimlari foydalanadi. Ilova bolalar uchun mo‘ljallanmagan: bolalar uni ishlatmaydi, ular haqidagi ma’lumotni mutaxassislar kiritadi.</p>
+
+  <h2>Qanday ma’lumot yig‘iladi</h2>
+  <table>
+    <tr><th>Kim haqida</th><th>Ma’lumot</th><th>Nima uchun</th></tr>
+    <tr><td>Xodim</td><td>Ism, email, telefon, lavozim, mutaxassislik, malaka, ish staji, muassasa</td><td>Hisob yuritish, jamoani tashkil etish</td></tr>
+    <tr><td>Bola</td><td>Ism, tug‘ilgan sana, muassasa, sinf; mutaxassislar kiritgan anketalar, baholash va mashg‘ulot natijalari, kuzatuvlar, individual reja</td><td>Bolaning rivojlanishini kuzatish va unga yordam berish</td></tr>
+    <tr><td>Xodim</td><td>Kirishlar, ma’lumotdagi o‘zgarishlar (kim, qachon, nima), IP manzil</td><td>Hisob va ma’lumot xavfsizligi, nazorat</td></tr>
+  </table>
+  <p>Joylashuv, kontaktlar, fotosuratlar, mikrofon va kamera ishlatilmaydi. Reklama va analitika xizmatlari yo‘q.</p>
+
+  <h2>Kim ko‘radi</h2>
+  <ul>
+    <li>Bola haqidagi ma’lumotni faqat <strong>o‘sha bola bilan ishlaydigan mutaxassislar jamoasi</strong> ko‘radi. Jamoaga mutaxassislarning o‘zi hamkasblarini qo‘shadi.</li>
+    <li>Muassasa administratori o‘z muassasasidagi ma’lumotni nazorat uchun ko‘radi.</li>
+    <li>Maxfiy deb belgilangan kuzatuvni faqat uning muallifi va administrator ko‘radi.</li>
+    <li>Ma’lumot uchinchi shaxslarga sotilmaydi va berilmaydi. Qonunda belgilangan holatlarda vakolatli davlat organining so‘rovi bundan mustasno.</li>
+  </ul>
+
+  <h2>Qayerda va qanday saqlanadi</h2>
+  <ul>
+    <li>Barcha ma’lumot O‘zbekiston Respublikasi hududidagi serverda saqlanadi (“Shaxsga doir ma’lumotlar to‘g‘risida”gi O‘RQ-547-son Qonun).</li>
+    <li>Bolalar haqidagi ma’lumot va xodimlar profili bazada AES-256 bilan shifrlangan. Aloqa faqat HTTPS orqali.</li>
+    <li>Veb-saytda ishlaganda ma’lumot qurilmada saqlanmaydi: chiqishda hammasi tozalanadi.</li>
+    <li>Administratorlar uchun ikki bosqichli tasdiqlash majburiy. Har bir o‘zgarish jurnalga yoziladi.</li>
+    <li>Zaxira nusxalar shifrlangan holda olinadi.</li>
+  </ul>
+
+  <h2>Cookie</h2>
+  <p>Faqat bitta zarur cookie ishlatiladi: tizimga kirganingizni eslab qolish uchun seans cookie’si. Kuzatuv yoki reklama cookie’lari yo‘q.</p>
+
+  <h2>Qancha saqlanadi</h2>
+  <ul>
+    <li>Xodim ma’lumoti — hisob o‘chirilguncha.</li>
+    <li>Bolalar bo‘yicha ish yozuvlari muassasaning hujjati hisoblanadi. Ular muassasa belgilagan muddatda saqlanadi va muassasa so‘rovi bilan o‘chiriladi.</li>
+    <li>Xavfsizlik va o‘zgarishlar jurnali — xizmat ko‘rsatilgan butun davr davomida. Kim nimani o‘zgartirganini tekshirish uchun u kerak. Jurnalda bola haqidagi ma’lumot shifrlangan holda turadi.</li>
+  </ul>
+
+  <h2>Huquqlaringiz</h2>
+  <ul>
+    <li>O‘z ma’lumotlaringizni ko‘rish va tuzatish: ilovada <em>Sozlamalar → Profilni tahrirlash</em>.</li>
+    <li>Hisobni o‘chirish: <a href="/account-deletion.html">individ.uz/account-deletion.html</a>. Ism, email, telefon darhol o‘chiriladi. Bolalar bo‘yicha kiritgan yozuvlaringiz muassasa hujjati sifatida qoladi, lekin ularda ismingiz ko‘rsatilmaydi.</li>
+    <li>Ota-ona yoki vasiy bola haqidagi ma’lumot bo‘yicha bolaning muassasasiga yoki operatorga murojaat qilishi mumkin.</li>
+    <li>Savol va shikoyatlar: <a href="mailto:{{OPERATOR_EMAIL}}">{{OPERATOR_EMAIL}}</a>. 30 kun ichida javob beriladi.</li>
+  </ul>
+
+  <h2>O‘zgarishlar</h2>
+  <p>Siyosat o‘zgarsa, yangi matn shu sahifada e’lon qilinadi va sanasi yangilanadi. Muhim o‘zgarishlar haqida foydalanuvchilarga ilovada xabar beriladi.</p>
+</main>
+</body>
+</html>

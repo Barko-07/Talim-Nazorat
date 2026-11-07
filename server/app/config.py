@@ -49,8 +49,9 @@ class Settings:
     login_max_failures: int = 5  # wrong passwords from one address before it is refused
     login_account_max_failures: int = 20  # from all addresses before the account itself locks
     login_lock_minutes: int = 15
-    login_ip_per_minute: int = 10
-    api_per_minute: int = 120
+    login_ip_per_minute: int = 60  # sign-ins from one address; a school shares one (NAT)
+    api_per_minute: int = 120  # per signed-in session, or per address when not signed in
+    api_ip_per_minute: int = 3000  # whole address: a school behind one NAT shares it
 
     # Password / reset codes
     code_ttl_minutes: int = 10
@@ -126,8 +127,9 @@ def load_settings() -> Settings:
         login_max_failures=_int("LOGIN_MAX_FAILURES", 5),
         login_account_max_failures=_int("LOGIN_ACCOUNT_MAX_FAILURES", 20),
         login_lock_minutes=_int("LOGIN_LOCK_MINUTES", 15),
-        login_ip_per_minute=_int("LOGIN_IP_PER_MINUTE", 10),
+        login_ip_per_minute=_int("LOGIN_IP_PER_MINUTE", 60),
         api_per_minute=_int("API_PER_MINUTE", 120),
+        api_ip_per_minute=_int("API_IP_PER_MINUTE", 3000),
         code_ttl_minutes=_int("CODE_TTL_MINUTES", 10),
         code_max_attempts=_int("CODE_MAX_ATTEMPTS", 5),
         code_resend_seconds=_int("CODE_RESEND_SECONDS", 60),
