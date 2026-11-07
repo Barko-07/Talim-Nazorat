@@ -217,4 +217,7 @@ def test_people_edit_only_their_own_profile_and_admins_see_the_change(app):
     # The school administrator sees what changed.
     d = _dir(app, inst)
     row = next(c for c in d.get("/api/admin/changes").json() if c["kind"] == "profile")
-    assert row["after"]["full_name"] == "Karimova Dilnoza" and "phone" in row["fields"]
+    assert "full_name" in row["fields"] and "phone" in row["fields"]
+    # Only which fields changed: the history cannot be erased, and a deleted
+    # account's name and phone must disappear.
+    assert row["before"] is None and row["after"] is None

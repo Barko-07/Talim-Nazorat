@@ -290,3 +290,15 @@ def test_rejected_sign_up_is_deleted(api, app):
     uid = next(u["id"] for u in boss.get("/api/admin/users").json() if u["pending_approval"])
     assert boss.post(f"/api/admin/users/{uid}/reject").status_code == 200
     assert api.login(FORM["email"], NEW).status_code == 401
+
+
+def test_a_school_administrator_hears_about_sign_ups_that_name_their_school(api, app):
+    mine = add_institution(app, "14-sonli maktab")
+    other = add_institution(app, "15-sonli maktab")
+    add_user(app, "dir14@maktab.uz", Role.INSTITUTION_ADMIN, mine)
+    add_user(app, "dir15@maktab.uz", Role.INSTITUTION_ADMIN, other)
+    reg_id = api.post("/api/auth/register", FORM).json()["registration_id"]
+    code = last_code_for(app, FORM["email"])
+    assert api.post("/api/auth/register/verify", {"registration_id": reg_id, "code": code}).status_code == 200
+    to = {m.to for m in app.state.ctx.mailer.outbox}
+    assert "dir14@maktab.uz" in to and "dir15@maktab.uz" not in to

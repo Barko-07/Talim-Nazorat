@@ -247,6 +247,12 @@ def _put_student(db: Session, p: Principal, rec: Record | None, rid: str, data: 
         may_remove_others = rec.owner_id == u.id or access.admin_for(u, rec.institution_id)
         if removed - {u.id} and not may_remove_others:
             raise _denied(db, p, "remove team member", rid, index)
+        if not access.can_write(u) and not access.admin_for(u, rec.institution_id):
+            # Read-only roles (reviewer) look, never write. The one thing they
+            # may do is take themselves off the team; the card stays as it was.
+            if removed != {u.id} or (assigned - old_assigned) or (coordinator and coordinator != old_coord):
+                raise _denied(db, p, "change student (read-only role)", rid, index)
+            data = dict(before)
     added = (assigned - old_assigned) | ({coordinator} if coordinator and coordinator != old_coord else set())
     for uid in added:
         if uid != u.id and not _team_member_ok(db, uid, rec.institution_id):
@@ -259,7 +265,12 @@ def _put_student(db: Session, p: Principal, rec: Record | None, rid: str, data: 
     data.pop("id", None)
     data.pop("createdById", None)
     rec.data = json.dumps(data, ensure_ascii=False)
-    _history(db, p, rec, "create" if before is None else "update", before, data)
+    # Who is on the team is part of the history too: admins see who linked or removed whom.
+    team_before = None if before is None else {
+        **before, "team": sorted(old_assigned), "teamCoordinator": old_coord}
+    team_after = {**data, "team": sorted(assigned - ({coordinator} if coordinator else set())),
+                  "teamCoordinator": coordinator}
+    _history(db, p, rec, "create" if before is None else "update", team_before, team_after)
     return rec
 
 

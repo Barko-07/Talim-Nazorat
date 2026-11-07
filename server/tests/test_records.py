@@ -310,3 +310,44 @@ def test_offline_edits_detect_changes_made_meanwhile(app):
     r = t1.post("/api/records/batch", {"ops": [{"op": "put", "kind": "student", "id": "s1", "base_version": v + 1,
                                                 "data": {"firstName": "Aliyor", "assignedSpecialistIds": team}}]})
     assert r.status_code == 200 and r.json()["items"][0]["version"] == v + 2
+
+
+def test_a_reviewer_on_the_team_reads_but_only_ever_leaves(app):
+    inst = _school(app)
+    add_user(app, "rev@1-maktab.uz", Role.REVIEWER, inst)
+    ids = _ids(app)
+    t1 = _as(app, "t1@1-maktab.uz")
+    team = sorted([ids["t1@1-maktab.uz"], ids["rev@1-maktab.uz"]])
+    assert _put(t1, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": team})).status_code == 200
+    rev = _as(app, "rev@1-maktab.uz")
+    assert [s["firstName"] for s in _items(rev, "student")] == ["Ali"]
+    # Cannot change the card, cannot link anyone.
+    assert _put(rev, ("student", "s1", {"firstName": "X", "assignedSpecialistIds": team})).status_code == 403
+    more = sorted(team + [ids["t2@1-maktab.uz"]])
+    assert _put(rev, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": more})).status_code == 403
+    # Can take themselves off; whatever else was sent, the card is unchanged.
+    r = _put(rev, ("student", "s1", {"firstName": "X", "assignedSpecialistIds": [ids["t1@1-maktab.uz"]]}))
+    assert r.status_code == 200
+    assert _items(rev, "student") == []
+    assert [s["firstName"] for s in _items(t1, "student")] == ["Ali"]
+
+
+def test_a_role_change_away_from_child_work_ends_team_access(app):
+    _school(app)
+    ids = _ids(app)
+    _put(_as(app, "t1@1-maktab.uz"), ("student", "s1", {}))
+    boss = _boss(app)
+    assert boss.patch(f"/api/admin/users/{ids['t1@1-maktab.uz']}", {"role": "PARENT"}).status_code == 200
+    assert _items(_as(app, "t1@1-maktab.uz"), "student") == []
+
+
+def test_team_changes_are_in_the_history(app):
+    _school(app)
+    ids = _ids(app)
+    t1 = _as(app, "t1@1-maktab.uz")
+    _put(t1, ("student", "s1", {"firstName": "Ali"}))
+    team = sorted([ids["t1@1-maktab.uz"], ids["psy@1-maktab.uz"]])
+    _put(t1, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": team}))
+    upd = _boss(app).get("/api/admin/changes").json()[0]
+    assert upd["fields"] == ["team"]
+    assert upd["before"] == {"team": [ids["t1@1-maktab.uz"]]} and upd["after"] == {"team": team}

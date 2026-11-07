@@ -12,6 +12,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
+from ..access import TEAM_ROLES
 from ..context import AppContext
 from ..deps import ADMIN_ROLES, ApiError, Principal, get_ctx, get_db, require_admin, require_super
 from ..mailer import MailError
@@ -180,6 +181,9 @@ def update_user(user_id: str, body: UserUpdateIn, p: Principal = Depends(require
     if body.is_active is not None:
         u.is_active = body.is_active
     moved = body.institution_id is not None and body.institution_id != u.institution_id
+    if body.role is not None and body.role.value not in TEAM_ROLES:
+        # No longer someone who works with children: off every child's team.
+        db.execute(delete(StudentAccess).where(StudentAccess.user_id == u.id))
     if moved:
         if db.get(Institution, body.institution_id) is None:
             raise ApiError(422, "bad_institution", "Muassasa topilmadi")

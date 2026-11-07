@@ -15,6 +15,7 @@ from ..crypto import constant_time_equals, keyed_hash
 from ..deps import ApiError, Principal, _authenticate, client_ip, get_ctx, get_db, require_partial, require_user
 from ..mailer import MailError
 from ..models import (
+    Institution,
     OneTimeCode,
     PendingRegistration,
     RecordChange,
@@ -336,11 +337,11 @@ def update_profile(body: ProfileUpdateIn, p: Principal = Depends(require_user), 
     after = {**profile, "full_name": user.full_name, "phone": user.phone}
     keys = sorted(k for k in set(before) | set(after) if before.get(k) != after.get(k))
     if keys:
+        # Which fields changed - not their values: the history can never be
+        # erased, while a deleted account's name and phone must be.
         db.add(RecordChange(
             user_id=user.id, kind="profile", rid=user.id, institution_id=user.institution_id,
             action="update", fields=",".join(keys)[:1000],
-            before=json.dumps({k: before.get(k) for k in keys}, ensure_ascii=False),
-            after=json.dumps({k: after.get(k) for k in keys}, ensure_ascii=False),
         ))
     db.commit()
     audit.record(db, "PROFILE_UPDATED", user_id=user.id, ip=p.ip, detail=",".join(keys)[:400])
@@ -758,6 +759,14 @@ def register_resend(body: RegistrationIdIn, request: Request, db: Session = Depe
     return {"ok": True, "resend_after": s.code_resend_seconds, "message": REGISTRATION_SENT}
 
 
+def _admin_of_named_school(db: Session, admin: User, school_name: str) -> bool:
+    """A school administrator whose school is the one the sign-up named."""
+    def norm(x: str) -> str:
+        return " ".join("".join(c for c in (x or "").lower() if c.isalnum() or c.isspace()).split())
+    inst = db.get(Institution, admin.institution_id) if admin.institution_id else None
+    return inst is not None and bool(school_name) and norm(inst.name) == norm(school_name)
+
+
 @router.post("/register/verify")
 def register_verify(body: RegistrationVerifyIn, request: Request, db: Session = Depends(get_db),
                     ctx: AppContext = Depends(get_ctx)):
@@ -789,7 +798,9 @@ def register_verify(body: RegistrationVerifyIn, request: Request, db: Session = 
     db.delete(reg)
     db.commit()
     audit.record(db, "REGISTERED_PENDING_APPROVAL", user_id=user.id, subject=audit.mask_login(user.email), ip=ip)
-    admins = db.scalars(select(User).where(User.role == "SUPER_ADMIN", User.is_active.is_(True))).all()
+    admins = [a for a in db.scalars(select(User).where(
+        User.role.in_(("SUPER_ADMIN", "INSTITUTION_ADMIN")), User.is_active.is_(True)))
+        if a.role == "SUPER_ADMIN" or _admin_of_named_school(db, a, data["profile"].get("institution_name", ""))]
     for admin in admins:
         notify(db, ctx, admin.email, "Individ: yangi ro‘yxatdan o‘tish",
                         f"{user.full_name} ({data['profile'].get('institution_name', '')}) ro‘yxatdan o‘tdi va "
