@@ -269,12 +269,12 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                       final isCompact = cardConstraints.maxWidth < 560;
 
                       final avatar = CircleAvatar(
-                        radius: 26,
+                        radius: 19,
                         backgroundColor: sp.role.color.withValues(alpha: 0.15),
                         child: Icon(
                           sp.role.icon,
                           color: sp.role.color,
-                          size: 28,
+                          size: 19,
                         ),
                       );
 

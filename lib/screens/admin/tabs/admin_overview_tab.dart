@@ -13,6 +13,7 @@ import '../../../services/child_status_service.dart';
 import '../../../services/dynamics_service.dart';
 import '../../students/student_detail_screen.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
 class _AttentionItem {
   final StudentModel student;
@@ -526,16 +527,16 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final icon = Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
             ),
             child: const Icon(
               LucideIcons.landmark,
               color: Colors.white,
-              size: 30,
+              size: 22,
             ),
           );
           final status = Container(
@@ -1001,7 +1002,10 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
           mainAxisSpacing: 14,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          childAspectRatio: 2.3,
+          childAspectRatio:
+              constraints.maxWidth < 430
+                  ? 1.7
+                  : (constraints.maxWidth < 900 ? 1.85 : 2.0),
           children: [
             // 1. Jami ro'yxatdagi bolalar
             _buildStatCard(
@@ -2548,73 +2552,61 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     required Color bgColor,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return SurfaceCard(
+      borderRadius: 22,
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textSecondary,
+                    letterSpacing: 0.3,
+                    height: 1.25,
+                  ),
+                ),
               ),
-              child: Icon(icon, color: color, size: 22),
+              const SizedBox(width: 8),
+              Icon(icon, color: color, size: 20),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+              letterSpacing: -0.5,
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textMuted,
-                      letterSpacing: 0.5,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textSecondary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              LucideIcons.chevronRight,
+          ),
+          const SizedBox(height: 3),
+          Text(
+            subtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 11.5,
               color: AppColors.textMuted,
-              size: 18,
+              fontWeight: FontWeight.w500,
+              height: 1.25,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -2202,11 +2202,11 @@ class _ProfileRightDropdownMenu extends StatelessWidget {
 
     return GlassSurface(
       customBorderRadius: radius,
-      borderColor: AppColors.navGlassBorder,
+      borderColor: AppColors.cardGlassBorder,
       useBlur: true,
       blur: 24,
-      opacity: AppColors.navGlassOpacity,
-      boxShadow: AppColors.navShadow,
+      opacity: 0.96,
+      boxShadow: AppColors.elevatedShadow,
       padding: EdgeInsets.zero,
       child: ConstrainedBox(
         constraints: BoxConstraints(

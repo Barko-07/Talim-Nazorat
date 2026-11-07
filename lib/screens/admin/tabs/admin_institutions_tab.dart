@@ -260,11 +260,11 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                       final isCompact = cardConstraints.maxWidth < 560;
 
                       final iconBadge = Container(
-                        width: 48,
-                        height: 48,
+                        width: 36,
+                        height: 36,
                         decoration: BoxDecoration(
                           color: AppColors.infoBg,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: AppColors.info.withValues(alpha: 0.2),
                           ),
@@ -272,7 +272,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                         child: Icon(
                           LucideIcons.building2,
                           color: AppColors.info,
-                          size: 26,
+                          size: 18,
                         ),
                       );
 

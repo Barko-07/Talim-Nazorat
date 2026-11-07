@@ -1,7 +1,5 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -83,9 +81,12 @@ class _LoginScreenState extends State<LoginScreen>
       if (!mounted || saved == null || _loginIdentifierCtrl.text.isNotEmpty) {
         return;
       }
-      setState(() {
-        _loginIdentifierCtrl.text = saved;
-        _rememberMe = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setState(() {
+          _loginIdentifierCtrl.text = saved;
+          _rememberMe = true;
+        });
       });
     });
   }
@@ -394,7 +395,7 @@ class _LoginScreenState extends State<LoginScreen>
     double letterSpacing = -0.1,
     double? height,
   }) {
-    return GoogleFonts.golosText(
+    return TextStyle(
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color ?? AppColors.textPrimary,
@@ -539,6 +540,8 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final isCompactHeight = screenHeight < 720;
 
     return AmbientMeshBackground(
       intense: true,
@@ -547,7 +550,10 @@ class _LoginScreenState extends State<LoginScreen>
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
+              padding: EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: isCompactHeight ? 16 : 28,
+              ),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 480),
                 child: Column(
@@ -562,16 +568,8 @@ class _LoginScreenState extends State<LoginScreen>
                           onPressed: () => Navigator.of(context).maybePop(),
                         ),
                       ),
-                    _buildBrandHeader()
-                        .animate()
-                        .fadeIn(duration: 220.ms, curve: Curves.easeOutCubic)
-                        .slideY(
-                          begin: 0.04,
-                          end: 0,
-                          duration: 220.ms,
-                          curve: Curves.easeOutCubic,
-                        ),
-                    const SizedBox(height: 24),
+                    _buildBrandHeader(compact: isCompactHeight),
+                    SizedBox(height: isCompactHeight ? 16 : 24),
 
                     if (_errorMessage != null) ...[
                       Container(
@@ -612,47 +610,24 @@ class _LoginScreenState extends State<LoginScreen>
                     ],
 
                     GlassSurface(
-                          borderRadius: 20,
-                          blur: 18,
-                          opacity: 0.96,
-                          boxShadow: AppColors.elevatedShadow,
-                          padding: const EdgeInsets.all(24),
-                          child: PageTransitionSwitcher(
-                            duration: const Duration(milliseconds: 210),
-                            transitionBuilder: (child, primary, secondary) {
-                              return FadeThroughTransition(
-                                fillColor: Colors.transparent,
-                                animation: primary,
-                                secondaryAnimation: secondary,
-                                child: child,
-                              );
-                            },
-                            child:
-                                _tabController.index == 0
-                                    ? KeyedSubtree(
-                                      key: const ValueKey('tab_login'),
-                                      child: _buildLoginView(auth),
-                                    )
-                                    : KeyedSubtree(
-                                      key: const ValueKey('tab_signup'),
-                                      child: _buildStepByStepSignUpView(auth),
-                                    ),
-                          ),
-                        )
-                        .animate()
-                        .fadeIn(
-                          delay: 50.ms,
-                          duration: 240.ms,
-                          curve: Curves.easeOutCubic,
-                        )
-                        .slideY(
-                          begin: 0.03,
-                          end: 0,
-                          duration: 240.ms,
-                          curve: Curves.easeOutCubic,
-                        ),
+                      borderRadius: 20,
+                      blur: 18,
+                      opacity: 0.96,
+                      boxShadow: AppColors.elevatedShadow,
+                      padding: EdgeInsets.all(isCompactHeight ? 18 : 24),
+                      child:
+                          _tabController.index == 0
+                              ? KeyedSubtree(
+                                key: const ValueKey('tab_login'),
+                                child: _buildLoginView(auth),
+                              )
+                              : KeyedSubtree(
+                                key: const ValueKey('tab_signup'),
+                                child: _buildStepByStepSignUpView(auth),
+                              ),
+                    ),
 
-                    const SizedBox(height: 24),
+                    SizedBox(height: isCompactHeight ? 16 : 24),
 
                     Center(
                       child: Text(
@@ -675,11 +650,11 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildBrandHeader() {
+  Widget _buildBrandHeader({bool compact = false}) {
     return Column(
       children: [
-        const BrandLogo(height: 118),
-        const SizedBox(height: 16),
+        BrandLogo(height: compact ? 76 : 112),
+        SizedBox(height: compact ? 10 : 16),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
@@ -698,14 +673,17 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
         ),
-        const SizedBox(height: 12),
-        Text(
-          'Yagona inklyuziv ta’lim va pedagogik monitoring platformasi',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 13,
-            color: AppColors.textMuted,
-            fontWeight: FontWeight.w500,
+        SizedBox(height: compact ? 8 : 12),
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            'Yagona inklyuziv ta’lim va pedagogik monitoring platformasi',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: compact ? 12 : 13,
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],

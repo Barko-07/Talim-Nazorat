@@ -212,12 +212,9 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         titleSpacing: 16,
-        backgroundColor: AppColors.surface,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(1.0),
-          child: Divider(height: 1, thickness: 1, color: AppColors.border),
-        ),
+        scrolledUnderElevation: 0,
         title: Row(
           children: [
             const BrandMark(height: 32),

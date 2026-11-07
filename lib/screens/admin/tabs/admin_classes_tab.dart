@@ -167,11 +167,11 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                       final isCompact = cardConstraints.maxWidth < 560;
 
                       final iconBadge = Container(
-                        width: 48,
-                        height: 48,
+                        width: 34,
+                        height: 34,
                         decoration: BoxDecoration(
                           color: AppColors.warningBg,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: AppColors.warning.withValues(alpha: 0.25),
                           ),
@@ -181,8 +181,8 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                             grade,
                             style: TextStyle(
                               color: AppColors.warning,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12.5,
                             ),
                           ),
                         ),
