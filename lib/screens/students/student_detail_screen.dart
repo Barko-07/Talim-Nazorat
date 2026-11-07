@@ -384,24 +384,53 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               ),
             ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabAlignment: TabAlignment.start,
-          dividerColor: AppColors.hairlineBorder,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textMuted,
-          indicatorColor: AppColors.primary,
-          indicatorWeight: 2.6,
-          labelStyle: const TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 13,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              dividerColor: Colors.transparent,
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
+              splashFactory: NoSplash.splashFactory,
+              labelColor: AppColors.textPrimary,
+              unselectedLabelColor: AppColors.textMuted,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(
+                color: AppColors.isDark ? AppColors.surfaceRaised : Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color:
+                      AppColors.isDark
+                          ? const Color(0x35FFFFFF)
+                          : AppColors.cardGlassBorder,
+                  width: 1.0,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: (AppColors.isDark
+                            ? Colors.black
+                            : const Color(0xFF0F172A))
+                        .withValues(alpha: AppColors.isDark ? 0.35 : 0.06),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1.5),
+                  ),
+                ],
+              ),
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+              tabs: _tabs.map((title) => Tab(height: 36, text: title)).toList(),
+            ),
           ),
-          unselectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 13,
-          ),
-          tabs: _tabs.map((title) => Tab(text: title)).toList(),
         ),
       ),
       body: AmbientMeshBackground(
@@ -2190,39 +2219,26 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      ChoiceChip(
-                        label: const Text('Har bir o‘lchov'),
-                        selected:
-                            _selectedDynamicsPeriod ==
-                            DynamicsPeriod.measurement,
-                        onSelected:
-                            (_) => setState(
-                              () =>
-                                  _selectedDynamicsPeriod =
-                                      DynamicsPeriod.measurement,
-                            ),
-                      ),
-                      ChoiceChip(
-                        label: const Text('Oylik dinamika'),
-                        selected:
-                            _selectedDynamicsPeriod == DynamicsPeriod.month,
-                        onSelected:
-                            (_) => setState(
-                              () =>
-                                  _selectedDynamicsPeriod =
-                                      DynamicsPeriod.month,
-                            ),
-                      ),
-                      ChoiceChip(
-                        label: const Text('Choraklik dinamika'),
-                        selected:
-                            _selectedDynamicsPeriod == DynamicsPeriod.quarter,
-                        onSelected:
-                            (_) => setState(
-                              () =>
-                                  _selectedDynamicsPeriod =
-                                      DynamicsPeriod.quarter,
-                            ),
+                      ModernPillFilterBar(
+                        items: const [
+                          'Har bir o‘lchov',
+                          'Oylik dinamika',
+                          'Choraklik dinamika',
+                        ],
+                        selectedItem: switch (_selectedDynamicsPeriod) {
+                          DynamicsPeriod.measurement => 'Har bir o‘lchov',
+                          DynamicsPeriod.month => 'Oylik dinamika',
+                          DynamicsPeriod.quarter => 'Choraklik dinamika',
+                        },
+                        onSelected: (val) {
+                          setState(() {
+                            _selectedDynamicsPeriod = switch (val) {
+                              'Har bir o‘lchov' => DynamicsPeriod.measurement,
+                              'Oylik dinamika' => DynamicsPeriod.month,
+                              _ => DynamicsPeriod.quarter,
+                            };
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -3164,26 +3180,20 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                     ),
                                   ),
                                   const SizedBox(height: 6),
-                                  Wrap(
-                                    spacing: 6,
-                                    children:
-                                        Mastery.values.map((m) {
-                                          final selected = currentMastery == m;
-                                          return ChoiceChip(
-                                            label: Text(
-                                              m.label,
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                            selected: selected,
-                                            onSelected: (_) {
-                                              setModalState(() {
-                                                results[std.id] = m;
-                                              });
-                                            },
-                                          );
-                                        }).toList(),
+                                  ModernPillFilterBar(
+                                    items:
+                                        Mastery.values
+                                            .map((m) => m.label)
+                                            .toList(),
+                                    selectedItem: currentMastery?.label ?? '',
+                                    onSelected: (selectedLabel) {
+                                      final matched = Mastery.values.firstWhere(
+                                        (m) => m.label == selectedLabel,
+                                      );
+                                      setModalState(() {
+                                        results[std.id] = matched;
+                                      });
+                                    },
                                   ),
                                 ],
                               ),

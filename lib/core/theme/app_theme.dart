@@ -242,15 +242,53 @@ class AppTheme {
         ),
         type: BottomNavigationBarType.fixed,
       ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.white;
+          }
+          return dark ? AppColors.textSecondary : Colors.white;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.primary;
+          }
+          return dark ? AppColors.surfaceMuted : const Color(0xFFCBD5E1);
+        }),
+        trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
+      ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.surface,
+        backgroundColor: dark ? AppColors.surfaceMuted : const Color(0xFFF1F5F9),
         selectedColor: AppColors.primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          side: BorderSide(color: AppColors.border, width: 1.0),
+          side: BorderSide(
+            color: dark ? AppColors.border : const Color(0xFFE2E8F0),
+            width: 1.0,
+          ),
         ),
-        side: BorderSide(color: AppColors.border, width: 1.0),
+        side: BorderSide(
+          color: dark ? AppColors.border : const Color(0xFFE2E8F0),
+          width: 1.0,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+      ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: AppColors.primary,
+        unselectedLabelColor: AppColors.textMuted,
+        indicatorColor: AppColors.primary,
+        dividerColor: AppColors.hairlineBorder,
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
+        splashFactory: NoSplash.splashFactory,
+        labelStyle: const TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 13,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
       ),
       dividerTheme: DividerThemeData(
         color: AppColors.hairlineBorder,

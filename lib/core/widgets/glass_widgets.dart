@@ -837,12 +837,13 @@ class AdaptivePageHeader extends StatelessWidget {
   }
 }
 
-/// Minimalist segmentli filtr-bar (12px tashqi, 9px ichki)
+/// Minimalist segmentli filtr-bar (13px tashqi, 10px ichki pill)
 class ModernPillFilterBar extends StatelessWidget {
   final List<String> items;
   final String selectedItem;
   final ValueChanged<String> onSelected;
   final Map<String, int>? counts;
+  final Map<String, Color>? itemColors;
 
   const ModernPillFilterBar({
     super.key,
@@ -850,19 +851,25 @@ class ModernPillFilterBar extends StatelessWidget {
     required this.selectedItem,
     required this.onSelected,
     this.counts,
+    this.itemColors,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDark;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.none,
       child: Container(
         padding: const EdgeInsets.all(3.5),
         decoration: BoxDecoration(
-          color: AppColors.surfaceMuted,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border, width: 0.9),
+          color: isDark ? AppColors.surfaceMuted : const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(
+            color: isDark ? AppColors.border : const Color(0xFFE2E8F0),
+            width: 1.0,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -870,11 +877,13 @@ class ModernPillFilterBar extends StatelessWidget {
               items.map((item) {
                 final isSelected = item == selectedItem;
                 final count = counts?[item];
+                final accentColor = itemColors?[item];
 
                 return _ModernFilterPillItem(
                   item: item,
                   isSelected: isSelected,
                   count: count,
+                  accentColor: accentColor,
                   onTap: () => onSelected(item),
                 );
               }).toList(),
@@ -888,12 +897,14 @@ class _ModernFilterPillItem extends StatefulWidget {
   final String item;
   final bool isSelected;
   final int? count;
+  final Color? accentColor;
   final VoidCallback onTap;
 
   const _ModernFilterPillItem({
     required this.item,
     required this.isSelected,
     required this.count,
+    this.accentColor,
     required this.onTap,
   });
 
@@ -902,91 +913,157 @@ class _ModernFilterPillItem extends StatefulWidget {
 }
 
 class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
+  bool _hovered = false;
   bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) => setState(() => _pressed = false),
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.94 : 1.0,
-        duration: Duration(milliseconds: _pressed ? 80 : 160),
-        curve: _pressed ? Curves.easeInCubic : Curves.easeOutCubic,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
+    final isDark = AppColors.isDark;
+    final accent = widget.accentColor;
+
+    // Asosiy fon ranglari: Tanlanmagan holatda `withValues(alpha: 0.0)` ishlatiladi.
+    // Bu Flutter'ning Color.lerp'i orqali animatsiya bo'lganda RGB o'zgarmasdan (255, 255, 255)
+    // faqat shaffoflik o'zgarishini ta'minlaydi va oraliq qora/kulrang miltillash (bug)ni 100% yo'qotadi.
+    final baseActiveBg = isDark ? AppColors.surfaceRaised : Colors.white;
+    final baseInactiveBg = baseActiveBg.withValues(alpha: 0.0);
+    final baseHoverBg = baseActiveBg.withValues(alpha: isDark ? 0.35 : 0.45);
+
+    final effectiveBg =
+        widget.isSelected
+            ? baseActiveBg
+            : (_hovered ? baseHoverBg : baseInactiveBg);
+
+    // Chegara (Border) ranglari: xuddi shunday alpha orqali toza o'tadi
+    final baseActiveBorder =
+        accent != null
+            ? accent.withValues(alpha: isDark ? 0.45 : 0.32)
+            : (isDark ? const Color(0x35FFFFFF) : AppColors.cardGlassBorder);
+    final baseInactiveBorder = baseActiveBorder.withValues(alpha: 0.0);
+    final baseHoverBorder =
+        baseActiveBorder.withValues(alpha: isDark ? 0.15 : 0.25);
+
+    final effectiveBorder =
+        widget.isSelected
+            ? baseActiveBorder
+            : (_hovered ? baseHoverBorder : baseInactiveBorder);
+
+    // Soya (BoxShadow) parametrlari: ikkala holatda ham bir xil elementlar soni va offset/blur
+    final shadowBaseColor = isDark ? Colors.black : const Color(0xFF0F172A);
+    final shadowColor1 = shadowBaseColor.withValues(
+      alpha: isDark ? 0.35 : 0.06,
+    );
+    final shadowColor2 = shadowBaseColor.withValues(
+      alpha: isDark ? 0.20 : 0.04,
+    );
+
+    final effectiveShadows = [
+      BoxShadow(
+        color:
+            widget.isSelected
+                ? shadowColor1
+                : shadowColor1.withValues(alpha: 0.0),
+        blurRadius: 4,
+        offset: const Offset(0, 1.5),
+      ),
+      BoxShadow(
+        color:
+            widget.isSelected
+                ? shadowColor2
+                : shadowColor2.withValues(alpha: 0.0),
+        blurRadius: 8,
+        offset: const Offset(0, 3),
+      ),
+    ];
+
+    final activeTextColor = accent ?? AppColors.textPrimary;
+    final badgeAccent = accent ?? AppColors.primary;
+    final badgeActiveBg =
+        accent != null
+            ? accent.withValues(alpha: isDark ? 0.22 : 0.14)
+            : AppColors.primaryLight;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapUp: (_) => setState(() => _pressed = false),
+        onTapCancel: () => setState(() => _pressed = false),
+        child: AnimatedScale(
+          scale: _pressed ? 0.98 : 1.0,
+          duration: Duration(milliseconds: _pressed ? 70 : 150),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7.5),
-          decoration: BoxDecoration(
-            color:
-                widget.isSelected
-                    ? AppColors.surfaceRaised
-                    : Colors.transparent,
-            borderRadius: BorderRadius.circular(9),
-            border: Border.all(
-              color:
-                  widget.isSelected
-                      ? AppColors.glassWhiteBorder
-                      : Colors.transparent,
-              width: 0.85,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7.5),
+            decoration: BoxDecoration(
+              color: effectiveBg,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: effectiveBorder, width: 1.0),
+              boxShadow: effectiveShadows,
             ),
-            boxShadow:
-                widget.isSelected
-                    ? const [
-                      BoxShadow(
-                        color: Color(0x0D0A1A3F),
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
-                      ),
-                    ]
-                    : null,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                widget.item,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight:
-                      widget.isSelected ? FontWeight.w700 : FontWeight.w600,
-                  color:
-                      widget.isSelected
-                          ? AppColors.textPrimary
-                          : AppColors.textMuted,
-                ),
-              ),
-              if (widget.count != null) ...[
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 1.5,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                        widget.isSelected
-                            ? AppColors.primaryLight
-                            : AppColors.surface.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    '${widget.count}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                      color:
-                          widget.isSelected
-                              ? AppColors.primary
-                              : AppColors.textMuted,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (accent != null) ...[
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: accent,
+                      shape: BoxShape.circle,
                     ),
                   ),
+                  const SizedBox(width: 6),
+                ],
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOutCubic,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight:
+                        widget.isSelected ? FontWeight.w700 : FontWeight.w600,
+                    color:
+                        widget.isSelected
+                            ? activeTextColor
+                            : AppColors.textMuted,
+                  ),
+                  child: Text(widget.item),
                 ),
+                if (widget.count != null) ...[
+                  const SizedBox(width: 6),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6.5,
+                      vertical: 1.5,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          widget.isSelected
+                              ? badgeActiveBg
+                              : badgeActiveBg.withValues(alpha: 0.0),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '${widget.count}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                        color:
+                            widget.isSelected
+                                ? badgeAccent
+                                : AppColors.textMuted,
+                      ),
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

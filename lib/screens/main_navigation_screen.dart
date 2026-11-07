@@ -1601,7 +1601,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                             color:
                                                 isSelected
                                                     ? AppColors.primaryLight
-                                                    : Colors.transparent,
+                                                    : AppColors.primaryLight
+                                                        .withValues(alpha: 0.0),
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
@@ -1609,7 +1610,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                               color:
                                                   isSelected
                                                       ? AppColors.primaryTint
-                                                      : Colors.transparent,
+                                                      : AppColors.primaryTint
+                                                          .withValues(
+                                                            alpha: 0.0,
+                                                          ),
                                               width: 1.0,
                                             ),
                                           ),
@@ -1822,16 +1826,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                             ? AppColors.primary.withValues(
                                               alpha: 0.12,
                                             )
-                                            : Colors.transparent,
+                                            : AppColors.primary.withValues(
+                                              alpha: 0.0,
+                                            ),
                                     borderRadius: pillRadius,
-                                    border:
-                                        isSelected
-                                            ? Border.all(
-                                              color: AppColors.primary
-                                                  .withValues(alpha: 0.22),
-                                              width: 1.0,
-                                            )
-                                            : null,
+                                    border: Border.all(
+                                      color:
+                                          isSelected
+                                              ? AppColors.primary.withValues(
+                                                alpha: 0.22,
+                                              )
+                                              : AppColors.primary.withValues(
+                                                alpha: 0.0,
+                                              ),
+                                      width: 1.0,
+                                    ),
                                   ),
                                   child:
                                       isSelected
@@ -1906,19 +1915,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           color:
                               isMoreActive
                                   ? AppColors.primary.withValues(alpha: 0.12)
-                                  : Colors.transparent,
+                                  : AppColors.primary.withValues(alpha: 0.0),
                           borderRadius: const BorderRadius.all(
                             Radius.circular(20),
                           ),
-                          border:
-                              isMoreActive
-                                  ? Border.all(
-                                    color: AppColors.primary.withValues(
-                                      alpha: 0.22,
-                                    ),
-                                    width: 1.0,
-                                  )
-                                  : null,
+                          border: Border.all(
+                            color:
+                                isMoreActive
+                                    ? AppColors.primary.withValues(alpha: 0.22)
+                                    : AppColors.primary.withValues(alpha: 0.0),
+                            width: 1.0,
+                          ),
                         ),
                         child:
                             isMoreActive

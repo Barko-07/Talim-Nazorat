@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/glass_widgets.dart';
 import '../../../models/user_model.dart';
 import '../../../models/student_model.dart';
 import '../../../providers/app_provider.dart';
@@ -290,76 +291,45 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
           ),
           if (summary != null) ...[
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                FilterChip(
-                  selected: _filterColor == null,
-                  label: Text('Barchasi (${allStudents.length})'),
-                  onSelected: (_) => setState(() => _filterColor = null),
-                ),
-                FilterChip(
-                  selected: _filterColor == StatusColor.red,
-                  label: Text(
-                    'Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
-                  ),
-                  selectedColor: AppColors.error,
-                  backgroundColor: AppColors.errorBg,
-                  labelStyle: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color:
-                        _filterColor == StatusColor.red
-                            ? Colors.white
-                            : AppColors.error,
-                  ),
-                  onSelected:
-                      (v) => setState(
-                        () => _filterColor = v ? StatusColor.red : null,
-                      ),
-                ),
-                FilterChip(
-                  selected: _filterColor == StatusColor.yellow,
-                  label: Text(
-                    'Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
-                  ),
-                  selectedColor: AppColors.warning,
-                  backgroundColor: AppColors.warningBg,
-                  labelStyle: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color:
-                        _filterColor == StatusColor.yellow
-                            ? Colors.white
-                            : AppColors.warning,
-                  ),
-                  onSelected:
-                      (v) => setState(
-                        () => _filterColor = v ? StatusColor.yellow : null,
-                      ),
-                ),
-                FilterChip(
-                  selected: _filterColor == StatusColor.green,
-                  label: Text(
-                    'Yashil — Ijobiy (${summary.count(StatusColor.green)})',
-                  ),
-                  selectedColor: AppColors.success,
-                  backgroundColor: AppColors.successBg,
-                  labelStyle: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color:
-                        _filterColor == StatusColor.green
-                            ? Colors.white
-                            : AppColors.success,
-                  ),
-                  onSelected:
-                      (v) => setState(
-                        () => _filterColor = v ? StatusColor.green : null,
-                      ),
-                ),
+            ModernPillFilterBar(
+              items: const [
+                'Barchasi',
+                'Qizil — Ishlanmagan',
+                'Sariq — E’tibor',
+                'Yashil — Ijobiy',
               ],
+              selectedItem:
+                  _filterColor == StatusColor.red
+                      ? 'Qizil — Ishlanmagan'
+                      : _filterColor == StatusColor.yellow
+                      ? 'Sariq — E’tibor'
+                      : _filterColor == StatusColor.green
+                      ? 'Yashil — Ijobiy'
+                      : 'Barchasi',
+              counts: {
+                'Barchasi': allStudents.length,
+                'Qizil — Ishlanmagan': summary.count(StatusColor.red),
+                'Sariq — E’tibor': summary.count(StatusColor.yellow),
+                'Yashil — Ijobiy': summary.count(StatusColor.green),
+              },
+              itemColors: {
+                'Qizil — Ishlanmagan': AppColors.error,
+                'Sariq — E’tibor': AppColors.warning,
+                'Yashil — Ijobiy': AppColors.success,
+              },
+              onSelected: (v) {
+                setState(() {
+                  if (v == 'Qizil — Ishlanmagan') {
+                    _filterColor = StatusColor.red;
+                  } else if (v == 'Sariq — E’tibor') {
+                    _filterColor = StatusColor.yellow;
+                  } else if (v == 'Yashil — Ijobiy') {
+                    _filterColor = StatusColor.green;
+                  } else {
+                    _filterColor = null;
+                  }
+                });
+              },
             ),
           ],
           const SizedBox(height: 16),

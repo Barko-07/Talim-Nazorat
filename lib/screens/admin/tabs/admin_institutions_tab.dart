@@ -460,16 +460,76 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                       length: 2,
                       child: Column(
                         children: [
-                          TabBar(
-                            labelColor: AppColors.primary,
-                            unselectedLabelColor: AppColors.textSecondary,
-                            indicatorColor: AppColors.primary,
-                            tabs: [
-                              Tab(
-                                text: 'ATEB O‘quvchilar (${students.length})',
+                          Container(
+                            padding: const EdgeInsets.all(3.5),
+                            decoration: BoxDecoration(
+                              color:
+                                  AppColors.isDark
+                                      ? AppColors.surfaceMuted
+                                      : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(13),
+                              border: Border.all(
+                                color:
+                                    AppColors.isDark
+                                        ? AppColors.border
+                                        : const Color(0xFFE2E8F0),
+                                width: 1.0,
                               ),
-                              Tab(text: 'Pedagog-kadrlar (${staff.length})'),
-                            ],
+                            ),
+                            child: TabBar(
+                              dividerColor: Colors.transparent,
+                              overlayColor: WidgetStateProperty.all(
+                                Colors.transparent,
+                              ),
+                              splashFactory: NoSplash.splashFactory,
+                              labelColor: AppColors.textPrimary,
+                              unselectedLabelColor: AppColors.textMuted,
+                              indicatorSize: TabBarIndicatorSize.tab,
+                              indicator: BoxDecoration(
+                                color:
+                                    AppColors.isDark
+                                        ? AppColors.surfaceRaised
+                                        : Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color:
+                                      AppColors.isDark
+                                          ? const Color(0x35FFFFFF)
+                                          : AppColors.cardGlassBorder,
+                                  width: 1.0,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: (AppColors.isDark
+                                            ? Colors.black
+                                            : const Color(0xFF0F172A))
+                                        .withValues(
+                                          alpha: AppColors.isDark ? 0.35 : 0.06,
+                                        ),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 1.5),
+                                  ),
+                                ],
+                              ),
+                              labelStyle: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                              ),
+                              unselectedLabelStyle: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                              tabs: [
+                                Tab(
+                                  height: 36,
+                                  text: 'ATEB O‘quvchilar (${students.length})',
+                                ),
+                                Tab(
+                                  height: 36,
+                                  text: 'Pedagog-kadrlar (${staff.length})',
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 10),
                           Expanded(

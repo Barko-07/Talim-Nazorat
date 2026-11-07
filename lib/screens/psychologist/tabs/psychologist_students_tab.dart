@@ -284,103 +284,62 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                 ),
                 const SizedBox(height: 12),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 10,
+                  runSpacing: 10,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    FilterChip(
-                      selected: _onlyAssignedToMe,
-                      label: const Text('Faqat menga biriktirilgan bolalar'),
-                      avatar: Icon(
-                        _onlyAssignedToMe
-                            ? LucideIcons.circleCheck
-                            : LucideIcons.circleUser,
-                        size: 16,
-                        color:
-                            _onlyAssignedToMe
-                                ? Colors.white
-                                : AppColors.primary,
-                      ),
-                      selectedColor: AppColors.primary,
-                      labelStyle: TextStyle(
-                        fontSize: 12,
-                        color:
-                            _onlyAssignedToMe
-                                ? Colors.white
-                                : AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    ModernPillFilterBar(
+                      items: const [
+                        'Barcha bolalar',
+                        'Menga biriktirilganlar',
+                      ],
+                      selectedItem:
+                          _onlyAssignedToMe
+                              ? 'Menga biriktirilganlar'
+                              : 'Barcha bolalar',
                       onSelected:
-                          (val) => setState(() => _onlyAssignedToMe = val),
+                          (v) => setState(
+                            () =>
+                                _onlyAssignedToMe =
+                                    v == 'Menga biriktirilganlar',
+                          ),
                     ),
-                    if (summary != null) ...[
-                      FilterChip(
-                        selected: _statusColorFilter == StatusColor.red,
-                        label: Text(
-                          'Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
-                        ),
-                        selectedColor: AppColors.error,
-                        backgroundColor: AppColors.errorBg,
-                        labelStyle: TextStyle(
-                          fontSize: 12,
-                          color:
-                              _statusColorFilter == StatusColor.red
-                                  ? Colors.white
-                                  : AppColors.error,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        onSelected:
-                            (val) => setState(
-                              () =>
-                                  _statusColorFilter =
-                                      val ? StatusColor.red : null,
-                            ),
+                    if (summary != null)
+                      ModernPillFilterBar(
+                        items: const ['Barchasi', 'Qizil', 'Sariq', 'Yashil'],
+                        selectedItem:
+                            _statusColorFilter == StatusColor.red
+                                ? 'Qizil'
+                                : _statusColorFilter == StatusColor.yellow
+                                ? 'Sariq'
+                                : _statusColorFilter == StatusColor.green
+                                ? 'Yashil'
+                                : 'Barchasi',
+                        counts: {
+                          'Barchasi': summary.total,
+                          'Qizil': summary.count(StatusColor.red),
+                          'Sariq': summary.count(StatusColor.yellow),
+                          'Yashil': summary.count(StatusColor.green),
+                        },
+                        itemColors: {
+                          'Qizil': AppColors.error,
+                          'Sariq': AppColors.warning,
+                          'Yashil': AppColors.success,
+                        },
+                        onSelected: (v) {
+                          setState(() {
+                            if (v == 'Qizil') {
+                              _statusColorFilter = StatusColor.red;
+                            } else if (v == 'Sariq') {
+                              _statusColorFilter = StatusColor.yellow;
+                            } else if (v == 'Yashil') {
+                              _statusColorFilter = StatusColor.green;
+                            } else {
+                              _statusColorFilter = null;
+                            }
+                          });
+                        },
                       ),
-                      FilterChip(
-                        selected: _statusColorFilter == StatusColor.yellow,
-                        label: Text(
-                          'Sariq (${summary.count(StatusColor.yellow)})',
-                        ),
-                        selectedColor: AppColors.warning,
-                        backgroundColor: AppColors.warningBg,
-                        labelStyle: TextStyle(
-                          fontSize: 12,
-                          color:
-                              _statusColorFilter == StatusColor.yellow
-                                  ? Colors.white
-                                  : AppColors.warning,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        onSelected:
-                            (val) => setState(
-                              () =>
-                                  _statusColorFilter =
-                                      val ? StatusColor.yellow : null,
-                            ),
-                      ),
-                      FilterChip(
-                        selected: _statusColorFilter == StatusColor.green,
-                        label: Text(
-                          'Yashil (${summary.count(StatusColor.green)})',
-                        ),
-                        selectedColor: AppColors.success,
-                        backgroundColor: AppColors.successBg,
-                        labelStyle: TextStyle(
-                          fontSize: 12,
-                          color:
-                              _statusColorFilter == StatusColor.green
-                                  ? Colors.white
-                                  : AppColors.success,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        onSelected:
-                            (val) => setState(
-                              () =>
-                                  _statusColorFilter =
-                                      val ? StatusColor.green : null,
-                            ),
-                      ),
-                    ],
                     TextButton(
                       onPressed: () {
                         setState(() {
