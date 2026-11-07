@@ -6,12 +6,12 @@ import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/app_brand.dart';
 import 'core/constants/app_colors.dart';
-import 'core/widgets/brand_logo.dart';
 import 'providers/auth_provider.dart';
 import 'providers/app_provider.dart';
 import 'providers/theme_provider.dart';
 import 'models/user_model.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/entry/intro_screen.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/admin/admin_portal_screen.dart';
 
@@ -94,17 +94,20 @@ class _TalimNazoratAppState extends State<TalimNazoratApp>
   }
 }
 
-/// Ilovaning asosiy kirish nuqtasi. Kirgan foydalanuvchiga — rolga mos
-/// boshqaruv paneli, kirmagan mehmonga esa to‘g‘ridan-to‘g‘ri kirish oynasi.
-class AppEntry extends StatelessWidget {
+/// Ilovaning asosiy kirish nuqtasi. Ochilishda minimalist brend animatsiyasi
+/// ko‘rsatiladi, so‘ng kirgan foydalanuvchiga — rolga mos boshqaruv paneli,
+/// kirmagan mehmonga esa kirish oynasi silliq ochiladi.
+class AppEntry extends StatefulWidget {
   const AppEntry({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
-    if (auth.isInitializing) {
-      return const _AppLoadingScreen();
-    }
+  State<AppEntry> createState() => _AppEntryState();
+}
+
+class _AppEntryState extends State<AppEntry> {
+  bool _introDone = false;
+
+  Widget _buildDestination(AuthProvider auth) {
     if (auth.initializationError != null) {
       return _InitializationErrorScreen(onRetry: auth.retryInitialization);
     }
@@ -116,34 +119,31 @@ class AppEntry extends StatelessWidget {
     }
     return const LoginScreen();
   }
-}
-
-class _AppLoadingScreen extends StatelessWidget {
-  const _AppLoadingScreen();
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: AppColors.background,
-    body: Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const BrandLogo(height: 110),
-          const SizedBox(height: 22),
-          const SizedBox(
-            width: 24,
-            height: 24,
-            child: CircularProgressIndicator(strokeWidth: 2.4),
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final showIntro = !_introDone || auth.isInitializing;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        auth.isInitializing
+            ? const SizedBox.shrink()
+            : _buildDestination(auth),
+        if (showIntro)
+          IntroScreen(
+            key: const ValueKey('individ_brand_intro'),
+            canFinish: !auth.isInitializing,
+            onDone: () {
+              if (mounted) {
+                setState(() => _introDone = true);
+              }
+            },
           ),
-          const SizedBox(height: 10),
-          Text(
-            'Ma’lumotlar yuklanmoqda…',
-            style: TextStyle(color: AppColors.textMuted, fontSize: 12),
-          ),
-        ],
-      ),
-    ),
-  );
+      ],
+    );
+  }
 }
 
 class _InitializationErrorScreen extends StatelessWidget {
