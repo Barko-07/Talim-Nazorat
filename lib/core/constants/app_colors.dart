@@ -219,8 +219,9 @@ class AppColors {
       _p.isDark ? _p.border : const Color(0xFFE2E8F0);
   static Color get cardGlassBorder =>
       _p.isDark ? const Color(0x24FFFFFF) : const Color(0xFFFFFFFF);
-  static Color get navGlassBorder => Colors.transparent;
-  static double get navGlassOpacity => 0.0;
+  static Color get navGlassBorder =>
+      _p.isDark ? const Color(0x24FFFFFF) : const Color(0x85FFFFFF);
+  static double get navGlassOpacity => _p.isDark ? 0.36 : 0.32;
 
   // Matn
   static Color get textPrimary => _p.textPrimary;

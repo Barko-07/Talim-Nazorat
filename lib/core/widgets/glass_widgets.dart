@@ -164,6 +164,7 @@ class GlassSurface extends StatelessWidget {
   final Color? borderColor;
   final List<BoxShadow>? boxShadow;
   final bool useBlur;
+  final double borderWidth;
 
   const GlassSurface({
     super.key,
@@ -178,6 +179,7 @@ class GlassSurface extends StatelessWidget {
     this.borderColor,
     this.boxShadow,
     this.useBlur = true,
+    this.borderWidth = 1.0,
   });
 
   @override
@@ -193,7 +195,7 @@ class GlassSurface extends StatelessWidget {
         color: baseColor.withValues(alpha: effectiveOpacity),
         border: Border.all(
           color: borderColor ?? AppColors.glassWhiteBorder,
-          width: 1.0,
+          width: borderWidth,
         ),
       ),
       child: child,
