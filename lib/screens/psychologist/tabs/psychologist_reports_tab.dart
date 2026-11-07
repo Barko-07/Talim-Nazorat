@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../providers/app_provider.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
 class PsychologistReportsTab extends StatefulWidget {
   const PsychologistReportsTab({super.key});
@@ -182,128 +183,121 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
             : '0';
 
     final width = MediaQuery.sizeOf(context).width;
+    final horizontalPad = width < 600 ? 12.0 : 18.0;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(
-          24,
+          horizontalPad,
           MediaQuery.paddingOf(context).top + (width >= 920 ? 82 : 74),
-          24,
+          horizontalPad,
           width < 920 ? (84 + MediaQuery.paddingOf(context).bottom) : 24,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Sarlavha va eksport tugmalari
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 52,
-                    height: 52,
+            // Sarlavha va davr tanlagich (Minimalist Glassy Header)
+            SurfaceCard(
+              borderRadius: 24,
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+              child: LayoutBuilder(
+                builder: (context, c) {
+                  final isCompact = c.maxWidth < 640;
+                  final periodDropdown = Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.surfaceMuted,
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border),
                     ),
-                    child: Icon(
-                      LucideIcons.barChart,
-                      color: AppColors.primary,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Psixologik faoliyat va rivojlanish monitoringi hisobotlari',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Maktab amaliyotchi psixologi faoliyat ko‘rsatkichlari, diagnostika natijalari va bolalar dinamikasi.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary.withValues(alpha: 0.9),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Davr tanlagich (aniq kenglik: ro'yxat qatorda o'lchanadi)
-                  SizedBox(
-                    width: 170,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceMuted,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          value: _selectedPeriod,
-                          items:
-                              _periods.map((p) {
-                                return DropdownMenuItem(
-                                  value: p,
-                                  child: Text(
-                                    p,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        isExpanded: isCompact,
+                        value: _selectedPeriod,
+                        items:
+                            _periods.map((p) {
+                              return DropdownMenuItem(
+                                value: p,
+                                child: Text(
+                                  p,
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                );
-                              }).toList(),
-                          onChanged: (val) {
-                            if (val != null) {
-                              setState(() => _selectedPeriod = val);
-                            }
-                          },
-                        ),
+                                ),
+                              );
+                            }).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() => _selectedPeriod = val);
+                          }
+                        },
                       ),
                     ),
-                  ),
-                ],
+                  );
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: StatusPill(
+                              label: 'Tahlil va eksport',
+                              color: AppColors.primary,
+                              backgroundColor: AppColors.primaryLight,
+                              icon: LucideIcons.barChart,
+                            ),
+                          ),
+                          if (!isCompact) ...[
+                            const SizedBox(width: 12),
+                            periodDropdown,
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Psixologik faoliyat va rivojlanish monitoringi hisobotlari',
+                        style: TextStyle(
+                          fontSize: isCompact ? 18.5 : 21,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Maktab amaliyotchi psixologi faoliyat ko‘rsatkichlari, diagnostika natijalari va bolalar dinamikasi.',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: AppColors.textMuted,
+                          height: 1.4,
+                        ),
+                      ),
+                      if (isCompact) ...[
+                        const SizedBox(height: 12),
+                        periodDropdown,
+                      ],
+                    ],
+                  );
+                },
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             // Maxfiylik va qonuniylik burchagi
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppColors.primaryLight,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.primaryTint),
-              ),
+            GlassWell(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              borderRadius: 16,
+              tintColor: AppColors.primaryLight.withValues(alpha: 0.65),
+              borderColor: AppColors.primaryTint,
               child: Row(
                 children: [
                   Icon(
                     LucideIcons.shield,
-                    color: AppColors.primaryDark,
-                    size: 20,
+                    color: AppColors.primary,
+                    size: 18,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -312,7 +306,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                       'mutaxassislarga ochiq. Maxfiy kuzatuvlarni faqat psixologlar ko‘radi.',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.primaryDark,
+                        color: AppColors.textSecondary,
                         height: 1.4,
                       ),
                     ),
@@ -320,71 +314,53 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
 
-            // Asosiy statistika kartalari (KPI)
-            LayoutBuilder(
-              builder: (context, c) {
-                // KPI kartalari: telefonda 2 tadan, keng ekranda 4 tasi bir qatorda
-                final columns = c.maxWidth >= 760 ? 4 : 2;
-                const gap = 14.0;
-                final w = (c.maxWidth - gap * (columns - 1)) / columns;
-                final cards = [
-                  _buildKpiCard(
-                    title: 'Psixologik kuzatuvdagi bolalar',
-                    value: '${students.length}',
-                    subtext: 'Biriktirilgan o‘quvchilar',
-                    icon: LucideIcons.users,
-                    color: AppColors.primaryDark,
-                    bgColor: AppColors.primaryLight,
-                  ),
-                  _buildKpiCard(
-                    title: 'O‘tkazilgan baholashlar',
-                    value: '${assessments.length}',
-                    subtext: 'Standartlashtirilgan testlar',
-                    icon: LucideIcons.clipboardCheck,
-                    color: AppColors.brandTeal,
-                    bgColor: AppColors.infoBg,
-                  ),
-                  _buildKpiCard(
-                    title: 'Bajarilgan mashg‘ulotlar',
-                    value: '$completedSessions',
-                    subtext: 'Rejadagilar: $scheduledSessions ta',
-                    icon: LucideIcons.brain,
-                    color: AppColors.success,
-                    bgColor: AppColors.successBg,
-                  ),
-                  _buildKpiCard(
-                    title: 'Ijobiy dinamika ulushi',
-                    value: '$positiveDynamicsPercent%',
-                    subtext: '$improvingCount ta o‘quvchida o‘sish',
-                    icon: LucideIcons.trendingUp,
-                    color: AppColors.purple,
-                    bgColor: AppColors.purpleBg,
-                  ),
-                ];
-                return Wrap(
-                  spacing: gap,
-                  runSpacing: gap,
-                  children: [
-                    for (final card in cards) SizedBox(width: w, child: card),
-                  ],
-                );
-              },
+            // Asosiy statistika kartalari (KPI — bir xil balandlik va kenglikda)
+            ResponsiveGlassGrid(
+              mobileColumns: 2,
+              tabletColumns: 2,
+              desktopColumns: 4,
+              spacing: 10,
+              children: [
+                _buildKpiCard(
+                  title: 'Psixologik kuzatuvdagi bolalar',
+                  value: '${students.length} nafar',
+                  subtext: 'Biriktirilgan o‘quvchilar',
+                  icon: LucideIcons.users,
+                  color: AppColors.primary,
+                ),
+                _buildKpiCard(
+                  title: 'O‘tkazilgan baholashlar',
+                  value: '${assessments.length} ta',
+                  subtext: 'Standartlashtirilgan testlar',
+                  icon: LucideIcons.clipboardCheck,
+                  color: AppColors.info,
+                ),
+                _buildKpiCard(
+                  title: 'Bajarilgan mashg‘ulotlar',
+                  value: '$completedSessions ta',
+                  subtext: 'Rejadagilar: $scheduledSessions ta',
+                  icon: LucideIcons.brain,
+                  color: AppColors.success,
+                ),
+                _buildKpiCard(
+                  title: 'Ijobiy dinamika ulushi',
+                  value: '$positiveDynamicsPercent%',
+                  subtext: '$improvingCount ta o‘quvchida o‘sish',
+                  icon: LucideIcons.trendingUp,
+                  color: AppColors.purple,
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
 
             // Dinamika taqsimoti va Eksport bloki (2 ustun)
             LayoutBuilder(
               builder: (context, c) {
-                // Telefonda dinamika va eksport bloklari ustma-ust
-                final dynamics = Container(
+                final dynamics = SurfaceCard(
+                  borderRadius: 24,
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.border),
-                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -395,8 +371,8 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                             size: 20,
                             color: AppColors.primary,
                           ),
-                          SizedBox(width: 8),
-                          Flexible(
+                          const SizedBox(width: 8),
+                          Expanded(
                             child: Text(
                               'Psixologik dinamika taqsimoti',
                               style: TextStyle(
@@ -410,7 +386,6 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Yaxshilanish
                       _buildDynamicBar(
                         label: 'Ijobiy o‘sish (Yaxshilanish)',
                         count: improvingCount,
@@ -419,38 +394,31 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Barqaror
                       _buildDynamicBar(
                         label: 'Barqaror (O‘zgarmagan)',
                         count: stableCount,
                         total: assessments.isEmpty ? 1 : assessments.length,
-                        color: AppColors.primaryDark,
+                        color: AppColors.primary,
                       ),
                       const SizedBox(height: 12),
 
-                      // Qo'shimcha e'tibor talab
                       _buildDynamicBar(
                         label: 'Qo‘shimcha korreksiya talab etiladi',
                         count: needsAttentionCount,
                         total: assessments.isEmpty ? 1 : assessments.length,
                         color: AppColors.warning,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 18),
 
-                      // Qisqacha tahliliy matn
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceMuted,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.border),
-                        ),
+                      GlassWell(
+                        padding: const EdgeInsets.all(14),
+                        borderRadius: 12,
                         child: Text(
                           'Kuzatuv davrida jami ${assessments.length} ta psixologik diagnostika va ${observations.length} ta xulq-atvor kuzatuvi amalga oshirildi. '
                           'O‘tkazilgan korreksion mashg‘ulotlar natijasida bolalarning $positiveDynamicsPercent% qismida barqaror va ijobiy o‘sish dinamikasi qayd etildi.',
                           style: TextStyle(
-                            fontSize: 12,
-                            height: 1.5,
+                            fontSize: 12.5,
+                            height: 1.45,
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -458,13 +426,9 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                     ],
                   ),
                 );
-                final exports = Container(
+                final exports = SurfaceCard(
+                  borderRadius: 24,
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.border),
-                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -475,8 +439,8 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                             size: 20,
                             color: AppColors.primary,
                           ),
-                          SizedBox(width: 8),
-                          Flexible(
+                          const SizedBox(width: 8),
+                          Expanded(
                             child: Text(
                               'Hisobotlarni yuklab olish',
                               style: TextStyle(
@@ -498,7 +462,6 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Baholashlar CSV
                       _buildExportButton(
                         title: 'Psixologik baholashlar hisoboti',
                         subtitle: '${assessments.length} ta baholash qaydlari',
@@ -516,7 +479,6 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                       ),
                       const SizedBox(height: 10),
 
-                      // Kuzatuv jurnali CSV
                       _buildExportButton(
                         title: 'Kuzatuv jurnali hisoboti',
                         subtitle: '${observations.length} ta kuzatuv qaydlari',
@@ -534,7 +496,6 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                       ),
                       const SizedBox(height: 10),
 
-                      // Mashg'ulotlar CSV
                       _buildExportButton(
                         title: 'Mashg‘ulotlar va davomat hisoboti',
                         subtitle:
@@ -557,60 +518,61 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 if (c.maxWidth < 760) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [dynamics, const SizedBox(height: 20), exports],
+                    children: [dynamics, const SizedBox(height: 12), exports],
                   );
                 }
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 3, child: dynamics),
-                    const SizedBox(width: 20),
-                    Expanded(flex: 2, child: exports),
-                  ],
+                return IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(child: dynamics),
+                      const SizedBox(width: 12),
+                      Expanded(child: exports),
+                    ],
+                  ),
                 );
               },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
 
             // O'quvchilar kesimida konsolidatsiyalangan psixologik ko'rsatkichlar jadvali
-            Container(
+            SurfaceCard(
+              borderRadius: 24,
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Icon(
-                        LucideIcons.table,
-                        size: 20,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          'O‘quvchilar kesimida umumiy psixologik ko‘rsatkichlar',
-                          style: TextStyle(
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            LucideIcons.table,
+                            size: 20,
+                            color: AppColors.primary,
                           ),
-                        ),
-                      ),
-                      const Spacer(),
-                      Flexible(
-                        child: Text(
-                          'Jami: ${students.length} nafar o‘quvchi',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              'O‘quvchilar kesimida umumiy psixologik ko‘rsatkichlar',
+                              style: TextStyle(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
+                      ),
+                      StatusPill(
+                        label: 'Jami: ${students.length} nafar',
+                        color: AppColors.textSecondary,
+                        backgroundColor: AppColors.surfaceMuted,
                       ),
                     ],
                   ),
@@ -668,7 +630,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                                 trend = studentAssessments.first.trend;
                               }
 
-                              Color trendColor = AppColors.primaryDark;
+                              Color trendColor = AppColors.primary;
                               if (trend == 'Yaxshilanish') {
                                 trendColor = AppColors.success;
                               }
@@ -683,15 +645,15 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                                       children: [
                                         CircleAvatar(
                                           radius: 12,
-                                          backgroundColor: AppColors.primary
-                                              .withValues(alpha: 0.1),
+                                          backgroundColor:
+                                              AppColors.primaryLight,
                                           child: Text(
                                             s.fullName.isNotEmpty
                                                 ? s.fullName[0]
                                                 : 'O',
                                             style: TextStyle(
                                               fontSize: 11,
-                                              fontWeight: FontWeight.w600,
+                                              fontWeight: FontWeight.w700,
                                               color: AppColors.primary,
                                             ),
                                           ),
@@ -716,25 +678,11 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                                   ),
                                   DataCell(Text('${studentObs.length} ta')),
                                   DataCell(
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 3,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: trendColor.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: trendColor.withValues(alpha: 0.3),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        trend,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                          color: trendColor,
-                                        ),
+                                    StatusPill(
+                                      label: trend,
+                                      color: trendColor,
+                                      backgroundColor: trendColor.withValues(
+                                        alpha: 0.1,
                                       ),
                                     ),
                                   ),
@@ -758,55 +706,56 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
     required String subtext,
     required IconData icon,
     required Color color,
-    required Color bgColor,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
+    return SurfaceCard(
+      borderRadius: 22,
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 26),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
                   title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                Text(
-                  subtext,
-                  style: TextStyle(
-                    fontSize: 11,
                     color: AppColors.textSecondary,
+                    height: 1.25,
                   ),
                 ),
-              ],
+              ),
+              const SizedBox(width: 8),
+              Icon(icon, color: color, size: 20),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+              letterSpacing: -0.5,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            subtext,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 11.5,
+              color: color,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -839,14 +788,14 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
                 ),
               ),
             ),
-            Flexible(
-              child: Text(
-                '$count ta ($pctStr%)',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
+            const SizedBox(width: 8),
+            Text(
+              '$count ta ($pctStr%)',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: color,
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
           ],
@@ -871,56 +820,43 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
     required IconData icon,
     required VoidCallback onPressed,
   }) {
-    return InkWell(
+    return SurfaceCard(
+      borderRadius: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceMuted,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: AppColors.primary, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textSecondary,
-                    ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: AppColors.textSecondary,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Icon(
-              LucideIcons.chevronRight,
-              size: 14,
-              color: AppColors.textSecondary,
-            ),
-          ],
-        ),
+          ),
+          Icon(
+            LucideIcons.chevronRight,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
+        ],
       ),
     );
   }

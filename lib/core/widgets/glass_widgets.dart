@@ -456,7 +456,7 @@ class ResponsiveGlassGrid extends StatelessWidget {
     this.mobileColumns = 1,
     this.tabletColumns = 2,
     this.desktopColumns = 4,
-    this.spacing = 14,
+    this.spacing = 10,
   });
 
   @override
@@ -467,7 +467,7 @@ class ResponsiveGlassGrid extends StatelessWidget {
       builder: (context, constraints) {
         final w = constraints.maxWidth;
         final cols =
-            w >= 960
+            w >= 760
                 ? desktopColumns
                 : w >= 540
                 ? tabletColumns
@@ -545,10 +545,10 @@ class ResponsivePageContainer extends StatelessWidget {
     final width = MediaQuery.sizeOf(context).width;
     final horizontal =
         width < 600
-            ? 16.0
+            ? 12.0
             : width < 1024
-            ? 24.0
-            : 32.0;
+            ? 18.0
+            : 22.0;
 
     final hasAppBar = Scaffold.maybeOf(context)?.hasAppBar ?? false;
     final needsTopOffset = withTopHeaderPadding ?? !hasAppBar;
