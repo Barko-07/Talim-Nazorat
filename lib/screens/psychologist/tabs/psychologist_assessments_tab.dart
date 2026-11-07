@@ -141,8 +141,14 @@ class _PsychologistAssessmentsTabState
           }).toList()
           ..sort((a, b) => b.assessmentDate.compareTo(a.assessmentDate));
 
+    final width = MediaQuery.sizeOf(context).width;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.fromLTRB(
+        24,
+        MediaQuery.paddingOf(context).top + (width >= 920 ? 82 : 74),
+        24,
+        width < 920 ? (84 + MediaQuery.paddingOf(context).bottom) : 24,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

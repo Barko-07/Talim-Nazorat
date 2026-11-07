@@ -86,10 +86,16 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           return matchesDomain && matchesSearch;
         }).toList();
 
+    final width = MediaQuery.sizeOf(context).width;
     return Scaffold(
-      backgroundColor: AppColors.surfaceMuted,
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.fromLTRB(
+          24,
+          MediaQuery.paddingOf(context).top + (width >= 920 ? 82 : 74),
+          24,
+          width < 920 ? (84 + MediaQuery.paddingOf(context).bottom) : 24,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

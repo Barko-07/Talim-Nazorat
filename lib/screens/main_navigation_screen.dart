@@ -361,17 +361,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     if (_isPsychologist) {
       final psychScreen = _buildPsychologistScreen();
       if (psychScreen != null) {
-        // Psixolog kabineti sahifalari umumiy sahifa konteyneridan foydalanmaydi —
-        // ular ustki va pastki suzuvchi panellar ostida qolmasin.
-        final width = MediaQuery.sizeOf(context).width;
-        return Padding(
-          key: psychScreen.key,
-          padding: EdgeInsets.only(
-            top: MediaQuery.paddingOf(context).top + (width >= 920 ? 82 : 74),
-            bottom: width < 920 ? 84 : 0,
-          ),
-          child: psychScreen,
-        );
+        return psychScreen;
       }
     }
     switch (_selectedIndex) {
@@ -1136,13 +1126,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       unreadNotifCount: unreadNotifCount,
                     ),
                   ),
+                  if (!isDesktop)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: _buildMobileFrostedBottomBar(context, app),
+                    ),
                 ],
               ),
             ),
           ],
         ),
-        bottomNavigationBar:
-            isDesktop ? null : _buildMobileFrostedBottomBar(context, app),
       ),
     );
   }
