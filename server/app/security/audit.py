@@ -6,6 +6,7 @@ import logging
 import threading
 import urllib.request
 from datetime import timedelta
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -95,20 +96,36 @@ def _detect_burst(db: Session, ip: str, webhook_url: str) -> None:
     )
 
 
+def alert_request(webhook_url: str, line: str) -> tuple[str, dict]:
+    """Where and what to post. A Telegram bot URL carries the chat in the query
+    (https://api.telegram.org/bot<token>/sendMessage?chat_id=<id>); Telegram
+    wants it in the body, so it is moved there. Other webhooks get {"text"}."""
+    body: dict = {"text": "Individ security alert: " + line}
+    parts = urlsplit(webhook_url)
+    if parts.hostname == "api.telegram.org":
+        query = dict(parse_qsl(parts.query))
+        if "chat_id" in query:
+            body["chat_id"] = query.pop("chat_id")
+        webhook_url = urlunsplit(parts._replace(query=urlencode(query)))
+    return webhook_url, body
+
+
 def _send_alert(webhook_url: str, line: str) -> None:
     if not webhook_url.startswith("https://"):
         return
+    url, body = alert_request(webhook_url, line)
 
     def post() -> None:
         try:
             req = urllib.request.Request(
-                webhook_url,
-                data=json.dumps({"text": "Individ security alert: " + line}).encode(),
+                url,
+                data=json.dumps(body).encode(),
                 headers={"Content-Type": "application/json"},
                 method="POST",
             )
             urllib.request.urlopen(req, timeout=5).close()  # noqa: S310 (https enforced above)
         except Exception:  # noqa: BLE001 - alerting must never break requests
-            log.exception("alert webhook failed")
+            # The URL may hold a bot token: never log it.
+            log.error("alert webhook failed")
 
     threading.Thread(target=post, daemon=True).start()

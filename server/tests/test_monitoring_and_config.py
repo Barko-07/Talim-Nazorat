@@ -78,3 +78,14 @@ def test_unsafe_production_config_refuses_to_start(monkeypatch, override):
     _env(monkeypatch, **override)
     with pytest.raises(ConfigError):
         load_settings()
+
+
+def test_telegram_alert_url_moves_chat_into_body():
+    from app.security.audit import alert_request
+
+    url, body = alert_request("https://api.telegram.org/bot123:ABC/sendMessage?chat_id=-1001", "x")
+    assert url == "https://api.telegram.org/bot123:ABC/sendMessage"
+    assert body == {"text": "Individ security alert: x", "chat_id": "-1001"}
+
+    url, body = alert_request("https://hooks.example.uz/alert", "y")
+    assert url == "https://hooks.example.uz/alert" and body == {"text": "Individ security alert: y"}
