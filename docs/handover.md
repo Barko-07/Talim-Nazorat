@@ -14,7 +14,7 @@ Asosiy qoida: kalit nusxasini berib, eskisini o‘chirish yetarli emas. Nusxa qa
 | Zaxira nusxalar | `C:\Users\user\.individ\backups\` + serverda `~/offsite` | Shifrlangan baza nusxalari |
 | “Individ backup pull” vazifasi | Windows Task Scheduler | Har kuni zaxirani shu kompyuterga tortadi |
 | Android yuklash kaliti `individ-upload.jks` + `android/key.properties` | `C:\Users\user\.individ\`, loyiha papkasi | Play’ga ilova yangilanishini yuklash |
-| Serverdagi `.env` (ma’lumot shifrlash kaliti, baza paroli, pochta paroli, seans siri) | Faqat serverda `/srv/individ/server/.env` | Bazadagi shifrlangan ma’lumot, pochta |
+| Serverdagi `.env` (ma’lumot shifrlash kaliti, baza paroli, pochta paroli, seans siri) | Faqat serverda `/etc/individ/individ.env` | Bazadagi shifrlangan ma’lumot, pochta |
 | Play Console hisobi | Sizning Google hisobingiz | Ilova sahifasi va chiqarilishi |
 | Domen `individ.uz` va DNS | Registrator hisobi (sizda) | Sayt manzili |
 | VDS provayder hisobi | Sizda | Server, qayta o‘rnatish, konsol |
@@ -27,12 +27,28 @@ Asosiy qoida: kalit nusxasini berib, eskisini o‘chirish yetarli emas. Nusxa qa
 1. **Mijozning server hisobi.** Mijoz o‘z kompyuterida SSH kalit yaratadi (`ssh-keygen -t ed25519`). Serverda unga alohida hisob ochiladi, kaliti qo‘shiladi, sudo paroli **mijozning o‘zi** kiritadi.
 2. **Deploy huquqi mijozga.** `/etc/sudoers.d/91-individ-deploy` va `individ-deploy` skriptidagi `mistaker0908` mijoz hisobiga almashtiriladi.
 3. **Yangi zaxira kaliti.** Mijoz o‘z kompyuterida `age-keygen` qiladi. Serverdagi `individ-backup` yangi ochiq kalitga o‘tkaziladi. Yangi zaxira olinib, mijoz kompyuterida ochilishi tekshiriladi (`pull-backups.ps1` u yerda o‘rnatiladi).
-4. **Server sirlarini almashtirish.** Baza paroli, pochta paroli, seans siri yangilanadi. Ma’lumot shifrlash kaliti ham almashtiriladi. Buning uchun butun bazani yangi kalit bilan qayta shifrlaydigan buyruq kerak. U hali yozilmagan: topshirishdan oldin qo‘shiladi.
+4. **Server sirlarini almashtirish.** Baza paroli, pochta paroli, seans siri yangilanadi. Ma’lumot shifrlash kaliti ham almashtiriladi (pastdagi 2a-bo‘lim).
 5. **Android kaliti.** `individ-upload.jks` va `key.properties` mijozga shifrlangan fleshkada beriladi. Yoki yaxshirog‘i: Play Console’da “Upload key reset” qilinib, mijoz o‘z kalitini yaratadi.
 6. **Play Console.** Ilova mijozning developer hisobiga **App transfer** orqali o‘tkaziladi (Play Console → Settings → App transfer). Yoki mijoz hisobi “Owner” qilib qo‘shiladi.
 7. **Domen, VDS, pochta hisoblari.** Egalik mijozga o‘tkaziladi, parollarni mijoz o‘zgartiradi.
 8. **Ilova super admini.** Mijozning emaili bilan yangi super admin yaratiladi. Sizning hisobingiz o‘chiriladi (`/api/auth/account/delete`).
 9. **Kod.** GitHub repozitoriyasi mijozga topshiriladi (Transfer ownership).
+
+## 2a. Ma’lumot shifrlash kalitini almashtirish (serverda, mijoz bilan)
+
+Sayt ishlab turadi: o‘tish davrida ilova eski va yangi kalitni ham o‘qiydi, yozganda faqat yangisini ishlatadi.
+
+1. Zaxira: `sudo individ-deploy backup`.
+2. Yangi kalit: `python3 -c "import os,base64;print(base64.urlsafe_b64encode(os.urandom(32)).decode())"`.
+3. `/etc/individ/individ.env` da: eski qiymatni `DATA_ENCRYPTION_KEY_OLD=` ga ko‘chiring, `DATA_ENCRYPTION_KEY=` ga yangisini yozing. `sudo systemctl restart individ-api`.
+4. Qayta shifrlash (o‘zgarishlar tarixi faqat egasi hisobiga yoziladi, shuning uchun egasining ulanishi bilan):
+   ```
+   sudo bash -c 'set -a; . /etc/individ/individ.env; set +a; cd /srv/individ/server &&
+     PYTHONDONTWRITEBYTECODE=1 OWNER_DATABASE_URL="postgresql+psycopg://individ_owner:<parol>@127.0.0.1/individ"      .venv/bin/python -m app.cli rotate-key'
+   ```
+   Har jadval bo‘yicha nechta qator qayta shifrlangani chiqadi. Qayta ishga tushirish xavfsiz.
+5. `individ.env` dan `DATA_ENCRYPTION_KEY_OLD` qatorini o‘chiring, `sudo systemctl restart individ-api`. Saytda bolalar ma’lumoti ochilishini tekshiring.
+6. Yangi zaxira oling. Eski kalit endi faqat eski zaxiralarni ochadi, ular esa eski zaxira kaliti bilan qo‘shimcha shifrlangan va 3-bo‘limda yo‘q qilinadi.
 
 ## 3. Eski kirishlarni bekor qilish (mijoz tekshiradi)
 

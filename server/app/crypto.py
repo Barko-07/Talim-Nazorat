@@ -10,6 +10,7 @@ import hashlib
 import hmac
 import os
 
+from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from sqlalchemy import Text
 from sqlalchemy.types import TypeDecorator
@@ -17,12 +18,14 @@ from sqlalchemy.types import TypeDecorator
 _PREFIX = "enc1:"  # legacy: no associated data
 _PREFIX2 = "enc2:"  # bound to its column: a value copied into another column fails to decrypt
 _key: bytes | None = None
+_old_keys: tuple[bytes, ...] = ()  # only during a key change: still readable, never written
 _hmac_key: bytes = b""
 
 
-def configure(data_key: bytes, secret_key: str) -> None:
-    global _key, _hmac_key
+def configure(data_key: bytes, secret_key: str, old_keys: tuple[bytes, ...] = ()) -> None:
+    global _key, _old_keys, _hmac_key
     _key = data_key
+    _old_keys = tuple(k for k in old_keys if k and k != data_key)
     _hmac_key = secret_key.encode()
 
 
@@ -37,16 +40,42 @@ def encrypt(plain: str, context: str = "") -> str:
     return _PREFIX2 + base64.urlsafe_b64encode(nonce + ct).decode()
 
 
-def decrypt(stored: str, context: str = "") -> str:
-    if _key is None:
-        raise RuntimeError("encryption key not configured")
+def _open(stored: str, context: str, key: bytes) -> str:
     if stored.startswith(_PREFIX2):
         raw = base64.urlsafe_b64decode(stored[len(_PREFIX2):])
-        return AESGCM(_key).decrypt(raw[:12], raw[12:], context.encode()).decode()
+        return AESGCM(key).decrypt(raw[:12], raw[12:], context.encode()).decode()
     if not stored.startswith(_PREFIX):
         raise ValueError("value is not encrypted")
     raw = base64.urlsafe_b64decode(stored[len(_PREFIX):])
-    return AESGCM(_key).decrypt(raw[:12], raw[12:], None).decode()
+    return AESGCM(key).decrypt(raw[:12], raw[12:], None).decode()
+
+
+def decrypt(stored: str, context: str = "") -> str:
+    if _key is None:
+        raise RuntimeError("encryption key not configured")
+    try:
+        return _open(stored, context, _key)
+    except InvalidTag:
+        for old in _old_keys:
+            try:
+                return _open(stored, context, old)
+            except InvalidTag:
+                continue
+        raise
+
+
+def is_current(stored: str, context: str = "") -> bool:
+    """True when the value is already sealed with the current key in the
+    current format, so a key change can skip it."""
+    if _key is None:
+        raise RuntimeError("encryption key not configured")
+    if context and not stored.startswith(_PREFIX2):
+        return False
+    try:
+        _open(stored, context, _key)
+        return True
+    except InvalidTag:
+        return False
 
 
 def keyed_hash(value: str) -> str:

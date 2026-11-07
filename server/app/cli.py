@@ -5,21 +5,24 @@
     python -m app.cli reset-mfa --email you@example.uz
     python -m app.cli check-config
     python -m app.cli cleanup        (daily, from cron: expired sessions, codes, counters)
+    python -m app.cli rotate-key     (re-encrypt everything with DATA_ENCRYPTION_KEY;
+                                      see docs/handover.md for the full procedure)
 """
 from __future__ import annotations
 
 import argparse
 import getpass
+import os
 import sys
 
 from datetime import timedelta
 
-from sqlalchemy import delete, or_, select
+from sqlalchemy import Text, delete, or_, select, type_coerce, update
 
 from . import crypto
 from .config import ConfigError, load_settings
 from .db import Database
-from .models import AuthSession, OneTimeCode, PendingRegistration, RateCounter, Role, User, utcnow
+from .models import Base, AuthSession, OneTimeCode, PendingRegistration, RateCounter, Role, User, utcnow
 from .security import audit, passwords, sessions
 
 
@@ -29,6 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("init-db", help="create tables")
     sub.add_parser("check-config", help="validate environment variables")
     sub.add_parser("cleanup", help="delete expired sessions, codes and counters")
+    sub.add_parser("rotate-key", help="re-encrypt every sensitive value with the current key")
     ca = sub.add_parser("create-admin", help="create a system administrator")
     ca.add_argument("--email", required=True)
     ca.add_argument("--name", required=True)
@@ -45,7 +49,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"OK: environment={settings.environment}")
         return 0
 
-    crypto.configure(settings.data_encryption_key, settings.secret_key)
+    crypto.configure(settings.data_encryption_key, settings.secret_key,
+                     settings.old_data_encryption_keys)
     db_ = Database(settings.database_url)
     db_.create_all()
     if args.cmd == "init-db":
@@ -53,6 +58,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "cleanup":
         return _cleanup(db_)
+    if args.cmd == "rotate-key":
+        # The change history is append-only for the app's database account, so
+        # this runs with the owner account when OWNER_DATABASE_URL is given.
+        owner_url = os.environ.get("OWNER_DATABASE_URL", "")
+        return _rotate_key(Database(owner_url) if owner_url else db_, settings)
 
     email = args.email.strip().lower()
     if args.cmd == "reset-mfa":
@@ -119,3 +129,41 @@ def _cleanup(db_: Database) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def _rotate_key(db_: Database, settings) -> int:
+    """Re-encrypts every encrypted column with the current key. Old keys must
+    be listed in DATA_ENCRYPTION_KEY_OLD. Safe to run again: values already
+    under the current key are skipped. Each table is one transaction."""
+    if not settings.old_data_encryption_keys:
+        print("DATA_ENCRYPTION_KEY_OLD is empty: set it to the previous key first.", file=sys.stderr)
+        return 2
+    total = 0
+    for table in Base.metadata.sorted_tables:
+        cols = [c for c in table.columns if isinstance(c.type, crypto.EncryptedText)]
+        if not cols:
+            continue
+        pk = list(table.primary_key.columns)
+        raw = [type_coerce(c, Text).label(c.name) for c in cols]
+        changed = 0
+        with db_.engine.begin() as conn:
+            for row in conn.execute(select(*pk, *raw)).mappings().all():
+                values = {}
+                for c in cols:
+                    stored = row[c.name]
+                    if stored is None or crypto.is_current(stored, c.type.context):
+                        continue
+                    # decrypt() raises if no known key opens it: nothing is half-changed.
+                    values[c.name] = crypto.encrypt(crypto.decrypt(stored, c.type.context), c.type.context)
+                if values:
+                    where = [k == row[k.name] for k in pk]
+                    conn.execute(update(table).where(*where).values(
+                        {table.c[n]: type_coerce(v, Text) for n, v in values.items()}))
+                    changed += 1
+        print(f"{table.name}: {changed} rows re-encrypted")
+        total += changed
+    with db_.sessionmaker() as db:
+        audit.record(db, "DATA_KEY_ROTATED", severity="warning", detail=f"rows={total}",
+                     webhook_url=settings.alert_webhook_url)
+    print(f"Done: {total} rows. Remove DATA_ENCRYPTION_KEY_OLD and restart the service.")
+    return 0

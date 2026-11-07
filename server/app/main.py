@@ -114,7 +114,8 @@ class SecurityMiddleware(BaseHTTPMiddleware):
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or load_settings()
-    crypto.configure(settings.data_encryption_key, settings.secret_key)
+    crypto.configure(settings.data_encryption_key, settings.secret_key,
+                     settings.old_data_encryption_keys)
     database = Database(settings.database_url)
     if not settings.is_production:
         database.create_all()  # production schema is created by `python -m app.cli init-db`

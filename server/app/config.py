@@ -84,6 +84,8 @@ class Settings:
 
     max_body_bytes: int = 1024 * 1024
 
+    old_data_encryption_keys: tuple[bytes, ...] = ()  # set only while changing the key
+
     @property
     def is_production(self) -> bool:
         return self.environment == "production"
@@ -119,6 +121,7 @@ def load_settings() -> Settings:
         database_url=db_url,
         secret_key=secret,
         data_encryption_key=_decode_key(enc) if enc else b"",
+        old_data_encryption_keys=tuple(_decode_key(k) for k in _list("DATA_ENCRYPTION_KEY_OLD")),
         allowed_origins=_list("ALLOWED_ORIGINS"),
         public_base_url=os.environ.get("PUBLIC_BASE_URL", "").rstrip("/"),
         session_idle_minutes=_int("SESSION_IDLE_MINUTES", 30),
