@@ -83,40 +83,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 1. MY.GOV.UZ USLUBIDAGI YUQORI PROFIL KARTasi
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.border),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x080A1A3F),
-                    blurRadius: 14,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
+            SurfaceCard(
+              borderRadius: 24,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
               child: Row(
                 children: [
                   Container(
-                    width: 52,
-                    height: 52,
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.surfaceMuted,
+                      color: AppColors.primary.withValues(alpha: 0.10),
                       border: Border.all(
-                        color: AppColors.borderSlate,
-                        width: 1.4,
+                        color: AppColors.primary.withValues(alpha: 0.25),
+                        width: 1.2,
                       ),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       fullName.substring(0, 1).toUpperCase(),
                       style: _myGovFont(
-                        fontSize: 20,
+                        fontSize: 19,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
@@ -155,7 +144,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                     icon: Icon(
                       _hideSensitiveInfo ? LucideIcons.eyeOff : LucideIcons.eye,
-                      size: 21,
+                      size: 20,
                       color: AppColors.textSecondary,
                     ),
                   ),
@@ -164,7 +153,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onPressed: () => _showChangePasswordSheet(context),
                     icon: Icon(
                       LucideIcons.settings,
-                      size: 21,
+                      size: 20,
                       color: AppColors.textSecondary,
                     ),
                   ),
@@ -174,19 +163,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 16),
 
             // 2. MY.GOV.UZ USLUBIDAGI PROFIL VA SOZLAMALAR RO'YXATI
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.border),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x060A1A3F),
-                    blurRadius: 12,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
+            SurfaceCard(
+              borderRadius: 24,
+              padding: EdgeInsets.zero,
               child: Column(
                 children: [
                   _buildMyGovMenuItem(
@@ -336,18 +315,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         child: Row(
           children: [
-            // my.gov.uz uslubidagi chiziqli ikona (stiker)
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.border),
-              ),
-              alignment: Alignment.center,
-              child: Icon(icon, size: 20, color: AppColors.textPrimary),
-            ),
+            Icon(icon, size: 20, color: AppColors.primary),
             const SizedBox(width: 14),
             Expanded(
               child: Column(

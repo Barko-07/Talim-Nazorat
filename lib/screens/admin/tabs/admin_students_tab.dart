@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/glass_widgets.dart';
 import '../../../models/user_model.dart';
 import '../../../models/student_model.dart';
 import '../../../providers/app_provider.dart';
@@ -88,62 +89,60 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. HEADER
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          'Alohida Ehtiyojli Bolalar Reyestri',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 640;
+              final headerTexts = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        'Alohida Ehtiyojli Bolalar Reyestri',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
                         ),
-                        const SizedBox(width: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.successBg,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: AppColors.success.withValues(alpha: 0.2),
-                            ),
-                          ),
-                          child: Text(
-                            '${filtered.length} nafar o‘quvchi',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.success,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Viloyat va muassasalar kesimida ATEB bolalar hisobi, ta’limiy ehtiyojlari va individual profillari',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
                       ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.successBg,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.success.withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: Text(
+                          '${filtered.length} nafar o‘quvchi',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.success,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Viloyat va muassasalar kesimida ATEB bolalar hisobi, ta’limiy ehtiyojlari va individual profillari',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
                     ),
-                  ],
-                ),
-              ),
-              ElevatedButton.icon(
+                  ),
+                ],
+              );
+
+              final addBtn = ElevatedButton.icon(
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -163,8 +162,28 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-              ),
-            ],
+              );
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    headerTexts,
+                    const SizedBox(height: 12),
+                    addBtn,
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: headerTexts),
+                  const SizedBox(width: 16),
+                  addBtn,
+                ],
+              );
+            },
           ),
           const SizedBox(height: 20),
 
@@ -172,9 +191,9 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -201,7 +220,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
-                      value: _filterStatus,
+                      initialValue: _filterStatus,
                       decoration: InputDecoration(
                         labelText: 'Holati',
                         contentPadding: const EdgeInsets.symmetric(
@@ -234,7 +253,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
-                      value: _filterLevel,
+                      initialValue: _filterLevel,
                       decoration: InputDecoration(
                         labelText: 'Yordam darajasi',
                         contentPadding: const EdgeInsets.symmetric(
@@ -272,76 +291,45 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
           ),
           if (summary != null) ...[
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                FilterChip(
-                  selected: _filterColor == null,
-                  label: Text('Barchasi (${allStudents.length})'),
-                  onSelected: (_) => setState(() => _filterColor = null),
-                ),
-                FilterChip(
-                  selected: _filterColor == StatusColor.red,
-                  label: Text(
-                    'Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
-                  ),
-                  selectedColor: AppColors.error,
-                  backgroundColor: AppColors.errorBg,
-                  labelStyle: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color:
-                        _filterColor == StatusColor.red
-                            ? Colors.white
-                            : AppColors.error,
-                  ),
-                  onSelected:
-                      (v) => setState(
-                        () => _filterColor = v ? StatusColor.red : null,
-                      ),
-                ),
-                FilterChip(
-                  selected: _filterColor == StatusColor.yellow,
-                  label: Text(
-                    'Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
-                  ),
-                  selectedColor: AppColors.warning,
-                  backgroundColor: AppColors.warningBg,
-                  labelStyle: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color:
-                        _filterColor == StatusColor.yellow
-                            ? Colors.white
-                            : AppColors.warning,
-                  ),
-                  onSelected:
-                      (v) => setState(
-                        () => _filterColor = v ? StatusColor.yellow : null,
-                      ),
-                ),
-                FilterChip(
-                  selected: _filterColor == StatusColor.green,
-                  label: Text(
-                    'Yashil — Ijobiy (${summary.count(StatusColor.green)})',
-                  ),
-                  selectedColor: AppColors.success,
-                  backgroundColor: AppColors.successBg,
-                  labelStyle: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color:
-                        _filterColor == StatusColor.green
-                            ? Colors.white
-                            : AppColors.success,
-                  ),
-                  onSelected:
-                      (v) => setState(
-                        () => _filterColor = v ? StatusColor.green : null,
-                      ),
-                ),
+            ModernPillFilterBar(
+              items: const [
+                'Barchasi',
+                'Qizil — Ishlanmagan',
+                'Sariq — E’tibor',
+                'Yashil — Ijobiy',
               ],
+              selectedItem:
+                  _filterColor == StatusColor.red
+                      ? 'Qizil — Ishlanmagan'
+                      : _filterColor == StatusColor.yellow
+                      ? 'Sariq — E’tibor'
+                      : _filterColor == StatusColor.green
+                      ? 'Yashil — Ijobiy'
+                      : 'Barchasi',
+              counts: {
+                'Barchasi': allStudents.length,
+                'Qizil — Ishlanmagan': summary.count(StatusColor.red),
+                'Sariq — E’tibor': summary.count(StatusColor.yellow),
+                'Yashil — Ijobiy': summary.count(StatusColor.green),
+              },
+              itemColors: {
+                'Qizil — Ishlanmagan': AppColors.error,
+                'Sariq — E’tibor': AppColors.warning,
+                'Yashil — Ijobiy': AppColors.success,
+              },
+              onSelected: (v) {
+                setState(() {
+                  if (v == 'Qizil — Ishlanmagan') {
+                    _filterColor = StatusColor.red;
+                  } else if (v == 'Sariq — E’tibor') {
+                    _filterColor = StatusColor.yellow;
+                  } else if (v == 'Yashil — Ijobiy') {
+                    _filterColor = StatusColor.green;
+                  } else {
+                    _filterColor = null;
+                  }
+                });
+              },
             ),
           ],
           const SizedBox(height: 16),
@@ -364,225 +352,249 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                 elevation: 0,
                 color: isRed ? AppColors.errorBg : AppColors.surface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(22),
                   side: BorderSide(
                     color:
                         !isArchived && stColor != null
                             ? stColor.withValues(alpha: isRed ? 0.55 : 0.35)
-                            : AppColors.border,
+                            : AppColors.cardGlassBorder,
                     width: isRed ? 1.5 : 1.0,
                   ),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor:
-                            isArchived
-                                ? Colors.grey.shade200
-                                : (stBg ?? AppColors.primaryLight),
-                        child: Text(
-                          s.firstName.isNotEmpty ? s.firstName[0] : 'B',
-                          style: TextStyle(
-                            color:
+                  child: LayoutBuilder(
+                    builder: (context, cardConstraints) {
+                      final isNarrow = cardConstraints.maxWidth < 560;
+
+                      final studentInfo = Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor:
                                 isArchived
-                                    ? AppColors.textMuted
-                                    : (stColor ?? AppColors.primary),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 17,
+                                    ? Colors.grey.shade200
+                                    : (stBg ?? AppColors.primaryLight),
+                            child: Text(
+                              s.firstName.isNotEmpty ? s.firstName[0] : 'B',
+                              style: TextStyle(
+                                color:
+                                    isArchived
+                                        ? AppColors.textMuted
+                                        : (stColor ?? AppColors.primary),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 17,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 4,
-                              crossAxisAlignment: WrapCrossAlignment.center,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  s.fullName,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
-                                    color:
-                                        isArchived
-                                            ? AppColors.textMuted
-                                            : AppColors.textPrimary,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryLight,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    s.grade,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                                _buildStatusPill(s.status),
-                                if (!isArchived && st != null)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: stBg,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: stColor!.withValues(alpha: 0.35),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      '${st.color.label}: ${st.color == StatusColor.red
-                                          ? "Ishlanmagan"
-                                          : st.color == StatusColor.yellow
-                                          ? "E’tibor talab"
-                                          : "Ijobiy"}',
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 4,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Text(
+                                      s.fullName,
                                       style: TextStyle(
-                                        fontSize: 11,
                                         fontWeight: FontWeight.w600,
-                                        color: stColor,
+                                        fontSize: 14,
+                                        color:
+                                            isArchived
+                                                ? AppColors.textMuted
+                                                : AppColors.textPrimary,
                                       ),
                                     ),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Ehtiyoj toifasi: ${s.primaryNeed} • Qo‘llab-quvvatlash: ${s.supportLevel}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            if (!isArchived &&
-                                st != null &&
-                                st.reasons.isNotEmpty) ...[
-                              const SizedBox(height: 3),
-                              Text(
-                                'Svetofor sababi: ${st.reasons.first}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: stColor,
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primaryLight,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        s.grade,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    ),
+                                    _buildStatusPill(s.status),
+                                    if (!isArchived && st != null)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: stBg,
+                                          borderRadius: BorderRadius.circular(4),
+                                          border: Border.all(
+                                            color: stColor!.withValues(alpha: 0.35),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${st.color.label}: ${st.color == StatusColor.red
+                                              ? "Ishlanmagan"
+                                              : st.color == StatusColor.yellow
+                                              ? "E’tibor talab"
+                                              : "Ijobiy"}',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: stColor,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                            const SizedBox(height: 3),
-                            Text(
-                              '${s.institutionName} • Tug‘ilgan: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.surfaceMuted,
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: AppColors.border),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    LucideIcons.badge,
-                                    size: 14,
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Ehtiyoj toifasi: ${s.primaryNeed} • Qo‘llab-quvvatlash: ${s.supportLevel}',
+                                  style: TextStyle(
+                                    fontSize: 12,
                                     color: AppColors.textSecondary,
                                   ),
-                                  const SizedBox(width: 4),
+                                ),
+                                if (!isArchived &&
+                                    st != null &&
+                                    st.reasons.isNotEmpty) ...[
+                                  const SizedBox(height: 3),
                                   Text(
-                                    '${s.assignedSpecialistIds.length} mutaxassis',
+                                    'Svetofor sababi: ${st.reasons.first}',
                                     style: TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.textSecondary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: stColor,
                                     ),
                                   ),
                                 ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryLight,
-                                foregroundColor: AppColors.primary,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 8,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => StudentDetailScreen(
-                                          studentId: s.id,
-                                        ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  '${s.institutionName} • Tug‘ilgan: ${df.format(s.dateOfBirth)} (${s.age} yosh)',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.textMuted,
                                   ),
-                                );
-                              },
-                              child: const Text(
-                                'Profilni ochish',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
                                 ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+
+                      final actionButtons = Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceMuted,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  LucideIcons.badge,
+                                  size: 14,
+                                  color: AppColors.textSecondary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${s.assignedSpecialistIds.length} mutaxassis',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryLight,
+                              foregroundColor: AppColors.primary,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
                               ),
                             ),
-                            if (!isArchived) ...[
-                              const SizedBox(width: 6),
-                              IconButton(
-                                icon: Icon(
-                                  LucideIcons.archive,
-                                  size: 18,
-                                  color: AppColors.warning,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => StudentDetailScreen(
+                                        studentId: s.id,
+                                      ),
                                 ),
-                                tooltip: 'Arxivlash',
-                                onPressed:
-                                    () => _confirmArchiveStudent(
-                                      context,
-                                      s,
-                                      currentUser,
-                                    ),
+                              );
+                            },
+                            child: const Text(
+                              'Profilni ochish',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
                               ),
-                            ],
+                            ),
+                          ),
+                          if (!isArchived)
+                            IconButton(
+                              icon: Icon(
+                                LucideIcons.archive,
+                                size: 18,
+                                color: AppColors.warning,
+                              ),
+                              tooltip: 'Arxivlash',
+                              onPressed:
+                                  () => _confirmArchiveStudent(
+                                    context,
+                                    s,
+                                    currentUser,
+                                  ),
+                            ),
+                        ],
+                      );
+
+                      if (isNarrow) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            studentInfo,
+                            const SizedBox(height: 12),
+                            actionButtons,
                           ],
-                        ),
-                      ),
-                    ],
+                        );
+                      }
+
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: studentInfo),
+                          const SizedBox(width: 12),
+                          Flexible(child: actionButtons),
+                        ],
+                      );
+                    },
                   ),
                 ),
               );

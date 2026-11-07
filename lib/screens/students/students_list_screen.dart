@@ -230,75 +230,45 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                       ),
                     if (summary != null) ...[
                       const SizedBox(height: 10),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            _buildStatusFilterChip(
-                              label: 'Barchasi (${rawStudents.length})',
-                              color: AppColors.primary,
-                              bg: AppColors.primaryLight,
-                              selected: _selectedStatusColor == null,
-                              onTap:
-                                  () => setState(
-                                    () => _selectedStatusColor = null,
-                                  ),
-                            ),
-                            const SizedBox(width: 8),
-                            _buildStatusFilterChip(
-                              label:
-                                  'Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
-                              color: AppColors.error,
-                              bg: AppColors.errorBg,
-                              selected: _selectedStatusColor == StatusColor.red,
-                              onTap:
-                                  () => setState(
-                                    () =>
-                                        _selectedStatusColor =
-                                            _selectedStatusColor ==
-                                                    StatusColor.red
-                                                ? null
-                                                : StatusColor.red,
-                                  ),
-                            ),
-                            const SizedBox(width: 8),
-                            _buildStatusFilterChip(
-                              label:
-                                  'Sariq — E’tibor (${summary.count(StatusColor.yellow)})',
-                              color: AppColors.warning,
-                              bg: AppColors.warningBg,
-                              selected:
-                                  _selectedStatusColor == StatusColor.yellow,
-                              onTap:
-                                  () => setState(
-                                    () =>
-                                        _selectedStatusColor =
-                                            _selectedStatusColor ==
-                                                    StatusColor.yellow
-                                                ? null
-                                                : StatusColor.yellow,
-                                  ),
-                            ),
-                            const SizedBox(width: 8),
-                            _buildStatusFilterChip(
-                              label:
-                                  'Yashil — Ijobiy (${summary.count(StatusColor.green)})',
-                              color: AppColors.success,
-                              bg: AppColors.successBg,
-                              selected:
-                                  _selectedStatusColor == StatusColor.green,
-                              onTap:
-                                  () => setState(
-                                    () =>
-                                        _selectedStatusColor =
-                                            _selectedStatusColor ==
-                                                    StatusColor.green
-                                                ? null
-                                                : StatusColor.green,
-                                  ),
-                            ),
-                          ],
-                        ),
+                      ModernPillFilterBar(
+                        items: const [
+                          'Barchasi',
+                          'Qizil — Ishlanmagan',
+                          'Sariq — E’tibor',
+                          'Yashil — Ijobiy',
+                        ],
+                        selectedItem:
+                            _selectedStatusColor == StatusColor.red
+                                ? 'Qizil — Ishlanmagan'
+                                : _selectedStatusColor == StatusColor.yellow
+                                ? 'Sariq — E’tibor'
+                                : _selectedStatusColor == StatusColor.green
+                                ? 'Yashil — Ijobiy'
+                                : 'Barchasi',
+                        counts: {
+                          'Barchasi': rawStudents.length,
+                          'Qizil — Ishlanmagan': summary.count(StatusColor.red),
+                          'Sariq — E’tibor': summary.count(StatusColor.yellow),
+                          'Yashil — Ijobiy': summary.count(StatusColor.green),
+                        },
+                        itemColors: {
+                          'Qizil — Ishlanmagan': AppColors.error,
+                          'Sariq — E’tibor': AppColors.warning,
+                          'Yashil — Ijobiy': AppColors.success,
+                        },
+                        onSelected: (v) {
+                          setState(() {
+                            if (v == 'Qizil — Ishlanmagan') {
+                              _selectedStatusColor = StatusColor.red;
+                            } else if (v == 'Sariq — E’tibor') {
+                              _selectedStatusColor = StatusColor.yellow;
+                            } else if (v == 'Yashil — Ijobiy') {
+                              _selectedStatusColor = StatusColor.green;
+                            } else {
+                              _selectedStatusColor = null;
+                            }
+                          });
+                        },
                       ),
                     ],
                   ],
@@ -382,38 +352,6 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
     );
   }
 
-  Widget _buildStatusFilterChip({
-    required String label,
-    required Color color,
-    required Color bg,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        decoration: BoxDecoration(
-          color: selected ? color : bg,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: selected ? color : color.withValues(alpha: 0.35),
-            width: 1.2,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: selected ? Colors.white : color,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildStudentCard(
     BuildContext context,
     StudentModel s,
@@ -432,9 +370,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       backgroundColor: isRed ? AppColors.errorBg : null,
       borderColor:
-          statusColor != null
-              ? statusColor.withValues(alpha: isRed ? 0.55 : 0.32)
-              : null,
+          statusColor?.withValues(alpha: isRed ? 0.55 : 0.32),
       onTap: () {
         Navigator.push(
           context,

@@ -7,6 +7,7 @@ import 'package:talim_nazorat/providers/app_provider.dart';
 import 'package:talim_nazorat/providers/auth_provider.dart';
 import 'package:talim_nazorat/models/user_model.dart';
 import 'package:talim_nazorat/models/student_model.dart';
+import 'package:talim_nazorat/screens/entry/intro_screen.dart';
 import 'package:talim_nazorat/screens/students/add_student_screen.dart';
 import 'package:talim_nazorat/core/constants/namangan_data.dart';
 
@@ -153,6 +154,29 @@ void main() {
         // Sessiya taymeri to'xtatiladi (ilovada provayderni ChangeNotifierProvider yopadi)
         await tester.pumpWidget(const SizedBox());
         authProvider.dispose();
+      },
+    );
+
+    testWidgets(
+      'IntroScreen animates only logo and brand name and finishes cleanly',
+      (tester) async {
+        var finished = false;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: IntroScreen(onDone: () => finished = true),
+          ),
+        );
+
+        // Boshlang'ich holatda ortiqcha yuklagich yoki shior chiqmasligi shart
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(find.text('Ma’lumotlar yuklanmoqda…'), findsNothing);
+
+        // Animatsiya to'liq o'ynab bo'lishi (kirish + silliq chiqish)
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pump(const Duration(milliseconds: 1800));
+        await tester.pumpAndSettle();
+
+        expect(finished, isTrue);
       },
     );
   });

@@ -120,9 +120,9 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -149,7 +149,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<UserRole?>(
-                      value: _filterRole,
+                      initialValue: _filterRole,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: 'Yo‘nalish / Rol',
@@ -191,7 +191,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
-                      value: _filterCategory,
+                      initialValue: _filterCategory,
                       decoration: InputDecoration(
                         labelText: 'Toifasi',
                         contentPadding: const EdgeInsets.symmetric(
@@ -259,150 +259,172 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
               return Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: AppColors.border),
-                ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        radius: 26,
+                  child: LayoutBuilder(
+                    builder: (context, cardConstraints) {
+                      final isCompact = cardConstraints.maxWidth < 560;
+
+                      final avatar = CircleAvatar(
+                        radius: 19,
                         backgroundColor: sp.role.color.withValues(alpha: 0.15),
                         child: Icon(
                           sp.role.icon,
                           color: sp.role.color,
-                          size: 28,
+                          size: 19,
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 6,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(
-                                  sp.fullName,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15.5,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: sp.role.color.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    sp.role.label,
-                                    style: TextStyle(
-                                      color: sp.role.color,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surfaceMuted,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    sp.qualificationCategory ?? 'Mutaxassis',
-                                    style: TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Mutaxassislik: ${sp.specialization ?? sp.role.professionTitle} • Ish staji: ${sp.experienceYears} yil',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${sp.institutionName ?? 'Muassasa belgilanmagan'} (${sp.district ?? 'Namangan viloyati'})',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Wrap(
-                              spacing: 8,
-                              children: [
-                                _buildMetricPill(
-                                  icon: LucideIcons.users,
-                                  label:
-                                      '${assignedStudents.length} ta bola biriktirilgan',
-                                  color: AppColors.primary,
-                                ),
-                                _buildMetricPill(
-                                  icon: LucideIcons.clipboardCheck,
-                                  label:
-                                      '$userAssessmentsCount ta baholash o‘tkazilgan',
-                                  color: AppColors.success,
-                                ),
-                                _buildMetricPill(
-                                  icon: LucideIcons.calendarCheck,
-                                  label:
-                                      '$userSessionsCount ta korreksion mashg‘ulot',
-                                  color: AppColors.warning,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      );
+
+                      final specialistInfo = Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          OutlinedButton.icon(
-                            onPressed:
-                                () => _showAssignedStudentsDialog(
-                                  context,
-                                  sp,
-                                  assignedStudents,
-                                  allStudents,
-                                  currentUser,
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                sp.fullName,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15.5,
+                                  color: AppColors.textPrimary,
                                 ),
-                            icon: const Icon(LucideIcons.users, size: 16),
-                            label: const Text('O‘quvchilar ro‘yxati'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.primary,
-                              side: BorderSide(color: AppColors.primary),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
                               ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: sp.role.color.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  sp.role.label,
+                                  style: TextStyle(
+                                    color: sp.role.color,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceMuted,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  sp.qualificationCategory ?? 'Mutaxassis',
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Mutaxassislik: ${sp.specialization ?? sp.role.professionTitle} • Ish staji: ${sp.experienceYears} yil',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
                             ),
                           ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${sp.institutionName ?? 'Muassasa belgilanmagan'} (${sp.district ?? 'Namangan viloyati'})',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: [
+                              _buildMetricPill(
+                                icon: LucideIcons.users,
+                                label:
+                                    '${assignedStudents.length} ta bola biriktirilgan',
+                                color: AppColors.primary,
+                              ),
+                              _buildMetricPill(
+                                icon: LucideIcons.clipboardCheck,
+                                label:
+                                    '$userAssessmentsCount ta baholash o‘tkazilgan',
+                                color: AppColors.success,
+                              ),
+                              _buildMetricPill(
+                                icon: LucideIcons.calendarCheck,
+                                label:
+                                    '$userSessionsCount ta korreksion mashg‘ulot',
+                                color: AppColors.warning,
+                              ),
+                            ],
+                          ),
                         ],
-                      ),
-                    ],
+                      );
+
+                      final actionBtn = OutlinedButton.icon(
+                        onPressed:
+                            () => _showAssignedStudentsDialog(
+                              context,
+                              sp,
+                              assignedStudents,
+                              allStudents,
+                              currentUser,
+                            ),
+                        icon: const Icon(LucideIcons.users, size: 16),
+                        label: const Text('O‘quvchilar ro‘yxati'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: BorderSide(color: AppColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+
+                      if (isCompact) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                avatar,
+                                const SizedBox(width: 14),
+                                Expanded(child: specialistInfo),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            SizedBox(width: double.infinity, child: actionBtn),
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          avatar,
+                          const SizedBox(width: 16),
+                          Expanded(child: specialistInfo),
+                          const SizedBox(width: 16),
+                          actionBtn,
+                        ],
+                      );
+                    },
                   ),
                 ),
               );
@@ -600,7 +622,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       DropdownButtonFormField<StudentModel>(
-                        value: selectedStudent,
+                        initialValue: selectedStudent,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           labelText: 'O‘quvchini tanlang',
@@ -636,12 +658,13 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                       ),
                       onPressed: () async {
                         if (selectedStudent != null) {
+                          final nav = Navigator.of(dlgCtx);
                           await app.assignSpecialistToStudent(
                             selectedStudent!.id,
                             specialist.id,
                             byUser: byUser,
                           );
-                          Navigator.pop(dlgCtx);
+                          nav.pop();
                           onAssigned();
                         }
                       },

@@ -38,6 +38,7 @@ import 'package:talim_nazorat/screens/admin/tabs/admin_users_tab.dart';
 import 'package:talim_nazorat/screens/assessments/assessments_list_screen.dart';
 import 'package:talim_nazorat/screens/auth/login_screen.dart';
 import 'package:talim_nazorat/screens/dashboard/dashboard_screen.dart';
+import 'package:talim_nazorat/screens/entry/intro_screen.dart';
 import 'package:talim_nazorat/screens/entry/landing_screen.dart';
 import 'package:talim_nazorat/screens/entry/welcome_screen.dart';
 import 'package:talim_nazorat/screens/iep/iep_list_screen.dart';
@@ -95,6 +96,7 @@ class _Screen {
 String _firstStudentId() => LocalDbService().getStudents().first.id;
 
 final _screens = <_Screen>[
+  _Screen('Intro', '', () => const IntroScreen()),
   _Screen('Landing', '', () => const LandingScreen()),
   _Screen('Welcome', '', () => const WelcomeScreen()),
   _Screen('Login', '', () => const LoginScreen()),

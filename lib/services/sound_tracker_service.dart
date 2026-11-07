@@ -81,8 +81,9 @@ class SoundTrackerService {
       if (w == null || UzbekSpeechSounds.byId(w) == null) {
         return 'Tovush qaysi tovushga almashtirilishini ko‘rsating.';
       }
-      if (w == e.soundId)
+      if (w == e.soundId) {
         return 'Tovush o‘zi bilan almashtirilishi mumkin emas.';
+      }
     }
     final from = e.differentiatedFrom;
     if (from != null) {
