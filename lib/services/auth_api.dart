@@ -95,7 +95,12 @@ UserModel userFromServer(Map<String, dynamic> u) {
     region: text('region') ?? 'Namangan viloyati',
     district: text('district'),
     institutionId: u['institution_id'] as String?,
-    institutionName: text('institution_name'),
+    // Hisob tegishli bo'lgan haqiqiy maktab (ro'yxatdan o'tishda yozilgan nom
+    // undan farq qilishi mumkin).
+    institutionName:
+        (u['institution_name'] as String?)?.trim().isNotEmpty == true
+            ? (u['institution_name'] as String).trim()
+            : text('institution_name'),
     phone: u['phone'] as String?,
     specialization: text('specialization'),
     qualificationCategory: text('qualification_category') ?? 'Mutaxassis',

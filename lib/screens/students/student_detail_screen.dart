@@ -318,6 +318,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                   ),
                                 ),
                                 IconButton(
+                                  // Ekran o'quvchi (va brauzer testlari) tugmani nomi bilan topadi.
+                                  tooltip: '${sp.fullName}ni jamoaga qo‘shish',
                                   icon: Icon(
                                     LucideIcons.userPlus,
                                     color: AppColors.primary,

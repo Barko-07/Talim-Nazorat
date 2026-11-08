@@ -221,3 +221,11 @@ def test_people_edit_only_their_own_profile_and_admins_see_the_change(app):
     # Only which fields changed: the history cannot be erased, and a deleted
     # account's name and phone must disappear.
     assert row["before"] is None and row["after"] is None
+
+
+def test_the_signed_in_user_carries_their_actual_school_name(app):
+    inst = add_institution(app, "14-sonli maktab")
+    add_user(app, "t14@a.uz", Role.TEACHER, inst)
+    t = Api(TestClient(app))
+    me = t.login("t14@a.uz").json()["user"]
+    assert me["institution_id"] == inst and me["institution_name"] == "14-sonli maktab"

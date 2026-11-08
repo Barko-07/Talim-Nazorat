@@ -3,10 +3,12 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../core/config/app_config.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/namangan_data.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/student_model.dart';
+import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/app_exceptions.dart';
@@ -120,17 +122,28 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     super.dispose();
   }
 
+  /// Server rejimida tizim administratoridan boshqa hamma bolani faqat o'z
+  /// maktabiga qo'shadi (buni server ham tekshiradi) — maktab tanlanmaydi.
+  bool _ownSchoolOnly(UserModel? user) =>
+      AppConfig.serverMode && user?.role != UserRole.superAdmin;
+
   void _saveStudent() async {
     if (_formKey.currentState!.validate()) {
       final app = context.read<AppProvider>();
       final user = context.read<AuthProvider>().currentUser;
+      final ownOnly = _ownSchoolOnly(user);
       final schoolName =
-          _selectedInstitution.trim().isNotEmpty
-              ? _selectedInstitution.trim()
-              : (user?.institutionName ?? '');
+          ownOnly
+              ? (user?.institutionName ?? '')
+              : (_selectedInstitution.trim().isNotEmpty
+                  ? _selectedInstitution.trim()
+                  : (user?.institutionName ?? ''));
       // O'z maktabi bo'lsa — uning ID si; boshqa maktab tanlansa (tizim administratori) — nomidan
       final schoolId =
-          (user?.institutionName == schoolName && user?.institutionId != null)
+          ownOnly
+              ? (user?.institutionId ?? '')
+              : (user?.institutionName == schoolName &&
+                  user?.institutionId != null)
               ? user!.institutionId!
               : 'inst_${schoolName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_')}';
       final guardianName = _guardianNameCtrl.text.trim();
@@ -396,78 +409,90 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               ),
                             ),
                             const SizedBox(height: 14),
-                            DropdownButtonFormField<String>(
-                              key: ValueKey('district_$_selectedDistrict'),
-                              initialValue:
-                                  NamanganData.districts.contains(
-                                        _selectedDistrict,
-                                      )
-                                      ? _selectedDistrict
-                                      : null,
-                              isExpanded: true,
-                              decoration: const InputDecoration(
-                                labelText: 'Tuman / shahar',
-                              ),
-                              items:
-                                  NamanganData.districts
-                                      .map(
-                                        (d) => DropdownMenuItem(
-                                          value: d,
-                                          child: Text(d),
-                                        ),
-                                      )
-                                      .toList(),
-                              onChanged: (v) {
-                                if (v == null) return;
-                                final schools =
-                                    NamanganData.getSchoolsForDistrict(v);
-                                setState(() {
-                                  _selectedDistrict = v;
-                                  _selectedInstitution =
-                                      schools.isNotEmpty ? schools.first : '';
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 14),
-                            DropdownButtonFormField<String>(
-                              key: ValueKey(
-                                'school_${_selectedDistrict}_$_selectedInstitution',
-                              ),
-                              initialValue:
-                                  NamanganData.getSchoolsForDistrict(
-                                        _selectedDistrict,
-                                      ).contains(_selectedInstitution)
-                                      ? _selectedInstitution
-                                      : null,
-                              isExpanded: true,
-                              decoration: const InputDecoration(
-                                labelText: 'Ta’lim muassasasi *',
-                              ),
-                              items:
-                                  NamanganData.getSchoolsForDistrict(
-                                        _selectedDistrict,
-                                      )
-                                      .map(
-                                        (sch) => DropdownMenuItem(
-                                          value: sch,
-                                          child: Text(
-                                            sch,
-                                            overflow: TextOverflow.ellipsis,
+                            if (_ownSchoolOnly(
+                              context.read<AuthProvider>().currentUser,
+                            ))
+                              _OwnSchoolField(
+                                name:
+                                    context
+                                        .read<AuthProvider>()
+                                        .currentUser
+                                        ?.institutionName,
+                              )
+                            else ...[
+                              DropdownButtonFormField<String>(
+                                key: ValueKey('district_$_selectedDistrict'),
+                                initialValue:
+                                    NamanganData.districts.contains(
+                                          _selectedDistrict,
+                                        )
+                                        ? _selectedDistrict
+                                        : null,
+                                isExpanded: true,
+                                decoration: const InputDecoration(
+                                  labelText: 'Tuman / shahar',
+                                ),
+                                items:
+                                    NamanganData.districts
+                                        .map(
+                                          (d) => DropdownMenuItem(
+                                            value: d,
+                                            child: Text(d),
                                           ),
-                                        ),
-                                      )
-                                      .toList(),
-                              onChanged: (v) {
-                                if (v != null)
-                                  setState(() => _selectedInstitution = v);
-                              },
-                              validator:
-                                  (v) =>
-                                      (v == null || v.isEmpty) &&
-                                              _selectedInstitution.isEmpty
-                                          ? 'Ta’lim muassasasini tanlang'
-                                          : null,
-                            ),
+                                        )
+                                        .toList(),
+                                onChanged: (v) {
+                                  if (v == null) return;
+                                  final schools =
+                                      NamanganData.getSchoolsForDistrict(v);
+                                  setState(() {
+                                    _selectedDistrict = v;
+                                    _selectedInstitution =
+                                        schools.isNotEmpty ? schools.first : '';
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 14),
+                              DropdownButtonFormField<String>(
+                                key: ValueKey(
+                                  'school_${_selectedDistrict}_$_selectedInstitution',
+                                ),
+                                initialValue:
+                                    NamanganData.getSchoolsForDistrict(
+                                          _selectedDistrict,
+                                        ).contains(_selectedInstitution)
+                                        ? _selectedInstitution
+                                        : null,
+                                isExpanded: true,
+                                decoration: const InputDecoration(
+                                  labelText: 'Ta’lim muassasasi *',
+                                ),
+                                items:
+                                    NamanganData.getSchoolsForDistrict(
+                                          _selectedDistrict,
+                                        )
+                                        .map(
+                                          (sch) => DropdownMenuItem(
+                                            value: sch,
+                                            child: Text(
+                                              sch,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged: (v) {
+                                  if (v != null)
+                                    setState(() => _selectedInstitution = v);
+                                },
+                                validator:
+                                    (v) =>
+                                        (v == null || v.isEmpty) &&
+                                                _selectedInstitution.isEmpty
+                                            ? 'Ta’lim muassasasini tanlang'
+                                            : null,
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -702,6 +727,32 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// O'z maktabi — o'zgartirib bo'lmaydigan maydon ko'rinishida.
+class _OwnSchoolField extends StatelessWidget {
+  const _OwnSchoolField({required this.name});
+
+  final String? name;
+
+  @override
+  Widget build(BuildContext context) {
+    return InputDecorator(
+      decoration: InputDecoration(
+        labelText: 'Ta’lim muassasasi',
+        helperText: 'Bola sizning maktabingizga qo‘shiladi',
+        prefixIcon: Icon(
+          LucideIcons.building2,
+          size: 18,
+          color: AppColors.primary,
+        ),
+      ),
+      child: Text(
+        (name ?? '').trim().isNotEmpty ? name!.trim() : 'O‘z maktabingiz',
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

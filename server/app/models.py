@@ -93,6 +93,8 @@ class User(Base):
     password_changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
+    institution: Mapped["Institution | None"] = relationship(lazy="joined")
+
     def locked_now(self, now: datetime) -> bool:
         lu = _tz(self.locked_until)
         return lu is not None and lu > now

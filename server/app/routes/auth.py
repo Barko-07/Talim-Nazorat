@@ -70,6 +70,9 @@ def _user_out(ctx: AppContext, p_session, user: User, **extra) -> dict:
             "full_name": user.full_name,
             "role": user.role,
             "institution_id": user.institution_id,
+            # The school the account actually belongs to (the sign-up form's
+            # free-text school name may differ from it).
+            "institution_name": user.institution.name if user.institution else None,
             "phone": user.phone,
             "mfa_enabled": user.mfa_enabled,
             "can_stay_signed_in": sessions.may_stay_signed_in(ctx.settings, user),
