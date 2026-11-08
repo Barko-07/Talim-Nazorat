@@ -21,6 +21,28 @@ class ServerHistoryTab extends StatefulWidget {
   State<ServerHistoryTab> createState() => _ServerHistoryTabState();
 }
 
+/// Maydon nomlari odam tilida. Ro'yxatda yo'q maydon o'z nomi bilan chiqadi.
+const fieldLabels = {
+  'team': 'Jamoa',
+  'teamCoordinator': 'Koordinator',
+  'firstName': 'Ism',
+  'lastName': 'Familiya',
+  'middleName': 'Otasining ismi',
+  'birthDate': 'Tug‘ilgan sana',
+  'full_name': 'F.I.Sh.',
+  'first_name': 'Ism',
+  'last_name': 'Familiya',
+  'middle_name': 'Otasining ismi',
+  'phone': 'Telefon',
+  'specialization': 'Mutaxassislik',
+  'qualification_category': 'Malaka toifasi',
+  'experience_years': 'Ish staji',
+  'region': 'Viloyat',
+  'district': 'Tuman',
+  'status': 'Holat',
+  'notes': 'Izoh',
+};
+
 const kindLabels = {
   'student': 'O‘quvchi kartasi',
   'assessment': 'Baholash',
@@ -321,7 +343,20 @@ class _ServerHistoryTabState extends State<ServerHistoryTab> {
               ),
             ),
             children: [
-              if (c.action == 'update')
+              if (c.action == 'update' && c.before == null && c.after == null)
+                // Shaxsiy ma'lumot (profil): qiymatlar tarixda saqlanmaydi.
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'O‘zgargan: ${c.fields.map((f) => fieldLabels[f] ?? f).join(', ')}. '
+                    'Shaxsiy ma’lumot bo‘lgani uchun qiymatlar tarixda saqlanmaydi.',
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                )
+              else if (c.action == 'update')
                 for (final f in c.fields) _diffRow(f, c.before?[f], c.after?[f])
               else
                 Align(
@@ -345,7 +380,12 @@ class _ServerHistoryTabState extends State<ServerHistoryTab> {
 
   static String _show(Object? v) {
     if (v == null) return '—';
-    final text = v is String ? v : jsonEncode(v);
+    final text =
+        v is String
+            ? v
+            : v is List
+            ? (v.isEmpty ? '—' : v.join(', '))
+            : jsonEncode(v);
     if (text.trim().isEmpty) return '—';
     return text.length > 240 ? '${text.substring(0, 240)}…' : text;
   }
@@ -357,7 +397,7 @@ class _ServerHistoryTabState extends State<ServerHistoryTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            field,
+            fieldLabels[field] ?? field,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,

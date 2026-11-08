@@ -31,13 +31,26 @@ def _live_session(app) -> AuthSession:
 
 # ------------------------------------------------------------------ password only for non-admins
 
-def test_teachers_sign_in_with_the_password_alone(api, app):
+def test_every_sign_in_needs_the_code_emailed_to_the_account(api, app):
     add_user(app, "t@maktab.uz", Role.TEACHER)
     r = api.login("t@maktab.uz", email_code=False)
-    assert r.status_code == 200 and r.json()["state"] == "ok"
+    assert r.status_code == 200 and r.json()["state"] == "email_code_required"
     assert r.json()["user"]["can_stay_signed_in"] is True
-    assert app.state.ctx.mailer.outbox == []  # no code mailed
-    assert api.get("/api/auth/me").status_code == 200
+    assert [m.to for m in app.state.ctx.mailer.outbox] == ["t@maktab.uz"]
+    # The password alone opens nothing.
+    assert api.get("/api/records").status_code == 403
+    code = last_code_for(app, "t@maktab.uz")
+    r = api.post("/api/auth/email-code/verify", {"code": code})
+    assert r.status_code == 200 and r.json()["state"] == "ok"
+    assert api.get("/api/records").status_code == 200
+
+
+def test_a_partial_sign_in_is_never_kept_for_days(api, app):
+    add_user(app, "p@maktab.uz", Role.TEACHER)
+    r = api.login("p@maktab.uz", email_code=False, remember=True)
+    assert r.json()["state"] == "email_code_required"
+    assert "max-age=2592000" not in r.headers["set-cookie"].lower()
+    assert _live_session(app).remember is False
 
 
 def test_without_eslab_qolish_the_session_ends_after_30_idle_minutes(api, app):

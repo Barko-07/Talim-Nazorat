@@ -974,7 +974,7 @@ class _LoginScreenState extends State<LoginScreen>
                     controller: ctrl,
                     decoration: InputDecoration(
                       labelText: 'Telefon raqam yoki Email *',
-                      hintText: '+998 90 123 45 67 yoki login@talim.uz',
+                      hintText: '+998 90 123 45 67 yoki email@maktab.uz',
                       prefixIcon: Icon(
                         LucideIcons.keyRound,
                         size: 18,

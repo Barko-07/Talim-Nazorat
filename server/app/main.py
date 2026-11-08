@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import threading
 from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Request
@@ -112,6 +113,58 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         return response
 
 
+ALERT_TEXT = {
+    "ACCOUNT_LOCKED": "Hisob ko‘p noto‘g‘ri parol sababli vaqtincha bloklandi",
+    "SUSPICIOUS_ACTIVITY": "Bitta manzildan shubhali ko‘p urinishlar",
+    "MAIL_FAILED": "Email yuborib bo‘lmadi (kirish kodlari yetib bormasligi mumkin)",
+    "MFA_RESET_BY_CLI": "Server orqali ikki bosqichli himoya o‘chirildi",
+}
+
+
+def _alert_mailer(ctx: AppContext):
+    """Security alerts by email to every active system administrator - at most
+    one email per kind of alert every 15 minutes, so an attack cannot flood
+    their mailbox. The email holds no children's data (alerts have none)."""
+    from sqlalchemy import select
+
+    from .models import User
+
+    def send(action: str, subject: str, ip: str, detail: str) -> None:
+        if action == "MAIL_FAILED" or not ctx.mem_limiter.hit(f"alert-mail:{action}", 1, 900):
+            return  # mail is the broken part: nothing to send it with
+
+        def run() -> None:
+            db = ctx.db.sessionmaker()
+            try:
+                admins = db.scalars(select(User.email).where(
+                    User.role == "SUPER_ADMIN", User.is_active.is_(True))).all()
+            finally:
+                db.close()
+            what = ALERT_TEXT.get(action, action)
+            body = "\n".join([
+                f"Individ xavfsizlik ogohlantirishi: {what}.",
+                "",
+                f"Hodisa: {action}",
+                f"Kim: {subject or '-'}",
+                f"Manzil (IP): {ip or '-'}",
+                f"Tafsilot: {detail or '-'}",
+                "",
+                "Batafsil: administrator paneli → Audit jurnali → Xavfsizlik.",
+            ])
+            for to in admins:
+                try:
+                    ctx.mailer.send(to, f"Individ: xavfsizlik ogohlantirishi - {what}", body)
+                except Exception:  # noqa: BLE001
+                    log.error("alert mail to an administrator failed")
+
+        if ctx.settings.is_production:
+            threading.Thread(target=run, daemon=True).start()
+        else:
+            run()  # tests see the email at once
+
+    return send
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or load_settings()
     crypto.configure(settings.data_encryption_key, settings.secret_key,
@@ -128,6 +181,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openapi_url=None if settings.is_production else "/api/openapi.json",
     )
     app.state.ctx = AppContext(settings=settings, db=database, mailer=Mailer(settings))
+    audit.configure_mail_alerts(_alert_mailer(app.state.ctx))
 
     if settings.allowed_origins:
         app.add_middleware(

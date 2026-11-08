@@ -514,6 +514,12 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Server rejimi: o'zgarishdan keyin hamma narsani serverdan qayta o'qish.
+  Future<void> reloadFromServer() async {
+    await _db.loadFromServer();
+    notifyListeners();
+  }
+
   Future<void> toggleUserActive(
     String userId,
     bool isActive, {

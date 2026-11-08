@@ -3,12 +3,15 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../core/config/app_config.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/access_control_service.dart';
+import '../../services/admin_api.dart';
+import '../../services/api_client.dart';
 import '../../services/password_hasher.dart';
 import '../../core/widgets/status_badge.dart';
 
@@ -60,7 +63,10 @@ class SpecialistsScreen extends StatelessWidget {
                                       UserRole.specialEdTeacher,
                                       UserRole.teacher,
                                       UserRole.coordinator,
-                                      UserRole.institutionAdmin,
+                                      // Administratorni faqat tizim administratori ochadi.
+                                      if (!AppConfig.serverMode ||
+                                          user?.role == UserRole.superAdmin)
+                                        UserRole.institutionAdmin,
                                     ]
                                     .map(
                                       (r) => DropdownMenuItem(
@@ -96,8 +102,16 @@ class SpecialistsScreen extends StatelessWidget {
                           const SizedBox(height: 12),
                           TextField(
                             controller: emailCtrl,
-                            decoration: const InputDecoration(
-                              labelText: 'Elektron pochta (Email)',
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              labelText:
+                                  AppConfig.serverMode
+                                      ? 'Elektron pochta (Email) *'
+                                      : 'Elektron pochta (Email)',
+                              helperText:
+                                  AppConfig.serverMode
+                                      ? 'Vaqtinchalik parol shu manzilga yuboriladi'
+                                      : null,
                             ),
                           ),
                         ],
@@ -123,6 +137,70 @@ class SpecialistsScreen extends StatelessWidget {
                           return;
                         }
 
+                        if (AppConfig.serverMode) {
+                          // Hisob serverda ochiladi; vaqtinchalik parol faqat
+                          // xodimning emailiga boradi, ekranda ko'rsatilmaydi.
+                          final email = emailCtrl.text.trim();
+                          if (!RegExp(
+                            r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                          ).hasMatch(email)) {
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                    'Xodimning email manzilini kiriting: vaqtinchalik parol unga yuboriladi.',
+                                  ),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                            return;
+                          }
+                          final phoneDigits = phoneCtrl.text.replaceAll(
+                            RegExp(r'\D'),
+                            '',
+                          );
+                          try {
+                            await AdminApi().createUser(
+                              email: email,
+                              fullName: nameCtrl.text.trim(),
+                              role: selectedRole,
+                              institutionId: user?.institutionId,
+                              phone:
+                                  phoneDigits.length > 3
+                                      ? phoneCtrl.text.trim()
+                                      : null,
+                            );
+                            await app.reloadFromServer();
+                          } on ApiException catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(
+                                    content: Text(e.message),
+                                    backgroundColor: AppColors.error,
+                                  ),
+                                );
+                            }
+                            return;
+                          }
+                          if (ctx.mounted) Navigator.pop(ctx);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Xodim qo‘shildi. Vaqtinchalik parol $email manziliga yuborildi.',
+                                  ),
+                                  backgroundColor: AppColors.success,
+                                ),
+                              );
+                          }
+                          return;
+                        }
+
                         final tempPassword = PasswordHasher.generateTemporary();
                         final newStaff = UserModel(
                           id: 'usr_${const Uuid().v4().substring(0, 8)}',
@@ -130,7 +208,7 @@ class SpecialistsScreen extends StatelessWidget {
                           email:
                               emailCtrl.text.trim().isNotEmpty
                                   ? emailCtrl.text.trim()
-                                  : '${phoneCtrl.text.replaceAll(RegExp(r'\D'), '')}@talim.uz',
+                                  : '${phoneCtrl.text.replaceAll(RegExp(r'\D'), '')}@local.invalid',
                           phone: phoneCtrl.text.trim(),
                           role: selectedRole,
                           specialization:
@@ -318,12 +396,36 @@ class SpecialistsScreen extends StatelessWidget {
                                           ? AppColors.error
                                           : AppColors.success,
                                 ),
-                                onPressed: () {
-                                  app.toggleUserActive(
-                                    staff.id,
-                                    !isActive,
-                                    byUser: user,
-                                  );
+                                onPressed: () async {
+                                  if (!AppConfig.serverMode) {
+                                    await app.toggleUserActive(
+                                      staff.id,
+                                      !isActive,
+                                      byUser: user,
+                                    );
+                                    return;
+                                  }
+                                  // Server rejimi: bloklash serverda; bloklangan
+                                  // xodim ro'yxatdan chiqadi (qayta faollashtirish -
+                                  // Administrator paneli, Foydalanuvchilar).
+                                  try {
+                                    await AdminApi().update(
+                                      staff.id,
+                                      isActive: !isActive,
+                                    );
+                                    await app.reloadFromServer();
+                                  } on ApiException catch (e) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(e.message),
+                                          backgroundColor: AppColors.error,
+                                        ),
+                                      );
+                                    }
+                                  }
                                 },
                                 child: Text(
                                   isActive ? 'Bloklash' : 'Faollashtirish',

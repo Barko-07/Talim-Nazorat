@@ -207,3 +207,24 @@ def test_the_last_system_administrator_cannot_delete_their_account(api, app):
     add_user(app, "boss@maktab.uz", Role.SUPER_ADMIN)
     api.login("boss@maktab.uz")
     assert api.post("/api/auth/account/delete", {"password": PASSWORD}).status_code == 409
+
+
+def test_system_administrators_are_emailed_when_an_account_locks():
+    app = create_app(make_settings(trusted_proxies=["testclient"], login_account_max_failures=3))
+    add_user(app, "boss@maktab.uz", Role.SUPER_ADMIN)
+    add_user(app, "lock@maktab.uz")
+    add_user(app, "lock2@maktab.uz")
+    c = TestClient(app)
+
+    def fail(email, n):
+        for i in range(n):
+            c.post("/api/auth/login", json={"email": email, "password": "Notogri-Parol-1"},
+                   headers={"X-Requested-With": "XMLHttpRequest", "X-Real-IP": f"203.0.113.{i}"})
+
+    fail("lock@maktab.uz", 3)
+    alerts = [m for m in app.state.ctx.mailer.outbox if m.to == "boss@maktab.uz"]
+    assert len(alerts) == 1 and "bloklandi" in alerts[0].subject
+    assert "lock@maktab.uz" not in alerts[0].body  # the login is masked
+    # A second lock soon after does not flood the administrator's mailbox.
+    fail("lock2@maktab.uz", 3)
+    assert len([m for m in app.state.ctx.mailer.outbox if m.to == "boss@maktab.uz"]) == 1

@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, Request, Response
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
+from .. import identity
 from ..context import AppContext
 from ..crypto import constant_time_equals, keyed_hash
 from ..deps import ApiError, Principal, _authenticate, client_ip, get_ctx, get_db, require_partial, require_user
@@ -112,7 +113,7 @@ def login(
     _too_many(ctx, db, f"login-ip:{ip}", s.login_ip_per_minute, 60, ip, "login per IP")
 
     email = body.email.lower()
-    user = db.scalar(select(User).where(User.email == email))
+    user = identity.find_by_email(db, email)
     now = utcnow()
 
     if user is None:
@@ -171,16 +172,12 @@ def login(
         user.password_hash = passwords.hash_password(body.password)
     db.commit()
 
-    if not sessions.needs_second_factor(s, user):
-        # Teachers and specialists sign in with the password alone; "Eslab
-        # qolish" keeps them signed in on this device for REMEMBER_ME_DAYS.
-        sess = sessions.issue(db, s, user, request, response, mfa_verified=True, ip=ip,
-                              factor="password", remember=body.remember)
-        audit.record(db, "LOGIN_OK", user_id=user.id, subject=audit.mask_login(email), ip=ip,
-                     detail="password, remembered" if sess.remember else "password")
-        return _user_out(ctx, sess, user)
-
+    # Every sign-in is confirmed with a second factor (emailed code or the
+    # authenticator). "Eslab qolish" applies once that is done.
     sess = sessions.issue(db, s, user, request, response, mfa_verified=False, ip=ip)
+    if body.remember and sessions.may_stay_signed_in(s, user):
+        sess.factor = sessions.WANTS_REMEMBER
+        db.commit()
     audit.record(db, "LOGIN_PASSWORD_OK", user_id=user.id, subject=audit.mask_login(email), ip=ip)
     if user.mfa_enabled:
         return _user_out(ctx, sess, user)
@@ -219,7 +216,8 @@ def email_code_verify(body: EmailCodeIn, request: Request, response: Response,
     p.session.revoked = True  # privilege change: rotate the session token
     db.commit()
     sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=p.ip,
-                          factor="email")
+                          factor="email",
+                          remember=p.session.factor == sessions.WANTS_REMEMBER)
     audit.record(db, "LOGIN_OK", user_id=user.id, ip=p.ip, detail="password + email code")
     return _user_out(ctx, sess, user)
 
@@ -245,7 +243,8 @@ def mfa_verify(
     p.session.revoked = True  # privilege change: rotate the session token
     db.commit()
     sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=ip,
-                          factor="totp")
+                          factor="totp",
+                          remember=p.session.factor == sessions.WANTS_REMEMBER)
     audit.record(db, "LOGIN_OK", user_id=user.id, ip=ip, detail="password + 2FA")
     return _user_out(ctx, sess, user)
 
@@ -274,7 +273,8 @@ def mfa_recovery(body: RecoveryCodeIn, request: Request, response: Response,
     db.commit()
     left = len(unused) - 1
     sess = sessions.issue(db, ctx.settings, user, request, response, mfa_verified=True, ip=p.ip,
-                          factor="recovery")
+                          factor="recovery",
+                          remember=p.session.factor == sessions.WANTS_REMEMBER)
     audit.record(db, "MFA_RECOVERY_USED", severity="warning", user_id=user.id, ip=p.ip,
                  detail=f"{left} left", webhook_url=ctx.settings.alert_webhook_url)
     notify(db, ctx, user.email, "Individ: zaxira kod ishlatildi",
@@ -332,6 +332,8 @@ def update_profile(body: ProfileUpdateIn, p: Principal = Depends(require_user), 
     profile["first_name"], profile["last_name"] = first, last
     user.full_name = f"{last} {first}".strip()[:120]
     if "phone" in changes:
+        if identity.phone_taken(db, changes["phone"], except_user_id=user.id):
+            raise ApiError(409, "phone_taken", "Bu telefon raqami bilan hisob allaqachon bor")
         user.phone = changes["phone"]
     user.profile = json.dumps(profile, ensure_ascii=False)
     after = {**profile, "full_name": user.full_name, "phone": user.phone}
@@ -608,7 +610,7 @@ def password_reset_request(body: ResetRequestIn, request: Request, db: Session =
     ip = client_ip(request)
     email = body.email.lower()
     _too_many(ctx, db, f"reset-ip:{ip}", 5, 900, ip, "reset per IP")
-    user = db.scalar(select(User).where(User.email == email))
+    user = identity.find_by_email(db, email)
     if user is not None and user.is_active and ctx.db_limiter.hit(db, f"reset-user:{user.id}", 3, 3600):
         _issue_code(db, ctx, user, "password_reset", quiet=True)
         audit.record(db, "PASSWORD_RESET_CODE_SENT", user_id=user.id, subject=audit.mask_login(email), ip=ip)
@@ -622,7 +624,7 @@ def password_reset_confirm(body: ResetConfirmIn, request: Request, response: Res
                            db: Session = Depends(get_db), ctx: AppContext = Depends(get_ctx)):
     ip = client_ip(request)
     _too_many(ctx, db, f"reset-confirm-ip:{ip}", 10, 900, ip, "reset confirm per IP")
-    user = db.scalar(select(User).where(User.email == body.email.lower()))
+    user = identity.find_by_email(db, body.email)
     if user is None or not user.is_active or not _consume_code(db, ctx, user, "password_reset", body.code, ip):
         raise ApiError(400, "invalid_code", "Kod noto‘g‘ri yoki muddati o‘tgan")
     _set_password(db, ctx, user, body.new_password)
@@ -667,7 +669,10 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
 
     now = utcnow()
     db.execute(delete(PendingRegistration).where(PendingRegistration.expires_at < now - timedelta(days=1)))
-    existing = db.scalar(select(User).where(User.email == email))
+    existing = identity.find_by_email(db, email)
+    if existing is None and identity.phone_taken(db, body.phone):
+        # Not a secret worth hiding: the person needs to know to sign in instead.
+        raise ApiError(409, "phone_taken", "Bu telefon raqami bilan hisob allaqachon bor. Hisobingizga kiring yoki parolni tiklang")
     reg = PendingRegistration(email=email, code_hash="", data="{}",
                               expires_at=now + timedelta(minutes=s.code_ttl_minutes))
     db.add(reg)
@@ -678,7 +683,7 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
         db.commit()
         audit.record(db, "REGISTER_EXISTING_EMAIL", severity="warning", user_id=existing.id,
                      subject=audit.mask_login(email), ip=ip, webhook_url=s.alert_webhook_url)
-        notify(db, ctx, email, "Individ: ro‘yxatdan o‘tishga urinish",
+        notify(db, ctx, existing.email, "Individ: ro‘yxatdan o‘tishga urinish",
                         "Kimdir ushbu email bilan Individ’da yangi hisob ochmoqchi bo‘ldi. Sizda allaqachon "
                         "hisob bor, shuning uchun yangi hisob ochilmadi.\nParolingizni unutgan bo‘lsangiz, "
                         "kirish sahifasidagi “Parolni unutdingizmi?” orqali tiklang. Agar bu siz "
@@ -785,7 +790,7 @@ def register_verify(body: RegistrationVerifyIn, request: Request, db: Session = 
         audit.record(db, "REGISTER_CODE_FAILED", severity="warning", subject=audit.mask_login(reg.email), ip=ip)
         raise ApiError(400, "invalid_code", "Kod noto‘g‘ri yoki muddati o‘tgan")
     data = json.loads(reg.data)
-    if db.scalar(select(User).where(User.email == reg.email)) is not None:  # taken meanwhile
+    if identity.find_by_email(db, reg.email) is not None or identity.phone_taken(db, data["phone"]):  # taken meanwhile
         db.delete(reg)
         db.commit()
         raise ApiError(400, "invalid_code", "Kod noto‘g‘ri yoki muddati o‘tgan")

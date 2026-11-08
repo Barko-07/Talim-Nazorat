@@ -19,7 +19,7 @@ from datetime import timedelta
 
 from sqlalchemy import Text, delete, or_, select, type_coerce, update
 
-from . import crypto
+from . import crypto, identity
 from .config import ConfigError, load_settings
 from .db import Database
 from .models import Base, AuthSession, OneTimeCode, PendingRegistration, RateCounter, Role, User, utcnow
@@ -67,7 +67,7 @@ def main(argv: list[str] | None = None) -> int:
     email = args.email.strip().lower()
     if args.cmd == "reset-mfa":
         with db_.sessionmaker() as db:
-            user = db.scalar(select(User).where(User.email == email))
+            user = identity.find_by_email(db, email)
             if user is None:
                 print("No such account.", file=sys.stderr)
                 return 1
@@ -81,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     with db_.sessionmaker() as db:
-        if db.scalar(select(User).where(User.email == email)):
+        if identity.find_by_email(db, email):
             print("An account with this email already exists.", file=sys.stderr)
             return 1
         # Typed twice, never shown, never stored in plain text or shell history.

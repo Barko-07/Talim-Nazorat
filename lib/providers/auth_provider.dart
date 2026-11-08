@@ -330,7 +330,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     final newUser = UserModel(
       id: newId,
-      email: email.trim().isNotEmpty ? email.trim() : '$phone@talim.uz',
+      email: email.trim().isNotEmpty ? email.trim() : '$phone@local.invalid',
       fullName: fullName,
       role: role,
       region: region,

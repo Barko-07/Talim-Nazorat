@@ -16,6 +16,9 @@ cd "$(dirname "$0")/.."
 OUT=build/web_server
 ARCHIVE=build/web_release.tgz
 
+# The screens that talk to the server must work against a fake server first.
+flutter test --dart-define=SERVER_MODE=true test/server_sync_test.dart test/server_mode_screens_test.dart   || { echo "BUILD REFUSED: server-mode tests failed" >&2; exit 1; }
+
 flutter build web --release --no-web-resources-cdn --dart-define=SERVER_MODE=true --output "$OUT"
 
 fail() { echo "BUILD REFUSED: $1" >&2; rm -f "$ARCHIVE"; exit 1; }

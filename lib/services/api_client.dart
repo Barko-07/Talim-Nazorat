@@ -42,7 +42,14 @@ class ApiClient {
         '',
       );
 
-  static final ApiClient instance = ApiClient();
+  static ApiClient _instance = ApiClient();
+
+  /// Ilova bo'ylab yagona mijoz (bitta sessiya cookie'si).
+  static ApiClient get instance => _instance;
+
+  /// Faqat testlar uchun: ekranlarni soxta server bilan sinash.
+  @visibleForTesting
+  static set instance(ApiClient client) => _instance = client;
 
   static const _timeout = Duration(seconds: 20);
   static const _sessionCookiePrefs = 'api_session_cookie';

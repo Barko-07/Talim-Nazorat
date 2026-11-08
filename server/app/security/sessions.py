@@ -106,18 +106,25 @@ def revoke_all(db: Session, user_id: str, *, except_id: str | None = None) -> No
 
 # ------------------------------------------------------------------ who confirms logins
 
-# Accounts that manage others confirm every login with a code emailed to the
-# account, and are never kept signed in for long.
+# Accounts that manage others are never kept signed in for long.
 ADMIN_ROLES = {"SUPER_ADMIN", "INSTITUTION_ADMIN"}
+
+# A partial session (password right, emailed code not yet entered) remembers
+# here whether "Eslab qolish" was ticked, so the full session after the code
+# can honour it. Never set on a verified session.
+WANTS_REMEMBER = "pending:remember"
 
 
 def needs_second_factor(settings: Settings, user: User) -> bool:
-    return user.mfa_enabled or user.role in ADMIN_ROLES or user.role in settings.mfa_required_roles
+    """Every account confirms every sign-in: with the authenticator app if it
+    has one, otherwise with a code emailed to the account."""
+    return True
 
 
 def may_stay_signed_in(settings: Settings, user: User) -> bool:
-    """"Eslab qolish": a password-only account may keep its session for days."""
-    return not needs_second_factor(settings, user)
+    """"Eslab qolish": after the code, a non-administrator may keep the session
+    for REMEMBER_ME_DAYS on that device."""
+    return user.role not in ADMIN_ROLES and user.role not in settings.mfa_required_roles
 
 
 def csrf_token(session: AuthSession) -> str:

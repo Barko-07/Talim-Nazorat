@@ -14,9 +14,11 @@ from sqlalchemy import (
     Integer,
     String,
     UniqueConstraint,
+    event,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from . import identity
 from .crypto import EncryptedText
 from .db import Base
 
@@ -62,6 +64,10 @@ class User(Base):
     __tablename__ = "users"
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
     email: Mapped[str] = mapped_column(String(254), unique=True, index=True)
+    # The same mailbox / number however it is spelled (app/identity.py): one
+    # account per person. Kept in step with email and phone automatically.
+    email_key: Mapped[str] = mapped_column(String(254), unique=True, index=True)
+    phone_key: Mapped[str | None] = mapped_column(String(16), unique=True, nullable=True)
     full_name: Mapped[str] = mapped_column(String(120))
     role: Mapped[str] = mapped_column(String(32))
     institution_id: Mapped[str | None] = mapped_column(
@@ -90,6 +96,13 @@ class User(Base):
     def locked_now(self, now: datetime) -> bool:
         lu = _tz(self.locked_until)
         return lu is not None and lu > now
+
+
+@event.listens_for(User, "before_insert")
+@event.listens_for(User, "before_update")
+def _identity_keys(mapper, connection, user: User) -> None:
+    user.email_key = identity.email_key(user.email)
+    user.phone_key = identity.phone_key(user.phone)
 
 
 class AuthSession(Base):

@@ -350,4 +350,6 @@ def test_team_changes_are_in_the_history(app):
     _put(t1, ("student", "s1", {"firstName": "Ali", "assignedSpecialistIds": team}))
     upd = _boss(app).get("/api/admin/changes").json()[0]
     assert upd["fields"] == ["team"]
-    assert upd["before"] == {"team": [ids["t1@1-maktab.uz"]]} and upd["after"] == {"team": team}
+    # Shown by name, not by internal id.
+    assert upd["before"] == {"team": ["Test Foydalanuvchi"]}
+    assert upd["after"] == {"team": ["Test Foydalanuvchi", "Test Foydalanuvchi"]}

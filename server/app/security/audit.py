@@ -15,6 +15,15 @@ from ..models import AuditEvent, utcnow
 
 log = logging.getLogger("individ.security")
 
+# Set by the app (main.create_app): emails an alert to the system
+# administrators. Without it alerts reach only the log and the webhook.
+_mail_alert = None
+
+
+def configure_mail_alerts(fn) -> None:
+    global _mail_alert
+    _mail_alert = fn
+
 # Detection thresholds: this many warning events from one IP within the window
 # raises a SUSPICIOUS_ACTIVITY alert (at most one alert per IP per window).
 SUSPICIOUS_THRESHOLD = 10
@@ -68,6 +77,11 @@ def record(
         _detect_burst(db, ip, webhook_url)
     if severity == "alert":
         _send_alert(webhook_url, line)
+        if _mail_alert is not None:
+            try:
+                _mail_alert(action, event.subject, event.ip, event.detail)
+            except Exception:  # noqa: BLE001 - alerting must never break requests
+                log.error("alert mail failed")
 
 
 def _detect_burst(db: Session, ip: str, webhook_url: str) -> None:

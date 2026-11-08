@@ -12,6 +12,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
+from .. import identity
 from ..access import TEAM_ROLES
 from ..context import AppContext
 from ..deps import ADMIN_ROLES, ApiError, Principal, get_ctx, get_db, require_admin, require_super
@@ -119,8 +120,10 @@ def list_users(q: str = Query(default="", max_length=100), offset: int = Query(d
 def create_user(body: UserCreateIn, p: Principal = Depends(require_admin),
                 db: Session = Depends(get_db), ctx: AppContext = Depends(get_ctx)):
     email = body.email.lower()
-    if db.scalar(select(User).where(User.email == email)):
+    if identity.find_by_email(db, email):
         raise ApiError(409, "exists", "Bu email bilan hisob mavjud")
+    if identity.phone_taken(db, body.phone):
+        raise ApiError(409, "phone_taken", "Bu telefon raqami bilan hisob allaqachon bor")
     if body.institution_id and db.get(Institution, body.institution_id) is None:
         raise ApiError(422, "bad_institution", "Muassasa topilmadi")
     scope = _scope(p)
@@ -353,7 +356,25 @@ def changes(kind: str | None = Query(default=None, pattern=r"^[a-z_]{1,32}$"),
     if before_id:
         stmt = stmt.where(RecordChange.id < before_id)
     rows = db.scalars(stmt).all()
-    names = {u.id: u.full_name for u in db.scalars(select(User).where(User.id.in_({r.user_id for r in rows} or {""})))}
+    values = {r.id: (json.loads(r.before) if r.before else None, json.loads(r.after) if r.after else None)
+              for r in rows}
+    # People named in team changes are shown by name, not by internal id.
+    people = {r.user_id for r in rows}
+    for before, after in values.values():
+        for side in (before, after):
+            if side:
+                people |= set(side.get("team") or []) | ({side["teamCoordinator"]} if side.get("teamCoordinator") else set())
+    names = {u.id: u.full_name for u in db.scalars(select(User).where(User.id.in_(people or {""})))}
+
+    def named(side: dict | None) -> dict | None:
+        if not side:
+            return side
+        side = dict(side)
+        if "team" in side:
+            side["team"] = [names.get(i, "Noma’lum xodim") for i in side["team"] or []]
+        if side.get("teamCoordinator"):
+            side["teamCoordinator"] = names.get(side["teamCoordinator"], "Noma’lum xodim")
+        return side
     kids: dict[str, str] = {}
     for sid in {r.student_id or (r.rid if r.kind == "student" else "") for r in rows} - {""}:
         rec = db.get(Record, ("student", sid))
@@ -365,8 +386,8 @@ def changes(kind: str | None = Query(default=None, pattern=r"^[a-z_]{1,32}$"),
         "student_name": kids.get(r.student_id or (r.rid if r.kind == "student" else ""), ""),
         "user_id": r.user_id, "user_name": names.get(r.user_id, ""), "institution_id": r.institution_id,
         "fields": [f for f in r.fields.split(",") if f],
-        "before": json.loads(r.before) if r.before else None,
-        "after": json.loads(r.after) if r.after else None,
+        "before": named(values[r.id][0]),
+        "after": named(values[r.id][1]),
     } for r in rows]
 
 

@@ -556,7 +556,7 @@ class _EmailCodeStepState extends State<_EmailCodeStep> {
       icon: LucideIcons.mailCheck,
       title: 'Kirishni tasdiqlang',
       subtitle:
-          'Administrator hisobi xavfsizligi uchun ${_maskEmail(email)} manziliga '
+          'Hisobingiz xavfsizligi uchun ${_maskEmail(email)} manziliga '
           '6 xonali kod yuborildi. Kod 10 daqiqa amal qiladi. Xat ko‘rinmasa, '
           '“Spam” papkasini ham tekshiring.',
       onBack: widget.onBack,
