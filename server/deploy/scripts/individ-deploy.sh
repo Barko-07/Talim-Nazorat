@@ -11,6 +11,7 @@
 #   sudo individ-deploy migrate ~/NNN_x.sql   run one SQL migration as postgres (after a backup)
 #   sudo individ-deploy backup                take a backup now
 #   sudo individ-deploy status                service state, health, last errors
+#   sudo individ-deploy logs [hours]          read-only: API log and mail log (default 24 h)
 set -euo pipefail
 umask 027
 
@@ -101,8 +102,18 @@ case "${1:-}" in
     health || true
     journalctl -u individ-api --since "1 hour ago" -p warning --no-pager | tail -10
     ;;
+  logs)
+    # Read-only diagnostics for the deploy user (who cannot read the system
+    # journal): what the API did and what the mail server did with each email.
+    hours="${2:-24}"
+    case "$hours" in ''|*[!0-9]*) echo "hours must be a number" >&2; exit 2 ;; esac
+    echo "== API (last ${hours} h)"
+    journalctl -u individ-api --since "${hours} hours ago" --no-pager -o short-iso | tail -200
+    echo "== mail (last 120 lines)"
+    tail -120 /var/log/mail.log 2>/dev/null || journalctl -u postfix@- --since "${hours} hours ago" --no-pager | tail -120
+    ;;
   *)
-    echo "usage: individ-deploy server|web|migrate <file> | backup | status" >&2
+    echo "usage: individ-deploy server|web|migrate <file> | backup | status | logs [hours]" >&2
     exit 2
     ;;
 esac
