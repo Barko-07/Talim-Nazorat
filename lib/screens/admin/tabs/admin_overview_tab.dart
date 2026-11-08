@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/namangan_data.dart';
+import '../../../core/widgets/glass_widgets.dart';
 import '../../../models/user_model.dart';
 import '../../../models/student_model.dart';
 import '../../../providers/app_provider.dart';
@@ -376,8 +377,14 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     if (_selectedPeriod != 'Barcha davr') activeFiltersCount++;
     if (_selectedDomain != 'Barchasi') activeFiltersCount++;
 
+    final narrow = MediaQuery.sizeOf(context).width < 600;
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      padding: EdgeInsets.fromLTRB(
+        narrow ? 16 : 20,
+        narrow ? 10 : 12,
+        narrow ? 16 : 20,
+        24,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -389,7 +396,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                     ? (user?.institutionName ?? 'Ta’lim muassasasi')
                     : 'Namangan viloyati',
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
 
           // 2. Eng muhim topilma va uni hal qiladigan amal
           AdminAttentionCard(
@@ -408,18 +415,27 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 'Ro‘yxatdagi bolalar',
                 totalChildren,
                 'nafar',
+                icon: LucideIcons.users,
+                color: AppColors.primary,
+                caption: 'Inklyuziv ro‘yxatda',
                 onTap: () => widget.onNavigateTab(3),
               ),
               AdminMetric(
                 'Faol mutaxassislar',
                 activeSpecialistsCount,
                 'nafar',
+                icon: LucideIcons.userCheck,
+                color: AppColors.success,
+                caption: 'Faol hisoblar',
                 onTap: () => widget.onNavigateTab(2),
               ),
               AdminMetric(
                 'Ishlanmagan bolalar',
                 unworkedRedCount,
                 'nafar',
+                icon: LucideIcons.userX,
+                color: AppColors.error,
+                caption: '30 kundan ortiq faoliyatsiz',
                 alert: true,
                 onTap: () => widget.onNavigateTab(8),
               ),
@@ -427,23 +443,32 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 'Tugallanmagan baholashlar',
                 incompleteAssessmentsCount,
                 'ta',
+                icon: LucideIcons.clipboardList,
+                color: AppColors.warning,
+                caption: 'Yakunlanmagan yoki boshlanmagan',
                 onTap: () => widget.onNavigateTab(8),
               ),
               AdminMetric(
                 'Faol ITR rejalari',
                 activeIepPlansCount,
                 'ta',
+                icon: LucideIcons.bookOpenCheck,
+                color: AppColors.info,
+                caption: 'Ijro etilayotgan',
                 onTap: () => widget.onNavigateTab(7),
               ),
               AdminMetric(
                 'Kutilayotgan yo‘naltirishlar',
                 pendingReferralsCount,
                 'ta',
+                icon: LucideIcons.arrowLeftRight,
+                color: AppColors.purple,
+                caption: 'Javob kutmoqda',
                 onTap: () => widget.onNavigateTab(11),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           // Svetofor holati
           _buildSvetoforStrip(
@@ -465,41 +490,49 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 'Foydalanuvchilar',
                 LucideIcons.userCog,
                 () => widget.onNavigateTab(1),
+                description: 'Hisoblar, tasdiqlash va bloklash',
               ),
               AdminSection(
                 'Ta’lim muassasalari',
                 LucideIcons.building2,
                 () => widget.onNavigateTab(4),
+                description: 'Maktablar va ularning xodimlari',
               ),
               AdminSection(
                 'O‘quvchilar reyestri',
                 LucideIcons.users,
                 () => widget.onNavigateTab(3),
+                description: 'Barcha bolalar va ularning holati',
               ),
               AdminSection(
                 'Mutaxassislar',
                 LucideIcons.contact,
                 () => widget.onNavigateTab(2),
+                description: 'Pedagog va mutaxassislar yuklamasi',
               ),
               AdminSection(
                 'Monitoring',
                 LucideIcons.activity,
                 () => widget.onNavigateTab(8),
+                description: 'Xavf signallari va kechikishlar',
               ),
               AdminSection(
                 'Yo‘naltirishlar',
                 LucideIcons.route,
                 () => widget.onNavigateTab(11),
+                description: 'Mutaxassislararo yo‘naltirishlar',
               ),
               AdminSection(
                 'Hisobotlar',
                 LucideIcons.chartColumn,
                 () => widget.onNavigateTab(7),
+                description: 'Tahliliy hisobot va eksport',
               ),
               AdminSection(
                 'Audit jurnali',
                 LucideIcons.scrollText,
                 () => widget.onNavigateTab(10),
+                description: 'Kim, qachon, nimani o‘zgartirgan',
               ),
             ],
           ),
@@ -953,40 +986,68 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     required int greenCount,
     required int unassignedCount,
   }) {
-    // Bolalar holati: o'quvchilar filtridagi Qizil / Sariq / Yashil ranglari,
-    // "Faol" belgisi uslubidagi ixcham belgilar va bitta havola bir qatorda.
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        crossAxisAlignment: WrapCrossAlignment.center,
+    // Bolalar holati — mutaxassislar bosh sahifasidagi "Svetofor nazorati"
+    // kartasi uslubida.
+    return SurfaceCard(
+      borderRadius: 22,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Bolalar holati',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-              color: AppColors.textPrimary,
-            ),
+          Row(
+            children: [
+              Icon(LucideIcons.activity, size: 19, color: AppColors.primary),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  'Bolalar holati (Svetofor nazorati)',
+                  style: TextStyle(
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () => widget.onNavigateTab(3),
+                child: Text(
+                  'Barcha o‘quvchilar →',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
-          StatusBadge.child(StatusColor.red, 'Qizil $redCount'),
-          StatusBadge.child(StatusColor.yellow, 'Sariq $yellowCount'),
-          StatusBadge.child(StatusColor.green, 'Yashil $greenCount'),
-          if (unassignedCount > 0)
-            StatusBadge(
-              'Mutaxassissiz $unassignedCount',
-              tone: StatusTone.neutral,
-            ),
-          TextButton(
-            onPressed: () => widget.onNavigateTab(3),
-            child: const Text('Barcha o‘quvchilar'),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            children: [
+              StatusPill(
+                label: 'Qizil: $redCount nafar',
+                color: AppColors.error,
+                backgroundColor: AppColors.errorBg,
+              ),
+              StatusPill(
+                label: 'Sariq: $yellowCount nafar',
+                color: AppColors.warning,
+                backgroundColor: AppColors.warningBg,
+              ),
+              StatusPill(
+                label: 'Yashil: $greenCount nafar',
+                color: AppColors.success,
+                backgroundColor: AppColors.successBg,
+              ),
+              if (unassignedCount > 0)
+                StatusPill(
+                  label: 'Mutaxassissiz: $unassignedCount nafar',
+                  color: AppColors.textSecondary,
+                  backgroundColor: AppColors.surfaceMuted,
+                ),
+            ],
           ),
         ],
       ),

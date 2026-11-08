@@ -54,19 +54,31 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Check categorized sidebar headers
-        expect(find.text('Asosiy'), findsOneWidget);
-        expect(find.text('Monitoring va tahlil'), findsOneWidget);
-        expect(find.text('Reyestrlar va kadrlar'), findsOneWidget);
-        expect(find.text('Xavfsizlik va ma’muriyat'), findsOneWidget);
+        // Categorized sidebar headers (capitals, as in the specialist app)
+        expect(find.text('ASOSIY'), findsOneWidget);
+        expect(find.text('MONITORING VA TAHLIL'), findsOneWidget);
+        expect(find.text('REYESTRLAR VA KADRLAR'), findsOneWidget);
 
         // Check categorized items
-        expect(find.text('Boshqaruv paneli'), findsOneWidget);
+        // In the menu and as the page title in the top bar.
+        expect(find.text('Boshqaruv paneli'), findsWidgets);
         expect(find.text('Monitoring markazi'), findsOneWidget);
         expect(find.text('Tahliliy hisobotlar'), findsOneWidget);
         expect(find.text('O‘quvchilar reyestri'), findsWidgets);
         expect(find.text('Pedagog-mutaxassislar'), findsOneWidget);
         expect(find.text('Yo‘naltirishlar jurnali'), findsOneWidget);
+        // The menu scrolls: bring the last group into view.
+        await tester.scrollUntilVisible(
+          find.text('XAVFSIZLIK VA MA’MURIYAT'),
+          200,
+          scrollable: find
+              .ancestor(
+                of: find.text('MONITORING VA TAHLIL'),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+        );
+        expect(find.text('XAVFSIZLIK VA MA’MURIYAT'), findsOneWidget);
 
         await tester.pumpWidget(const SizedBox());
         auth.dispose();
@@ -225,9 +237,11 @@ void main() {
         await tester.pumpAndSettle();
 
         // Should display institution-specific title and badge
+        // Role as a badge, the school on its own line.
+        expect(find.text('Muassasa rahbari'), findsWidgets);
         expect(
-          find.text('Muassasa rahbari · 5-sonli umumiy o‘rta ta’lim maktabi'),
-          findsOneWidget,
+          find.text('5-sonli umumiy o‘rta ta’lim maktabi'),
+          findsWidgets,
         );
         expect(find.textContaining('Namangan viloyati'), findsNothing);
 

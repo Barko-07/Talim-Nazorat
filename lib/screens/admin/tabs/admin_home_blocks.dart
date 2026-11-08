@@ -2,14 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/glass_widgets.dart';
 import '../../../models/user_model.dart';
 
-// Administrator bosh sahifasining yuqori qismi — my.gov.uz ilovasi uslubida:
-// salomlashuv va ism, eng muhim topilma, bitta bo'lingan ko'rsatkichlar
-// kartasi va "Sohalar" plitkalari kabi bo'limlar to'ri. Rang faqat holat
-// va asosiy amalda; ikonalar bitta rangdagi chiziqli Lucide.
+// Administrator bosh sahifasining bloklari — mutaxassislar ilovasining bosh
+// sahifasi bilan bir xil uslubda (SurfaceCard, StatusPill, ikonali KPI).
 
-/// "Xush kelibsiz" va administrator ismi, ostida roli va hududi.
+String _initials(String? fullName) {
+  final parts =
+      (fullName ?? '')
+          .trim()
+          .split(RegExp(r'\s+'))
+          .where((p) => p.isNotEmpty)
+          .toList();
+  if (parts.isEmpty) return 'A';
+  if (parts.length == 1) return parts.first[0].toUpperCase();
+  return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+}
+
+/// Profil kartasi: monogramma, "Xush kelibsiz" va ism, rol belgisi, hudud.
 class AdminWelcome extends StatelessWidget {
   const AdminWelcome({super.key, required this.user, required this.scope});
 
@@ -20,36 +31,83 @@ class AdminWelcome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Xush kelibsiz',
-          style: TextStyle(fontSize: 15.5, color: AppColors.textMuted),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          user?.fullName ?? 'Administrator',
-          style: TextStyle(
-            fontSize: 24,
-            height: 1.2,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.3,
-            color: AppColors.textPrimary,
+    return SurfaceCard(
+      borderRadius: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.primaryTint),
+            ),
+            child: Text(
+              _initials(user?.fullName),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+              ),
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '${user?.role.label ?? 'Tizim administratori'} · $scope',
-          style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
-        ),
-      ],
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Xush kelibsiz',
+                  style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+                ),
+                const SizedBox(height: 2),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      user?.fullName ?? 'Administrator',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    StatusPill(
+                      label: user?.role.label ?? 'Tizim administratori',
+                      color: AppColors.primary,
+                      backgroundColor: AppColors.primaryLight,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  scope,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-/// Bugungi eng muhim fakt va uni hal qiladigan bitta amal. Hammasi joyida
-/// bo'lsa, buni ochiq aytadi (yashil emas, sokin matn bilan).
+/// Bugungi eng muhim holat. Muammo bo'lsa — sariq (yoki qizil) karta va
+/// "Monitoringni ko'rish"; hammasi joyida bo'lsa — sokin yashil belgi.
 class AdminAttentionCard extends StatelessWidget {
   const AdminAttentionCard({
     super.key,
@@ -73,65 +131,90 @@ class AdminAttentionCard extends StatelessWidget {
       if (incompleteAssessments > 0)
         '$incompleteAssessments ta baholash tugallanmagan',
     ];
-    final urgent = unworked > 0;
     final calm = parts.isEmpty;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-      decoration: BoxDecoration(
-        color:
-            calm
-                ? AppColors.surface
-                : (urgent ? AppColors.errorBg : AppColors.warningBg),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color:
-              calm
-                  ? AppColors.border
-                  : (urgent ? AppColors.errorBorder : AppColors.warningBorder),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            calm ? LucideIcons.circleCheck : LucideIcons.triangleAlert,
-            size: 22,
-            color:
+    final urgent = unworked > 0;
+    final tone =
+        calm
+            ? AppColors.success
+            : (urgent ? AppColors.error : AppColors.warning);
+
+    return SurfaceCard(
+      borderRadius: 22,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      backgroundColor:
+          calm
+              ? AppColors.surface
+              : (urgent ? AppColors.errorBg : AppColors.warningBg),
+      borderColor:
+          calm
+              ? AppColors.border
+              : (urgent ? AppColors.errorBorder : AppColors.warningBorder),
+      onTap: calm ? null : onOpen,
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final text = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                calm ? 'Hammasi nazoratda' : 'Diqqat talab',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
                 calm
-                    ? AppColors.success
-                    : (urgent ? AppColors.error : AppColors.warning),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
+                    ? 'Kechikkan ish, javobsiz yo‘naltirish yoki tugallanmagan baholash yo‘q.'
+                    : '${parts.join('. ')}.',
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.35,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          );
+          final icon = Icon(
+            calm ? LucideIcons.circleCheck : LucideIcons.triangleAlert,
+            color: tone,
+            size: 21,
+          );
+          final pill = StatusPill(
+            label: 'Monitoringni ko‘rish',
+            color: tone,
+            backgroundColor: AppColors.surface,
+            icon: LucideIcons.arrowUpRight,
+          );
+          if (c.maxWidth < 430) {
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  calm ? 'Hammasi nazoratda' : 'Diqqat talab',
-                  style: TextStyle(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: icon,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(child: text),
+                  ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  calm
-                      ? 'Kechikkan ish, javobsiz yo‘naltirish yoki tugallanmagan baholash yo‘q.'
-                      : parts.join('. '),
-                  style: TextStyle(
-                    fontSize: 14,
-                    height: 1.4,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
+                if (!calm) ...[const SizedBox(height: 10), pill],
               ],
-            ),
-          ),
-          if (!calm) ...[
-            const SizedBox(width: 8),
-            TextButton(onPressed: onOpen, child: const Text('Ko‘rish')),
-          ],
-        ],
+            );
+          }
+          return Row(
+            children: [
+              icon,
+              const SizedBox(width: 14),
+              Expanded(child: text),
+              if (!calm) ...[const SizedBox(width: 12), pill],
+            ],
+          );
+        },
       ),
     );
   }
@@ -142,6 +225,9 @@ class AdminMetric {
     this.label,
     this.value,
     this.unit, {
+    this.icon = LucideIcons.chartColumn,
+    this.color,
+    this.caption = '',
     this.alert = false,
     this.onTap,
   });
@@ -149,14 +235,19 @@ class AdminMetric {
   final String label;
   final int value;
   final String unit;
+  final IconData icon;
+  final Color? color;
+
+  /// Qiymat ostidagi qisqa izoh (masalan "Inklyuziv ro'yxatda").
+  final String caption;
 
   /// Noldan katta bo'lsa — qiymat xato rangida (masalan ishlanmagan bolalar).
   final bool alert;
   final VoidCallback? onTap;
 }
 
-/// Bitta karta, ichi ingichka chiziqlar bilan teng kataklarga bo'lingan:
-/// yorliq tepada kulrang, qiymat ostida. Ikona va rangli plitka yo'q.
+/// Ko'rsatkichlar: mutaxassislar bosh sahifasidagi KPI kartalari kabi —
+/// nom, o'ng burchakda rangli ikona, katta qiymat va izoh.
 class AdminMetricsCard extends StatelessWidget {
   const AdminMetricsCard({super.key, required this.metrics});
 
@@ -164,128 +255,123 @@ class AdminMetricsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, c) {
-        final columns = c.maxWidth >= 900 ? 3 : 2;
-        // Kataklar qatorlab, har qator eng baland katak bo'yicha teng —
-        // ikki qatorli yorliq ajratuvchi chiziqlarni uzmasin.
-        final rows = <List<AdminMetric>>[
-          for (var i = 0; i < metrics.length; i += columns)
-            metrics.sublist(i, (i + columns).clamp(0, metrics.length)),
-        ];
-        return Container(
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Column(
-            children: [
-              for (var r = 0; r < rows.length; r++)
-                IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      for (var i = 0; i < columns; i++)
-                        Expanded(
-                          child:
-                              i < rows[r].length
-                                  ? _cell(
-                                    rows[r][i],
-                                    rightRule: i != columns - 1,
-                                    bottomRule: r != rows.length - 1,
-                                  )
-                                  : const SizedBox.shrink(),
-                        ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
+    // Telefonda ikki ustun tor: ichki bo'shliq va ikona kichikroq, so'zlar
+    // bo'linmasin.
+    final compact = MediaQuery.sizeOf(context).width < 600;
+    return ResponsiveGlassGrid(
+      mobileColumns: 2,
+      tabletColumns: 3,
+      desktopColumns: 3,
+      spacing: 10,
+      children: [for (final m in metrics) _card(m, compact)],
     );
   }
 
-  Widget _cell(
-    AdminMetric m, {
-    required bool rightRule,
-    required bool bottomRule,
-  }) {
+  Widget _card(AdminMetric m, bool compact) {
+    final color = m.color ?? AppColors.primary;
     final valueColor =
         m.alert && m.value > 0 ? AppColors.error : AppColors.textPrimary;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: m.onTap,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-          decoration: BoxDecoration(
-            border: Border(
-              right:
-                  rightRule
-                      ? BorderSide(color: AppColors.borderLight)
-                      : BorderSide.none,
-              bottom:
-                  bottomRule
-                      ? BorderSide(color: AppColors.borderLight)
-                      : BorderSide.none,
-            ),
-          ),
-          child: Column(
+    final iconBox = compact ? 30.0 : 36.0;
+    return SurfaceCard(
+      borderRadius: 16,
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 13 : 18,
+        vertical: compact ? 14 : 16,
+      ),
+      onTap: m.onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                m.label,
-                maxLines: 2,
-                style: TextStyle(
-                  fontSize: 13,
-                  height: 1.3,
-                  color: AppColors.textMuted,
+              Expanded(
+                child: Text(
+                  m.label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: compact ? 12.5 : 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                    height: 1.25,
+                  ),
                 ),
               ),
-              const SizedBox(height: 6),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: '${m.value}',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: valueColor,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                    TextSpan(
-                      text: ' ${m.unit}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                  ],
+              const SizedBox(width: 6),
+              Container(
+                width: iconBox,
+                height: iconBox,
+                decoration: BoxDecoration(
+                  color: color.withValues(
+                    alpha: AppColors.isDark ? 0.20 : 0.10,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                child: Icon(m.icon, color: color, size: compact ? 16 : 19),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 12),
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '${m.value}',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.7,
+                    color: valueColor,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+                TextSpan(
+                  text: ' ${m.unit}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (m.caption.isNotEmpty) ...[
+            const SizedBox(height: 3),
+            Text(
+              m.caption,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
 }
 
 class AdminSection {
-  const AdminSection(this.title, this.icon, this.onTap);
+  const AdminSection(
+    this.title,
+    this.icon,
+    this.onTap, {
+    this.description = '',
+  });
 
   final String title;
   final IconData icon;
   final VoidCallback onTap;
+  final String description;
 }
 
-/// Bo'limlar to'ri — my.gov.uz "Sohalar" plitkalari kabi: chapda nom,
-/// o'ngda chiziqli ikona; telefonda 2 ta, kengroq ekranda 4 ta ustun.
+/// Bo'limlar — my.gov.uz xizmatlar to'ri kabi: ikona, nom, qisqa izoh va
+/// o'q (mutaxassislar ilovasidagi "ish maydoni" plitkalari uslubida).
 class AdminSectionsGrid extends StatelessWidget {
   const AdminSectionsGrid({super.key, required this.sections});
 
@@ -293,61 +379,75 @@ class AdminSectionsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, c) {
-        final columns = c.maxWidth >= 900 ? 4 : 2;
-        const gap = 10.0;
-        final w = (c.maxWidth - gap * (columns - 1)) / columns;
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
-          children: [
-            for (final s in sections) SizedBox(width: w, child: _tile(s)),
-          ],
-        );
-      },
+    return ResponsiveGlassGrid(
+      mobileColumns: 1,
+      tabletColumns: 2,
+      desktopColumns: 3,
+      spacing: 10,
+      children: [for (final s in sections) _tile(s)],
     );
   }
 
   Widget _tile(AdminSection s) {
-    return Material(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: s.onTap,
-        child: Container(
-          height: 76,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+    return SurfaceCard(
+      elevated: false,
+      borderRadius: 14,
+      padding: const EdgeInsets.all(16),
+      backgroundColor: AppColors.glassWellFill,
+      borderColor: AppColors.glassInnerBorder,
+      onTap: s.onTap,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(s.icon, color: AppColors.primary, size: 22),
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
                   s.title,
-                  maxLines: 2,
                   style: TextStyle(
-                    fontSize: 14.5,
-                    height: 1.25,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Icon(s.icon, size: 26, color: AppColors.primary),
-            ],
+                if (s.description.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    s.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
-        ),
+          const SizedBox(width: 6),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(
+              LucideIcons.chevronRight,
+              size: 16,
+              color: AppColors.textSubtle,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-/// Bo'lim sarlavhasi: 17/600, ixtiyoriy o'ng tomondagi havola bilan.
+/// Bo'lim sarlavhasi (mutaxassislar ilovasidagi karta sarlavhalari kabi).
 class AdminSectionTitle extends StatelessWidget {
   const AdminSectionTitle(this.text, {super.key, this.action, this.onAction});
 
@@ -358,21 +458,32 @@ class AdminSectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 10, top: 4),
       child: Row(
         children: [
           Expanded(
             child: Text(
               text,
               style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.2,
                 color: AppColors.textPrimary,
               ),
             ),
           ),
           if (action != null)
-            TextButton(onPressed: onAction, child: Text(action!)),
+            InkWell(
+              onTap: onAction,
+              child: Text(
+                '$action →',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
         ],
       ),
     );
