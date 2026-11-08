@@ -315,3 +315,28 @@ def test_a_school_administrator_hears_about_sign_ups_that_name_their_school(api,
     assert api.post("/api/auth/register/verify", {"registration_id": reg_id, "code": code}).status_code == 200
     to = {m.to for m in app.state.ctx.mailer.outbox}
     assert "dir14@maktab.uz" in to and "dir15@maktab.uz" not in to
+
+
+def test_a_sign_up_rings_the_administrators_bell_in_the_app(api, app):
+    from conftest import Api as _Api
+
+    mine = add_institution(app, "14-sonli maktab")
+    boss = add_user(app, "root@maktab.uz", Role.SUPER_ADMIN, mfa=True)
+    add_user(app, "dir14@maktab.uz", Role.INSTITUTION_ADMIN, mine)
+    add_user(app, "t@maktab.uz", Role.TEACHER, mine)
+    reg_id = api.post("/api/auth/register", FORM).json()["registration_id"]
+    code = last_code_for(app, FORM["email"])
+    assert api.post("/api/auth/register/verify", {"registration_id": reg_id, "code": code}).status_code == 200
+
+    def bell(email, **kw):
+        a = _Api(TestClient(app))
+        me = a.login(email, **kw).json()["user"]["id"]
+        # The app shows the ones addressed to the person (a system administrator
+        # can also read others' for oversight).
+        return [n for n in a.get("/api/records").json()["items"]["notification"]
+                if n["recipientUserId"] == me]
+
+    for got in (bell("root@maktab.uz", mfa_secret=boss.mfa_secret), bell("dir14@maktab.uz")):
+        assert len(got) == 1 and got[0]["type"] == "SIGNUP" and "Karimova Dilnoza" in got[0]["body"]
+        assert got[0]["isRead"] is False
+    assert bell("t@maktab.uz") == []  # nobody else hears about it

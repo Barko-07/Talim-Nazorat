@@ -54,12 +54,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Check categorized sidebar headers
-        expect(find.text('Asosiy'), findsOneWidget);
-        expect(find.text('Monitoring va tahlil'), findsOneWidget);
-        expect(find.text('Reyestrlar va kadrlar'), findsOneWidget);
-        expect(find.text('Xavfsizlik va ma’muriyat'), findsOneWidget);
-
+        // Categorized sidebar: the dashboard entry on its own, then the
+        // groups (shown in capitals, as in the design).
+        expect(find.text('MONITORING VA TAHLIL'), findsOneWidget);
+        expect(find.text('REYESTRLAR VA KADRLAR'), findsOneWidget);
         // Check categorized items
         expect(find.text('Boshqaruv paneli'), findsOneWidget);
         expect(find.text('Monitoring markazi'), findsOneWidget);
@@ -67,6 +65,18 @@ void main() {
         expect(find.text('O‘quvchilar reyestri'), findsWidgets);
         expect(find.text('Pedagog-mutaxassislar'), findsOneWidget);
         expect(find.text('Yo‘naltirishlar jurnali'), findsOneWidget);
+        // The menu is a scrolling list: bring the last group into view.
+        await tester.scrollUntilVisible(
+          find.text('XAVFSIZLIK VA MA’MURIYAT'),
+          200,
+          scrollable: find
+              .ancestor(
+                of: find.text('MONITORING VA TAHLIL'),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+        );
+        expect(find.text('XAVFSIZLIK VA MA’MURIYAT'), findsOneWidget);
 
         await tester.pumpWidget(const SizedBox());
         auth.dispose();
@@ -109,7 +119,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // 1. Welcome and the one thing that needs attention
-        expect(find.text('Xush kelibsiz'), findsOneWidget);
+        expect(find.text('Xush kelibsiz,'), findsOneWidget);
         expect(find.text('Diqqat talab'), findsOneWidget);
 
         // 2. Global Filters Card

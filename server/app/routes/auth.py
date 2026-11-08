@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import math
 import secrets
+import uuid
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, Request, Response
@@ -17,6 +18,7 @@ from ..deps import ApiError, Principal, _authenticate, client_ip, get_ctx, get_d
 from ..mailer import MailError
 from ..models import (
     Institution,
+    Record,
     OneTimeCode,
     PendingRegistration,
     RecordChange,
@@ -774,6 +776,29 @@ def _admin_of_named_school(db: Session, admin: User, school_name: str) -> bool:
     return inst is not None and bool(school_name) and norm(inst.name) == norm(school_name)
 
 
+def _signup_notifications(db: Session, user: User, school: str, admins: list[User]) -> None:
+    """The bell in the administrators' app: one notification each, readable only
+    by that administrator (owner and recipient), like any personal item."""
+    now = utcnow().isoformat()
+    for admin in admins:
+        rid = uuid.uuid4().hex
+        db.add(Record(
+            kind="notification", rid=rid, owner_id=admin.id, recipient_id=admin.id,
+            institution_id=admin.institution_id,
+            data=json.dumps({
+                "recipientUserId": admin.id,
+                "title": "Yangi ro‘yxatdan o‘tish",
+                "body": f"{user.full_name}" + (f" ({school})" if school else "")
+                        + " ro‘yxatdan o‘tdi va tasdiqlashingizni kutmoqda.",
+                "type": "SIGNUP",
+                "relatedRecordId": user.id,
+                "isRead": False,
+                "createdAt": now,
+            }, ensure_ascii=False),
+        ))
+    db.commit()
+
+
 @router.post("/register/verify")
 def register_verify(body: RegistrationVerifyIn, request: Request, db: Session = Depends(get_db),
                     ctx: AppContext = Depends(get_ctx)):
@@ -808,6 +833,7 @@ def register_verify(body: RegistrationVerifyIn, request: Request, db: Session = 
     admins = [a for a in db.scalars(select(User).where(
         User.role.in_(("SUPER_ADMIN", "INSTITUTION_ADMIN")), User.is_active.is_(True)))
         if a.role == "SUPER_ADMIN" or _admin_of_named_school(db, a, data["profile"].get("institution_name", ""))]
+    _signup_notifications(db, user, data["profile"].get("institution_name", ""), admins)
     for admin in admins:
         notify(db, ctx, admin.email, "Individ: yangi ro‘yxatdan o‘tish",
                         f"{user.full_name} ({data['profile'].get('institution_name', '')}) ro‘yxatdan o‘tdi va "
