@@ -44,7 +44,9 @@ from ..security import audit, mfa, passwords, sessions
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-GENERIC_LOGIN_ERROR = "Login yoki parol noto‘g‘ri, yoki hisob vaqtincha bloklangan"
+# The same answer for a wrong password, an unknown email and a locked account,
+# so the form cannot be used to find out which emails have accounts.
+GENERIC_LOGIN_ERROR = "Login yoki parol noto‘g‘ri"
 MAX_LOCK = timedelta(hours=24)
 
 
