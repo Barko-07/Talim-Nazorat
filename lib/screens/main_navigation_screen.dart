@@ -1172,19 +1172,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     required int unreadNotifCount,
   }) {
     final showMenuIsland = !isDesktop || !_isDesktopSidebarOpen;
-    final mediaPadding = MediaQuery.paddingOf(context);
-    const menuIslandRadius = BorderRadius.only(
-      topLeft: Radius.zero,
-      bottomLeft: Radius.zero,
-      topRight: Radius.circular(28),
-      bottomRight: Radius.circular(28),
-    );
-    const mainBarRadius = BorderRadius.only(
-      topLeft: Radius.circular(28),
-      bottomLeft: Radius.circular(28),
-      topRight: Radius.zero,
-      bottomRight: Radius.zero,
-    );
+    const islandRadius = BorderRadius.all(Radius.circular(24));
 
     return SafeArea(
       bottom: false,
@@ -1192,9 +1180,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       right: false,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-          showMenuIsland ? 0 : 20,
+          isDesktop ? 20 : 12,
           isDesktop ? 14 : 8,
-          0,
+          isDesktop ? 20 : 12,
           6,
         ),
         child: IntrinsicHeight(
@@ -1203,17 +1191,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             children: [
               if (showMenuIsland) ...[
                 GlassSurface(
-                  customBorderRadius: menuIslandRadius,
+                  customBorderRadius: islandRadius,
                   borderColor: AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 44,
+                  blur: 20,
                   opacity: AppColors.navGlassOpacity,
                   boxShadow: AppColors.navShadow,
                   padding: EdgeInsets.zero,
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      borderRadius: menuIslandRadius,
+                      borderRadius: islandRadius,
                       onTap: () {
                         if (isDesktop) {
                           setState(() => _isDesktopSidebarOpen = true);
@@ -1224,11 +1212,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(minHeight: 54),
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            15 + mediaPadding.left,
-                            0,
-                            18,
-                            0,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isDesktop ? 16 : 14,
                           ),
                           child: Center(
                             child: Tooltip(
@@ -1249,16 +1234,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               ],
               Expanded(
                 child: GlassSurface(
-                  customBorderRadius: mainBarRadius,
+                  customBorderRadius: islandRadius,
                   borderColor: AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 44,
+                  blur: 20,
                   opacity: AppColors.navGlassOpacity,
                   boxShadow: AppColors.navShadow,
                   padding: EdgeInsets.fromLTRB(
-                    isDesktop ? 22 : 16,
+                    isDesktop ? 22 : 14,
                     8,
-                    (isDesktop ? 24 : 12) + mediaPadding.right,
+                    isDesktop ? 20 : 10,
                     8,
                   ),
                   child: ConstrainedBox(
@@ -1760,45 +1745,33 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget _buildMobileFrostedBottomBar(BuildContext context, AppProvider app) {
     final quickTabs = _navItems.take(4).toList();
     final isMoreActive = _selectedIndex >= 4;
-    final mediaPadding = MediaQuery.paddingOf(context);
 
-    const leftIslandRadius = BorderRadius.only(
-      topLeft: Radius.zero,
-      bottomLeft: Radius.zero,
-      topRight: Radius.circular(28),
-      bottomRight: Radius.circular(28),
-    );
-    const rightIslandRadius = BorderRadius.only(
-      topLeft: Radius.circular(28),
-      bottomLeft: Radius.circular(28),
-      topRight: Radius.zero,
-      bottomRight: Radius.zero,
-    );
+    const bottomIslandRadius = BorderRadius.all(Radius.circular(24));
 
     return SafeArea(
       top: false,
       left: false,
       right: false,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
         child: SizedBox(
           height: 54,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Chap tarafga yopishgan asosiy kengayuvchi Island
+              // 1. Chap tarafdagi asosiy kengayuvchi Island
               Expanded(
                 flex: isMoreActive ? 14 : 23,
                 child: GlassSurface(
-                  customBorderRadius: leftIslandRadius,
+                  customBorderRadius: bottomIslandRadius,
                   borderColor: AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 44,
+                  blur: 20,
                   opacity: AppColors.navGlassOpacity,
                   boxShadow: AppColors.navShadow,
-                  padding: EdgeInsets.fromLTRB(mediaPadding.left + 5, 5, 5, 5),
+                  padding: const EdgeInsets.all(5),
                   child: ClipRRect(
-                    borderRadius: leftIslandRadius,
+                    borderRadius: bottomIslandRadius,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children:
@@ -1886,22 +1859,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              // 2. O'ng tarafga yopishgan "Barchasi" Island
+              // 2. O'ng tarafdagi "Barchasi" Island
               Expanded(
                 flex: isMoreActive ? 16 : 7,
                 child: GlassSurface(
-                  customBorderRadius: rightIslandRadius,
+                  customBorderRadius: bottomIslandRadius,
                   borderColor:
                       isMoreActive
                           ? AppColors.primary.withValues(alpha: 0.28)
                           : AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 44,
+                  blur: 20,
                   opacity: AppColors.navGlassOpacity,
                   boxShadow: AppColors.navShadow,
-                  padding: EdgeInsets.fromLTRB(5, 5, mediaPadding.right + 5, 5),
+                  padding: const EdgeInsets.all(5),
                   child: ClipRRect(
-                    borderRadius: rightIslandRadius,
+                    borderRadius: bottomIslandRadius,
                     child: TactileBounce(
                       onTap: () => _showMobileModulesSheet(context, app),
                       pressedScale: 0.94,

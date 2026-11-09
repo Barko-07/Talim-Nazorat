@@ -205,7 +205,11 @@ class GlassSurface extends StatelessWidget {
       content = ClipRRect(
         borderRadius: radius,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+          filter: ImageFilter.blur(
+            sigmaX: blur,
+            sigmaY: blur,
+            tileMode: TileMode.clamp,
+          ),
           child: content,
         ),
       );
@@ -379,6 +383,7 @@ class _SurfaceCardState extends State<SurfaceCard> {
                 filter: ImageFilter.blur(
                   sigmaX: widget.blur,
                   sigmaY: widget.blur,
+                  tileMode: TileMode.clamp,
                 ),
                 child: cardInner,
               ),
