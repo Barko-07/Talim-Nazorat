@@ -114,10 +114,10 @@ class AppEntry extends StatefulWidget {
 }
 
 class _AppEntryState extends State<AppEntry> {
-  // Ochilishdagi animatsiya (saytda ham, ilovada ham) - bir marta, ekranga
-  // bosilsa o'tkazib yuboriladi, tizimda animatsiyalar o'chirilgan bo'lsa
-  // ko'rsatilmaydi.
-  bool _introDone = false;
+  // Ochilish animatsiyasi: telefon ilovasida - shu IntroScreen. Saytda esa
+  // u web/index.html ichida (sahifa ochilishi bilan darhol, ilova kodi
+  // yuklanayotganda) o'ynaydi, shuning uchun bu yerda qaytarilmaydi.
+  bool _introDone = kIsWeb;
 
   @override
   Widget build(BuildContext context) {
