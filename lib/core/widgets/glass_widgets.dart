@@ -180,7 +180,10 @@ class GlassSurface extends StatelessWidget {
     this.boxShadow,
     this.useBlur = true,
     this.borderWidth = 1.0,
+    this.gradient,
   });
+
+  final Gradient? gradient;
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +195,11 @@ class GlassSurface extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         borderRadius: radius,
-        color: baseColor.withValues(alpha: effectiveOpacity),
+        color:
+            gradient == null
+                ? baseColor.withValues(alpha: effectiveOpacity)
+                : null,
+        gradient: gradient,
         border: Border.all(
           color: borderColor ?? AppColors.glassWhiteBorder,
           width: borderWidth,

@@ -1172,7 +1172,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     required int unreadNotifCount,
   }) {
     final showMenuIsland = !isDesktop || !_isDesktopSidebarOpen;
-    const islandRadius = BorderRadius.all(Radius.circular(24));
+    const menuIslandRadius = BorderRadius.only(
+      topLeft: Radius.zero,
+      bottomLeft: Radius.zero,
+      topRight: Radius.circular(24),
+      bottomRight: Radius.circular(24),
+    );
+    const mainBarRadius = BorderRadius.only(
+      topLeft: Radius.circular(24),
+      bottomLeft: Radius.circular(24),
+      topRight: Radius.zero,
+      bottomRight: Radius.zero,
+    );
 
     return SafeArea(
       bottom: false,
@@ -1180,9 +1191,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       right: false,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-          isDesktop ? 20 : 12,
+          showMenuIsland ? 0 : (isDesktop ? 20 : 12),
           isDesktop ? 14 : 8,
-          isDesktop ? 20 : 12,
+          0,
           6,
         ),
         child: IntrinsicHeight(
@@ -1191,17 +1202,31 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             children: [
               if (showMenuIsland) ...[
                 GlassSurface(
-                  customBorderRadius: islandRadius,
+                  customBorderRadius: menuIslandRadius,
                   borderColor: AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 20,
+                  blur: 16,
                   opacity: AppColors.navGlassOpacity,
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    stops: const [0.0, 0.5, 1.0],
+                    colors: [
+                      AppColors.surface.withValues(alpha: 0.96),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity + 0.1,
+                      ),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity,
+                      ),
+                    ],
+                  ),
                   boxShadow: AppColors.navShadow,
                   padding: EdgeInsets.zero,
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      borderRadius: islandRadius,
+                      borderRadius: menuIslandRadius,
                       onTap: () {
                         if (isDesktop) {
                           setState(() => _isDesktopSidebarOpen = true);
@@ -1234,16 +1259,30 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               ],
               Expanded(
                 child: GlassSurface(
-                  customBorderRadius: islandRadius,
+                  customBorderRadius: mainBarRadius,
                   borderColor: AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 20,
+                  blur: 16,
                   opacity: AppColors.navGlassOpacity,
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    stops: const [0.0, 0.85, 1.0],
+                    colors: [
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity,
+                      ),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity + 0.1,
+                      ),
+                      AppColors.surface.withValues(alpha: 0.96),
+                    ],
+                  ),
                   boxShadow: AppColors.navShadow,
                   padding: EdgeInsets.fromLTRB(
                     isDesktop ? 22 : 14,
                     8,
-                    isDesktop ? 20 : 10,
+                    isDesktop ? 20 : 12,
                     8,
                   ),
                   child: ConstrainedBox(
@@ -1746,32 +1785,57 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final quickTabs = _navItems.take(4).toList();
     final isMoreActive = _selectedIndex >= 4;
 
-    const bottomIslandRadius = BorderRadius.all(Radius.circular(24));
+    const leftIslandRadius = BorderRadius.only(
+      topLeft: Radius.zero,
+      bottomLeft: Radius.zero,
+      topRight: Radius.circular(24),
+      bottomRight: Radius.circular(24),
+    );
+    const rightIslandRadius = BorderRadius.only(
+      topLeft: Radius.circular(24),
+      bottomLeft: Radius.circular(24),
+      topRight: Radius.zero,
+      bottomRight: Radius.zero,
+    );
 
     return SafeArea(
       top: false,
       left: false,
       right: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+        padding: const EdgeInsets.only(bottom: 10),
         child: SizedBox(
           height: 54,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Chap tarafdagi asosiy kengayuvchi Island
+              // 1. Chap tarafga yopishgan asosiy kengayuvchi Island
               Expanded(
                 flex: isMoreActive ? 14 : 23,
                 child: GlassSurface(
-                  customBorderRadius: bottomIslandRadius,
+                  customBorderRadius: leftIslandRadius,
                   borderColor: AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 20,
+                  blur: 16,
                   opacity: AppColors.navGlassOpacity,
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    stops: const [0.0, 0.25, 1.0],
+                    colors: [
+                      AppColors.surface.withValues(alpha: 0.96),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity + 0.1,
+                      ),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity,
+                      ),
+                    ],
+                  ),
                   boxShadow: AppColors.navShadow,
-                  padding: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
                   child: ClipRRect(
-                    borderRadius: bottomIslandRadius,
+                    borderRadius: leftIslandRadius,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children:
@@ -1859,22 +1923,36 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              // 2. O'ng tarafdagi "Barchasi" Island
+              // 2. O'ng tarafga yopishgan "Barchasi" Island
               Expanded(
                 flex: isMoreActive ? 16 : 7,
                 child: GlassSurface(
-                  customBorderRadius: bottomIslandRadius,
+                  customBorderRadius: rightIslandRadius,
                   borderColor:
                       isMoreActive
                           ? AppColors.primary.withValues(alpha: 0.28)
                           : AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 20,
+                  blur: 16,
                   opacity: AppColors.navGlassOpacity,
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    stops: const [0.0, 0.5, 1.0],
+                    colors: [
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity,
+                      ),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity + 0.1,
+                      ),
+                      AppColors.surface.withValues(alpha: 0.96),
+                    ],
+                  ),
                   boxShadow: AppColors.navShadow,
-                  padding: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
                   child: ClipRRect(
-                    borderRadius: bottomIslandRadius,
+                    borderRadius: rightIslandRadius,
                     child: TactileBounce(
                       onTap: () => _showMobileModulesSheet(context, app),
                       pressedScale: 0.94,
