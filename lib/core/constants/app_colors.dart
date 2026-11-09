@@ -220,8 +220,8 @@ class AppColors {
   static Color get cardGlassBorder =>
       _p.isDark ? const Color(0x24FFFFFF) : const Color(0xFFFFFFFF);
   static Color get navGlassBorder =>
-      _p.isDark ? const Color(0x24FFFFFF) : const Color(0x85FFFFFF);
-  static double get navGlassOpacity => _p.isDark ? 0.36 : 0.32;
+      _p.isDark ? const Color(0x30FFFFFF) : const Color(0xB0FFFFFF);
+  static double get navGlassOpacity => _p.isDark ? 0.72 : 0.65;
 
   // Matn
   static Color get textPrimary => _p.textPrimary;
@@ -265,7 +265,14 @@ class AppColors {
     ),
   ];
 
-  static List<BoxShadow> get navShadow => const [];
+  static List<BoxShadow> get navShadow => [
+    BoxShadow(
+      color: _p.shadow.withValues(alpha: _p.isDark ? 0.35 : 0.07),
+      blurRadius: 18,
+      spreadRadius: -2,
+      offset: const Offset(0, 5),
+    ),
+  ];
 
   static List<BoxShadow> get elevatedShadow => [
     BoxShadow(

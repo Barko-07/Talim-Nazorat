@@ -180,7 +180,10 @@ class GlassSurface extends StatelessWidget {
     this.boxShadow,
     this.useBlur = true,
     this.borderWidth = 1.0,
+    this.gradient,
   });
+
+  final Gradient? gradient;
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +195,11 @@ class GlassSurface extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         borderRadius: radius,
-        color: baseColor.withValues(alpha: effectiveOpacity),
+        color:
+            gradient == null
+                ? baseColor.withValues(alpha: effectiveOpacity)
+                : null,
+        gradient: gradient,
         border: Border.all(
           color: borderColor ?? AppColors.glassWhiteBorder,
           width: borderWidth,
@@ -205,7 +212,11 @@ class GlassSurface extends StatelessWidget {
       content = ClipRRect(
         borderRadius: radius,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+          filter: ImageFilter.blur(
+            sigmaX: blur,
+            sigmaY: blur,
+            tileMode: TileMode.clamp,
+          ),
           child: content,
         ),
       );
@@ -379,6 +390,7 @@ class _SurfaceCardState extends State<SurfaceCard> {
                 filter: ImageFilter.blur(
                   sigmaX: widget.blur,
                   sigmaY: widget.blur,
+                  tileMode: TileMode.clamp,
                 ),
                 child: cardInner,
               ),
@@ -704,6 +716,7 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
               padding: pad,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (widget.icon != null) ...[
                     Icon(
@@ -735,104 +748,173 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
   }
 }
 
-/// Barcha ekranlar uchun mobil/desktop tekis tekislangan minimalist sahifa sarlavhasi
+/// Barcha ekranlar uchun mobil/desktop premium qutiga (SurfaceCard) olingan sahifa sarlavhasi
 class AdaptivePageHeader extends StatelessWidget {
   final String title;
   final String subtitle;
+  final String? badge;
   final Widget? action;
   final IconData? icon;
   final bool inlineActionOnMobile;
+  final bool boxed;
+  final double borderRadius;
+  final EdgeInsetsGeometry? padding;
 
   const AdaptivePageHeader({
     super.key,
     required this.title,
     required this.subtitle,
+    this.badge,
     this.action,
     this.icon,
-    this.inlineActionOnMobile = true,
+    this.inlineActionOnMobile = false,
+    this.boxed = true,
+    this.borderRadius = 24,
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
+    // Agar badge berilmagan bo'lsa va subtitle da ' • ' bo'lsa, avtomatik ajratamiz
+    String? effectiveBadge = badge;
+    String effectiveSubtitle = subtitle;
+    if (effectiveBadge == null && subtitle.contains(' • ')) {
+      final parts = subtitle.split(' • ');
+      final first = parts.first.trim();
+      final last = parts.sublist(1).join(' • ').trim();
+      if (first.length <= 42 &&
+          (first.contains('rahbar') ||
+              first.contains('qituvchi') ||
+              first.contains('mutaxassis') ||
+              first.contains('admin') ||
+              first.contains('psixolog') ||
+              first.contains('logoped') ||
+              first.contains('koordinator') ||
+              first.contains('direktor'))) {
+        effectiveBadge = first;
+        effectiveSubtitle = last;
+      }
+    }
+
+    Widget content = LayoutBuilder(
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 560;
 
-        // Agar action inline sig'masa (masalan, filter bar bo'lsa), pastga tushiramiz
-        if (action != null && !inlineActionOnMobile && isCompact) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: isCompact ? 20 : 23,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
-                  wordSpacing: 0.35,
-                  height: 1.2,
-                ),
+        Widget? iconWidget;
+        if (icon != null) {
+          iconWidget = Container(
+            width: isCompact ? 44 : 48,
+            height: isCompact ? 44 : 48,
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.primaryTint,
+                width: 1.0,
               ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: isCompact ? 12.5 : 13.0,
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w400,
-                  height: 1.35,
-                ),
-              ),
-              const SizedBox(height: 12),
-              action!,
-            ],
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              icon,
+              color: AppColors.primary,
+              size: isCompact ? 21 : 23,
+            ),
           );
         }
 
-        return Column(
+        final titleRow = Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: isCompact ? 18.5 : 21,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                letterSpacing: -0.3,
+                height: 1.2,
+              ),
+            ),
+            if (effectiveBadge != null)
+              StatusPill(
+                label: effectiveBadge,
+                color: AppColors.primary,
+                backgroundColor: AppColors.primaryLight,
+              ),
+          ],
+        );
+
+        final textBlock = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: isCompact ? 19.5 : 22.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.2,
-                      wordSpacing: 0.35,
-                      height: 1.2,
-                    ),
-                  ),
-                ),
-                if (action != null) ...[const SizedBox(width: 12), action!],
-              ],
-            ),
-            const SizedBox(height: 4),
+            titleRow,
+            const SizedBox(height: 3.5),
             Text(
-              subtitle,
+              effectiveSubtitle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: isCompact ? 12.5 : 13.0,
                 color: AppColors.textMuted,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.0,
-                wordSpacing: 0.25,
+                fontWeight: FontWeight.w500,
                 height: 1.35,
               ),
             ),
           ],
         );
+
+        // Desktop / Katta ekranlarda yonma-yon gorizontal joylashuv
+        if (!isCompact) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (iconWidget != null) ...[
+                iconWidget,
+                const SizedBox(width: 15),
+              ],
+              Expanded(child: textBlock),
+              if (action != null) ...[
+                const SizedBox(width: 16),
+                action!,
+              ],
+            ],
+          );
+        }
+
+        // Mobilda Boshqaruv kabi: tepada Matn/Ikona, pastda qulay To'liq kenglikdagi Tugma
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (iconWidget != null) ...[
+                  iconWidget,
+                  const SizedBox(width: 13),
+                ],
+                Expanded(child: textBlock),
+              ],
+            ),
+            if (action != null) ...[
+              const SizedBox(height: 14),
+              action!,
+            ],
+          ],
+        );
       },
+    );
+
+    if (!boxed) return content;
+
+    return SurfaceCard(
+      borderRadius: borderRadius,
+      padding:
+          padding ??
+          const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+      child: content,
     );
   }
 }

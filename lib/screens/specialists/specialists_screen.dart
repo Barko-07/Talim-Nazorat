@@ -188,6 +188,7 @@ class SpecialistsScreen extends StatelessWidget {
         children: [
           AdaptivePageHeader(
             title: 'Mutaxassislar shtati',
+            icon: LucideIcons.userCheck,
             subtitle:
                 'Muassasa kadrlari va yuklamasi • ${staffList.length} nafar',
             action:

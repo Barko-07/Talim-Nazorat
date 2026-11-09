@@ -402,6 +402,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
         children: [
           AdaptivePageHeader(
             title: 'Yo‘naltirishlar',
+            icon: LucideIcons.gitPullRequest,
             subtitle:
                 'Konsilium va PMPK yo‘llanmalari • ${referrals.length} ta',
             action: HeaderActionButton(

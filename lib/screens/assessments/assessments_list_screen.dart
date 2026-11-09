@@ -62,8 +62,9 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
         children: [
           AdaptivePageHeader(
             title: 'Kasbiy baholashlar',
-            subtitle:
-                '${currentRole.label} • ${filtered.length} ta diagnostik qayd',
+            icon: LucideIcons.clipboardCheck,
+            badge: currentRole.label,
+            subtitle: '${filtered.length} ta diagnostik qayd',
             action:
                 currentRole.canCreateAssessments
                     ? HeaderActionButton(

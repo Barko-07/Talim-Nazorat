@@ -457,6 +457,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
         children: [
           AdaptivePageHeader(
             title: 'Mashg‘ulotlar jadvali',
+            icon: LucideIcons.calendar,
             subtitle:
                 'Jami ${filtered.length} ta rejalashtirilgan va o‘tilgan dars',
             action: HeaderActionButton(

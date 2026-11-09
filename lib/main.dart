@@ -2,6 +2,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:device_preview/device_preview.dart';
+import 'package:device_preview/presets.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/constants/app_brand.dart';
@@ -16,7 +18,8 @@ import 'screens/main_navigation_screen.dart';
 import 'screens/admin/admin_portal_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+  DevicePreview.enable();
+  DevicePreview.maybeController?.applyPreset(DevicePresets.iPhone16Pro);
 
   // Ilovani bazaning boshlang'ich yuklanishini kutib turmasdan ko'rsatamiz.
   // AuthProvider tayyor holatda bo'lguncha foydalanuvchiga yuklanish ekrani chiqadi.
