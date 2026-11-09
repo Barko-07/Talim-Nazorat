@@ -213,6 +213,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
           children: [
             AdaptivePageHeader(
               title: 'Monitoring tizimi',
+              icon: LucideIcons.activity,
               subtitle:
                   'Xavfli tendensiyalarni erta aniqlash va nazorat qilish',
               inlineActionOnMobile: false,

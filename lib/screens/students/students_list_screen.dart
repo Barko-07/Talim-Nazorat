@@ -97,6 +97,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
         children: [
           AdaptivePageHeader(
             title: 'Bolalar reyestri',
+            icon: LucideIcons.users,
             subtitle:
                 'Ro‘yxatda ${students.length} nafar inklyuziv ta’lim o‘quvchisi',
             // Yangi o'quvchini faqat koordinator va rahbariyat ro'yxatga oladi

@@ -716,6 +716,7 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
               padding: pad,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (widget.icon != null) ...[
                     Icon(
@@ -751,6 +752,7 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
 class AdaptivePageHeader extends StatelessWidget {
   final String title;
   final String subtitle;
+  final String? badge;
   final Widget? action;
   final IconData? icon;
   final bool inlineActionOnMobile;
@@ -762,9 +764,10 @@ class AdaptivePageHeader extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
+    this.badge,
     this.action,
     this.icon,
-    this.inlineActionOnMobile = true,
+    this.inlineActionOnMobile = false,
     this.boxed = true,
     this.borderRadius = 24,
     this.padding,
@@ -772,128 +775,133 @@ class AdaptivePageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Agar badge berilmagan bo'lsa va subtitle da ' • ' bo'lsa, avtomatik ajratamiz
+    String? effectiveBadge = badge;
+    String effectiveSubtitle = subtitle;
+    if (effectiveBadge == null && subtitle.contains(' • ')) {
+      final parts = subtitle.split(' • ');
+      final first = parts.first.trim();
+      final last = parts.sublist(1).join(' • ').trim();
+      if (first.length <= 42 &&
+          (first.contains('rahbar') ||
+              first.contains('qituvchi') ||
+              first.contains('mutaxassis') ||
+              first.contains('admin') ||
+              first.contains('psixolog') ||
+              first.contains('logoped') ||
+              first.contains('koordinator') ||
+              first.contains('direktor'))) {
+        effectiveBadge = first;
+        effectiveSubtitle = last;
+      }
+    }
+
     Widget content = LayoutBuilder(
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 560;
 
-        // Agar action inline sig'masa (masalan, filter bar bo'lsa), pastga tushiramiz
-        if (action != null && !inlineActionOnMobile && isCompact) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  if (icon != null) ...[
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.primaryTint,
-                          width: 1.0,
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(icon, color: AppColors.primary, size: 20),
-                    ),
-                    const SizedBox(width: 12),
-                  ],
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: isCompact ? 18.5 : 21,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                            letterSpacing: -0.2,
-                            wordSpacing: 0.35,
-                            height: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            fontSize: isCompact ? 12.5 : 13.0,
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.w400,
-                            height: 1.35,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+        Widget? iconWidget;
+        if (icon != null) {
+          iconWidget = Container(
+            width: isCompact ? 44 : 48,
+            height: isCompact ? 44 : 48,
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.primaryTint,
+                width: 1.0,
               ),
-              const SizedBox(height: 12),
-              action!,
-            ],
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              icon,
+              color: AppColors.primary,
+              size: isCompact ? 21 : 23,
+            ),
           );
         }
 
-        return Column(
+        final titleRow = Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: isCompact ? 18.5 : 21,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                letterSpacing: -0.3,
+                height: 1.2,
+              ),
+            ),
+            if (effectiveBadge != null)
+              StatusPill(
+                label: effectiveBadge,
+                color: AppColors.primary,
+                backgroundColor: AppColors.primaryLight,
+              ),
+          ],
+        );
+
+        final textBlock = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (icon != null) ...[
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.primaryTint,
-                        width: 1.0,
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(icon, color: AppColors.primary, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                ],
-                Expanded(
-                  child: Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: isCompact ? 18.5 : 21.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.2,
-                      wordSpacing: 0.35,
-                      height: 1.2,
-                    ),
-                  ),
-                ),
-                if (action != null) ...[const SizedBox(width: 10), action!],
-              ],
-            ),
+            titleRow,
             const SizedBox(height: 3.5),
             Text(
-              subtitle,
+              effectiveSubtitle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: isCompact ? 12.5 : 13.0,
                 color: AppColors.textMuted,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.0,
-                wordSpacing: 0.25,
+                fontWeight: FontWeight.w500,
                 height: 1.35,
               ),
             ),
+          ],
+        );
+
+        // Desktop / Katta ekranlarda yonma-yon gorizontal joylashuv
+        if (!isCompact) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (iconWidget != null) ...[
+                iconWidget,
+                const SizedBox(width: 15),
+              ],
+              Expanded(child: textBlock),
+              if (action != null) ...[
+                const SizedBox(width: 16),
+                action!,
+              ],
+            ],
+          );
+        }
+
+        // Mobilda Boshqaruv kabi: tepada Matn/Ikona, pastda qulay To'liq kenglikdagi Tugma
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (iconWidget != null) ...[
+                  iconWidget,
+                  const SizedBox(width: 13),
+                ],
+                Expanded(child: textBlock),
+              ],
+            ),
+            if (action != null) ...[
+              const SizedBox(height: 14),
+              action!,
+            ],
           ],
         );
       },
@@ -905,7 +913,7 @@ class AdaptivePageHeader extends StatelessWidget {
       borderRadius: borderRadius,
       padding:
           padding ??
-          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
       child: content,
     );
   }
