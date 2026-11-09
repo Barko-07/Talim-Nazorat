@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -26,15 +27,29 @@ class _IntroScreenState extends State<IntroScreen> {
   Timer? _timer;
   bool _finished = false;
 
+  /// Animatsiya ekranda haqiqatan ko'rinadigan paytda boshlanadi: saytda
+  /// birinchi kadrdan keyin HTML yuklanish ekrani ~0.4 s da so'nadi; shungacha
+  /// boshlansa, animatsiya uning ortida o'tib ketardi.
+  bool _playing = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _timer ??= Timer(
-      MediaQuery.of(context).disableAnimations
-          ? Duration.zero
-          : IntroScreen.duration,
-      _finish,
-    );
+    if (_timer != null || _playing) return;
+    if (MediaQuery.of(context).disableAnimations) {
+      _timer = Timer(Duration.zero, _finish);
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _timer = Timer(
+        kIsWeb ? const Duration(milliseconds: 450) : Duration.zero,
+        () {
+          if (!mounted) return;
+          setState(() => _playing = true);
+          _timer = Timer(IntroScreen.duration, _finish);
+        },
+      );
+    });
   }
 
   void _finish() {
@@ -64,43 +79,46 @@ class _IntroScreenState extends State<IntroScreen> {
               colors: [AppColors.surface, AppColors.primaryLight],
             ),
           ),
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const BrandMark(height: 104)
-                    .animate()
-                    .fadeIn(duration: 450.ms, curve: Curves.easeOut)
-                    .scale(
-                      begin: const Offset(0.6, 0.6),
-                      end: const Offset(1, 1),
-                      duration: 650.ms,
-                      curve: Curves.easeOutBack,
-                    )
-                    .then(delay: 120.ms)
-                    .shimmer(duration: 900.ms, color: Colors.white70),
-                const SizedBox(height: 22),
-                const BrandWordmark(fontSize: 40)
-                    .animate(delay: 550.ms)
-                    .fadeIn(duration: 400.ms)
-                    .slideY(
-                      begin: 0.35,
-                      end: 0,
-                      duration: 450.ms,
-                      curve: Curves.easeOutCubic,
+          child:
+              !_playing
+                  ? const SizedBox.expand()
+                  : Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const BrandMark(height: 104)
+                            .animate()
+                            .fadeIn(duration: 450.ms, curve: Curves.easeOut)
+                            .scale(
+                              begin: const Offset(0.6, 0.6),
+                              end: const Offset(1, 1),
+                              duration: 650.ms,
+                              curve: Curves.easeOutBack,
+                            )
+                            .then(delay: 120.ms)
+                            .shimmer(duration: 900.ms, color: Colors.white70),
+                        const SizedBox(height: 22),
+                        const BrandWordmark(fontSize: 40)
+                            .animate(delay: 550.ms)
+                            .fadeIn(duration: 400.ms)
+                            .slideY(
+                              begin: 0.35,
+                              end: 0,
+                              duration: 450.ms,
+                              curve: Curves.easeOutCubic,
+                            ),
+                        const SizedBox(height: 10),
+                        Text(
+                          AppBrand.tagline,
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textSecondary,
+                          ),
+                        ).animate(delay: 900.ms).fadeIn(duration: 450.ms),
+                      ],
                     ),
-                const SizedBox(height: 10),
-                Text(
-                  AppBrand.tagline,
-                  style: TextStyle(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
                   ),
-                ).animate(delay: 900.ms).fadeIn(duration: 450.ms),
-              ],
-            ),
-          ),
         ),
       ),
     );

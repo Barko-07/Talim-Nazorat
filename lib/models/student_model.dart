@@ -68,6 +68,15 @@ class StudentModel {
   final String primaryNeed; // Ta'limiy ehtiyoj toifasi
   final String
   supportLevel; // 1-daraja (Yengil), 2-daraja (O'rta), 3-daraja (Intensiv)
+
+  /// Bola qayerda va qanday o'qiydi (educationForms dan biri).
+  final String educationForm;
+
+  static const educationForms = [
+    'Inklyuziv sinf',
+    'Maxsus sinf',
+    'Uyda yakka tartibda',
+  ];
   final String? medicalNotes;
   final String? psychologicalNotes;
   final List<GuardianModel> guardians;
@@ -97,6 +106,7 @@ class StudentModel {
     required this.status,
     required this.primaryNeed,
     required this.supportLevel,
+    this.educationForm = 'Inklyuziv sinf',
     this.medicalNotes,
     this.psychologicalNotes,
     this.guardians = const [],
@@ -138,6 +148,7 @@ class StudentModel {
     String? status,
     String? primaryNeed,
     String? supportLevel,
+    String? educationForm,
     String? medicalNotes,
     String? psychologicalNotes,
     List<GuardianModel>? guardians,
@@ -164,6 +175,7 @@ class StudentModel {
       status: status ?? this.status,
       primaryNeed: primaryNeed ?? this.primaryNeed,
       supportLevel: supportLevel ?? this.supportLevel,
+      educationForm: educationForm ?? this.educationForm,
       medicalNotes: medicalNotes ?? this.medicalNotes,
       psychologicalNotes: psychologicalNotes ?? this.psychologicalNotes,
       guardians: guardians ?? this.guardians,
@@ -193,6 +205,7 @@ class StudentModel {
     'status': status,
     'primaryNeed': primaryNeed,
     'supportLevel': supportLevel,
+    'educationForm': educationForm,
     'medicalNotes': medicalNotes,
     'psychologicalNotes': psychologicalNotes,
     'guardians': guardians.map((g) => g.toJson()).toList(),
@@ -221,6 +234,7 @@ class StudentModel {
     status: json['status'] as String,
     primaryNeed: json['primaryNeed'] as String,
     supportLevel: json['supportLevel'] as String,
+    educationForm: json['educationForm'] as String? ?? 'Inklyuziv sinf',
     medicalNotes: json['medicalNotes'] as String?,
     psychologicalNotes: json['psychologicalNotes'] as String?,
     guardians:

@@ -235,12 +235,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onTap: () => showThemePicker(context),
                   ),
                   _buildMyGovMenuItem(
-                    icon: LucideIcons.languages,
-                    title: 'Ilova tili',
-                    trailingValue: 'O‘zbekcha',
-                    showChevron: false,
-                  ),
-                  _buildMyGovMenuItem(
                     icon: LucideIcons.circleAlert,
                     title: 'Ilova haqida',
                     subtitle: 'Tizim ma’lumotlari va huquqiy me’yorlar',

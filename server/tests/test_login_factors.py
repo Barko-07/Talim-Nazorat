@@ -340,3 +340,12 @@ def test_a_sign_up_rings_the_administrators_bell_in_the_app(api, app):
         assert len(got) == 1 and got[0]["type"] == "SIGNUP" and "Karimova Dilnoza" in got[0]["body"]
         assert got[0]["isRead"] is False
     assert bell("t@maktab.uz") == []  # nobody else hears about it
+
+
+def test_the_sign_up_form_lists_schools_by_name_only(api, app):
+    add_institution(app, "15-sonli maktab")
+    add_institution(app, "14-sonli maktab")
+    r = api.get("/api/auth/institutions")
+    assert r.status_code == 200
+    assert [x["name"] for x in r.json()] == ["14-sonli maktab", "15-sonli maktab"]
+    assert all(set(x) == {"id", "name"} for x in r.json())  # nothing else leaks

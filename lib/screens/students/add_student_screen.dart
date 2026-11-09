@@ -40,6 +40,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   String _guardianRelation = 'Onasi';
   DateTime _dob = DateTime(2018, 5, 10);
   String _selectedDistrict = NamanganData.defaultDistrict;
+  String _educationForm = StudentModel.educationForms.first;
   String _selectedInstitution = '';
 
   static const List<String> _grades = [
@@ -164,6 +165,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
         status: 'Faol',
         primaryNeed: _primaryNeed,
         supportLevel: _supportLevel,
+        educationForm: _educationForm,
         medicalNotes:
             _medicalNotesCtrl.text.trim().isEmpty
                 ? null
@@ -407,6 +409,28 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                   '${_dob.day.toString().padLeft(2, '0')}.${_dob.month.toString().padLeft(2, '0')}.${_dob.year}',
                                 ),
                               ),
+                            ),
+                            const SizedBox(height: 14),
+                            DropdownButtonFormField<String>(
+                              initialValue: _educationForm,
+                              isExpanded: true,
+                              decoration: const InputDecoration(
+                                labelText: 'Ta’lim shakli',
+                              ),
+                              items:
+                                  StudentModel.educationForms
+                                      .map(
+                                        (f) => DropdownMenuItem(
+                                          value: f,
+                                          child: Text(f),
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() => _educationForm = v);
+                                }
+                              },
                             ),
                             const SizedBox(height: 14),
                             if (_ownSchoolOnly(

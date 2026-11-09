@@ -659,6 +659,14 @@ def _new_code() -> str:
     return f"{secrets.randbelow(1_000_000):06d}"
 
 
+@router.get("/institutions")
+def public_institutions(db: Session = Depends(get_db)):
+    """Schools for the sign-up form: names only (public information, no
+    counts or staff). Signing up with a school's exact name lets that school's
+    administrator see and approve the request."""
+    return [{"id": i.id, "name": i.name} for i in db.scalars(select(Institution).order_by(Institution.name))]
+
+
 @router.post("/register", status_code=202)
 def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
              ctx: AppContext = Depends(get_ctx)):

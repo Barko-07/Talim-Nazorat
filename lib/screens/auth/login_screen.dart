@@ -37,6 +37,17 @@ class _LoginScreenState extends State<LoginScreen>
   // --- SIGN UP STEP MANAGEMENT ---
   int _signUpStep = 0;
 
+  /// Server rejimida: serverdagi haqiqiy maktablar. Bo'sh yoki yuklanmagan
+  /// bo'lsa — tayyor ro'yxat (NamanganData) ishlatiladi.
+  List<String>? _serverSchools;
+
+  /// Maktab tanlash ro'yxati: serverdagi maktablar bo'lsa — ular, aks holda
+  /// tanlangan tumandagi maktablar.
+  List<String> get _schoolChoices =>
+      (_serverSchools?.isNotEmpty ?? false)
+          ? _serverSchools!
+          : NamanganData.getSchoolsForDistrict(_selectedDistrict);
+
   // Qadam 1: Shaxsiy ma'lumotlar
   final _firstNameCtrl = TextEditingController();
   final _lastNameCtrl = TextEditingController();
@@ -74,9 +85,24 @@ class _LoginScreenState extends State<LoginScreen>
         setState(() => _errorMessage = null);
       }
     });
-    final initialSchools = NamanganData.getSchoolsForDistrict('Chortoq tumani');
-    if (initialSchools.isNotEmpty) {
-      _institutionCtrl.text = initialSchools.first;
+    if (AppConfig.serverMode) {
+      // Maktab oldindan tanlanmaydi: xodim o'zi tanlaydi (aks holda boshqa
+      // maktabga yozilib qolardi).
+      AuthApi()
+          .institutionNames()
+          .then((names) {
+            if (mounted) setState(() => _serverSchools = names);
+          })
+          .catchError((_) {
+            // Ro'yxat yuklanmasa — tayyor ro'yxat bilan davom etiladi.
+          });
+    } else {
+      final initialSchools = NamanganData.getSchoolsForDistrict(
+        'Chortoq tumani',
+      );
+      if (initialSchools.isNotEmpty) {
+        _institutionCtrl.text = initialSchools.first;
+      }
     }
     // "Eslab qolish" avval belgilangan bo'lsa — email tayyor turadi.
     context.read<AuthProvider>().rememberedLogin().then((saved) {
@@ -113,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _showIosSchoolPickerModal(BuildContext context) {
-    final allSchools = NamanganData.getSchoolsForDistrict(_selectedDistrict);
+    final allSchools = _schoolChoices;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -174,7 +200,9 @@ class _LoginScreenState extends State<LoginScreen>
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Namangan viloyati • Chortoq tumani (${allSchools.length} ta maktab)',
+                                    (_serverSchools?.isNotEmpty ?? false)
+                                        ? 'Tizimdagi maktablar (${allSchools.length} ta)'
+                                        : 'Namangan viloyati • $_selectedDistrict (${allSchools.length} ta maktab)',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textMuted,
@@ -350,11 +378,7 @@ class _LoginScreenState extends State<LoginScreen>
       }
     } else if (_signUpStep == 1) {
       if (_institutionCtrl.text.trim().isEmpty) {
-        setState(
-          () =>
-              _errorMessage =
-                  'Iltimos, Chortoq tumanidagi maktabingizni tanlang.',
-        );
+        setState(() => _errorMessage = 'Iltimos, maktabingizni tanlang.');
         return;
       }
     } else if (_signUpStep == 2) {
@@ -1192,7 +1216,7 @@ class _LoginScreenState extends State<LoginScreen>
     final selectedSchool =
         _institutionCtrl.text.isNotEmpty
             ? _institutionCtrl.text
-            : 'Maktab tanlanmagan';
+            : 'Maktabni tanlang';
 
     return KeyedSubtree(
       key: const ValueKey('step_2_profession'),
@@ -1351,8 +1375,11 @@ class _LoginScreenState extends State<LoginScreen>
               if (val == null) return;
               setState(() {
                 _selectedDistrict = val;
-                final schools = NamanganData.getSchoolsForDistrict(val);
-                _institutionCtrl.text = schools.isNotEmpty ? schools.first : '';
+                if (!(_serverSchools?.isNotEmpty ?? false)) {
+                  final schools = NamanganData.getSchoolsForDistrict(val);
+                  _institutionCtrl.text =
+                      schools.isNotEmpty ? schools.first : '';
+                }
               });
             },
           ),

@@ -58,8 +58,12 @@ class Screen:
 
     async def open(self, path="/"):
         await self.page.goto(BASE + path, wait_until="networkidle")
-        await self.page.wait_for_timeout(2500)
-        await self.semantics()
+        # The opening animation plays first (about 2.3 s); wait for the page.
+        for _ in range(20):
+            await self.page.wait_for_timeout(500)
+            await self.semantics()
+            if await self.page.get_by_role("button", name="Kirish", exact=True).count():
+                break
 
     async def semantics(self):
         await self.page.evaluate("document.querySelector('flt-semantics-placeholder')?.click()")
@@ -258,7 +262,8 @@ async def journey_register(b):
     await s.choose("Chortoq tumani")
     await s.probe("step 2 district chosen")
     await s.press(re.compile("Tanlash"))
-    await s.press("14-sonli umumiy o‘rta ta’lim maktabi")
+    # The list comes from the server: the school as the administrator named it.
+    await s.press("14-sonli maktab")
     await s.probe("step 2 school chosen")
     await s.shot("step2_filled")
     await s.press("Keyingisi")
@@ -314,6 +319,9 @@ async def journey_add_child(b):
     await s.shot("form")
     await s.type("Familiyasi *", "Rustamov")
     await s.type("Ismi *", "Sanjar")
+    check("Bola qo‘shish: maktab o‘qituvchining o‘z maktabi (tanlanmaydi)", await s.sees("14-sonli maktab"))
+    await s.press(re.compile("^Ta’lim shakli"))
+    await s.choose("Uyda yakka tartibda")
     await s.shot("filled")
     # The save button is at the bottom of a long form: scroll to it and click
     # it where it is drawn, like a person would.
@@ -351,6 +359,7 @@ async def journey_add_child(b):
     await s2.semantics()
     await s2.probe("child card")
     await s2.shot("card")
+    check("Bola kartasida ta’lim shakli ko‘rinadi", await s2.sees("Uyda yakka tartibda"))
     await s2.press("Hamkasb qo‘shish")
     await s2.probe("colleague dialog")
     await s2.shot("colleague_dialog")

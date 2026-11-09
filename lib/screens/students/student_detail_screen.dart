@@ -189,6 +189,53 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     );
   }
 
+  Future<void> _changeEducationForm(
+    BuildContext context,
+    StudentModel student,
+    UserModel currentUser,
+  ) async {
+    final app = context.read<AppProvider>();
+    final messenger = ScaffoldMessenger.of(context);
+    final chosen = await showDialog<String>(
+      context: context,
+      builder:
+          (ctx) => SimpleDialog(
+            title: const Text('Ta’lim shakli'),
+            children: [
+              for (final f in StudentModel.educationForms)
+                SimpleDialogOption(
+                  onPressed: () => Navigator.pop(ctx, f),
+                  child: Row(
+                    children: [
+                      Icon(
+                        f == student.educationForm
+                            ? LucideIcons.circleCheck
+                            : LucideIcons.circle,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(f),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+    );
+    if (chosen == null || chosen == student.educationForm) return;
+    try {
+      await app.updateStudent(
+        student.copyWith(educationForm: chosen),
+        byUser: currentUser,
+      );
+      messenger.showSnackBar(SnackBar(content: Text('Ta’lim shakli: $chosen')));
+    } on AppException catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
+      );
+    }
+  }
+
   Future<void> _confirmRemove(
     BuildContext context,
     StudentModel student,
@@ -653,7 +700,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${s.institutionName} • ${s.grade}-sinf',
+                        '${s.institutionName} • ${s.grade}-sinf • ${s.educationForm}',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -779,6 +826,32 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     iconColor: AppColors.info,
                     label: 'Qo‘llab-quvvatlash darajasi',
                     value: s.supportLevel,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    child: Divider(height: 1),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildDetailItem(
+                          icon: LucideIcons.school,
+                          iconColor: AppColors.success,
+                          label: 'Ta’lim shakli',
+                          value: s.educationForm,
+                        ),
+                      ),
+                      if (currentUser != null &&
+                          !isArchived &&
+                          _access.canEditStudent(currentUser, s))
+                        TextButton(
+                          onPressed:
+                              () =>
+                                  _changeEducationForm(context, s, currentUser),
+                          child: const Text('O‘zgartirish'),
+                        ),
+                    ],
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 14),

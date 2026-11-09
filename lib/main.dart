@@ -114,8 +114,10 @@ class AppEntry extends StatefulWidget {
 }
 
 class _AppEntryState extends State<AppEntry> {
-  // Animatsiya faqat ilovada va faqat ochilishda bir marta.
-  bool _introDone = kIsWeb;
+  // Ochilishdagi animatsiya (saytda ham, ilovada ham) - bir marta, ekranga
+  // bosilsa o'tkazib yuboriladi, tizimda animatsiyalar o'chirilgan bo'lsa
+  // ko'rsatilmaydi.
+  bool _introDone = false;
 
   @override
   Widget build(BuildContext context) {

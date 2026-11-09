@@ -203,12 +203,6 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                       onTap: () => showThemePicker(context),
                     ),
                     _buildMyGovRow(
-                      icon: LucideIcons.languages,
-                      title: 'Ilova tili',
-                      trailingValue: 'O‘zbekcha',
-                      showChevron: false,
-                    ),
-                    _buildMyGovRow(
                       icon: LucideIcons.circleAlert,
                       title: 'Ilova haqida',
                       subtitle: 'Individ v1.0.0 • O‘RQ-547 standarti',

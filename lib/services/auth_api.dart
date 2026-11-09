@@ -184,6 +184,13 @@ class AuthApi {
   Future<void> deleteAccount(String password) =>
       _api.post('/api/auth/account/delete', {'password': password});
 
+  /// Ro'yxatdan o'tish formasi uchun maktablar (faqat nomlari) — serverdagi
+  /// haqiqiy muassasalar, shunda so'rov o'sha maktab administratoriga boradi.
+  Future<List<String>> institutionNames() async =>
+      (await _api.getList('/api/auth/institutions'))
+          .map((e) => (e as Map<String, dynamic>)['name'] as String)
+          .toList();
+
   Future<void> requestPasswordChangeCode() =>
       _api.post('/api/auth/password/change/request');
 
