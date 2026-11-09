@@ -747,13 +747,16 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
   }
 }
 
-/// Barcha ekranlar uchun mobil/desktop tekis tekislangan minimalist sahifa sarlavhasi
+/// Barcha ekranlar uchun mobil/desktop premium qutiga (SurfaceCard) olingan sahifa sarlavhasi
 class AdaptivePageHeader extends StatelessWidget {
   final String title;
   final String subtitle;
   final Widget? action;
   final IconData? icon;
   final bool inlineActionOnMobile;
+  final bool boxed;
+  final double borderRadius;
+  final EdgeInsetsGeometry? padding;
 
   const AdaptivePageHeader({
     super.key,
@@ -762,11 +765,14 @@ class AdaptivePageHeader extends StatelessWidget {
     this.action,
     this.icon,
     this.inlineActionOnMobile = true,
+    this.boxed = true,
+    this.borderRadius = 24,
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
+    Widget content = LayoutBuilder(
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 560;
 
@@ -776,26 +782,55 @@ class AdaptivePageHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: isCompact ? 20 : 23,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
-                  wordSpacing: 0.35,
-                  height: 1.2,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: isCompact ? 12.5 : 13.0,
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w400,
-                  height: 1.35,
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (icon != null) ...[
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.primaryTint,
+                          width: 1.0,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(icon, color: AppColors.primary, size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: isCompact ? 18.5 : 21,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                            letterSpacing: -0.2,
+                            wordSpacing: 0.35,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: isCompact ? 12.5 : 13.0,
+                            color: AppColors.textMuted,
+                            fontWeight: FontWeight.w400,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               action!,
@@ -810,13 +845,30 @@ class AdaptivePageHeader extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                if (icon != null) ...[
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.primaryTint,
+                        width: 1.0,
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(icon, color: AppColors.primary, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                ],
                 Expanded(
                   child: Text(
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: isCompact ? 19.5 : 22.5,
+                      fontSize: isCompact ? 18.5 : 21.5,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.2,
@@ -825,10 +877,10 @@ class AdaptivePageHeader extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (action != null) ...[const SizedBox(width: 12), action!],
+                if (action != null) ...[const SizedBox(width: 10), action!],
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3.5),
             Text(
               subtitle,
               maxLines: 2,
@@ -845,6 +897,16 @@ class AdaptivePageHeader extends StatelessWidget {
           ],
         );
       },
+    );
+
+    if (!boxed) return content;
+
+    return SurfaceCard(
+      borderRadius: borderRadius,
+      padding:
+          padding ??
+          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: content,
     );
   }
 }
