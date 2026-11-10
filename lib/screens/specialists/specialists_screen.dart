@@ -14,6 +14,7 @@ import '../../services/admin_api.dart';
 import '../../services/api_client.dart';
 import '../../services/password_hasher.dart';
 import '../../core/widgets/status_badge.dart';
+import '../../core/utils/uz_phone.dart';
 
 class SpecialistsScreen extends StatelessWidget {
   const SpecialistsScreen({super.key});
@@ -24,7 +25,7 @@ class SpecialistsScreen extends StatelessWidget {
     final user = auth.currentUser;
 
     final nameCtrl = TextEditingController();
-    final phoneCtrl = TextEditingController(text: '+998 ');
+    final phoneCtrl = TextEditingController(text: UzPhone.prefix);
     final emailCtrl = TextEditingController();
     final specCtrl = TextEditingController();
     UserRole selectedRole = UserRole.psychologist;
@@ -95,8 +96,11 @@ class SpecialistsScreen extends StatelessWidget {
                           const SizedBox(height: 12),
                           TextField(
                             controller: phoneCtrl,
+                            keyboardType: TextInputType.phone,
+                            inputFormatters: [UzPhone.formatter],
                             decoration: const InputDecoration(
                               labelText: 'Telefon raqami *',
+                              hintText: UzPhone.hint,
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -137,6 +141,19 @@ class SpecialistsScreen extends StatelessWidget {
                           return;
                         }
 
+                        if (!UzPhone.isEmpty(phoneCtrl.text) &&
+                            !UzPhone.isValid(phoneCtrl.text)) {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                content: const Text(UzPhone.error),
+                                backgroundColor: AppColors.error,
+                              ),
+                            );
+                          return;
+                        }
+
                         if (AppConfig.serverMode) {
                           // Hisob serverda ochiladi; vaqtinchalik parol faqat
                           // xodimning emailiga boradi, ekranda ko'rsatilmaydi.
@@ -156,20 +173,13 @@ class SpecialistsScreen extends StatelessWidget {
                               );
                             return;
                           }
-                          final phoneDigits = phoneCtrl.text.replaceAll(
-                            RegExp(r'\D'),
-                            '',
-                          );
                           try {
                             await AdminApi().createUser(
                               email: email,
                               fullName: nameCtrl.text.trim(),
                               role: selectedRole,
                               institutionId: user?.institutionId,
-                              phone:
-                                  phoneDigits.length > 3
-                                      ? phoneCtrl.text.trim()
-                                      : null,
+                              phone: UzPhone.normalize(phoneCtrl.text),
                             );
                             await app.reloadFromServer();
                           } on ApiException catch (e) {

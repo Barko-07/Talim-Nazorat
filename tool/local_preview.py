@@ -2,7 +2,10 @@
 file) plus the built web app on one origin, with the production CSP.
 Nothing here touches the live server.
 
-    server/.venv/Scripts/python tool/local_preview.py [web-build-dir] [port]
+    server/.venv/Scripts/python tool/local_preview.py [web-build-dir] [port] [--lan]
+
+--lan: also reachable from a phone on the same Wi-Fi / hotspot
+(http://<this PC's address>:port). Test data only; stop it when done.
 
 Build the web app first:
     flutter build web --release --no-web-resources-cdn --dart-define=SERVER_MODE=true --output build/web_local
@@ -17,8 +20,10 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-WEB = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else REPO / "build" / "web_local"
-PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 8780
+LAN = "--lan" in sys.argv
+ARGS = [a for a in sys.argv[1:] if a != "--lan"]
+WEB = Path(ARGS[0]).resolve() if len(ARGS) > 0 else REPO / "build" / "web_local"
+PORT = int(ARGS[1]) if len(ARGS) > 1 else 8780
 HERE = REPO / "build" / "local_preview"
 HERE.mkdir(parents=True, exist_ok=True)
 DB = HERE / "local-preview.db"
@@ -102,8 +107,8 @@ r = c.post("/api/auth/email-code/verify", json={"code": last_code("oqituvchi@mak
            headers={**H, "X-CSRF-Token": csrf})
 assert r.status_code == 200, (r.status_code, r.text)
 csrf = r.json()["csrf_token"]
-kids = [("Ali", "Valiyev", "3-sinf"), ("Madina", "Qodirova", "2-sinf"), ("Sardor", "Aliyev", "4-sinf"),
-        ("Zarina", "Nazarova", "1-sinf")]
+kids = [("Ali", "Valiyev", "3-A"), ("Madina", "Qodirova", "2-B"), ("Sardor", "Aliyev", "4-A"),
+        ("Zarina", "Nazarova", "1-A")]
 ops = []
 for i, (first, last, grade) in enumerate(kids):
     ops.append({"op": "put", "kind": "student", "id": f"s{i + 1}", "data": {
@@ -147,4 +152,9 @@ if __name__ == "__main__":
     import uvicorn
 
     print(f"READY http://localhost:{PORT}  password={PASSWORD}  codes -> {MAIL}", flush=True)
-    uvicorn.run(app, host="127.0.0.1", port=PORT, log_level="warning")
+    if LAN:
+        import socket
+        addrs = sorted({i[4][0] for i in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET)})
+        for a in addrs:
+            print(f"PHONE http://{a}:{PORT}", flush=True)
+    uvicorn.run(app, host="0.0.0.0" if LAN else "127.0.0.1", port=PORT, log_level="warning")

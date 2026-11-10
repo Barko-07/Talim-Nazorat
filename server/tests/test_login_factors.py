@@ -4,11 +4,14 @@ code (or the authenticator, with recovery codes). Sign-up confirms the email."""
 import re
 from datetime import timedelta
 
+import pytest
+
 from fastapi.testclient import TestClient
 from sqlalchemy import select, update
 
 from app.main import create_app
 from app.models import AuthSession, OneTimeCode, PendingRegistration, Role, User, utcnow
+from app.security import passwords
 
 from conftest import (
     PASSWORD,
@@ -220,7 +223,13 @@ FORM = {
 }
 
 
-def test_sign_up_needs_the_emailed_code_then_admin_approval(api, app):
+@pytest.fixture(autouse=True)
+def _school(app):
+    """Sign-ups pick their school from the public list: it has to exist."""
+    return add_institution(app, "14-sonli maktab")
+
+
+def test_sign_up_code_signs_the_person_into_their_school(api, app, _school):
     r = api.post("/api/auth/register", FORM)
     assert r.status_code == 202
     reg_id = r.json()["registration_id"]
@@ -231,22 +240,36 @@ def test_sign_up_needs_the_emailed_code_then_admin_approval(api, app):
     bad = "000000" if code != "000000" else "111111"
     assert api.post("/api/auth/register/verify", {"registration_id": reg_id, "code": bad}).status_code == 400
     r = api.post("/api/auth/register/verify", {"registration_id": reg_id, "code": code})
-    assert r.status_code == 200
-    r = api.login(FORM["email"], NEW)
-    assert r.status_code == 403 and r.json()["code"] == "pending_approval"
-
-    admin = add_user(app, "root@maktab.uz", Role.SUPER_ADMIN, mfa=True)
-    boss = Api(TestClient(app))
-    boss.login("root@maktab.uz", mfa_secret=admin.mfa_secret)
-    pending = [u for u in boss.get("/api/admin/users").json() if u["pending_approval"]]
-    assert [u["email"] for u in pending] == [FORM["email"]]
-    assert pending[0]["profile"]["institution_name"] == "14-sonli maktab"
-    inst = add_institution(app)
-    assert boss.post(f"/api/admin/users/{pending[0]['id']}/approve", {"institution_id": inst}).status_code == 200
-
-    r = api.login(FORM["email"], NEW)
+    # No administrator approval and no second code: the person is in.
     assert r.status_code == 200 and r.json()["state"] == "ok"
-    assert r.json()["user"]["institution_id"] == inst
+    assert r.json()["user"]["institution_id"] == _school
+    assert r.json()["user"]["institution_name"] == "14-sonli maktab"
+    with db_session(app) as db:
+        u = db.scalar(select(User).where(User.email == FORM["email"]))
+        assert u.is_active and not u.pending_approval
+
+    # Later sign-ins work as for everyone (password + emailed code).
+    fresh = Api(TestClient(app))
+    r = fresh.login(FORM["email"], NEW)
+    assert r.status_code == 200 and r.json()["state"] == "ok"
+
+
+def test_sign_up_needs_a_school_from_the_list(api):
+    r = api.post("/api/auth/register", {**FORM, "institution_name": "Mavjud emas maktab"})
+    assert r.status_code == 422 and r.json()["code"] == "unknown_school"
+
+
+def test_an_account_left_waiting_for_approval_signs_in_and_joins_its_school(app, _school):
+    import json as _json
+
+    with db_session(app) as db:
+        db.add(User(email="old@maktab.uz", full_name="Eski So‘rov", role=Role.TEACHER.value,
+                    password_hash=passwords.hash_password(PASSWORD), is_active=True,
+                    must_change_password=False, pending_approval=True, profile=_json.dumps({"institution_name": "14-sonli maktab"})))
+        db.commit()
+    r = Api(TestClient(app)).login("old@maktab.uz")
+    assert r.status_code == 200 and r.json()["state"] == "ok"
+    assert r.json()["user"]["institution_id"] == _school
 
 
 def test_sign_up_with_a_used_email_looks_the_same_but_creates_nothing(api, app):
@@ -262,6 +285,7 @@ def test_sign_up_with_a_used_email_looks_the_same_but_creates_nothing(api, app):
 
 def test_sign_up_resend_has_a_cooldown_and_replaces_the_code():
     app = create_app(make_settings(code_resend_seconds=60))
+    add_institution(app, "14-sonli maktab")
     api = Api(TestClient(app))
     reg_id = api.post("/api/auth/register", FORM).json()["registration_id"]
     first = last_code_for(app, FORM["email"])
@@ -294,15 +318,15 @@ def test_expired_sign_up_code_cannot_be_used(api, app):
     assert r.status_code == 400 and r.json()["code"] == "registration_expired"
 
 
-def test_rejected_sign_up_is_deleted(api, app):
+def test_an_administrator_can_block_a_sign_up_that_does_not_belong(api, app):
     reg_id = api.post("/api/auth/register", FORM).json()["registration_id"]
     api.post("/api/auth/register/verify", {"registration_id": reg_id, "code": last_code_for(app, FORM["email"])})
     admin = add_user(app, "root@maktab.uz", Role.SUPER_ADMIN, mfa=True)
     boss = Api(TestClient(app))
     boss.login("root@maktab.uz", mfa_secret=admin.mfa_secret)
-    uid = next(u["id"] for u in boss.get("/api/admin/users").json() if u["pending_approval"])
-    assert boss.post(f"/api/admin/users/{uid}/reject").status_code == 200
-    assert api.login(FORM["email"], NEW).status_code == 401
+    uid = next(u["id"] for u in boss.get("/api/admin/users").json() if u["email"] == FORM["email"])
+    assert boss.patch(f"/api/admin/users/{uid}", {"is_active": False}).status_code == 200
+    assert Api(TestClient(app)).login(FORM["email"], NEW).status_code == 401
 
 
 def test_a_school_administrator_hears_about_sign_ups_that_name_their_school(api, app):
@@ -343,8 +367,7 @@ def test_a_sign_up_rings_the_administrators_bell_in_the_app(api, app):
 
 
 def test_the_sign_up_form_lists_schools_by_name_only(api, app):
-    add_institution(app, "15-sonli maktab")
-    add_institution(app, "14-sonli maktab")
+    add_institution(app, "15-sonli maktab")  # "14-sonli maktab" comes from the fixture
     r = api.get("/api/auth/institutions")
     assert r.status_code == 200
     assert [x["name"] for x in r.json()] == ["14-sonli maktab", "15-sonli maktab"]

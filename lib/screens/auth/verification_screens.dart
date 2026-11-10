@@ -170,8 +170,11 @@ class _AuthShell extends StatelessWidget {
   }
 }
 
-/// 6 xonali kod maydoni. 6-raqam kiritilishi bilan [onCompleted] chaqiriladi.
-class CodeField extends StatelessWidget {
+/// 6 xonali kod: oltita alohida katak. Ostida bitta haqiqiy matn maydoni
+/// turadi (ko'rinmas) - klaviatura, nusxa qo'yish va telefonning "kodni
+/// avtomatik to'ldirish" taklifi odatdagidek ishlaydi. 6-raqam kiritilishi
+/// bilan [onCompleted] chaqiriladi.
+class CodeField extends StatefulWidget {
   final TextEditingController controller;
   final ValueChanged<String>? onCompleted;
   final bool enabled;
@@ -184,30 +187,307 @@ class CodeField extends StatelessWidget {
   });
 
   @override
+  State<CodeField> createState() => _CodeFieldState();
+}
+
+class _CodeFieldState extends State<CodeField> {
+  final _focus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_redraw);
+    _focus.addListener(_redraw);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_redraw);
+    _focus.dispose();
+    super.dispose();
+  }
+
+  void _redraw() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      enabled: enabled,
-      autofocus: true,
-      keyboardType: TextInputType.number,
-      textAlign: TextAlign.center,
-      maxLength: 6,
-      autofillHints: const [AutofillHints.oneTimeCode],
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      style: TextStyle(
-        fontSize: 28,
-        letterSpacing: 12,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
+    final text = widget.controller.text;
+    final active = _focus.hasFocus ? text.length.clamp(0, 5) : -1;
+    return SizedBox(
+      height: 62,
+      child: Stack(
+        children: [
+          // Kataklar faqat ko'rinish: ekran o'quvchi va brauzer bitta kod
+          // maydonini ko'radi (raqam qo'shilganda maydon fokusni yo'qotmaydi).
+          ExcludeSemantics(
+            child: Row(
+              children: [
+                for (var i = 0; i < 6; i++) ...[
+                  if (i > 0) const SizedBox(width: 9),
+                  Expanded(
+                    child: _CodeBox(
+                      digit: i < text.length ? text[i] : null,
+                      active: i == active,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.01,
+              child: TextField(
+                controller: widget.controller,
+                focusNode: _focus,
+                enabled: widget.enabled,
+                autofocus: true,
+                showCursor: false,
+                enableInteractiveSelection: false,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                autofillHints: const [AutofillHints.oneTimeCode],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                style: const TextStyle(fontSize: 1, color: Colors.transparent),
+                decoration: const InputDecoration(
+                  counterText: '',
+                  semanticCounterText: '',
+                  hintText: 'Tasdiqlash kodi',
+                  hintStyle: TextStyle(fontSize: 1, color: Colors.transparent),
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  filled: false,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                onChanged: (v) {
+                  if (v.length == 6) widget.onCompleted?.call(v);
+                },
+              ),
+            ),
+          ),
+        ],
       ),
-      decoration: InputDecoration(
-        counterText: '',
-        hintText: '••••••',
-        hintStyle: TextStyle(letterSpacing: 12, color: AppColors.textMuted),
+    );
+  }
+}
+
+class _CodeBox extends StatelessWidget {
+  final String? digit;
+  final bool active;
+
+  const _CodeBox({required this.digit, required this.active});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color:
+              active
+                  ? AppColors.primary
+                  : AppColors.primary.withValues(alpha: 0.22),
+          width: active ? 1.8 : 1.2,
+        ),
       ),
-      onChanged: (v) {
-        if (v.length == 6) onCompleted?.call(v);
-      },
+      child:
+          digit != null
+              ? Text(
+                digit!,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              )
+              : active
+              ? Container(width: 2, height: 26, color: AppColors.primary)
+              : null,
+    );
+  }
+}
+
+/// Kod kiritiladigan sahifalar uchun shablon: yuqorida orqaga tugmasi va
+/// logotip, markazda katta belgi, sarlavha, qisqa izoh va kod bloki.
+/// Och ko'k katak - ko'kish fonda ham aniq ko'rinadi.
+Color get _tileColor => Color.alphaBlend(
+  AppColors.primary.withValues(alpha: AppColors.isDark ? 0.22 : 0.12),
+  AppColors.surface,
+);
+
+class _CodeShell extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String? detail;
+  final Widget child;
+  final String? hint;
+  final VoidCallback? onBack;
+
+  const _CodeShell({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.child,
+    this.detail,
+    this.hint,
+    this.onBack,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AmbientMeshBackground(
+      intense: true,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 28),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      height: 52,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              BrandMark(height: 40),
+                              SizedBox(width: 10),
+                              BrandWordmark(fontSize: 27),
+                            ],
+                          ),
+                          if (onBack != null)
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Material(
+                                color: _tileColor,
+                                borderRadius: BorderRadius.circular(13),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(13),
+                                  onTap: onBack,
+                                  child: Tooltip(
+                                    message: 'Orqaga',
+                                    child: SizedBox(
+                                      width: 46,
+                                      height: 46,
+                                      child: Icon(
+                                        LucideIcons.chevronLeft,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 44),
+                    Center(
+                      child: Container(
+                        width: 112,
+                        height: 112,
+                        decoration: BoxDecoration(
+                          color: _tileColor,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Icon(icon, size: 54, color: AppColors.primary),
+                            Positioned(
+                              right: 22,
+                              bottom: 24,
+                              child: Container(
+                                width: 26,
+                                height: 26,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: _tileColor,
+                                    width: 2.5,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  LucideIcons.check,
+                                  size: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.5,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      subtitle,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15,
+                        height: 1.4,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    if (detail != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        detail!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 34),
+                    child,
+                    if (hint != null) ...[
+                      const SizedBox(height: 18),
+                      Text(
+                        hint!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          height: 1.4,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -276,13 +556,34 @@ class _ResendCodeButtonState extends State<ResendCodeButton> {
   Widget build(BuildContext context) {
     final waiting = _left > 0;
     return Center(
-      child: TextButton.icon(
+      child: TextButton(
         onPressed: waiting || _busy ? null : _resend,
-        icon: const Icon(LucideIcons.rotateCw, size: 16),
-        label: Text(
-          waiting
-              ? 'Kodni qayta yuborish ($_left soniya)'
-              : 'Kod kelmadimi? Qayta yuborish',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(LucideIcons.rotateCw, size: 18, color: AppColors.primary),
+            const SizedBox(width: 10),
+            Text(
+              'Qayta yuborish',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: waiting ? AppColors.textSecondary : AppColors.primary,
+              ),
+            ),
+            if (waiting) ...[
+              const SizedBox(width: 6),
+              Text(
+                '($_left s)',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
@@ -553,22 +854,22 @@ class _EmailCodeStepState extends State<_EmailCodeStep> {
   Widget build(BuildContext context) {
     final auth = context.read<AuthProvider>();
     final email = auth.pendingUser?.email ?? '';
-    return _AuthShell(
-      icon: LucideIcons.mailCheck,
-      title: 'Kirishni tasdiqlang',
-      subtitle:
-          'Hisobingiz xavfsizligi uchun ${_maskEmail(email)} manziliga '
-          '6 xonali kod yuborildi. Kod 10 daqiqa amal qiladi. Xat ko‘rinmasa, '
-          '“Spam” papkasini ham tekshiring.',
+    return _CodeShell(
+      icon: LucideIcons.mail,
+      title: 'Tasdiqlash kodi',
+      subtitle: 'Email manzilingizga 6 xonali kod yubordik.',
+      detail: email.isEmpty ? null : _maskEmail(email),
+      hint:
+          'Kod 10 daqiqa amal qiladi. Xat ko‘rinmasa, “Spam” papkasini tekshiring.',
       onBack: widget.onBack,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CodeField(controller: _code, onCompleted: (_) => _submit()),
           _ErrorText(_error),
-          const SizedBox(height: 16),
+          const SizedBox(height: 30),
           _PrimaryButton(label: 'Tasdiqlash', busy: _busy, onPressed: _submit),
-          const SizedBox(height: 8),
+          const SizedBox(height: 14),
           ResendCodeButton(
             initialWait: auth.resendAfter,
             onResend: auth.resendEmailCode,
@@ -968,7 +1269,6 @@ class _RegistrationCodeScreenState extends State<RegistrationCodeScreen> {
   final _code = TextEditingController();
   bool _busy = false;
   String? _error;
-  String? _done;
 
   @override
   void dispose() {
@@ -990,46 +1290,36 @@ class _RegistrationCodeScreenState extends State<RegistrationCodeScreen> {
       _code.text,
     );
     if (!mounted) return;
+    if (res['success'] == true) {
+      // Admin tasdig'i kerak emas: kod tasdiqlangach to'g'ri ilovaga.
+      _openApp(context);
+      return;
+    }
     setState(() {
       _busy = false;
-      if (res['success'] == true) {
-        _done = res['message'] as String;
-      } else {
-        _error = res['message'] as String;
-        _code.clear();
-      }
+      _error = res['message'] as String;
+      _code.clear();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_done != null) {
-      return _AuthShell(
-        icon: LucideIcons.badgeCheck,
-        title: 'Email tasdiqlandi',
-        subtitle:
-            '$_done. Tasdiqlangach emailingizga xabar keladi va shu email hamda parolingiz bilan kirasiz.',
-        child: _PrimaryButton(
-          label: 'Kirish sahifasiga qaytish',
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      );
-    }
-    return _AuthShell(
-      icon: LucideIcons.mailCheck,
-      title: 'Emailingizni tasdiqlang',
-      subtitle:
-          '${_maskEmail(widget.email)} manziliga 6 xonali tasdiqlash kodi yuborildi. '
-          'Kod 10 daqiqa amal qiladi. Xat ko‘rinmasa, “Spam” papkasini ham tekshiring.',
+    return _CodeShell(
+      icon: LucideIcons.mail,
+      title: 'Tasdiqlash kodi',
+      subtitle: 'Email manzilingizga 6 xonali kod yubordik.',
+      detail: _maskEmail(widget.email),
+      hint:
+          'Kod 10 daqiqa amal qiladi. Xat ko‘rinmasa, “Spam” papkasini tekshiring.',
       onBack: () => Navigator.of(context).pop(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CodeField(controller: _code, onCompleted: (_) => _submit()),
           _ErrorText(_error),
-          const SizedBox(height: 16),
+          const SizedBox(height: 30),
           _PrimaryButton(label: 'Tasdiqlash', busy: _busy, onPressed: _submit),
-          const SizedBox(height: 8),
+          const SizedBox(height: 14),
           ResendCodeButton(
             initialWait: widget.resendAfter,
             onResend:

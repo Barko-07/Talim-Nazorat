@@ -261,12 +261,16 @@ class AuthApi {
           .toInt();
 
   /// Qaytaradi: foydalanuvchiga ko'rsatiladigan xabar.
-  Future<String> verifyRegistration(String registrationId, String code) async =>
-      (await _api.post('/api/auth/register/verify', {
-            'registration_id': registrationId,
-            'code': code,
-          }))['message']
-          as String;
+  /// Kod to'g'ri bo'lsa hisob yaratiladi va foydalanuvchi darhol kiradi.
+  Future<AuthResult> verifyRegistration(
+    String registrationId,
+    String code,
+  ) async => AuthResult.fromJson(
+    await _api.post('/api/auth/register/verify', {
+      'registration_id': registrationId,
+      'code': code,
+    }),
+  );
 
   Future<void> logout() async {
     try {

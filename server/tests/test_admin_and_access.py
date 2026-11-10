@@ -208,7 +208,7 @@ def test_people_edit_only_their_own_profile_and_admins_see_the_change(app):
                                       "experience_years": 7})
     assert r.status_code == 200
     me = r.json()["user"]
-    assert me["full_name"] == "Karimova Dilnoza" and me["phone"] == "+998 90 111-22-33"
+    assert me["full_name"] == "Karimova Dilnoza" and me["phone"] == "+998 90 111 22 33"  # stored one way
     assert me["profile"]["specialization"] == "Matematika" and me["profile"]["experience_years"] == 7
     # Email, role and school cannot be changed this way.
     for bad in ({"email": "x@y.uz"}, {"role": "SUPER_ADMIN"}, {"institution_id": "f" * 32}):

@@ -24,6 +24,7 @@ def test_spellings_of_one_mailbox_and_number_are_one_key():
 
 
 def test_a_gmail_alias_cannot_open_a_second_account(app):
+    add_institution(app, "14-sonli maktab")
     add_user(app, "mistaker0908@gmail.com", Role.TEACHER)
     api = Api(TestClient(app))
     r = api.post("/api/auth/register", {**FORM, "email": "Mistaker.0908+new@gmail.com"})
@@ -45,7 +46,7 @@ def test_the_owner_signs_in_whichever_way_they_write_the_address(app):
 
 
 def test_a_phone_number_already_in_use_is_refused_everywhere(app):
-    inst = add_institution(app)
+    inst = add_institution(app, "14-sonli maktab")
     owner = add_user(app, "owner@maktab.uz", Role.TEACHER, inst)
     with db_session(app) as db:
         db.get(User, owner.id).phone = "+998901112233"
@@ -65,3 +66,16 @@ def test_a_phone_number_already_in_use_is_refused_everywhere(app):
     me = Api(TestClient(app))
     me.login("owner@maktab.uz")
     assert me.patch("/api/auth/profile", {"phone": "+998 90 111 22 33"}).status_code == 200
+
+
+def test_only_uzbek_phone_numbers_are_accepted_and_stored_one_way(app):
+    add_institution(app, "14-sonli maktab")
+    api = Api(TestClient(app))
+    for bad in ("+7 912 345 67 89", "12345", "+998 01 234 56 78", "+998 90 123 45 6x"):
+        r = api.post("/api/auth/register", {**FORM, "phone": bad})
+        assert r.status_code == 422, bad
+    r = api.post("/api/auth/register", {**FORM, "phone": "90-777-12-34"})
+    assert r.status_code == 202
+    code = last_code_for(app, FORM["email"])
+    r = api.post("/api/auth/register/verify", {"registration_id": r.json()["registration_id"], "code": code})
+    assert r.status_code == 200 and r.json()["user"]["phone"] == "+998 90 777 12 34"

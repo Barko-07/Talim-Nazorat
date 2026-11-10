@@ -8,9 +8,10 @@ import '../../../models/user_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/admin_api.dart';
 import '../../../services/api_client.dart';
+import '../../../core/utils/uz_phone.dart';
 
-/// Server rejimidagi "Foydalanuvchilar": ro'yxatdan o'tib tasdiq kutayotganlar
-/// tepada, ostida barcha hisoblar. Har bir amalni server tekshiradi
+/// Server rejimidagi "Foydalanuvchilar": barcha hisoblar (ro'yxatdan
+/// o'tganlar tasdiq kutmaydi - kerak bo'lsa bloklanadi). Har bir amalni server tekshiradi
 /// (o'zini bloklash, oxirgi administratorni pasaytirish va h.k. taqiqlangan).
 class ServerUsersTab extends StatefulWidget {
   const ServerUsersTab({super.key, this.api});
@@ -87,33 +88,6 @@ class _ServerUsersTabState extends State<ServerUsersTab> {
   }
 
   // ------------------------------------------------------------------ actions
-
-  Future<void> _approve(AdminUser u) async {
-    final institution = await _pickInstitution(
-      title: 'Hisobni tasdiqlash',
-      message:
-          '${u.fullName} o‘zi yozgan maktab: ${u.statedInstitution ?? '—'}. '
-          'Hisob qaysi muassasaga biriktirilsin?',
-      confirmLabel: 'Tasdiqlash',
-    );
-    if (institution == null) return;
-    await _run(
-      () => _api.approve(u.id, institution.id),
-      '${u.fullName} tasdiqlandi. Unga email yuborildi.',
-    );
-  }
-
-  Future<void> _reject(AdminUser u) async {
-    final ok = await _confirm(
-      title: 'Ro‘yxatdan o‘tishni rad etish',
-      message:
-          '${u.fullName} (${u.email}) so‘rovi o‘chiriladi va unga email yuboriladi. '
-          'Bu amalni qaytarib bo‘lmaydi.',
-      confirmLabel: 'Rad etish',
-      danger: true,
-    );
-    if (ok) await _run(() => _api.reject(u.id), 'So‘rov rad etildi');
-  }
 
   Future<void> _move(AdminUser u) async {
     final institution = await _pickInstitution(
@@ -346,11 +320,10 @@ class _ServerUsersTabState extends State<ServerUsersTab> {
   @override
   Widget build(BuildContext context) {
     final me = context.watch<AuthProvider>().currentUser;
-    final pending = _users.where((u) => u.pendingApproval).toList();
+    // Ro'yxatdan o'tganlar admin tasdig'ini kutmaydi - hammasi bitta ro'yxatda.
     final q = _query.trim().toLowerCase();
     final accounts =
         _users
-            .where((u) => !u.pendingApproval)
             .where(
               (u) =>
                   q.isEmpty ||
@@ -385,8 +358,7 @@ class _ServerUsersTabState extends State<ServerUsersTab> {
                   Text(
                     _loading
                         ? 'Yuklanmoqda…'
-                        : '${_users.length - pending.length} ta hisob'
-                            '${pending.isEmpty ? '' : ' · ${pending.length} ta tasdiq kutmoqda'}',
+                        : '${_users.length} ta hisob',
                     style: TextStyle(fontSize: 14, color: AppColors.textMuted),
                   ),
                 ],
@@ -411,16 +383,6 @@ class _ServerUsersTabState extends State<ServerUsersTab> {
               child: Center(child: CircularProgressIndicator()),
             )
           else ...[
-            if (pending.isNotEmpty) ...[
-              _SectionTitle('Tasdiq kutayotganlar (${pending.length})'),
-              for (final u in pending)
-                _PendingCard(
-                  user: u,
-                  onApprove: () => _approve(u),
-                  onReject: () => _reject(u),
-                ),
-              const SizedBox(height: 24),
-            ],
             _SectionTitle('Hisoblar'),
             TextField(
               onChanged: (v) => setState(() => _query = v),
@@ -513,85 +475,6 @@ class _Notice extends StatelessWidget {
   );
 }
 
-class _PendingCard extends StatelessWidget {
-  const _PendingCard({
-    required this.user,
-    required this.onApprove,
-    required this.onReject,
-  });
-
-  final AdminUser user;
-  final VoidCallback onApprove;
-  final VoidCallback onReject;
-
-  @override
-  Widget build(BuildContext context) {
-    final details = [
-      user.role.label,
-      if (user.statedInstitution != null) user.statedInstitution!,
-      if (user.district != null) user.district!,
-    ].join(' · ');
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.warningBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 6,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Text(
-                user.fullName,
-                style: TextStyle(
-                  fontSize: 15.5,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const StatusBadge('Tasdiq kutmoqda', tone: StatusTone.warning),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            [user.email, if (user.phone != null) user.phone!].join(' · '),
-            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            details,
-            style: TextStyle(fontSize: 13, color: AppColors.textMuted),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              FilledButton.icon(
-                onPressed: onApprove,
-                icon: const Icon(LucideIcons.check, size: 18),
-                label: const Text('Tasdiqlash'),
-              ),
-              OutlinedButton(
-                onPressed: onReject,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.error,
-                ),
-                child: const Text('Rad etish'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _UserRow extends StatelessWidget {
   const _UserRow({
@@ -733,7 +616,7 @@ class _CreateUserDialog extends StatefulWidget {
 class _CreateUserDialogState extends State<_CreateUserDialog> {
   final _name = TextEditingController();
   final _email = TextEditingController();
-  final _phone = TextEditingController();
+  final _phone = TextEditingController(text: UzPhone.prefix);
   UserRole _role = UserRole.teacher;
   String? _institution;
   bool _busy = false;
@@ -758,7 +641,7 @@ class _CreateUserDialogState extends State<_CreateUserDialog> {
         fullName: _name.text.trim(),
         role: _role,
         institutionId: _institution,
-        phone: _phone.text,
+        phone: UzPhone.normalize(_phone.text),
       );
       if (mounted) Navigator.pop(context, true);
     } on ApiException catch (e) {
@@ -804,10 +687,16 @@ class _CreateUserDialogState extends State<_CreateUserDialog> {
               TextField(
                 controller: _phone,
                 keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
+                inputFormatters: [UzPhone.formatter],
+                decoration: InputDecoration(
                   labelText: 'Telefon (ixtiyoriy)',
-                  hintText: '+998 90 123 45 67',
+                  hintText: UzPhone.hint,
+                  errorText:
+                      UzPhone.isEmpty(_phone.text) || UzPhone.isValid(_phone.text)
+                          ? null
+                          : UzPhone.error,
                 ),
+                onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<UserRole>(

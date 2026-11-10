@@ -151,27 +151,19 @@ Future<Future<void> Function()> _pump(
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  testWidgets('pending sign-ups are listed first and approval sends the chosen school', (
+  testWidgets('sign-ups need no approval: everyone is in one account list', (
     tester,
   ) async {
     final server = _FakeAdminServer();
     final api = AdminApi(ApiClient(client: server.client, baseUrl: 'https://individ.uz'));
     final done = await _pump(tester, ServerUsersTab(api: api));
 
-    expect(find.text('Tasdiq kutayotganlar (1)'), findsOneWidget);
+    expect(find.textContaining('Tasdiq kutayotganlar'), findsNothing);
+    expect(find.text('Tasdiqlash'), findsNothing);
     expect(find.text('Karimova Dilnoza'), findsOneWidget);
     expect(find.text('Bloklangan'), findsOneWidget); // u3
-    expect(find.textContaining('2 ta hisob'), findsOneWidget);
-
-    await tester.tap(find.text('Tasdiqlash'));
-    await tester.pumpAndSettle();
-    expect(find.text('Hisobni tasdiqlash'), findsOneWidget);
-    await tester.tap(find.widgetWithText(FilledButton, 'Tasdiqlash').last);
-    await tester.pumpAndSettle();
-
-    expect(server.writes, ['POST /api/admin/users/u1/approve {"institution_id":"i1"}']);
-    expect(find.text('Tasdiq kutayotganlar (1)'), findsNothing);
     expect(find.textContaining('3 ta hisob'), findsOneWidget);
+    expect(server.writes, isEmpty);
     await done();
   });
 

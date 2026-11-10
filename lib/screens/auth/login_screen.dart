@@ -12,6 +12,7 @@ import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/auth_api.dart';
 import 'verification_screens.dart';
+import '../../core/utils/uz_phone.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool initialIsSignUp;
@@ -395,14 +396,8 @@ class _LoginScreenState extends State<LoginScreen>
         );
         return;
       }
-      final phone = _phoneCtrl.text.trim();
-      final digits = phone.replaceAll(RegExp(r'\D'), '');
-      if (digits.length < 9) {
-        setState(
-          () =>
-              _errorMessage =
-                  'Iltimos, to‘liq telefon raqamingizni kiriting (masalan: +998 90 123 45 67).',
-        );
+      if (!UzPhone.isValid(_phoneCtrl.text)) {
+        setState(() => _errorMessage = UzPhone.error);
         return;
       }
     }
@@ -478,7 +473,7 @@ class _LoginScreenState extends State<LoginScreen>
     final result = await auth.register(
       firstName: _firstNameCtrl.text.trim(),
       lastName: _lastNameCtrl.text.trim(),
-      phone: _phoneCtrl.text.trim(),
+      phone: UzPhone.normalize(_phoneCtrl.text) ?? _phoneCtrl.text.trim(),
       email: _emailCtrl.text.trim(),
       role: roleToRegister,
       region: NamanganData.defaultRegion,
@@ -513,8 +508,8 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  /// Server rejimi: forma serverga yuboriladi, emailga kod keladi. Hisob kod
-  /// tasdiqlangach yaratiladi va administrator tasdig'ini kutadi.
+  /// Server rejimi: forma serverga yuboriladi, emailga kod keladi. Kod
+  /// tasdiqlangach hisob tanlangan maktabda ochiladi va foydalanuvchi kiradi.
   Future<void> _startServerRegistration(
     AuthProvider auth,
     UserRole role,
@@ -524,7 +519,7 @@ class _LoginScreenState extends State<LoginScreen>
       firstName: _firstNameCtrl.text.trim(),
       lastName: _lastNameCtrl.text.trim(),
       email: email,
-      phone: _phoneCtrl.text.trim(),
+      phone: UzPhone.normalize(_phoneCtrl.text) ?? _phoneCtrl.text.trim(),
       role: role,
       specialization:
           _specializationCtrl.text.trim().isNotEmpty
@@ -554,7 +549,7 @@ class _LoginScreenState extends State<LoginScreen>
       ),
     );
     if (!mounted) return;
-    // Kod tasdiqlansa ham, kirish administrator tasdig'idan keyin — kirish oynasiga qaytamiz.
+    // Kod tasdiqlanmay orqaga qaytildi - forma boshidan.
     _signUpPasswordCtrl.clear();
     _signUpConfirmPasswordCtrl.clear();
     setState(() => _signUpStep = 0);
@@ -1438,10 +1433,11 @@ class _LoginScreenState extends State<LoginScreen>
           TextField(
             controller: _phoneCtrl,
             keyboardType: TextInputType.phone,
+            inputFormatters: [UzPhone.formatter],
             style: _myGovFont(fontSize: 14, fontWeight: FontWeight.w500),
             decoration: InputDecoration(
               labelText: 'Telefon',
-              hintText: '+998 90 123 45 67',
+              hintText: UzPhone.hint,
               prefixIcon: Icon(
                 LucideIcons.phone,
                 size: 18,

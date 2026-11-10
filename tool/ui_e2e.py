@@ -287,27 +287,24 @@ async def journey_register(b):
     await s.semantics()
     await s.probe("after registration code")
     await s.shot("reg_done")
-    check("Ro‘yxatdan o‘tish: 'administrator tasdig‘idan so‘ng' xabari", await s.sees("tasdig"))
+    # No administrator approval: the code signs the person straight in.
+    check("Ro‘yxatdan o‘tish: kod bilan darhol o‘z ish sahifasiga kirdi", await s.sees("Boshqaruv markazi"))
+    check("Ro‘yxatdan o‘tish: tanlangan maktab hisobga yozildi", await s.sees("14-sonli maktab"))
 
-    # Administrator approves the sign-up in Foydalanuvchilar.
-    a = Screen(await b.new_page(viewport={"width": 1440, "height": 900}), "approve")
+    # The administrator sees the new colleague among the accounts (and could block them).
+    a = Screen(await b.new_page(viewport={"width": 1440, "height": 900}), "admin_sees")
     await login(a, "admin@maktab.uz")
     await a.press("Foydalanuvchilar")
     await a.probe("users page")
     await a.shot("users")
-    check("Admin: so‘rov Foydalanuvchilar sahifasida ko‘rinadi", await a.sees("Tursunova Gulnora"))
-    await a.press_near("Tasdiqlash", "Tursunova Gulnora")
-    await a.probe("approve dialog")
-    await a.shot("approve_dialog")
-    await a.press("Tasdiqlash", last=True)
-    await a.page.wait_for_timeout(1500)
-    await a.shot("approved")
+    check("Admin: yangi xodim Foydalanuvchilar ro‘yxatida", await a.sees("Tursunova Gulnora"))
+    check("Admin: tasdiq kutayotganlar bo‘limi yo‘q", not await a.sees("Tasdiq kutayotganlar", timeout=1500))
 
     g = Screen(await b.new_page(viewport={"width": 1280, "height": 900}), "newuser")
     await login(g, REG_EMAIL)
     await g.probe("new user home")
     await g.shot("home")
-    check("Tasdiqlangan xodim kirdi va o‘z ish sahifasini ko‘rdi", await g.sees("Boshqaruv markazi"))
+    check("Yangi xodim keyin odatdagidek (parol + kod) kiradi", await g.sees("Boshqaruv markazi"))
 
 
 async def journey_add_child(b):
@@ -418,4 +415,5 @@ async def main():
     sys.exit(1 if failed else 0)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

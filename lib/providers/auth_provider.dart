@@ -787,7 +787,9 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     String code,
   ) async {
     try {
-      return _ok(await _authApi.verifyRegistration(id, code));
+      // Kod tasdiqlandi - hisob tanlangan maktabda ochildi va kirildi.
+      await _apply(await _authApi.verifyRegistration(id, code));
+      return _ok('Xush kelibsiz! Hisobingiz tayyor');
     } on ApiException catch (e) {
       return _apiFail(e);
     }

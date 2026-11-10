@@ -441,7 +441,7 @@ class _CallToAction extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Ro‘yxatdan o‘ting — maktabingiz administratori hisobingizni tasdiqlaydi.',
+              'Ro‘yxatdan o‘ting — emailingizga kelgan kod bilan darhol ishni boshlaysiz.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15.5,

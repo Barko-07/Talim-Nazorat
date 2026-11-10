@@ -169,9 +169,13 @@ def login(
         raise ApiError(401, "invalid_credentials", GENERIC_LOGIN_ERROR)
 
     if user.pending_approval:
-        # Told only to someone who knows the password.
-        raise ApiError(403, "pending_approval",
-                       "Hisobingiz administrator tasdig‘ini kutmoqda. Tasdiqlangach emailingizga xabar keladi.")
+        # Sign-ups no longer wait for an administrator: an account left from the
+        # old approval step joins the school it chose and simply signs in.
+        if user.institution_id is None:
+            school = _school_by_name(db, profile_of(user).get("institution_name", ""))
+            user.institution_id = school.id if school else None
+        user.pending_approval = False
+        audit.record(db, "SIGNUP_AUTO_ACTIVATED", user_id=user.id, subject=audit.mask_login(email), ip=ip)
 
     user.failed_logins = 0
     user.locked_until = None
@@ -685,6 +689,9 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
     now = utcnow()
     db.execute(delete(PendingRegistration).where(PendingRegistration.expires_at < now - timedelta(days=1)))
     existing = identity.find_by_email(db, email)
+    school = _school_by_name(db, body.institution_name)
+    if school is None:
+        raise ApiError(422, "unknown_school", "Maktabingizni ro‘yxatdan tanlang")
     if existing is None and identity.phone_taken(db, body.phone):
         # Not a secret worth hiding: the person needs to know to sign in instead.
         raise ApiError(409, "phone_taken", "Bu telefon raqami bilan hisob allaqachon bor. Hisobingizga kiring yoki parolni tiklang")
@@ -710,6 +717,7 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
             "full_name": full_name,
             "phone": body.phone,
             "role": body.role.value,
+            "institution_id": school.id,
             "password_hash": passwords.hash_password(body.password),
             "profile": {
                 "first_name": body.first_name, "last_name": body.last_name,
@@ -779,6 +787,21 @@ def register_resend(body: RegistrationIdIn, request: Request, db: Session = Depe
     return {"ok": True, "resend_after": s.code_resend_seconds, "message": REGISTRATION_SENT}
 
 
+def _norm_school(x: str) -> str:
+    return " ".join("".join(c for c in (x or "").lower() if c.isalnum() or c.isspace()).split())
+
+
+def _school_by_name(db: Session, name: str) -> Institution | None:
+    """The school picked from the public list at sign-up (matched by name)."""
+    want = _norm_school(name)
+    if not want:
+        return None
+    for inst in db.scalars(select(Institution)):
+        if _norm_school(inst.name) == want:
+            return inst
+    return None
+
+
 def _admin_of_named_school(db: Session, admin: User, school_name: str) -> bool:
     """A school administrator whose school is the one the sign-up named."""
     def norm(x: str) -> str:
@@ -800,7 +823,7 @@ def _signup_notifications(db: Session, user: User, school: str, admins: list[Use
                 "recipientUserId": admin.id,
                 "title": "Yangi ro‘yxatdan o‘tish",
                 "body": f"{user.full_name}" + (f" ({school})" if school else "")
-                        + " ro‘yxatdan o‘tdi va tasdiqlashingizni kutmoqda.",
+                        + " ro‘yxatdan o‘tdi va ishni boshladi.",
                 "type": "SIGNUP",
                 "relatedRecordId": user.id,
                 "isRead": False,
@@ -811,10 +834,12 @@ def _signup_notifications(db: Session, user: User, school: str, admins: list[Use
 
 
 @router.post("/register/verify")
-def register_verify(body: RegistrationVerifyIn, request: Request, db: Session = Depends(get_db),
-                    ctx: AppContext = Depends(get_ctx)):
-    """Step 2: the emailed code creates the account, which then waits for an
-    administrator to approve it (and attach it to the right school)."""
+def register_verify(body: RegistrationVerifyIn, request: Request, response: Response,
+                    db: Session = Depends(get_db), ctx: AppContext = Depends(get_ctx)):
+    """Step 2: the emailed code creates the account in the school chosen at
+    sign-up and signs the person in - the code has just proven the mailbox, so
+    no second code is asked. Administrators are told; they can block the
+    account if the person does not work there."""
     s = ctx.settings
     ip = client_ip(request)
     _too_many(ctx, db, f"register-verify-ip:{ip}", 20, 900, ip, "registration verify per IP")
@@ -832,21 +857,28 @@ def register_verify(body: RegistrationVerifyIn, request: Request, db: Session = 
         db.delete(reg)
         db.commit()
         raise ApiError(400, "invalid_code", "Kod noto‘g‘ri yoki muddati o‘tgan")
+    school = db.get(Institution, data["institution_id"]) if data.get("institution_id") else None
+    if school is None:  # sign-up started before schools were required
+        school = _school_by_name(db, data["profile"].get("institution_name", ""))
     user = User(
         email=reg.email, full_name=data["full_name"], role=data["role"], phone=data["phone"],
         password_hash=data["password_hash"], must_change_password=False, is_active=True,
-        pending_approval=True, profile=json.dumps(data["profile"]),
+        pending_approval=False, institution_id=school.id if school else None,
+        profile=json.dumps(data["profile"]),
     )
     db.add(user)
     db.delete(reg)
     db.commit()
-    audit.record(db, "REGISTERED_PENDING_APPROVAL", user_id=user.id, subject=audit.mask_login(user.email), ip=ip)
+    audit.record(db, "REGISTERED", user_id=user.id, subject=audit.mask_login(user.email), ip=ip)
     admins = [a for a in db.scalars(select(User).where(
         User.role.in_(("SUPER_ADMIN", "INSTITUTION_ADMIN")), User.is_active.is_(True)))
         if a.role == "SUPER_ADMIN" or _admin_of_named_school(db, a, data["profile"].get("institution_name", ""))]
     _signup_notifications(db, user, data["profile"].get("institution_name", ""), admins)
     for admin in admins:
-        notify(db, ctx, admin.email, "Individ: yangi ro‘yxatdan o‘tish",
+        notify(db, ctx, admin.email, "Individ: yangi xodim qo‘shildi",
                         f"{user.full_name} ({data['profile'].get('institution_name', '')}) ro‘yxatdan o‘tdi va "
-                        "tasdiqlashingizni kutmoqda. Administrator panelida ko‘rib chiqing.", admin.id)
-    return {"ok": True, "message": "Email tasdiqlandi. Hisobingiz administrator tasdig‘idan so‘ng faollashadi"}
+                        "tizimga kirdi. Agar u sizning muassasangizda ishlamasa, administrator panelidagi "
+                        "“Foydalanuvchilar” bo‘limida hisobini bloklang.", admin.id)
+    sess = sessions.issue(db, s, user, request, response, mfa_verified=True, ip=ip, factor="email")
+    audit.record(db, "LOGIN_OK", user_id=user.id, ip=ip, detail="sign-up email code")
+    return _user_out(ctx, sess, user, message="Xush kelibsiz! Hisobingiz tayyor")

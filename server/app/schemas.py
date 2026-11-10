@@ -22,6 +22,25 @@ def _plain(value: str) -> str:
     return value
 
 
+_UZ_LOCAL = re.compile(r"^[2-9][0-9]{8}$")
+
+
+def _uz_phone(value: str) -> str:
+    """Uzbek numbers only: +998 and 9 digits. Stored one way, "+998 90 123 45 67",
+    however it was typed (spaces, dashes, brackets, with or without 998)."""
+    digits = re.sub(r"[ ()+-]", "", value or "")
+    if not digits.isdigit():
+        raise ValueError("telefon raqamida faqat raqamlar bo‘lsin")
+    if len(digits) == 12 and digits.startswith("998"):
+        digits = digits[3:]
+    if not _UZ_LOCAL.match(digits):
+        raise ValueError("faqat O‘zbekiston raqami: +998 XX XXX XX XX")
+    return f"+998 {digits[:2]} {digits[2:5]} {digits[5:7]} {digits[7:]}"
+
+
+UzPhone = Annotated[str, AfterValidator(_uz_phone)]
+
+
 def _text(value: str) -> str:
     # Free text (notes) may contain < and >; Flutter renders it as plain text
     # and the API only returns JSON, so it is never interpreted as HTML.
@@ -81,7 +100,7 @@ class RegisterIn(Strict):
     first_name: PlainStr = Field(min_length=2, max_length=60)
     last_name: PlainStr = Field(min_length=2, max_length=60)
     email: EmailStr = Field(max_length=254)
-    phone: str = Field(pattern=r"^\+?[0-9 ()-]{7,20}$")
+    phone: UzPhone = Field(max_length=30)
     role: Role
     specialization: PlainStr = Field(default="", max_length=120)
     qualification_category: PlainStr = Field(default="", max_length=60)
@@ -122,7 +141,7 @@ class UserCreateIn(Strict):
     full_name: PlainStr = Field(min_length=3, max_length=120)
     role: Role
     institution_id: str | None = Field(default=None, pattern=r"^[a-f0-9]{32}$")
-    phone: str | None = Field(default=None, pattern=r"^\+?[0-9 ()-]{7,20}$")
+    phone: UzPhone | None = Field(default=None, max_length=30)
 
 
 class UserUpdateIn(Strict):
@@ -138,7 +157,7 @@ class ProfileUpdateIn(Strict):
     first_name: PlainStr | None = Field(default=None, min_length=2, max_length=60)
     last_name: PlainStr | None = Field(default=None, min_length=2, max_length=60)
     middle_name: PlainStr | None = Field(default=None, max_length=60)
-    phone: str | None = Field(default=None, pattern=r"^\+?[0-9 ()-]{7,20}$")
+    phone: UzPhone | None = Field(default=None, max_length=30)
     specialization: PlainStr | None = Field(default=None, max_length=120)
     qualification_category: PlainStr | None = Field(default=None, max_length=60)
     experience_years: int | None = Field(default=None, ge=0, le=60)
