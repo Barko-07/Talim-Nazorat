@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Dark mode: the intro animation's dark surface colour. -->
-    <color name="splash_background">#FF1E1F21</color>
+    <!-- Dark mode: the intro animation's dark background colour. -->
+    <color name="splash_background">#FF121314</color>
 </resources>

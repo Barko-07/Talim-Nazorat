@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -33,7 +32,7 @@ IconData premiumRoleIcon(UserRole role) {
   }
 }
 
-/// Toza, rasmiy va davlat xizmatlari (my.gov.uz) standarti bo‘yicha orqa fon
+/// Sokin va toza minimalist orqa fon (ortiqcha yorqin ranglarsiz)
 class AmbientMeshBackground extends StatelessWidget {
   final Widget child;
   final bool intense;
@@ -46,9 +45,108 @@ class AmbientMeshBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AppColors.background,
-      child: child,
+    final subtleAlpha = intense ? 0.09 : 0.07;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        RepaintBoundary(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // 1. Asosiy yorug' va nafas oladigan fon (Fresh Porcelain & Light Sky Mist)
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    // Qorong'i mavzuda — sokin grafit, yorug'da — havorang tus
+                    colors:
+                        AppColors.isDark
+                            ? [
+                              AppColors.background,
+                              AppColors.background,
+                              AppColors.backgroundDeep,
+                              AppColors.backgroundDeep,
+                            ]
+                            : [
+                              AppColors.surfaceMuted,
+                              AppColors.primaryLight,
+                              AppColors.primaryLight,
+                              AppColors.primaryTint,
+                            ],
+                    stops: const [0.0, 0.35, 0.70, 1.0],
+                  ),
+                ),
+              ),
+              // 2. Tepa qismdan tushuvchi keng mayin yorug'lik nuri
+              Positioned(
+                top: -140,
+                left: -80,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 580,
+                    height: 580,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          AppColors.surface.withValues(alpha: 0.65),
+                          AppColors.surface.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // 3. Tepa o'ng burchakdagi juda mayin havorang havo nafasi
+              Positioned(
+                top: -180,
+                right: -120,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 540,
+                    height: 540,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          AppColors.primary.withValues(alpha: subtleAlpha),
+                          AppColors.primary.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // 4. Pastki chap tomondagi nozik binafsha-havorang jilo
+              Positioned(
+                bottom: -200,
+                left: -140,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 540,
+                    height: 540,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          AppColors.primary.withValues(
+                            alpha: subtleAlpha * 0.6,
+                          ),
+                          AppColors.primary.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        child,
+      ],
     );
   }
 }
@@ -66,6 +164,7 @@ class GlassSurface extends StatelessWidget {
   final Color? borderColor;
   final List<BoxShadow>? boxShadow;
   final bool useBlur;
+  final double borderWidth;
 
   const GlassSurface({
     super.key,
@@ -79,34 +178,45 @@ class GlassSurface extends StatelessWidget {
     this.tintColor,
     this.borderColor,
     this.boxShadow,
-    this.useBlur = false,
+    this.useBlur = true,
+    this.borderWidth = 1.0,
+    this.gradient,
   });
+
+  final Gradient? gradient;
 
   @override
   Widget build(BuildContext context) {
     final baseColor = tintColor ?? AppColors.surface;
     final radius = customBorderRadius ?? BorderRadius.circular(borderRadius);
-    final effectiveOpacity =
-        kIsWeb ? opacity.clamp(0.95, 1.0) : opacity.clamp(0.0, 1.0);
+    final effectiveOpacity = opacity.clamp(0.0, 1.0);
 
     Widget content = Container(
       padding: padding,
       decoration: BoxDecoration(
         borderRadius: radius,
-        color: baseColor.withValues(alpha: effectiveOpacity),
+        color:
+            gradient == null
+                ? baseColor.withValues(alpha: effectiveOpacity)
+                : null,
+        gradient: gradient,
         border: Border.all(
           color: borderColor ?? AppColors.glassWhiteBorder,
-          width: 1.0,
+          width: borderWidth,
         ),
       ),
       child: child,
     );
 
-    if (!kIsWeb && useBlur && blur > 0) {
+    if (useBlur && blur > 0) {
       content = ClipRRect(
         borderRadius: radius,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+          filter: ImageFilter.blur(
+            sigmaX: blur,
+            sigmaY: blur,
+            tileMode: TileMode.clamp,
+          ),
           child: content,
         ),
       );
@@ -206,7 +316,7 @@ class SurfaceCard extends StatefulWidget {
     this.backgroundColor,
     this.borderColor,
     this.elevated = true,
-    this.useBlur = false,
+    this.useBlur = true,
     this.blur = 20,
   });
 
@@ -226,12 +336,25 @@ class _SurfaceCardState extends State<SurfaceCard> {
         widget.borderColor ?? AppColors.cardGlassBorder;
 
     final hasCustomBg = widget.backgroundColor != null;
-    final effectiveBg =
-        hasCustomBg ? widget.backgroundColor! : AppColors.surface;
+    final topAlpha = AppColors.isDark ? 0.92 : 0.96;
+    final bottomAlpha = AppColors.isDark ? 0.80 : 0.86;
+    final baseSurfaceColor =
+        AppColors.isDark ? AppColors.surface : Colors.white;
 
     Widget cardInner = Container(
       decoration: BoxDecoration(
-        color: effectiveBg,
+        color: hasCustomBg ? widget.backgroundColor : null,
+        gradient:
+            hasCustomBg
+                ? null
+                : LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    baseSurfaceColor.withValues(alpha: topAlpha),
+                    baseSurfaceColor.withValues(alpha: bottomAlpha),
+                  ],
+                ),
         borderRadius: radius,
         border: Border.all(color: effectiveBorderColor, width: 1.0),
       ),
@@ -260,13 +383,14 @@ class _SurfaceCardState extends State<SurfaceCard> {
     );
 
     Widget frostedCard =
-        !kIsWeb && widget.useBlur && widget.blur > 0
+        widget.useBlur && widget.blur > 0
             ? ClipRRect(
               borderRadius: radius,
               child: BackdropFilter(
                 filter: ImageFilter.blur(
                   sigmaX: widget.blur,
                   sigmaY: widget.blur,
+                  tileMode: TileMode.clamp,
                 ),
                 child: cardInner,
               ),
@@ -344,7 +468,7 @@ class ResponsiveGlassGrid extends StatelessWidget {
     this.mobileColumns = 1,
     this.tabletColumns = 2,
     this.desktopColumns = 4,
-    this.spacing = 14,
+    this.spacing = 10,
   });
 
   @override
@@ -355,7 +479,7 @@ class ResponsiveGlassGrid extends StatelessWidget {
       builder: (context, constraints) {
         final w = constraints.maxWidth;
         final cols =
-            w >= 960
+            w >= 760
                 ? desktopColumns
                 : w >= 540
                 ? tabletColumns
@@ -433,10 +557,10 @@ class ResponsivePageContainer extends StatelessWidget {
     final width = MediaQuery.sizeOf(context).width;
     final horizontal =
         width < 600
-            ? 16.0
+            ? 12.0
             : width < 1024
-            ? 24.0
-            : 32.0;
+            ? 18.0
+            : 22.0;
 
     final hasAppBar = Scaffold.maybeOf(context)?.hasAppBar ?? false;
     final needsTopOffset = withTopHeaderPadding ?? !hasAppBar;
@@ -592,6 +716,7 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
               padding: pad,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (widget.icon != null) ...[
                     Icon(
@@ -623,114 +748,184 @@ class _HeaderActionButtonState extends State<HeaderActionButton> {
   }
 }
 
-/// Barcha ekranlar uchun mobil/desktop tekis tekislangan minimalist sahifa sarlavhasi
+/// Barcha ekranlar uchun mobil/desktop premium qutiga (SurfaceCard) olingan sahifa sarlavhasi
 class AdaptivePageHeader extends StatelessWidget {
   final String title;
   final String subtitle;
+  final String? badge;
   final Widget? action;
   final IconData? icon;
   final bool inlineActionOnMobile;
+  final bool boxed;
+  final double borderRadius;
+  final EdgeInsetsGeometry? padding;
 
   const AdaptivePageHeader({
     super.key,
     required this.title,
     required this.subtitle,
+    this.badge,
     this.action,
     this.icon,
-    this.inlineActionOnMobile = true,
+    this.inlineActionOnMobile = false,
+    this.boxed = true,
+    this.borderRadius = 24,
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
+    // Agar badge berilmagan bo'lsa va subtitle da ' • ' bo'lsa, avtomatik ajratamiz
+    String? effectiveBadge = badge;
+    String effectiveSubtitle = subtitle;
+    if (effectiveBadge == null && subtitle.contains(' • ')) {
+      final parts = subtitle.split(' • ');
+      final first = parts.first.trim();
+      final last = parts.sublist(1).join(' • ').trim();
+      if (first.length <= 42 &&
+          (first.contains('rahbar') ||
+              first.contains('qituvchi') ||
+              first.contains('mutaxassis') ||
+              first.contains('admin') ||
+              first.contains('psixolog') ||
+              first.contains('logoped') ||
+              first.contains('koordinator') ||
+              first.contains('direktor'))) {
+        effectiveBadge = first;
+        effectiveSubtitle = last;
+      }
+    }
+
+    Widget content = LayoutBuilder(
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 560;
 
-        // Agar action inline sig'masa (masalan, filter bar bo'lsa), pastga tushiramiz
-        if (action != null && !inlineActionOnMobile && isCompact) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: isCompact ? 20 : 23,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
-                  wordSpacing: 0.35,
-                  height: 1.2,
-                ),
+        Widget? iconWidget;
+        if (icon != null) {
+          iconWidget = Container(
+            width: isCompact ? 44 : 48,
+            height: isCompact ? 44 : 48,
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.primaryTint,
+                width: 1.0,
               ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: isCompact ? 12.5 : 13.0,
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w400,
-                  height: 1.35,
-                ),
-              ),
-              const SizedBox(height: 12),
-              action!,
-            ],
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              icon,
+              color: AppColors.primary,
+              size: isCompact ? 21 : 23,
+            ),
           );
         }
 
-        return Column(
+        final titleRow = Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: isCompact ? 18.5 : 21,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                letterSpacing: -0.3,
+                height: 1.2,
+              ),
+            ),
+            if (effectiveBadge != null)
+              StatusPill(
+                label: effectiveBadge,
+                color: AppColors.primary,
+                backgroundColor: AppColors.primaryLight,
+              ),
+          ],
+        );
+
+        final textBlock = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: isCompact ? 19.5 : 22.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.2,
-                      wordSpacing: 0.35,
-                      height: 1.2,
-                    ),
-                  ),
-                ),
-                if (action != null) ...[const SizedBox(width: 12), action!],
-              ],
-            ),
-            const SizedBox(height: 4),
+            titleRow,
+            const SizedBox(height: 3.5),
             Text(
-              subtitle,
+              effectiveSubtitle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: isCompact ? 12.5 : 13.0,
                 color: AppColors.textMuted,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.0,
-                wordSpacing: 0.25,
+                fontWeight: FontWeight.w500,
                 height: 1.35,
               ),
             ),
           ],
         );
+
+        // Desktop / Katta ekranlarda yonma-yon gorizontal joylashuv
+        if (!isCompact) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (iconWidget != null) ...[
+                iconWidget,
+                const SizedBox(width: 15),
+              ],
+              Expanded(child: textBlock),
+              if (action != null) ...[
+                const SizedBox(width: 16),
+                action!,
+              ],
+            ],
+          );
+        }
+
+        // Mobilda Boshqaruv kabi: tepada Matn/Ikona, pastda qulay To'liq kenglikdagi Tugma
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (iconWidget != null) ...[
+                  iconWidget,
+                  const SizedBox(width: 13),
+                ],
+                Expanded(child: textBlock),
+              ],
+            ),
+            if (action != null) ...[
+              const SizedBox(height: 14),
+              action!,
+            ],
+          ],
+        );
       },
+    );
+
+    if (!boxed) return content;
+
+    return SurfaceCard(
+      borderRadius: borderRadius,
+      padding:
+          padding ??
+          const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+      child: content,
     );
   }
 }
 
-/// Minimalist segmentli filtr-bar (12px tashqi, 9px ichki)
+/// Minimalist segmentli filtr-bar (13px tashqi, 10px ichki pill)
 class ModernPillFilterBar extends StatelessWidget {
   final List<String> items;
   final String selectedItem;
   final ValueChanged<String> onSelected;
   final Map<String, int>? counts;
+  final Map<String, Color>? itemColors;
 
   const ModernPillFilterBar({
     super.key,
@@ -738,19 +933,25 @@ class ModernPillFilterBar extends StatelessWidget {
     required this.selectedItem,
     required this.onSelected,
     this.counts,
+    this.itemColors,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDark;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.none,
       child: Container(
         padding: const EdgeInsets.all(3.5),
         decoration: BoxDecoration(
-          color: AppColors.surfaceMuted,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border, width: 0.9),
+          color: isDark ? AppColors.surfaceMuted : const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(
+            color: isDark ? AppColors.border : const Color(0xFFE2E8F0),
+            width: 1.0,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -758,11 +959,13 @@ class ModernPillFilterBar extends StatelessWidget {
               items.map((item) {
                 final isSelected = item == selectedItem;
                 final count = counts?[item];
+                final accentColor = itemColors?[item];
 
                 return _ModernFilterPillItem(
                   item: item,
                   isSelected: isSelected,
                   count: count,
+                  accentColor: accentColor,
                   onTap: () => onSelected(item),
                 );
               }).toList(),
@@ -776,12 +979,14 @@ class _ModernFilterPillItem extends StatefulWidget {
   final String item;
   final bool isSelected;
   final int? count;
+  final Color? accentColor;
   final VoidCallback onTap;
 
   const _ModernFilterPillItem({
     required this.item,
     required this.isSelected,
     required this.count,
+    this.accentColor,
     required this.onTap,
   });
 
@@ -790,91 +995,157 @@ class _ModernFilterPillItem extends StatefulWidget {
 }
 
 class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
+  bool _hovered = false;
   bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) => setState(() => _pressed = false),
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.94 : 1.0,
-        duration: Duration(milliseconds: _pressed ? 80 : 160),
-        curve: _pressed ? Curves.easeInCubic : Curves.easeOutCubic,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
+    final isDark = AppColors.isDark;
+    final accent = widget.accentColor;
+
+    // Asosiy fon ranglari: Tanlanmagan holatda `withValues(alpha: 0.0)` ishlatiladi.
+    // Bu Flutter'ning Color.lerp'i orqali animatsiya bo'lganda RGB o'zgarmasdan (255, 255, 255)
+    // faqat shaffoflik o'zgarishini ta'minlaydi va oraliq qora/kulrang miltillash (bug)ni 100% yo'qotadi.
+    final baseActiveBg = isDark ? AppColors.surfaceRaised : Colors.white;
+    final baseInactiveBg = baseActiveBg.withValues(alpha: 0.0);
+    final baseHoverBg = baseActiveBg.withValues(alpha: isDark ? 0.35 : 0.45);
+
+    final effectiveBg =
+        widget.isSelected
+            ? baseActiveBg
+            : (_hovered ? baseHoverBg : baseInactiveBg);
+
+    // Chegara (Border) ranglari: xuddi shunday alpha orqali toza o'tadi
+    final baseActiveBorder =
+        accent != null
+            ? accent.withValues(alpha: isDark ? 0.45 : 0.32)
+            : (isDark ? const Color(0x35FFFFFF) : AppColors.cardGlassBorder);
+    final baseInactiveBorder = baseActiveBorder.withValues(alpha: 0.0);
+    final baseHoverBorder =
+        baseActiveBorder.withValues(alpha: isDark ? 0.15 : 0.25);
+
+    final effectiveBorder =
+        widget.isSelected
+            ? baseActiveBorder
+            : (_hovered ? baseHoverBorder : baseInactiveBorder);
+
+    // Soya (BoxShadow) parametrlari: ikkala holatda ham bir xil elementlar soni va offset/blur
+    final shadowBaseColor = isDark ? Colors.black : const Color(0xFF0F172A);
+    final shadowColor1 = shadowBaseColor.withValues(
+      alpha: isDark ? 0.35 : 0.06,
+    );
+    final shadowColor2 = shadowBaseColor.withValues(
+      alpha: isDark ? 0.20 : 0.04,
+    );
+
+    final effectiveShadows = [
+      BoxShadow(
+        color:
+            widget.isSelected
+                ? shadowColor1
+                : shadowColor1.withValues(alpha: 0.0),
+        blurRadius: 4,
+        offset: const Offset(0, 1.5),
+      ),
+      BoxShadow(
+        color:
+            widget.isSelected
+                ? shadowColor2
+                : shadowColor2.withValues(alpha: 0.0),
+        blurRadius: 8,
+        offset: const Offset(0, 3),
+      ),
+    ];
+
+    final activeTextColor = accent ?? AppColors.textPrimary;
+    final badgeAccent = accent ?? AppColors.primary;
+    final badgeActiveBg =
+        accent != null
+            ? accent.withValues(alpha: isDark ? 0.22 : 0.14)
+            : AppColors.primaryLight;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapUp: (_) => setState(() => _pressed = false),
+        onTapCancel: () => setState(() => _pressed = false),
+        child: AnimatedScale(
+          scale: _pressed ? 0.98 : 1.0,
+          duration: Duration(milliseconds: _pressed ? 70 : 150),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7.5),
-          decoration: BoxDecoration(
-            color:
-                widget.isSelected
-                    ? AppColors.surfaceRaised
-                    : Colors.transparent,
-            borderRadius: BorderRadius.circular(9),
-            border: Border.all(
-              color:
-                  widget.isSelected
-                      ? AppColors.glassWhiteBorder
-                      : Colors.transparent,
-              width: 0.85,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7.5),
+            decoration: BoxDecoration(
+              color: effectiveBg,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: effectiveBorder, width: 1.0),
+              boxShadow: effectiveShadows,
             ),
-            boxShadow:
-                widget.isSelected
-                    ? const [
-                      BoxShadow(
-                        color: Color(0x0D0A1A3F),
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
-                      ),
-                    ]
-                    : null,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                widget.item,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight:
-                      widget.isSelected ? FontWeight.w700 : FontWeight.w600,
-                  color:
-                      widget.isSelected
-                          ? AppColors.textPrimary
-                          : AppColors.textMuted,
-                ),
-              ),
-              if (widget.count != null) ...[
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 1.5,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                        widget.isSelected
-                            ? AppColors.primaryLight
-                            : AppColors.surface.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    '${widget.count}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                      color:
-                          widget.isSelected
-                              ? AppColors.primary
-                              : AppColors.textMuted,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (accent != null) ...[
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: accent,
+                      shape: BoxShape.circle,
                     ),
                   ),
+                  const SizedBox(width: 6),
+                ],
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOutCubic,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight:
+                        widget.isSelected ? FontWeight.w700 : FontWeight.w600,
+                    color:
+                        widget.isSelected
+                            ? activeTextColor
+                            : AppColors.textMuted,
+                  ),
+                  child: Text(widget.item),
                 ),
+                if (widget.count != null) ...[
+                  const SizedBox(width: 6),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6.5,
+                      vertical: 1.5,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          widget.isSelected
+                              ? badgeActiveBg
+                              : badgeActiveBg.withValues(alpha: 0.0),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '${widget.count}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                        color:
+                            widget.isSelected
+                                ? badgeAccent
+                                : AppColors.textMuted,
+                      ),
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

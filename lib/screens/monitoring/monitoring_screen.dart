@@ -213,6 +213,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
           children: [
             AdaptivePageHeader(
               title: 'Monitoring tizimi',
+              icon: LucideIcons.activity,
               subtitle:
                   'Xavfli tendensiyalarni erta aniqlash va nazorat qilish',
               inlineActionOnMobile: false,
@@ -257,72 +258,47 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: [
-                        _buildSvetoforCounter(
-                          label: 'Barchasi',
-                          count: summary.total,
-                          color: AppColors.primary,
-                          bg: AppColors.primaryLight,
-                          selected: _selectedSvetoforFilter == null,
-                          onTap:
-                              () => setState(
-                                () => _selectedSvetoforFilter = null,
-                              ),
-                        ),
-                        _buildSvetoforCounter(
-                          label: 'Qizil (Ishlanmagan)',
-                          count: summary.count(StatusColor.red),
-                          color: AppColors.error,
-                          bg: AppColors.errorBg,
-                          selected: _selectedSvetoforFilter == StatusColor.red,
-                          onTap:
-                              () => setState(
-                                () =>
-                                    _selectedSvetoforFilter =
-                                        _selectedSvetoforFilter ==
-                                                StatusColor.red
-                                            ? null
-                                            : StatusColor.red,
-                              ),
-                        ),
-                        _buildSvetoforCounter(
-                          label: 'Sariq (E’tibor talab)',
-                          count: summary.count(StatusColor.yellow),
-                          color: AppColors.warning,
-                          bg: AppColors.warningBg,
-                          selected:
-                              _selectedSvetoforFilter == StatusColor.yellow,
-                          onTap:
-                              () => setState(
-                                () =>
-                                    _selectedSvetoforFilter =
-                                        _selectedSvetoforFilter ==
-                                                StatusColor.yellow
-                                            ? null
-                                            : StatusColor.yellow,
-                              ),
-                        ),
-                        _buildSvetoforCounter(
-                          label: 'Yashil (Ijobiy)',
-                          count: summary.count(StatusColor.green),
-                          color: AppColors.success,
-                          bg: AppColors.successBg,
-                          selected:
-                              _selectedSvetoforFilter == StatusColor.green,
-                          onTap:
-                              () => setState(
-                                () =>
-                                    _selectedSvetoforFilter =
-                                        _selectedSvetoforFilter ==
-                                                StatusColor.green
-                                            ? null
-                                            : StatusColor.green,
-                              ),
-                        ),
+                    ModernPillFilterBar(
+                      items: const [
+                        'Barchasi',
+                        'Qizil (Ishlanmagan)',
+                        'Sariq (E’tibor talab)',
+                        'Yashil (Ijobiy)',
                       ],
+                      selectedItem:
+                          _selectedSvetoforFilter == StatusColor.red
+                              ? 'Qizil (Ishlanmagan)'
+                              : _selectedSvetoforFilter == StatusColor.yellow
+                              ? 'Sariq (E’tibor talab)'
+                              : _selectedSvetoforFilter == StatusColor.green
+                              ? 'Yashil (Ijobiy)'
+                              : 'Barchasi',
+                      counts: {
+                        'Barchasi': summary.total,
+                        'Qizil (Ishlanmagan)': summary.count(StatusColor.red),
+                        'Sariq (E’tibor talab)': summary.count(
+                          StatusColor.yellow,
+                        ),
+                        'Yashil (Ijobiy)': summary.count(StatusColor.green),
+                      },
+                      itemColors: {
+                        'Qizil (Ishlanmagan)': AppColors.error,
+                        'Sariq (E’tibor talab)': AppColors.warning,
+                        'Yashil (Ijobiy)': AppColors.success,
+                      },
+                      onSelected: (v) {
+                        setState(() {
+                          if (v == 'Qizil (Ishlanmagan)') {
+                            _selectedSvetoforFilter = StatusColor.red;
+                          } else if (v == 'Sariq (E’tibor talab)') {
+                            _selectedSvetoforFilter = StatusColor.yellow;
+                          } else if (v == 'Yashil (Ijobiy)') {
+                            _selectedSvetoforFilter = StatusColor.green;
+                          } else {
+                            _selectedSvetoforFilter = null;
+                          }
+                        });
+                      },
                     ),
                     const SizedBox(height: 16),
                     ...filteredStatuses.map(
@@ -425,63 +401,6 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
       appBar: canPop ? AppBar(title: const Text('Monitoring')) : null,
       body: canPop ? AmbientMeshBackground(child: scrollBody) : scrollBody,
-    );
-  }
-
-  Widget _buildSvetoforCounter({
-    required String label,
-    required int count,
-    required Color color,
-    required Color bg,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected ? color : bg,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selected ? color : color.withValues(alpha: 0.35),
-            width: 1.2,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: selected ? Colors.white : color,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-              decoration: BoxDecoration(
-                color:
-                    selected
-                        ? Colors.white.withValues(alpha: 0.22)
-                        : color.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                '$count',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: selected ? Colors.white : color,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

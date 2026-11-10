@@ -216,7 +216,7 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
                             ),
                             Expanded(
                               child: DropdownButtonFormField<AssessmentModel>(
-                                value: _assessmentB,
+                                initialValue: _assessmentB,
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   labelText: 'B-Baholash (Taqqoslanuvchi)',
@@ -386,8 +386,8 @@ class _AssessmentCompareDialogState extends State<AssessmentCompareDialog> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),

@@ -201,19 +201,27 @@ class AppColors {
   static Color get surfaceRaised => _p.surfaceRaised;
   static Color get card => _p.surface;
 
-  // Yuza qatlamlari — my.gov.uz davlat xizmatlari standarti: sof, aniq va mustahkam
-  static Color get glassFill => _p.surface;
-  static Color get glassFillStrong => _p.surface;
-  static Color get glassWellFill => _p.surfaceMuted;
+  // Yuza qatlamlari — nafis shisha (glassy) va chinni-kulrang uslubi
+  static Color get glassFill =>
+      _p.surface.withValues(alpha: _p.isDark ? 0.88 : 0.82);
+  static Color get glassFillStrong =>
+      _p.surface.withValues(alpha: _p.isDark ? 0.94 : 0.90);
+  static Color get glassWellFill =>
+      _p.isDark ? _p.surfaceMuted : const Color(0xFFF1F5F9);
   static Color get glassRecessedFill =>
-      _p.isDark ? _p.backgroundDeep : const Color(0xFFF1F5F9);
-  static Color get glassSpecular => _p.surface;
-  static Color get glassWhiteBorder => _p.border;
-  static Color get glassInnerBorder => _p.border;
-  static Color get hairlineBorder => _p.border;
-  static Color get cardGlassBorder => _p.border;
-  static Color get navGlassBorder => _p.border;
-  static double get navGlassOpacity => 1.0;
+      _p.isDark ? _p.backgroundDeep : const Color(0xFFEAF0F6);
+  static Color get glassSpecular => Colors.white;
+  static Color get glassWhiteBorder =>
+      _p.isDark ? const Color(0x22FFFFFF) : const Color(0xFFFFFFFF);
+  static Color get glassInnerBorder =>
+      _p.isDark ? const Color(0x18FFFFFF) : const Color(0xE0FFFFFF);
+  static Color get hairlineBorder =>
+      _p.isDark ? _p.border : const Color(0xFFE2E8F0);
+  static Color get cardGlassBorder =>
+      _p.isDark ? const Color(0x24FFFFFF) : const Color(0xFFFFFFFF);
+  static Color get navGlassBorder =>
+      _p.isDark ? const Color(0x30FFFFFF) : const Color(0xB0FFFFFF);
+  static double get navGlassOpacity => _p.isDark ? 0.72 : 0.65;
 
   // Matn
   static Color get textPrimary => _p.textPrimary;
@@ -259,9 +267,9 @@ class AppColors {
 
   static List<BoxShadow> get navShadow => [
     BoxShadow(
-      color: _p.shadow.withValues(alpha: _p.isDark ? 0.35 : 0.045),
-      blurRadius: 20,
-      spreadRadius: -3,
+      color: _p.shadow.withValues(alpha: _p.isDark ? 0.35 : 0.07),
+      blurRadius: 18,
+      spreadRadius: -2,
       offset: const Offset(0, 5),
     ),
   ];

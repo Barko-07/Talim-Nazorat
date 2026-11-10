@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/psychological_methods_data.dart';
 import '../../../providers/app_provider.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
 class PsychologistMethodsTab extends StatefulWidget {
   final Function(int tabIndex)? onNavigateToTab;
@@ -86,115 +87,64 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           return matchesDomain && matchesSearch;
         }).toList();
 
+    final width = MediaQuery.sizeOf(context).width;
+    final horizontalPad = width < 600 ? 12.0 : 18.0;
     return Scaffold(
-      backgroundColor: AppColors.surfaceMuted,
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.fromLTRB(
+          horizontalPad,
+          MediaQuery.paddingOf(context).top + (width >= 920 ? 82 : 74),
+          horizontalPad,
+          width < 920 ? (84 + MediaQuery.paddingOf(context).bottom) : 24,
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Sarlavha paneli
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
+            // Sarlavha paneli (Minimalist Glassy Header)
+            SurfaceCard(
+              borderRadius: 24,
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      LucideIcons.bookOpen,
-                      color: AppColors.primary,
-                      size: 28,
+                  StatusPill(
+                    label: '${allMethods.length} ta tasdiqlangan metodika',
+                    color: AppColors.primary,
+                    backgroundColor: AppColors.primaryLight,
+                    icon: LucideIcons.verified,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Psixologik metodikalar va vositalar to‘plami',
+                    style: TextStyle(
+                      fontSize: width < 600 ? 18.5 : 21,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      letterSpacing: -0.3,
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Psixologik metodikalar va vositalar to‘plami',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Maktab amaliyotchi psixologi faoliyatida tasdiqlangan diagnostik metodikalar, ko‘rsatmalar va me’yoriy talqinlar.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary.withOpacity(0.9),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.primaryTint),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          LucideIcons.verified,
-                          size: 16,
-                          color: AppColors.primaryDark,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${allMethods.length} ta tasdiqlangan metodika',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryDark,
-                          ),
-                        ),
-                      ],
+                  const SizedBox(height: 4),
+                  Text(
+                    'Maktab amaliyotchi psixologi faoliyatida tasdiqlangan diagnostik metodikalar, ko‘rsatmalar va me’yoriy talqinlar.',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: AppColors.textMuted,
+                      height: 1.4,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
             // Qidiruv va soha filtrlari
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-              ),
+            SurfaceCard(
+              borderRadius: 24,
+              padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Qidiruv maydoni
                   TextField(
                     controller: _searchController,
                     onChanged: (val) {
@@ -207,6 +157,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           'Metodika nomi, kodi (RAVEN, LANDOLT...), muallifi bo‘yicha qidiring...',
                       prefixIcon: Icon(
                         LucideIcons.search,
+                        size: 18,
                         color: AppColors.textSecondary,
                       ),
                       suffixIcon:
@@ -224,147 +175,87 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                       filled: true,
                       fillColor: AppColors.surfaceMuted,
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                        horizontal: 14,
+                        vertical: 11,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.border),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.border),
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
-
-                  // Soha chiplari
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children:
-                          dynamicDomains.map((domain) {
-                            final isSelected = _selectedDomain == domain;
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: ChoiceChip(
-                                label: Text(domain),
-                                selected: isSelected,
-                                onSelected: (selected) {
-                                  if (selected) {
-                                    setState(() {
-                                      _selectedDomain = domain;
-                                    });
-                                  }
-                                },
-                                selectedColor: AppColors.primary.withOpacity(
-                                  0.12,
-                                ),
-                                backgroundColor: AppColors.surfaceMuted,
-                                labelStyle: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight:
-                                      isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
-                                  color:
-                                      isSelected
-                                          ? AppColors.primary
-                                          : AppColors.textSecondary,
-                                ),
-                                side: BorderSide(
-                                  color:
-                                      isSelected
-                                          ? AppColors.primary
-                                          : Colors.transparent,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                    ),
+                  ModernPillFilterBar(
+                    items: dynamicDomains,
+                    selectedItem: _selectedDomain,
+                    onSelected:
+                        (domain) => setState(() => _selectedDomain = domain),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
             // Metodikalar ro'yxati yoki bo'sh holat
             if (filteredMethods.isEmpty)
-              Container(
-                width: double.infinity,
+              SurfaceCard(
+                borderRadius: 24,
                 padding: const EdgeInsets.all(40),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      LucideIcons.searchX,
-                      size: 54,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Bunday parametr bo‘yicha metodika topilmadi',
-                      style: TextStyle(
-                        fontSize: 15.5,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        LucideIcons.searchX,
+                        size: 46,
+                        color: AppColors.textSubtle,
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Qidiruv so‘zini o‘zgartiring yoki filtrlarni tozalang.',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
+                      const SizedBox(height: 12),
+                      Text(
+                        'Bunday parametr bo‘yicha metodika topilmadi',
+                        style: TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    OutlinedButton(
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() {
-                          _searchQuery = '';
-                          _selectedDomain = 'Barchasi';
-                        });
-                      },
-                      child: const Text('Filtrlarni tozalash'),
-                    ),
-                  ],
+                      const SizedBox(height: 6),
+                      Text(
+                        'Qidiruv so‘zini o‘zgartiring yoki filtrlarni tozalang.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      HeaderActionButton(
+                        label: 'Filtrlarni tozalash',
+                        variant: HeaderActionVariant.secondary,
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {
+                            _searchQuery = '';
+                            _selectedDomain = 'Barchasi';
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               )
             else
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  if (constraints.maxWidth > 850) {
-                    return Wrap(
-                      spacing: 16,
-                      runSpacing: 16,
-                      children:
-                          filteredMethods.map((m) {
-                            final cardWidth = (constraints.maxWidth - 16) / 2;
-                            return SizedBox(
-                              width: cardWidth,
-                              child: _buildMethodCard(context, m),
-                            );
-                          }).toList(),
-                    );
-                  } else {
-                    return Column(
-                      children:
-                          filteredMethods.map((m) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: _buildMethodCard(context, m),
-                            );
-                          }).toList(),
-                    );
-                  }
-                },
+              ResponsiveGlassGrid(
+                mobileColumns: 1,
+                tabletColumns: 1,
+                desktopColumns: 2,
+                spacing: 12,
+                children:
+                    filteredMethods
+                        .map((m) => _buildMethodCard(context, m))
+                        .toList(),
               ),
           ],
         ),
@@ -376,86 +267,55 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
     final domainColor = _getDomainColor(m.domain);
     final domainIcon = _getDomainIcon(m.domain);
 
-    return Container(
+    return SurfaceCard(
+      borderRadius: 22,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Yuqori qator: Kod, Soha va Vaqt
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            alignment: WrapAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: domainColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: domainColor.withOpacity(0.3)),
-                ),
-                child: Text(
-                  m.code,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  StatusPill(
+                    label: m.code,
                     color: domainColor,
+                    backgroundColor: domainColor.withValues(alpha: 0.1),
                   ),
-                ),
+                  StatusPill(
+                    label: m.domain,
+                    color: AppColors.textSecondary,
+                    backgroundColor: AppColors.surfaceMuted,
+                    icon: domainIcon,
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceMuted,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(domainIcon, size: 12, color: AppColors.textSecondary),
-                    const SizedBox(width: 4),
-                    Text(
-                      m.domain,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              Flexible(
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 6,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Icon(
-                      LucideIcons.timer,
-                      size: 14,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    LucideIcons.timer,
+                    size: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '~${m.durationMinutes} daq',
+                    style: TextStyle(
+                      fontSize: 11.5,
                       color: AppColors.textSecondary,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '~${m.durationMinutes} daq',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -465,31 +325,57 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           Text(
             m.title,
             style: TextStyle(
-              fontSize: 15.5,
-              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
               height: 1.3,
             ),
           ),
-          const SizedBox(height: 4),
-          Row(
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 12,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Icon(
-                LucideIcons.userRound,
-                size: 14,
-                color: AppColors.textSecondary,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    LucideIcons.userRound,
+                    size: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(width: 4),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 180),
+                    child: Text(
+                      'Muallif: ${m.author}',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 4),
-              Text(
-                'Muallif: ${m.author}',
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-              ),
-              const SizedBox(width: 12),
-              Icon(LucideIcons.cake, size: 14, color: AppColors.textSecondary),
-              const SizedBox(width: 4),
-              Text(
-                m.targetAge,
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    LucideIcons.cake,
+                    size: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    m.targetAge,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -501,7 +387,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 12.5,
               color: AppColors.textSecondary,
               height: 1.4,
             ),
@@ -512,7 +398,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
               decoration: BoxDecoration(
                 color: AppColors.warningBg,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: AppColors.warning.withValues(alpha: 0.4),
                 ),
@@ -544,31 +430,40 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           const SizedBox(height: 12),
 
           // Subshkalalar soni va max ball
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceMuted,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Row(
+          GlassWell(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            borderRadius: 12,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                Icon(LucideIcons.listChecks, size: 14, color: domainColor),
-                const SizedBox(width: 6),
-                Text(
-                  '${m.subscales.length} ta parametr / shkala',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(LucideIcons.listChecks, size: 14, color: domainColor),
+                    const SizedBox(width: 6),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 170),
+                      child: Text(
+                        '${m.subscales.length} ta parametr / shkala',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const Spacer(),
                 Text(
                   'Maksimal ball: ${m.maxScore.toInt()}',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 11.5,
                     color: AppColors.textSecondary,
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 ),
               ],
@@ -577,39 +472,24 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
           const SizedBox(height: 16),
 
           // Tugmalar
-          Row(
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _showMethodDetailsDialog(context, m),
-                  icon: const Icon(LucideIcons.info, size: 16),
-                  label: const Text('Ko‘rsatma va me’yor'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    textStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+              HeaderActionButton(
+                label: 'Ko‘rsatma va me’yor',
+                compactLabel: 'Ko‘rsatma',
+                icon: LucideIcons.info,
+                variant: HeaderActionVariant.secondary,
+                onPressed: () => _showMethodDetailsDialog(context, m),
               ),
-              const SizedBox(width: 10),
-              ElevatedButton.icon(
+              HeaderActionButton(
+                label: 'Baholashni boshlash',
+                compactLabel: 'Baholash',
+                icon: LucideIcons.play,
                 onPressed: () => _startAssessmentWithMethod(context, m),
-                icon: const Icon(LucideIcons.play, size: 16),
-                label: const Text('Baholash'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: domainColor,
-                  foregroundColor: AppColors.onPrimary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
               ),
             ],
           ),
@@ -645,7 +525,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: domainColor.withOpacity(0.1),
+                        color: domainColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -667,7 +547,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: domainColor.withOpacity(0.12),
+                                  color: domainColor.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -875,7 +755,7 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: AppColors.warningBg.withOpacity(0.3),
+                            color: AppColors.warningBg.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: AppColors.warningBorder),
                           ),

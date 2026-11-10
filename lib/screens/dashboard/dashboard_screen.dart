@@ -299,7 +299,7 @@ class DashboardScreen extends StatelessWidget {
     final initials = _initialsFor(user?.fullName);
 
     return SurfaceCard(
-      borderRadius: 16,
+      borderRadius: 26,
       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -1257,8 +1257,8 @@ class DashboardScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return SurfaceCard(
-      borderRadius: 16,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      borderRadius: 26,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1274,27 +1274,17 @@ class DashboardScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textSecondary,
                     height: 1.25,
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: color.withValues(
-                    alpha: AppColors.isDark ? 0.20 : 0.10,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(icon, color: color, size: 19),
-              ),
+              Icon(icon, color: color, size: 21),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1307,7 +1297,7 @@ class DashboardScreen extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                   letterSpacing: -0.7,
-                  fontFeatures: [FontFeature.tabularFigures()],
+                  fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
               const SizedBox(height: 3),

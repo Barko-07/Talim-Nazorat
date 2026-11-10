@@ -1,6 +1,7 @@
-"""Checks the opening sequence of the site in a real browser: the HTML loading
-screen shows at once, the Flutter opening animation follows, then the landing
-page; the loading screen is gone. Screenshots to build/opening/.
+"""Checks the opening sequence of the site in a real browser: a plain background
+in the intro's colour shows at once (no white page, no second loading screen),
+it is removed when Flutter draws its first frame, the opening animation
+(IntroScreen) plays, then the landing page. Screenshots to build/opening/.
 
     python tool/check_opening.py [url]      (default: local preview)
 """
@@ -26,9 +27,9 @@ async def main():
         await page.add_init_script("""
           window.__t0 = Date.now();
           new MutationObserver(ms => { for (const m of ms) {
-            if (m.target.id === 'app-splash' && m.attributeName === 'class' && !window.__hiddenAt)
+            for (const n of m.removedNodes) if (n.id === 'app-splash' && !window.__hiddenAt)
               window.__hiddenAt = Date.now() - window.__t0; } })
-            .observe(document, {subtree: true, attributes: true});
+            .observe(document, {subtree: true, childList: true});
         """)
         errors = []
         page.on("pageerror", lambda e: errors.append(str(e)[:200]))
@@ -45,12 +46,12 @@ async def main():
         await page.wait_for_selector("flutter-view, flt-glass-pane", state="attached", timeout=90000)
         await page.wait_for_timeout(900)
         await page.screenshot(path=str(OUT / "2_intro.png"))
-        await page.wait_for_timeout(3500)
+        await page.wait_for_timeout(6000)
         await page.screenshot(path=str(OUT / "3_landing.png"))
         shown_ms = await page.evaluate("window.__hiddenAt || 0")
-        long_enough = shown_ms >= 2300
-        print(("OK   " if long_enough else "FAIL ") + f"Ochilish animatsiyasi to‘liq ko‘rindi ({shown_ms} ms)")
-        ok &= long_enough
+        handed = shown_ms > 0
+        print(("OK   " if handed else "FAIL ") + f"Fon Flutter birinchi kadrida olib tashlandi ({shown_ms} ms)")
+        ok &= handed
         gone = await page.locator("#app-splash").count() == 0
         print(("OK   " if gone else "FAIL ") + "Ilova ochilgach yuklanish ekrani olib tashlandi")
         ok &= gone

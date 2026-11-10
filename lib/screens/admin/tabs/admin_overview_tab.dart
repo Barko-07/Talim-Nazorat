@@ -126,11 +126,13 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
       {'id': 'Barchasi', 'name': 'Barcha mutaxassislar'},
     ];
     for (final sp in app.specialists) {
-      if (_selectedDistrict != 'Barchasi' && sp.district != _selectedDistrict)
+      if (_selectedDistrict != 'Barchasi' && sp.district != _selectedDistrict) {
         continue;
+      }
       if (_selectedInstitution != 'Barchasi' &&
-          sp.institutionName != _selectedInstitution)
+          sp.institutionName != _selectedInstitution) {
         continue;
+      }
       specialistOptions.add({
         'id': sp.id,
         'name': '${sp.fullName} (${sp.role.label})',
@@ -178,14 +180,17 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     final filteredSpecialists =
         app.specialists.where((sp) {
           if (_selectedDistrict != 'Barchasi' &&
-              sp.district != _selectedDistrict)
+              sp.district != _selectedDistrict) {
             return false;
+          }
           if (_selectedInstitution != 'Barchasi' &&
-              sp.institutionName != _selectedInstitution)
+              sp.institutionName != _selectedInstitution) {
             return false;
+          }
           if (_selectedSpecialistId != 'Barchasi' &&
-              sp.id != _selectedSpecialistId)
+              sp.id != _selectedSpecialistId) {
             return false;
+          }
           return true;
         }).toList();
 
@@ -236,11 +241,13 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     // Tartiblash: qizillar oldinda, keyin kechikish kunlari bo'yicha
     attentionCases.sort((a, b) {
       if (a.status.color == StatusColor.red &&
-          b.status.color != StatusColor.red)
+          b.status.color != StatusColor.red) {
         return -1;
+      }
       if (a.status.color != StatusColor.red &&
-          b.status.color == StatusColor.red)
+          b.status.color == StatusColor.red) {
         return 1;
+      }
       return b.delayDays.compareTo(a.delayDays);
     });
 
@@ -644,8 +651,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -721,7 +728,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 SizedBox(
                   width: 210,
                   child: DropdownButtonFormField<String>(
-                    value:
+                    initialValue:
                         districtOptions.contains(_selectedDistrict)
                             ? _selectedDistrict
                             : 'Barchasi',
@@ -767,7 +774,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 SizedBox(
                   width: 250,
                   child: DropdownButtonFormField<String>(
-                    value:
+                    initialValue:
                         institutionOptions.contains(_selectedInstitution)
                             ? _selectedInstitution
                             : 'Barchasi',
@@ -800,8 +807,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         isInstitutionAdmin
                             ? null
                             : (val) {
-                              if (val != null)
+                              if (val != null) {
                                 setState(() => _selectedInstitution = val);
+                              }
                             },
                   ),
                 ),
@@ -810,7 +818,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 SizedBox(
                   width: 240,
                   child: DropdownButtonFormField<String>(
-                    value:
+                    initialValue:
                         specialistOptions.any(
                               (s) => s['id'] == _selectedSpecialistId,
                             )
@@ -842,8 +850,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                           );
                         }).toList(),
                     onChanged: (val) {
-                      if (val != null)
+                      if (val != null) {
                         setState(() => _selectedSpecialistId = val);
+                      }
                     },
                   ),
                 ),
@@ -852,7 +861,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 SizedBox(
                   width: 170,
                   child: DropdownButtonFormField<String>(
-                    value: _selectedPeriod,
+                    initialValue: _selectedPeriod,
                     isExpanded: true,
                     isDense: true,
                     decoration: InputDecoration(
@@ -907,7 +916,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 SizedBox(
                   width: 200,
                   child: DropdownButtonFormField<String>(
-                    value: _selectedDomain,
+                    initialValue: _selectedDomain,
                     isExpanded: true,
                     isDense: true,
                     decoration: InputDecoration(
@@ -1068,106 +1077,128 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: AppColors.error.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          LucideIcons.circleAlert,
-                          color: AppColors.error,
-                          size: 22,
-                        ),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 640;
+                final headerText = Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.error.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    'E’tibor Talab Etiladigan O‘quvchilar va Kechikkan Amallar',
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 15.5,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 7,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.error,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Text(
-                                    '${attentionCases.length}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Faoliyat kiritilmagan, 30 kundan ortiq kechikkan yoki testlari to‘liq bo‘lmagan bolalar',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (attentionCases.length > 5)
-                  TextButton(
-                    onPressed: () {
-                      setState(
-                        () => _showAllAttentionCases = !_showAllAttentionCases,
-                      );
-                    },
-                    child: Text(
-                      _showAllAttentionCases
-                          ? 'Qisqartirish'
-                          : 'Barchasini ko‘rish (${attentionCases.length})',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                      child: Icon(
+                        LucideIcons.circleAlert,
+                        color: AppColors.error,
+                        size: 22,
                       ),
                     ),
-                  ),
-              ],
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                'E’tibor Talab Etiladigan O‘quvchilar va Kechikkan Amallar',
+                                style: TextStyle(
+                                  fontSize: 15.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.error,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '${attentionCases.length}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Faoliyat kiritilmagan, 30 kundan ortiq kechikkan yoki testlari to‘liq bo‘lmagan bolalar',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+
+                final toggleBtn = attentionCases.length > 5
+                    ? TextButton(
+                        onPressed: () {
+                          setState(
+                            () => _showAllAttentionCases = !_showAllAttentionCases,
+                          );
+                        },
+                        child: Text(
+                          _showAllAttentionCases
+                              ? 'Qisqartirish'
+                              : 'Barchasini ko‘rish (${attentionCases.length})',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      )
+                    : null;
+
+                if (isCompact) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      headerText,
+                      if (toggleBtn != null) ...[
+                        const SizedBox(height: 8),
+                        toggleBtn,
+                      ],
+                    ],
+                  );
+                }
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: headerText),
+                    if (toggleBtn != null) ...[
+                      const SizedBox(width: 12),
+                      toggleBtn,
+                    ],
+                  ],
+                );
+              },
             ),
             const Divider(height: 24),
             if (attentionCases.isEmpty)
@@ -1223,10 +1254,11 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                 : AppColors.warning.withValues(alpha: 0.2),
                       ),
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
+                    child: LayoutBuilder(
+                      builder: (context, itemConstraints) {
+                        final isCompact = itemConstraints.maxWidth < 560;
+
+                        final avatarBadge = CircleAvatar(
                           radius: 18,
                           backgroundColor:
                               isRed ? AppColors.errorBg : AppColors.warningBg,
@@ -1235,111 +1267,105 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                             color: isRed ? AppColors.error : AppColors.warning,
                             size: 18,
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 4,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: [
-                                  Text(
-                                    item.student.fullName,
+                        );
+
+                        final itemInfo = Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  item.student.fullName,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 1.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surface,
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(
+                                      color: AppColors.border,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '${item.student.grade} • ${item.student.institutionName}',
                                     style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                      color: AppColors.textPrimary,
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
                                     ),
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 1.5,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.surface,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: AppColors.border,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      '${item.student.grade} • ${item.student.institutionName}',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
+                                ),
+                                _buildBadge(
+                                  label: item.delayLabel,
+                                  color:
+                                      isRed
+                                          ? AppColors.error
+                                          : AppColors.warning,
+                                  bgColor: Colors.white,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  'Yetishmayotgan faoliyat: ',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textMuted,
                                   ),
-                                  _buildBadge(
-                                    label: item.delayLabel,
+                                ),
+                                Text(
+                                  item.missingActivity,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
                                     color:
                                         isRed
                                             ? AppColors.error
                                             : AppColors.warning,
-                                    bgColor: Colors.white,
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      'Yetishmayotgan faoliyat: ',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.textMuted,
-                                      ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  LucideIcons.userRound,
+                                  size: 14,
+                                  color: AppColors.textMuted,
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    'Mas’ul mutaxassis: ${item.specialistName}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
                                     ),
                                   ),
-                                  Expanded(
-                                    child: Text(
-                                      item.missingActivity,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color:
-                                            isRed
-                                                ? AppColors.error
-                                                : AppColors.warning,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Icon(
-                                    LucideIcons.userRound,
-                                    size: 14,
-                                    color: AppColors.textMuted,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      'Mas’ul mutaxassis: ${item.specialistName}',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        ElevatedButton.icon(
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+
+                        final openBtn = ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.surface,
                             foregroundColor:
@@ -1380,8 +1406,37 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ),
-                      ],
+                        );
+
+                        if (isCompact) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  avatarBadge,
+                                  const SizedBox(width: 12),
+                                  Expanded(child: itemInfo),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              SizedBox(width: double.infinity, child: openBtn),
+                            ],
+                          );
+                        }
+
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            avatarBadge,
+                            const SizedBox(width: 12),
+                            Expanded(child: itemInfo),
+                            const SizedBox(width: 12),
+                            openBtn,
+                          ],
+                        );
+                      },
                     ),
                   );
                 },
@@ -1404,27 +1459,38 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                Icon(LucideIcons.shield, color: AppColors.primary, size: 22),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Avtomatlashtirilgan Monitoring Markazi',
-                    style: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(LucideIcons.shield, color: AppColors.primary, size: 22),
+                    const SizedBox(width: 10),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 220),
+                      child: Text(
+                        'Avtomatlashtirilgan Monitoring Markazi',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 TextButton(
                   onPressed: () => widget.onNavigateTab(8), // Monitoring tabi
@@ -1540,8 +1606,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1750,8 +1816,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1974,8 +2040,9 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         // Ishlanmagan bolalar
                         final unworkedWithThisSpec =
                             filteredStudents.where((s) {
-                              if (!s.assignedSpecialistIds.contains(sp.id))
+                              if (!s.assignedSpecialistIds.contains(sp.id)) {
                                 return false;
+                              }
                               final st = app.childStatus(s);
                               return st.specialistsNotStarted.contains(
                                 sp.fullName,
@@ -2138,8 +2205,8 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),

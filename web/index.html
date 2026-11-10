@@ -36,52 +36,45 @@
 
   <title>Individ — Alohida Ta’lim Ehtiyojlari Bo‘lgan Bolalar Rivojlanish Monitoringi</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #FFFFFF;
+      overflow: hidden;
+    }
+    @media (prefers-color-scheme: dark) {
+      html, body {
+        background-color: #121314;
+      }
+    }
+  </style>
   <script src="sw_cleanup.js"></script>
   <style>
-    /* Ochilish animatsiyasi (saytda): sahifa ochilishi bilan darhol boshlanadi
-       va ilova kodi yuklanguncha turadi. Ilovadagi kirish animatsiyasining
-       o'zi: belgi kattalashib chiqadi, keyin "Individ" va shior. splash.js
-       ilova chizilgach (kamida 2,4 s dan keyin) uni so'ndiradi. */
-    #app-splash { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; padding-bottom: 6vh;
-      background: radial-gradient(circle at 50% 40%, #ffffff 0%, #eaf3fd 100%);
-      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      transition: opacity .45s ease; }
-    #app-splash.hide { opacity: 0; pointer-events: none; }
-    #app-splash img { height: 104px; width: auto;
-      animation: s-logo .65s cubic-bezier(.34,1.56,.64,1) both; }
-    #app-splash .word { margin-top: 22px; font-size: 40px; font-weight: 700; letter-spacing: -.6px;
-      line-height: 1.1; color: #001945; animation: s-rise .45s .55s cubic-bezier(.2,.8,.2,1) both; }
-    #app-splash .word b { color: #3DBE37; font-weight: 700; }
-    #app-splash .tag { margin-top: 10px; font-size: 15.5px; font-weight: 500; color: #334155;
-      animation: s-fade .45s .9s ease both; }
-    /* Faqat yuklanish uzoq cho'zilsa (sekin internet) ko'rinadi */
-    #app-splash .bar { margin-top: 28px; width: 120px; height: 3px; border-radius: 3px;
-      background: #d6e4f7; overflow: hidden; opacity: 0; animation: s-fade .4s 2.6s ease both; }
+    /* Ilova kodi yuklanguncha: ochilish animatsiyasining (lib/screens/entry/
+       intro_screen.dart) birinchi kadri bilan bir xil rangli bo'sh ekran -
+       oq sahifa yoki alohida yuklanish ekrani yo'q, animatsiya shu fonda
+       boshlanadi. splash.js ilova chizilgach uni olib tashlaydi. */
+    #app-splash { position: fixed; inset: 0; z-index: 9999; background: #ffffff;
+      display: flex; align-items: flex-end; justify-content: center; }
+    /* Faqat internet juda sekin bo'lsa (6 s dan keyin) - ingichka chiziq */
+    #app-splash .bar { margin-bottom: 18vh; width: 96px; height: 3px; border-radius: 3px;
+      background: #e3ebf6; overflow: hidden; opacity: 0; animation: s-fade .4s 6s ease both; }
     #app-splash .bar::after { content: ""; display: block; width: 40%; height: 100%;
       border-radius: 3px; background: #0078EC; animation: s-bar 1.1s ease-in-out infinite; }
-    @keyframes s-logo { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
-    @keyframes s-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
     @keyframes s-fade { from { opacity: 0; } to { opacity: 1; } }
     @keyframes s-bar { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
     @media (prefers-color-scheme: dark) {
-      #app-splash { background: radial-gradient(circle at 50% 40%, #1e1f21 0%, #1c2a3d 100%); }
-      #app-splash .word { color: #f2f4f7; }
-      #app-splash .tag { color: #c9ced6; }
+      #app-splash { background: #121314; }
       #app-splash .bar { background: #303236; }
       #app-splash .bar::after { background: #7DB8FF; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      #app-splash img, #app-splash .word, #app-splash .tag, #app-splash .bar,
-      #app-splash .bar::after { animation: none; opacity: 1; }
     }
   </style>
 </head>
 <body>
   <div id="app-splash" role="status" aria-label="Individ yuklanmoqda">
-    <img src="icons/individ-mark.png" alt="">
-    <div class="word">Ind<b>i</b>v<b>i</b>d</div>
-    <div class="tag">Inklyuziv ta’lim monitoringi</div>
     <div class="bar"></div>
   </div>
   <script src="splash.js"></script>

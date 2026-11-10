@@ -9,6 +9,7 @@ import '../../../models/psychologist_observation_model.dart';
 import '../../../models/student_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
 class PsychologistObservationsTab extends StatefulWidget {
   final StudentModel? preselectedStudent;
@@ -116,7 +117,7 @@ class _PsychologistObservationsTabState
                       children: [
                         // O'quvchi
                         DropdownButtonFormField<StudentModel>(
-                          value:
+                          initialValue:
                               students.contains(selectedStudent)
                                   ? selectedStudent
                                   : students.first,
@@ -137,8 +138,9 @@ class _PsychologistObservationsTabState
                                   )
                                   .toList(),
                           onChanged: (v) {
-                            if (v != null)
+                            if (v != null) {
                               setDlgState(() => selectedStudent = v);
+                            }
                           },
                         ),
                         const SizedBox(height: 12),
@@ -174,7 +176,7 @@ class _PsychologistObservationsTabState
                             const SizedBox(width: 12),
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                value: selectedState,
+                                initialValue: selectedState,
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   labelText: 'Emotsional holati *',
@@ -194,8 +196,9 @@ class _PsychologistObservationsTabState
                                         )
                                         .toList(),
                                 onChanged: (v) {
-                                  if (v != null)
+                                  if (v != null) {
                                     setDlgState(() => selectedState = v);
+                                  }
                                 },
                               ),
                             ),
@@ -205,7 +208,7 @@ class _PsychologistObservationsTabState
 
                         // Kategoriya
                         DropdownButtonFormField<String>(
-                          value: selectedCategory,
+                          initialValue: selectedCategory,
                           isExpanded: true,
                           decoration: const InputDecoration(
                             labelText: 'Kuzatuv toifasi *',
@@ -220,8 +223,9 @@ class _PsychologistObservationsTabState
                                   )
                                   .toList(),
                           onChanged: (v) {
-                            if (v != null)
+                            if (v != null) {
                               setDlgState(() => selectedCategory = v);
+                            }
                           },
                         ),
                         const SizedBox(height: 12),
@@ -303,18 +307,17 @@ class _PsychologistObservationsTabState
                         createdAt: DateTime.now(),
                       );
 
+                      final sm = ScaffoldMessenger.of(context);
                       await app.addObservation(newObs, byUser: currentUser);
                       if (dlgCtx.mounted) Navigator.pop(dlgCtx);
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${selectedStudent.fullName} uchun kuzatuv qayd etildi!',
-                            ),
-                            backgroundColor: AppColors.success,
+                      sm.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '${selectedStudent.fullName} uchun kuzatuv qayd etildi!',
                           ),
-                        );
-                      }
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -347,198 +350,216 @@ class _PsychologistObservationsTabState
           return true;
         }).toList();
 
+    final width = MediaQuery.sizeOf(context).width;
+    final horizontalPad = width < 600 ? 12.0 : 18.0;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.fromLTRB(
+        horizontalPad,
+        MediaQuery.paddingOf(context).top + (width >= 920 ? 82 : 74),
+        horizontalPad,
+        width < 920 ? (84 + MediaQuery.paddingOf(context).bottom) : 24,
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Sarlavha
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Column(
+          // Sarlavha (Minimalist Glassy Header)
+          SurfaceCard(
+            borderRadius: 24,
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 600;
+                final addBtn = HeaderActionButton(
+                  label: 'Yangi Kuzatuv Qo‘shish',
+                  compactLabel: 'Yangi kuzatuv',
+                  icon: LucideIcons.notebookPen,
+                  onPressed: () => showAddObservationDialog(context),
+                );
+
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Flexible(
-                          child: Text(
-                            'Psixologik Kuzatuv Jurnali',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
+                          child: StatusPill(
+                            label: '${filtered.length} ta qayd',
+                            color: AppColors.warning,
+                            backgroundColor: AppColors.warningBg,
+                            icon: LucideIcons.bookOpen,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.warningBg,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: AppColors.warning.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Text(
-                            '${filtered.length} ta qayd',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.warning,
-                            ),
-                          ),
-                        ),
+                        if (!isCompact) ...[
+                          const SizedBox(width: 12),
+                          addBtn,
+                        ],
                       ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Psixologik Kuzatuv Jurnali',
+                      style: TextStyle(
+                        fontSize: isCompact ? 18.5 : 21,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.3,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Bolaning darsdagi xulq-atvori, hissiy holati va dinamik o‘zgarishlari xronologik daftari',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 12.5,
                         color: AppColors.textMuted,
+                        height: 1.4,
+                      ),
+                    ),
+                    if (isCompact) ...[
+                      const SizedBox(height: 12),
+                      addBtn,
+                    ],
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // FILTRLAR
+          SurfaceCard(
+            borderRadius: 24,
+            padding: const EdgeInsets.all(18),
+            child: LayoutBuilder(
+              builder: (context, c) {
+                InputDecoration inputDeco({
+                  String? label,
+                  String? hint,
+                  Widget? prefixIcon,
+                }) {
+                  return InputDecoration(
+                    labelText: label,
+                    hintText: hint,
+                    prefixIcon: prefixIcon,
+                    filled: true,
+                    fillColor: AppColors.surfaceMuted,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 11,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.border),
+                    ),
+                  );
+                }
+
+                final searchField = TextField(
+                  onChanged: (v) => setState(() => _search = v.trim()),
+                  decoration: inputDeco(
+                    hint: 'O‘quvchi yoki kuzatuv matni bo‘yicha...',
+                    prefixIcon: const Icon(LucideIcons.search, size: 18),
+                  ),
+                );
+                final categoryField = DropdownButtonFormField<String?>(
+                  initialValue: _categoryFilter,
+                  isExpanded: true,
+                  decoration: inputDeco(label: 'Toifa'),
+                  items: [
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text('Barcha toifalar'),
+                    ),
+                    ..._categories.map(
+                      (cat) => DropdownMenuItem(
+                        value: cat,
+                        child: Text(cat, overflow: TextOverflow.ellipsis),
                       ),
                     ),
                   ],
-                ),
-              ),
-              FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-                onPressed: () => showAddObservationDialog(context),
-                icon: const Icon(LucideIcons.notebookPen, size: 18),
-                label: const Text('+ Yangi Kuzatuv Qo‘shish'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
+                  onChanged: (v) => setState(() => _categoryFilter = v),
+                );
+                final stateField = DropdownButtonFormField<String?>(
+                  initialValue: _stateFilter,
+                  isExpanded: true,
+                  decoration: inputDeco(label: 'Emotsional holat'),
+                  items: [
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text('Barcha holatlar'),
+                    ),
+                    ..._emotionalStates.map(
+                      (st) => DropdownMenuItem(
+                        value: st,
+                        child: Text(st, overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) => setState(() => _stateFilter = v),
+                );
 
-          // FILTRLAR
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: TextField(
-                      onChanged: (v) => setState(() => _search = v.trim()),
-                      decoration: InputDecoration(
-                        hintText: 'O‘quvchi yoki kuzatuv matni bo‘yicha...',
-                        prefixIcon: const Icon(LucideIcons.search, size: 20),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                if (c.maxWidth < 600) {
+                  return Column(
+                    children: [
+                      searchField,
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(child: categoryField),
+                          const SizedBox(width: 10),
+                          Expanded(child: stateField),
+                        ],
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: DropdownButtonFormField<String?>(
-                      value: _categoryFilter,
-                      isExpanded: true,
-                      decoration: InputDecoration(
-                        labelText: 'Toifa',
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      items: [
-                        const DropdownMenuItem(
-                          value: null,
-                          child: Text('Barcha toifalar'),
-                        ),
-                        ..._categories.map(
-                          (c) => DropdownMenuItem(value: c, child: Text(c)),
-                        ),
-                      ],
-                      onChanged: (v) => setState(() => _categoryFilter = v),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: DropdownButtonFormField<String?>(
-                      value: _stateFilter,
-                      isExpanded: true,
-                      decoration: InputDecoration(
-                        labelText: 'Emotsional holat',
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      items: [
-                        const DropdownMenuItem(
-                          value: null,
-                          child: Text('Barcha holatlar'),
-                        ),
-                        ..._emotionalStates.map(
-                          (st) => DropdownMenuItem(value: st, child: Text(st)),
-                        ),
-                      ],
-                      onChanged: (v) => setState(() => _stateFilter = v),
-                    ),
-                  ),
-                ],
-              ),
+                    ],
+                  );
+                }
+
+                return Row(
+                  children: [
+                    Expanded(flex: 3, child: searchField),
+                    const SizedBox(width: 12),
+                    Expanded(flex: 2, child: categoryField),
+                    const SizedBox(width: 12),
+                    Expanded(flex: 2, child: stateField),
+                  ],
+                );
+              },
             ),
           ),
           const SizedBox(height: 16),
 
           // KUZATUVLAR LISTI
           if (filtered.isEmpty)
-            Container(
+            SurfaceCard(
+              borderRadius: 24,
               padding: const EdgeInsets.all(40),
-              alignment: Alignment.center,
-              child: Column(
-                children: [
-                  Icon(
-                    LucideIcons.notebookText,
-                    size: 48,
-                    color: AppColors.textMuted,
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Kuzatuvlar topilmadi',
-                    style: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w600,
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      LucideIcons.notebookText,
+                      size: 44,
+                      color: AppColors.textSubtle,
                     ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Yangi kuzatuv qaydini kiritish uchun yuqoridagi tugmadan foydalaning',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Kuzatuvlar topilmadi',
+                      style: TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Yangi kuzatuv qaydini kiritish uchun yuqoridagi tugmadan foydalaning',
+                      style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                    ),
+                  ],
+                ),
               ),
             )
           else
@@ -549,160 +570,129 @@ class _PsychologistObservationsTabState
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (ctx, i) {
                 final o = filtered[i];
+                final isPositive = o.emotionalState.contains('Barqaror');
 
-                return Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: AppColors.border),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(18),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              child: Wrap(
-                                spacing: 8,
-                                runSpacing: 6,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.surfaceMuted,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      df.format(o.date),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
+                return SurfaceCard(
+                  borderRadius: 22,
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 9,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceMuted,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: AppColors.border,
+                                    width: 0.85,
                                   ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    '${o.studentName} (${o.studentGrade})',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 15.5,
-                                      color: AppColors.textPrimary,
-                                    ),
+                                ),
+                                child: Text(
+                                  df.format(o.date),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textPrimary,
+                                    fontFeatures: const [
+                                      FontFeature.tabularFigures(),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryLight,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      o.category,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color:
-                                    o.emotionalState.contains('Barqaror')
-                                        ? AppColors.successBg
-                                        : AppColors.warningBg,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                o.emotionalState,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color:
-                                      o.emotionalState.contains('Barqaror')
-                                          ? AppColors.success
-                                          : AppColors.warning,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        if (o.triggerOrContext != null &&
-                            o.triggerOrContext!.isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            'Vaziyat: ${o.triggerOrContext}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontStyle: FontStyle.italic,
-                              color: AppColors.textMuted,
-                            ),
+                              Text(
+                                '${o.studentName} (${o.studentGrade})',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15.5,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              StatusPill(
+                                label: o.category,
+                                color: AppColors.primary,
+                                backgroundColor: AppColors.primaryLight,
+                              ),
+                            ],
+                          ),
+                          StatusPill(
+                            label: o.emotionalState,
+                            color:
+                                isPositive
+                                    ? AppColors.success
+                                    : AppColors.warning,
+                            backgroundColor:
+                                isPositive
+                                    ? AppColors.successBg
+                                    : AppColors.warningBg,
                           ),
                         ],
+                      ),
+                      if (o.triggerOrContext != null &&
+                          o.triggerOrContext!.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Text(
-                          o.observationText,
+                          'Vaziyat: ${o.triggerOrContext}',
                           style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textPrimary,
-                            height: 1.4,
+                            fontSize: 11.5,
+                            fontStyle: FontStyle.italic,
+                            color: AppColors.textMuted,
                           ),
                         ),
-                        if (o.recommendationOrAction != null &&
-                            o.recommendationOrAction!.isNotEmpty) ...[
-                          const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppColors.surfaceMuted,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: AppColors.border.withValues(alpha: 0.6),
+                      ],
+                      const SizedBox(height: 8),
+                      Text(
+                        o.observationText,
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          color: AppColors.textPrimary,
+                          height: 1.4,
+                        ),
+                      ),
+                      if (o.recommendationOrAction != null &&
+                          o.recommendationOrAction!.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        GlassWell(
+                          padding: const EdgeInsets.all(12),
+                          borderRadius: 12,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                LucideIcons.lightbulb,
+                                size: 16,
+                                color: AppColors.success,
                               ),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  LucideIcons.lightbulb,
-                                  size: 16,
-                                  color: AppColors.success,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    'Tavsiya/Chora: ${o.recommendationOrAction}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.success,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Tavsiya/Chora: ${o.recommendationOrAction}',
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    color: AppColors.success,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ],
-                    ),
+                    ],
                   ),
                 );
               },

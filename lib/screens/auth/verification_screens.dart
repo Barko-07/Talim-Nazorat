@@ -33,8 +33,9 @@ class PasswordRules {
       ].where((ok) => ok).length;
 
   static String? problem(String p) {
-    if (!longEnough(p))
+    if (!longEnough(p)) {
       return 'Parol kamida $minLength ta belgidan iborat bo‘lsin.';
+    }
     if (classes(p) < 3) {
       return 'Kichik va katta harf, raqam va belgilardan kamida uchtasini ishlating.';
     }

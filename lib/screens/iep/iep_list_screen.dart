@@ -666,6 +666,7 @@ class _IepListScreenState extends State<IepListScreen> {
         children: [
           AdaptivePageHeader(
             title: 'Individual rejalar (ITR)',
+            icon: LucideIcons.fileText,
             subtitle:
                 'Shaxsiy o‘quv rejalari va maqsadlar • ${allPlans.length} ta',
             action:

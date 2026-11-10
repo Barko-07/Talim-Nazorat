@@ -1317,7 +1317,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
       barrierLabel: 'Profil menyusi',
       barrierColor: Colors.black.withValues(alpha: 0.08),
       transitionDuration: const Duration(milliseconds: 180),
-      pageBuilder: (dialogCtx, _, __) {
+      pageBuilder: (dialogCtx, _, _) {
         return Stack(
           children: [
             Positioned(
@@ -1443,7 +1443,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                               shrinkWrap: true,
                               itemCount: items.length,
                               separatorBuilder:
-                                  (_, __) => const SizedBox(height: 8),
+                                  (_, _) => const SizedBox(height: 8),
                               itemBuilder: (ctx, i) {
                                 final n = items[i];
                                 final signup = n.type == 'SIGNUP';

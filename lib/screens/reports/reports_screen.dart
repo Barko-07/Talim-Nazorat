@@ -338,6 +338,7 @@ class ReportsScreen extends StatelessWidget {
           children: [
             AdaptivePageHeader(
               title: 'Tahliliy hisobotlar',
+              icon: LucideIcons.chartBar,
               subtitle: 'Pedagogik monitoring bo‘yicha rasmiy ko‘rsatkichlar',
               action: HeaderActionButton(
                 icon: LucideIcons.download,

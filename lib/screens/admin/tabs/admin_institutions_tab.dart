@@ -116,9 +116,9 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -145,7 +145,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
-                      value: _filterDistrict,
+                      initialValue: _filterDistrict,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: 'Hudud / Tuman',
@@ -177,7 +177,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                     flex: 2,
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
-                      value: _filterType,
+                      initialValue: _filterType,
                       decoration: InputDecoration(
                         labelText: 'Muassasa turi',
                         contentPadding: const EdgeInsets.symmetric(
@@ -250,19 +250,21 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
               return Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: AppColors.border),
-                ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
+                  child: LayoutBuilder(
+                    builder: (context, cardConstraints) {
+                      final isCompact = cardConstraints.maxWidth < 560;
+
+                      final iconBadge = Container(
+                        width: 36,
+                        height: 36,
                         decoration: BoxDecoration(
                           color: AppColors.infoBg,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: AppColors.info.withValues(alpha: 0.2),
                           ),
@@ -270,100 +272,98 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                         child: Icon(
                           LucideIcons.building2,
                           color: AppColors.info,
-                          size: 26,
+                          size: 18,
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 6,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(
-                                  name,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15.5,
-                                    color: AppColors.textPrimary,
-                                  ),
+                      );
+
+                      final instInfo = Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15.5,
+                                  color: AppColors.textPrimary,
                                 ),
-                                const SizedBox(width: 10),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryLight,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    type,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '$district • Namangan viloyati',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
                               ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryLight,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  type,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '$district • Namangan viloyati',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
                             ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 12,
-                              children: [
-                                Text(
-                                  'O‘quvchilar: $studentsCount nafar',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        studentsCount > 0
-                                            ? AppColors.primary
-                                            : AppColors.textMuted,
-                                  ),
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 4,
+                            children: [
+                              Text(
+                                'O‘quvchilar: $studentsCount nafar',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      studentsCount > 0
+                                          ? AppColors.primary
+                                          : AppColors.textMuted,
                                 ),
-                                Text(
-                                  'Kadrlar: $specialistsCount ta',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        specialistsCount > 0
-                                            ? AppColors.purple
-                                            : AppColors.textMuted,
-                                  ),
+                              ),
+                              Text(
+                                'Kadrlar: $specialistsCount ta',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      specialistsCount > 0
+                                          ? AppColors.purple
+                                          : AppColors.textMuted,
                                 ),
-                                Text(
-                                  'Faol ITR: $iepCount ta',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        iepCount > 0
-                                            ? AppColors.success
-                                            : AppColors.textMuted,
-                                  ),
+                              ),
+                              Text(
+                                'Faol ITR: $iepCount ta',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      iepCount > 0
+                                          ? AppColors.success
+                                          : AppColors.textMuted,
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      ElevatedButton.icon(
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+
+                      final actionBtn = ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.surfaceMuted,
                           foregroundColor: AppColors.textPrimary,
@@ -385,8 +385,36 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                         },
                         icon: const Icon(LucideIcons.eye, size: 16),
                         label: const Text('Tarkibini ko‘rish'),
-                      ),
-                    ],
+                      );
+
+                      if (isCompact) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                iconBadge,
+                                const SizedBox(width: 14),
+                                Expanded(child: instInfo),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            SizedBox(width: double.infinity, child: actionBtn),
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          iconBadge,
+                          const SizedBox(width: 16),
+                          Expanded(child: instInfo),
+                          const SizedBox(width: 16),
+                          actionBtn,
+                        ],
+                      );
+                    },
                   ),
                 ),
               );
@@ -432,16 +460,76 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                       length: 2,
                       child: Column(
                         children: [
-                          TabBar(
-                            labelColor: AppColors.primary,
-                            unselectedLabelColor: AppColors.textSecondary,
-                            indicatorColor: AppColors.primary,
-                            tabs: [
-                              Tab(
-                                text: 'ATEB O‘quvchilar (${students.length})',
+                          Container(
+                            padding: const EdgeInsets.all(3.5),
+                            decoration: BoxDecoration(
+                              color:
+                                  AppColors.isDark
+                                      ? AppColors.surfaceMuted
+                                      : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(13),
+                              border: Border.all(
+                                color:
+                                    AppColors.isDark
+                                        ? AppColors.border
+                                        : const Color(0xFFE2E8F0),
+                                width: 1.0,
                               ),
-                              Tab(text: 'Pedagog-kadrlar (${staff.length})'),
-                            ],
+                            ),
+                            child: TabBar(
+                              dividerColor: Colors.transparent,
+                              overlayColor: WidgetStateProperty.all(
+                                Colors.transparent,
+                              ),
+                              splashFactory: NoSplash.splashFactory,
+                              labelColor: AppColors.textPrimary,
+                              unselectedLabelColor: AppColors.textMuted,
+                              indicatorSize: TabBarIndicatorSize.tab,
+                              indicator: BoxDecoration(
+                                color:
+                                    AppColors.isDark
+                                        ? AppColors.surfaceRaised
+                                        : Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color:
+                                      AppColors.isDark
+                                          ? const Color(0x35FFFFFF)
+                                          : AppColors.cardGlassBorder,
+                                  width: 1.0,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: (AppColors.isDark
+                                            ? Colors.black
+                                            : const Color(0xFF0F172A))
+                                        .withValues(
+                                          alpha: AppColors.isDark ? 0.35 : 0.06,
+                                        ),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 1.5),
+                                  ),
+                                ],
+                              ),
+                              labelStyle: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                              ),
+                              unselectedLabelStyle: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                              tabs: [
+                                Tab(
+                                  height: 36,
+                                  text: 'ATEB O‘quvchilar (${students.length})',
+                                ),
+                                Tab(
+                                  height: 36,
+                                  text: 'Pedagog-kadrlar (${staff.length})',
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 10),
                           Expanded(

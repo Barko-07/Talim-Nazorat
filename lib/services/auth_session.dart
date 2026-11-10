@@ -28,8 +28,9 @@ class AuthSession {
 
   bool isValid({DateTime? now}) {
     final t = now ?? DateTime.now();
-    if (lastActive.isAfter(t.add(const Duration(minutes: 5))))
+    if (lastActive.isAfter(t.add(const Duration(minutes: 5)))) {
       return false; // soat orqaga surilgan
+    }
     return t.difference(lastActive) < idleTimeout &&
         t.difference(issuedAt) < maxAge;
   }

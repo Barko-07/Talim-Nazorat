@@ -669,9 +669,9 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                 Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: AppColors.border),
-                  ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                   child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(
@@ -729,8 +729,9 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                 ),
                                 Switch(
                                   value: !currentResponse.isEvaluated,
-                                  activeColor: AppColors.warning,
-                                  onChanged: (val) {
+                                  activeThumbColor: AppColors.warning,
+                                  // ignore: deprecated_member_use
+                  onChanged: (val) {
                                     setState(() {
                                       currentResponse.isEvaluated = !val;
                                       if (val) {
@@ -1020,8 +1021,10 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
+                // ignore: deprecated_member_use
                 child: RadioListTile<String>(
                   value: opt.text,
+                  // ignore: deprecated_member_use
                   groupValue: r.answer,
                   activeColor: AppColors.primary,
                   title: Text(
@@ -1054,6 +1057,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                       ),
                     ),
                   ),
+                  // ignore: deprecated_member_use
                   onChanged: (val) {
                     if (val != null) {
                       setState(() {

@@ -506,8 +506,9 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                         )
                                         .toList(),
                                 onChanged: (v) {
-                                  if (v != null)
+                                  if (v != null) {
                                     setState(() => _selectedInstitution = v);
+                                  }
                                 },
                                 validator:
                                     (v) =>

@@ -1,16 +1,17 @@
-import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:ui';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:device_preview/device_preview.dart';
+import 'package:device_preview/presets.dart';
 
 import 'core/feedback/app_messenger.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/app_brand.dart';
 import 'core/constants/app_colors.dart';
-import 'core/widgets/brand_logo.dart';
 import 'providers/auth_provider.dart';
 import 'providers/app_provider.dart';
 import 'providers/theme_provider.dart';
@@ -25,6 +26,12 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Ekranlar ushlamagan saqlash/ruxsat xatolari ham foydalanuvchiga ko'rsatiladi.
   PlatformDispatcher.instance.onError = reportUncaughtError;
+  // Qurilmalar ko'rinishini sinash vositasi - faqat ishlab chiqishda; jonli
+  // saytda va Play'dagi ilovada hech qachon yoqilmaydi.
+  if (kDebugMode) {
+    DevicePreview.enable();
+    DevicePreview.maybeController?.applyPreset(DevicePresets.iPhone16Pro);
+  }
 
   // Ilovani bazaning boshlang'ich yuklanishini kutib turmasdan ko'rsatamiz.
   // AuthProvider tayyor holatda bo'lguncha foydalanuvchiga yuklanish ekrani chiqadi.
@@ -103,9 +110,9 @@ class _TalimNazoratAppState extends State<TalimNazoratApp>
   }
 }
 
-/// Ilovaning ildiz oynasi. Saytda: kirmagan mehmonga landing sahifa.
-/// Telefon/desktop ilovasida: avval qisqa animatsiya, keyin "Xush kelibsiz"
-/// ekrani. Kirgan foydalanuvchiga — rolga mos bosh sahifa.
+/// Ilovaning asosiy kirish nuqtasi. Ochilishda minimalist brend animatsiyasi
+/// ko‘rsatiladi, so‘ng kirgan foydalanuvchiga — rolga mos boshqaruv paneli,
+/// kirmagan mehmonga — saytda landing sahifa, ilovada "Xush kelibsiz".
 class AppEntry extends StatefulWidget {
   const AppEntry({super.key});
 
@@ -114,22 +121,13 @@ class AppEntry extends StatefulWidget {
 }
 
 class _AppEntryState extends State<AppEntry> {
-  // Ochilish animatsiyasi: telefon ilovasida - shu IntroScreen. Saytda esa
-  // u web/index.html ichida (sahifa ochilishi bilan darhol, ilova kodi
-  // yuklanayotganda) o'ynaydi, shuning uchun bu yerda qaytarilmaydi.
-  bool _introDone = kIsWeb;
+  // Ochilish animatsiyasi saytda ham, ilovada ham shu IntroScreen. Saytdagi
+  // HTML qatlami (web/index.html) va Android ochilish ekrani uning birinchi
+  // kadri bilan bir xil rangli bo'sh ekran - foydalanuvchi bitta animatsiyani
+  // ko'radi.
+  bool _introDone = false;
 
-  @override
-  Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
-    if (!_introDone) {
-      return IntroScreen(onDone: () => setState(() => _introDone = true));
-    }
-    // Faqat ilova ochilayotganda. Kirish tugmasi bosilganda ham yuklanish
-    // ekrani ko'rsatilsa, kirish sahifasi yopilib, kod oynasi ochilmay qoladi.
-    if (auth.isInitializing) {
-      return const _AppLoadingScreen();
-    }
+  Widget _buildDestination(AuthProvider auth) {
     if (auth.initializationError != null) {
       return _InitializationErrorScreen(onRetry: auth.retryInitialization);
     }
@@ -139,36 +137,34 @@ class _AppEntryState extends State<AppEntry> {
       }
       return const MainNavigationScreen();
     }
+    // Kirmagan mehmon: saytda - landing sahifa, ilovada - "Xush kelibsiz".
     return kIsWeb ? const LandingScreen() : const WelcomeScreen();
   }
-}
-
-class _AppLoadingScreen extends StatelessWidget {
-  const _AppLoadingScreen();
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: AppColors.background,
-    body: Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const BrandLogo(height: 110),
-          const SizedBox(height: 22),
-          const SizedBox(
-            width: 24,
-            height: 24,
-            child: CircularProgressIndicator(strokeWidth: 2.4),
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final showIntro = !_introDone || auth.isInitializing;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        auth.isInitializing
+            ? const SizedBox.shrink()
+            : _buildDestination(auth),
+        if (showIntro)
+          IntroScreen(
+            key: const ValueKey('individ_brand_intro'),
+            canFinish: !auth.isInitializing,
+            onDone: () {
+              if (mounted) {
+                setState(() => _introDone = true);
+              }
+            },
           ),
-          const SizedBox(height: 10),
-          Text(
-            'Ma’lumotlar yuklanmoqda…',
-            style: TextStyle(color: AppColors.textMuted, fontSize: 12),
-          ),
-        ],
-      ),
-    ),
-  );
+      ],
+    );
+  }
 }
 
 class _InitializationErrorScreen extends StatelessWidget {

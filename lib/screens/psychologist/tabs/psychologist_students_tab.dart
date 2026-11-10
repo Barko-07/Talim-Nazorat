@@ -9,6 +9,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../services/child_status_service.dart';
 import '../../students/student_detail_screen.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
 class PsychologistStudentsTab extends StatefulWidget {
   final Function(StudentModel student)? onSelectStudentForObservation;
@@ -94,373 +95,301 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
           return true;
         }).toList();
 
+    final width = MediaQuery.sizeOf(context).width;
+    final horizontalPad = width < 600 ? 12.0 : 18.0;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.fromLTRB(
+        horizontalPad,
+        MediaQuery.paddingOf(context).top + (width >= 920 ? 82 : 74),
+        horizontalPad,
+        width < 920 ? (84 + MediaQuery.paddingOf(context).bottom) : 24,
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Sarlavha va vakolat eslatmasi
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            crossAxisAlignment: WrapCrossAlignment.end,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 6,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Text(
-                        'Psixologik hisobdagi o‘quvchilar',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Text(
-                          '${filtered.length} nafar bola',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Kasbiy psixologik diagnostika va korreksiya uchun biriktirilgan o‘quvchilar reyestri',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
-              ),
-              // Maxfiylik nishoni
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceMuted,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Row(
+          // Sarlavha va vakolat eslatmasi (Minimalist Glassy Header)
+          SurfaceCard(
+            borderRadius: 24,
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Icon(
-                      LucideIcons.lock,
-                      size: 14,
-                      color: AppColors.textMuted,
+                    StatusPill(
+                      label: '${filtered.length} nafar bola',
+                      color: AppColors.primary,
+                      backgroundColor: AppColors.primaryLight,
+                      icon: LucideIcons.users,
                     ),
-                    SizedBox(width: 6),
-                    Text(
-                      'Maxfiy psixologik ma’lumot',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
+                    StatusPill(
+                      label: 'Maxfiy psixologik ma’lumot',
+                      color: AppColors.textSecondary,
+                      backgroundColor: AppColors.surfaceMuted,
+                      icon: LucideIcons.lock,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Psixologik hisobdagi o‘quvchilar',
+                  style: TextStyle(
+                    fontSize: width < 600 ? 18.5 : 21,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Kasbiy psixologik diagnostika va korreksiya uchun biriktirilgan o‘quvchilar reyestri',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: AppColors.textMuted,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // FILTRLAR PANELI
+          SurfaceCard(
+            borderRadius: 24,
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                LayoutBuilder(
+                  builder: (context, c) {
+                    InputDecoration inputDeco({
+                      String? label,
+                      String? hint,
+                      Widget? prefixIcon,
+                    }) {
+                      return InputDecoration(
+                        labelText: label,
+                        hintText: hint,
+                        prefixIcon: prefixIcon,
+                        filled: true,
+                        fillColor: AppColors.surfaceMuted,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 11,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.border),
+                        ),
+                      );
+                    }
+
+                    final search = TextField(
+                      onChanged: (v) => setState(() => _search = v.trim()),
+                      decoration: inputDeco(
+                        hint: 'Ism-familiya yoki ehtiyoj toifasi...',
+                        prefixIcon: const Icon(LucideIcons.search, size: 18),
+                      ),
+                    );
+                    final grade = DropdownButtonFormField<String?>(
+                      initialValue: _gradeFilter,
+                      isExpanded: true,
+                      decoration: inputDeco(label: 'Sinfi'),
+                      items: const [
+                        DropdownMenuItem(
+                          value: null,
+                          child: Text('Barcha sinflar'),
+                        ),
+                        DropdownMenuItem(
+                          value: '1-A',
+                          child: Text('1-A sinf'),
+                        ),
+                        DropdownMenuItem(
+                          value: '2-B',
+                          child: Text('2-B sinf'),
+                        ),
+                        DropdownMenuItem(
+                          value: '3-A',
+                          child: Text('3-A sinf'),
+                        ),
+                        DropdownMenuItem(
+                          value: '4-A',
+                          child: Text('4-A sinf'),
+                        ),
+                        DropdownMenuItem(
+                          value: '5-A',
+                          child: Text('5-A sinf'),
+                        ),
+                      ],
+                      onChanged: (v) => setState(() => _gradeFilter = v),
+                    );
+                    final support = DropdownButtonFormField<String?>(
+                      initialValue: _levelFilter,
+                      isExpanded: true,
+                      decoration: inputDeco(label: 'Yordam darajasi'),
+                      items: const [
+                        DropdownMenuItem(
+                          value: null,
+                          child: Text('Barcha darajalar'),
+                        ),
+                        DropdownMenuItem(
+                          value: '1-daraja',
+                          child: Text('1-daraja (Yengil)'),
+                        ),
+                        DropdownMenuItem(
+                          value: '2-daraja',
+                          child: Text('2-daraja (O‘rta)'),
+                        ),
+                        DropdownMenuItem(
+                          value: '3-daraja',
+                          child: Text('3-daraja (Intensiv)'),
+                        ),
+                      ],
+                      onChanged: (v) => setState(() => _levelFilter = v),
+                    );
+                    if (c.maxWidth < 560) {
+                      return Column(
+                        children: [
+                          search,
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(child: grade),
+                              const SizedBox(width: 10),
+                              Expanded(child: support),
+                            ],
+                          ),
+                        ],
+                      );
+                    }
+                    return Row(
+                      children: [
+                        Expanded(flex: 3, child: search),
+                        const SizedBox(width: 12),
+                        Expanded(flex: 2, child: grade),
+                        const SizedBox(width: 12),
+                        Expanded(flex: 2, child: support),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    ModernPillFilterBar(
+                      items: const [
+                        'Barcha bolalar',
+                        'Menga biriktirilganlar',
+                      ],
+                      selectedItem:
+                          _onlyAssignedToMe
+                              ? 'Menga biriktirilganlar'
+                              : 'Barcha bolalar',
+                      onSelected:
+                          (v) => setState(
+                            () =>
+                                _onlyAssignedToMe =
+                                    v == 'Menga biriktirilganlar',
+                          ),
+                    ),
+                    if (summary != null)
+                      ModernPillFilterBar(
+                        items: const ['Barchasi', 'Qizil', 'Sariq', 'Yashil'],
+                        selectedItem:
+                            _statusColorFilter == StatusColor.red
+                                ? 'Qizil'
+                                : _statusColorFilter == StatusColor.yellow
+                                ? 'Sariq'
+                                : _statusColorFilter == StatusColor.green
+                                ? 'Yashil'
+                                : 'Barchasi',
+                        counts: {
+                          'Barchasi': summary.total,
+                          'Qizil': summary.count(StatusColor.red),
+                          'Sariq': summary.count(StatusColor.yellow),
+                          'Yashil': summary.count(StatusColor.green),
+                        },
+                        itemColors: {
+                          'Qizil': AppColors.error,
+                          'Sariq': AppColors.warning,
+                          'Yashil': AppColors.success,
+                        },
+                        onSelected: (v) {
+                          setState(() {
+                            if (v == 'Qizil') {
+                              _statusColorFilter = StatusColor.red;
+                            } else if (v == 'Sariq') {
+                              _statusColorFilter = StatusColor.yellow;
+                            } else if (v == 'Yashil') {
+                              _statusColorFilter = StatusColor.green;
+                            } else {
+                              _statusColorFilter = null;
+                            }
+                          });
+                        },
+                      ),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _search = '';
+                          _gradeFilter = null;
+                          _levelFilter = null;
+                          _onlyAssignedToMe = false;
+                          _statusColorFilter = null;
+                        });
+                      },
+                      child: const Text(
+                        'Filtrlarni tozalash',
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-
-          // FILTRLAR PANELI
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  LayoutBuilder(
-                    builder: (context, c) {
-                      final search = TextField(
-                        onChanged: (v) => setState(() => _search = v.trim()),
-                        decoration: InputDecoration(
-                          hintText: 'Ism-familiya yoki ehtiyoj toifasi...',
-                          prefixIcon: const Icon(LucideIcons.search, size: 20),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      );
-                      final grade = DropdownButtonFormField<String?>(
-                        value: _gradeFilter,
-                        isExpanded: true,
-                        decoration: InputDecoration(
-                          labelText: 'Sinfi',
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: null,
-                            child: Text('Barcha sinflar'),
-                          ),
-                          DropdownMenuItem(
-                            value: '1-A',
-                            child: Text('1-A sinf'),
-                          ),
-                          DropdownMenuItem(
-                            value: '2-B',
-                            child: Text('2-B sinf'),
-                          ),
-                          DropdownMenuItem(
-                            value: '3-A',
-                            child: Text('3-A sinf'),
-                          ),
-                          DropdownMenuItem(
-                            value: '4-A',
-                            child: Text('4-A sinf'),
-                          ),
-                          DropdownMenuItem(
-                            value: '5-A',
-                            child: Text('5-A sinf'),
-                          ),
-                        ],
-                        onChanged: (v) => setState(() => _gradeFilter = v),
-                      );
-                      final support = DropdownButtonFormField<String?>(
-                        value: _levelFilter,
-                        isExpanded: true,
-                        decoration: InputDecoration(
-                          labelText: 'Yordam darajasi',
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: null,
-                            child: Text('Barcha darajalar'),
-                          ),
-                          DropdownMenuItem(
-                            value: '1-daraja',
-                            child: Text('1-daraja (Yengil)'),
-                          ),
-                          DropdownMenuItem(
-                            value: '2-daraja',
-                            child: Text('2-daraja (O‘rta)'),
-                          ),
-                          DropdownMenuItem(
-                            value: '3-daraja',
-                            child: Text('3-daraja (Intensiv)'),
-                          ),
-                        ],
-                        onChanged: (v) => setState(() => _levelFilter = v),
-                      );
-                      if (c.maxWidth < 560) {
-                        // Telefon: qidiruv to'liq kenglikda, filtrlar ostida
-                        return Column(
-                          children: [
-                            search,
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(child: grade),
-                                const SizedBox(width: 10),
-                                Expanded(child: support),
-                              ],
-                            ),
-                          ],
-                        );
-                      }
-                      return Row(
-                        children: [
-                          Expanded(flex: 3, child: search),
-                          const SizedBox(width: 12),
-                          Expanded(flex: 2, child: grade),
-                          const SizedBox(width: 12),
-                          Expanded(flex: 2, child: support),
-                        ],
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      FilterChip(
-                        selected: _onlyAssignedToMe,
-                        label: const Text('Faqat menga biriktirilgan bolalar'),
-                        avatar: Icon(
-                          _onlyAssignedToMe
-                              ? LucideIcons.circleCheck
-                              : LucideIcons.circleUser,
-                          size: 16,
-                          color:
-                              _onlyAssignedToMe
-                                  ? Colors.white
-                                  : AppColors.primary,
-                        ),
-                        selectedColor: AppColors.primary,
-                        labelStyle: TextStyle(
-                          fontSize: 12,
-                          color:
-                              _onlyAssignedToMe
-                                  ? Colors.white
-                                  : AppColors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        onSelected:
-                            (val) => setState(() => _onlyAssignedToMe = val),
-                      ),
-                      if (summary != null) ...[
-                        FilterChip(
-                          selected: _statusColorFilter == StatusColor.red,
-                          label: Text(
-                            'Qizil — Ishlanmagan (${summary.count(StatusColor.red)})',
-                          ),
-                          selectedColor: AppColors.error,
-                          backgroundColor: AppColors.errorBg,
-                          labelStyle: TextStyle(
-                            fontSize: 12,
-                            color:
-                                _statusColorFilter == StatusColor.red
-                                    ? Colors.white
-                                    : AppColors.error,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          onSelected:
-                              (val) => setState(
-                                () =>
-                                    _statusColorFilter =
-                                        val ? StatusColor.red : null,
-                              ),
-                        ),
-                        FilterChip(
-                          selected: _statusColorFilter == StatusColor.yellow,
-                          label: Text(
-                            'Sariq (${summary.count(StatusColor.yellow)})',
-                          ),
-                          selectedColor: AppColors.warning,
-                          backgroundColor: AppColors.warningBg,
-                          labelStyle: TextStyle(
-                            fontSize: 12,
-                            color:
-                                _statusColorFilter == StatusColor.yellow
-                                    ? Colors.white
-                                    : AppColors.warning,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          onSelected:
-                              (val) => setState(
-                                () =>
-                                    _statusColorFilter =
-                                        val ? StatusColor.yellow : null,
-                              ),
-                        ),
-                        FilterChip(
-                          selected: _statusColorFilter == StatusColor.green,
-                          label: Text(
-                            'Yashil (${summary.count(StatusColor.green)})',
-                          ),
-                          selectedColor: AppColors.success,
-                          backgroundColor: AppColors.successBg,
-                          labelStyle: TextStyle(
-                            fontSize: 12,
-                            color:
-                                _statusColorFilter == StatusColor.green
-                                    ? Colors.white
-                                    : AppColors.success,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          onSelected:
-                              (val) => setState(
-                                () =>
-                                    _statusColorFilter =
-                                        val ? StatusColor.green : null,
-                              ),
-                        ),
-                      ],
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _search = '';
-                            _gradeFilter = null;
-                            _levelFilter = null;
-                            _onlyAssignedToMe = false;
-                            _statusColorFilter = null;
-                          });
-                        },
-                        child: const Text(
-                          'Filtrlarni tozalash',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
 
           // BOLALAR RO'YXATI
           if (filtered.isEmpty)
-            Container(
+            SurfaceCard(
+              borderRadius: 24,
               padding: const EdgeInsets.all(40),
-              alignment: Alignment.center,
-              child: Column(
-                children: [
-                  Icon(
-                    LucideIcons.searchX,
-                    size: 48,
-                    color: AppColors.textMuted,
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Mos keluvchi o‘quvchilar topilmadi',
-                    style: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w600,
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      LucideIcons.searchX,
+                      size: 44,
+                      color: AppColors.textSubtle,
                     ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Qidiruv so‘zini o‘zgartiring yoki filtrlarni tozalang',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Mos keluvchi o‘quvchilar topilmadi',
+                      style: TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Qidiruv so‘zini o‘zgartiring yoki filtrlarni tozalang',
+                      style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                    ),
+                  ],
+                ),
               ),
             )
           else
@@ -468,7 +397,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: filtered.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (ctx, i) {
                 final s = filtered[i];
                 final st = statusByStudentId[s.id];
@@ -480,175 +409,148 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                     (s.assignedSpecialistIds.contains(currentUser.id) ||
                         currentUser.assignedStudentIds.contains(s.id));
 
-                return Card(
-                  elevation: 0,
-                  color: isRed ? AppColors.errorBg : AppColors.surface,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                      color:
-                          stColor != null
-                              ? stColor.withValues(alpha: isRed ? 0.55 : 0.35)
-                              : AppColors.border,
-                      width: isRed ? 1.5 : 1.0,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundColor: stBg ?? AppColors.primaryLight,
-                              child: Text(
-                                s.firstName.isNotEmpty ? s.firstName[0] : 'O',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: stColor ?? AppColors.primary,
-                                ),
+                return SurfaceCard(
+                  borderRadius: 22,
+                  padding: const EdgeInsets.all(18),
+                  backgroundColor:
+                      isRed ? AppColors.errorBg.withValues(alpha: 0.72) : null,
+                  borderColor:
+                      stColor != null
+                          ? stColor.withValues(alpha: isRed ? 0.55 : 0.35)
+                          : AppColors.cardGlassBorder,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: stBg ?? AppColors.primaryLight,
+                            child: Text(
+                              s.firstName.isNotEmpty ? s.firstName[0] : 'O',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: stColor ?? AppColors.primary,
                               ),
                             ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 4,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    children: [
-                                      Text(
-                                        s.fullName,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15.5,
-                                          color: AppColors.textPrimary,
-                                        ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 6,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Text(
+                                      s.fullName,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15.5,
+                                        color: AppColors.textPrimary,
                                       ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 1,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.surfaceMuted,
-                                          borderRadius: BorderRadius.circular(
-                                            6,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          '${s.grade} • ${s.age} yosh',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
+                                    ),
+                                    StatusPill(
+                                      label: '${s.grade} • ${s.age} yosh',
+                                      color: AppColors.textSecondary,
+                                      backgroundColor: AppColors.surfaceMuted,
+                                    ),
+                                    if (st != null)
+                                      StatusBadge.child(
+                                        st.color,
+                                        '${st.color.label}: ${st.color == StatusColor.red
+                                            ? "Ishlanmagan"
+                                            : st.color == StatusColor.yellow
+                                            ? "E’tibor talab"
+                                            : "Ijobiy"}',
                                       ),
-                                      if (st != null)
-                                        StatusBadge.child(
-                                          st.color,
-                                          '${st.color.label}: ${st.color == StatusColor.red
-                                              ? "Ishlanmagan"
-                                              : st.color == StatusColor.yellow
-                                              ? "E’tibor talab"
-                                              : "Ijobiy"}',
-                                        ),
-                                      if (isAssigned)
-                                        const StatusBadge(
-                                          'Sizga biriktirilgan',
-                                          tone: StatusTone.primary,
-                                        ),
-                                    ],
+                                    if (isAssigned)
+                                      const StatusBadge(
+                                        'Sizga biriktirilgan',
+                                        tone: StatusTone.primary,
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Ehtiyoj: ${s.primaryNeed} • ${s.supportLevel}',
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    color: AppColors.textSecondary,
                                   ),
+                                ),
+                                if (st != null && st.reasons.isNotEmpty) ...[
                                   const SizedBox(height: 4),
                                   Text(
-                                    'Ehtiyoj: ${s.primaryNeed} • ${s.supportLevel}',
+                                    'Holat sababi: ${st.reasons.first}',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                      color: stColor,
                                     ),
                                   ),
-                                  if (st != null && st.reasons.isNotEmpty) ...[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Holat sababi: ${st.reasons.first}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: stColor,
-                                      ),
-                                    ),
-                                  ],
                                 ],
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                        // Harakatlar — telefonda ham sig'ishi uchun alohida qatorda
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
-                          alignment: WrapAlignment.end,
-                          children: [
-                            IconButton.outlined(
-                              tooltip: 'Kuzatuv qayd etish',
-                              icon: const Icon(
-                                LucideIcons.notebookPen,
-                                size: 18,
-                              ),
-                              onPressed:
-                                  () => widget.onSelectStudentForObservation
-                                      ?.call(s),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        alignment: WrapAlignment.end,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          IconButton.outlined(
+                            tooltip: 'Kuzatuv qayd etish',
+                            icon: const Icon(
+                              LucideIcons.notebookPen,
+                              size: 17,
                             ),
-                            const SizedBox(width: 6),
-                            IconButton.outlined(
-                              tooltip: 'Diagnostika o‘tkazish',
-                              icon: const Icon(LucideIcons.brain, size: 18),
-                              onPressed:
-                                  () => widget.onSelectStudentForAssessment
-                                      ?.call(s),
+                            onPressed:
+                                () => widget.onSelectStudentForObservation
+                                    ?.call(s),
+                          ),
+                          IconButton.outlined(
+                            tooltip: 'Diagnostika o‘tkazish',
+                            icon: const Icon(LucideIcons.brain, size: 17),
+                            onPressed:
+                                () => widget.onSelectStudentForAssessment
+                                    ?.call(s),
+                          ),
+                          IconButton.outlined(
+                            tooltip: 'Mashg‘ulot rejalashtirish',
+                            icon: const Icon(
+                              LucideIcons.alarmClockPlus,
+                              size: 17,
                             ),
-                            const SizedBox(width: 6),
-                            IconButton.outlined(
-                              tooltip: 'Mashg‘ulot rejalashtirish',
-                              icon: const Icon(
-                                LucideIcons.alarmClockPlus,
-                                size: 18,
-                              ),
-                              onPressed:
-                                  () =>
-                                      widget.onSelectStudentForSession?.call(s),
-                            ),
-                            const SizedBox(width: 8),
-                            FilledButton.tonal(
-                              style: FilledButton.styleFrom(
-                                visualDensity: VisualDensity.compact,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => StudentDetailScreen(
-                                          studentId: s.id,
-                                        ),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                'Profil',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            onPressed:
+                                () =>
+                                    widget.onSelectStudentForSession?.call(s),
+                          ),
+                          HeaderActionButton(
+                            label: 'Profil',
+                            icon: LucideIcons.user,
+                            variant: HeaderActionVariant.secondary,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => StudentDetailScreen(
+                                        studentId: s.id,
+                                      ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 );
               },

@@ -267,8 +267,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   /// Yon panel guruhi nomi: "Boshqaruv va tizim" faqat rahbariyat uchun ma'noli
   String _groupLabel(String group) {
     final leadership = _canSee(7);
-    if (group == 'BOSHQARUV VA TIZIM' && !leadership)
+    if (group == 'BOSHQARUV VA TIZIM' && !leadership) {
       return 'HISOBOT VA SOZLAMALAR';
+    }
     return group;
   }
 
@@ -360,17 +361,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     if (_isPsychologist) {
       final psychScreen = _buildPsychologistScreen();
       if (psychScreen != null) {
-        // Psixolog kabineti sahifalari umumiy sahifa konteyneridan foydalanmaydi —
-        // ular ustki va pastki suzuvchi panellar ostida qolmasin.
-        final width = MediaQuery.sizeOf(context).width;
-        return Padding(
-          key: psychScreen.key,
-          padding: EdgeInsets.only(
-            top: MediaQuery.paddingOf(context).top + (width >= 920 ? 82 : 74),
-            bottom: width < 920 ? 84 : 0,
-          ),
-          child: psychScreen,
-        );
+        return psychScreen;
       }
     }
     switch (_selectedIndex) {
@@ -1135,13 +1126,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       unreadNotifCount: unreadNotifCount,
                     ),
                   ),
+                  if (!isDesktop)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: _buildMobileFrostedBottomBar(context, app),
+                    ),
                 ],
               ),
             ),
           ],
         ),
-        bottomNavigationBar:
-            isDesktop ? null : _buildMobileFrostedBottomBar(context, app),
       ),
     );
   }
@@ -1176,16 +1172,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     required int unreadNotifCount,
   }) {
     final showMenuIsland = !isDesktop || !_isDesktopSidebarOpen;
-    final mediaPadding = MediaQuery.paddingOf(context);
     const menuIslandRadius = BorderRadius.only(
       topLeft: Radius.zero,
       bottomLeft: Radius.zero,
-      topRight: Radius.circular(28),
-      bottomRight: Radius.circular(28),
+      topRight: Radius.circular(24),
+      bottomRight: Radius.circular(24),
     );
     const mainBarRadius = BorderRadius.only(
-      topLeft: Radius.circular(28),
-      bottomLeft: Radius.circular(28),
+      topLeft: Radius.circular(24),
+      bottomLeft: Radius.circular(24),
       topRight: Radius.zero,
       bottomRight: Radius.zero,
     );
@@ -1196,7 +1191,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       right: false,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-          showMenuIsland ? 0 : 20,
+          showMenuIsland ? 0 : (isDesktop ? 20 : 12),
           isDesktop ? 14 : 8,
           0,
           6,
@@ -1210,8 +1205,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   customBorderRadius: menuIslandRadius,
                   borderColor: AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 24,
+                  blur: 16,
                   opacity: AppColors.navGlassOpacity,
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    stops: const [0.0, 0.5, 1.0],
+                    colors: [
+                      AppColors.surface.withValues(alpha: 0.96),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity + 0.1,
+                      ),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity,
+                      ),
+                    ],
+                  ),
                   boxShadow: AppColors.navShadow,
                   padding: EdgeInsets.zero,
                   child: Material(
@@ -1228,11 +1237,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(minHeight: 54),
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            15 + mediaPadding.left,
-                            0,
-                            18,
-                            0,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isDesktop ? 16 : 14,
                           ),
                           child: Center(
                             child: Tooltip(
@@ -1256,13 +1262,27 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   customBorderRadius: mainBarRadius,
                   borderColor: AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 24,
+                  blur: 16,
                   opacity: AppColors.navGlassOpacity,
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    stops: const [0.0, 0.85, 1.0],
+                    colors: [
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity,
+                      ),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity + 0.1,
+                      ),
+                      AppColors.surface.withValues(alpha: 0.96),
+                    ],
+                  ),
                   boxShadow: AppColors.navShadow,
                   padding: EdgeInsets.fromLTRB(
-                    isDesktop ? 22 : 16,
+                    isDesktop ? 22 : 14,
                     8,
-                    (isDesktop ? 24 : 12) + mediaPadding.right,
+                    isDesktop ? 20 : 12,
                     8,
                   ),
                   child: ConstrainedBox(
@@ -1605,7 +1625,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                             color:
                                                 isSelected
                                                     ? AppColors.primaryLight
-                                                    : Colors.transparent,
+                                                    : AppColors.primaryLight
+                                                        .withValues(alpha: 0.0),
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
@@ -1613,7 +1634,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                               color:
                                                   isSelected
                                                       ? AppColors.primaryTint
-                                                      : Colors.transparent,
+                                                      : AppColors.primaryTint
+                                                          .withValues(
+                                                            alpha: 0.0,
+                                                          ),
                                               width: 1.0,
                                             ),
                                           ),
@@ -1760,17 +1784,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget _buildMobileFrostedBottomBar(BuildContext context, AppProvider app) {
     final quickTabs = _navItems.take(4).toList();
     final isMoreActive = _selectedIndex >= 4;
-    final mediaPadding = MediaQuery.paddingOf(context);
 
     const leftIslandRadius = BorderRadius.only(
       topLeft: Radius.zero,
       bottomLeft: Radius.zero,
-      topRight: Radius.circular(28),
-      bottomRight: Radius.circular(28),
+      topRight: Radius.circular(24),
+      bottomRight: Radius.circular(24),
     );
     const rightIslandRadius = BorderRadius.only(
-      topLeft: Radius.circular(28),
-      bottomLeft: Radius.circular(28),
+      topLeft: Radius.circular(24),
+      bottomLeft: Radius.circular(24),
       topRight: Radius.zero,
       bottomRight: Radius.zero,
     );
@@ -1793,10 +1816,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   customBorderRadius: leftIslandRadius,
                   borderColor: AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 24,
+                  blur: 16,
                   opacity: AppColors.navGlassOpacity,
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    stops: const [0.0, 0.25, 1.0],
+                    colors: [
+                      AppColors.surface.withValues(alpha: 0.96),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity + 0.1,
+                      ),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity,
+                      ),
+                    ],
+                  ),
                   boxShadow: AppColors.navShadow,
-                  padding: EdgeInsets.fromLTRB(mediaPadding.left + 5, 5, 5, 5),
+                  padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
                   child: ClipRRect(
                     borderRadius: leftIslandRadius,
                     child: Row(
@@ -1826,16 +1863,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                             ? AppColors.primary.withValues(
                                               alpha: 0.12,
                                             )
-                                            : Colors.transparent,
+                                            : AppColors.primary.withValues(
+                                              alpha: 0.0,
+                                            ),
                                     borderRadius: pillRadius,
-                                    border:
-                                        isSelected
-                                            ? Border.all(
-                                              color: AppColors.primary
-                                                  .withValues(alpha: 0.22),
-                                              width: 1.0,
-                                            )
-                                            : null,
+                                    border: Border.all(
+                                      color:
+                                          isSelected
+                                              ? AppColors.primary.withValues(
+                                                alpha: 0.22,
+                                              )
+                                              : AppColors.primary.withValues(
+                                                alpha: 0.0,
+                                              ),
+                                      width: 1.0,
+                                    ),
                                   ),
                                   child:
                                       isSelected
@@ -1891,10 +1933,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           ? AppColors.primary.withValues(alpha: 0.28)
                           : AppColors.navGlassBorder,
                   useBlur: true,
-                  blur: 24,
+                  blur: 16,
                   opacity: AppColors.navGlassOpacity,
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    stops: const [0.0, 0.5, 1.0],
+                    colors: [
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity,
+                      ),
+                      AppColors.surface.withValues(
+                        alpha: AppColors.navGlassOpacity + 0.1,
+                      ),
+                      AppColors.surface.withValues(alpha: 0.96),
+                    ],
+                  ),
                   boxShadow: AppColors.navShadow,
-                  padding: EdgeInsets.fromLTRB(5, 5, mediaPadding.right + 5, 5),
+                  padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
                   child: ClipRRect(
                     borderRadius: rightIslandRadius,
                     child: TactileBounce(
@@ -1910,19 +1966,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           color:
                               isMoreActive
                                   ? AppColors.primary.withValues(alpha: 0.12)
-                                  : Colors.transparent,
+                                  : AppColors.primary.withValues(alpha: 0.0),
                           borderRadius: const BorderRadius.all(
                             Radius.circular(20),
                           ),
-                          border:
-                              isMoreActive
-                                  ? Border.all(
-                                    color: AppColors.primary.withValues(
-                                      alpha: 0.22,
-                                    ),
-                                    width: 1.0,
-                                  )
-                                  : null,
+                          border: Border.all(
+                            color:
+                                isMoreActive
+                                    ? AppColors.primary.withValues(alpha: 0.22)
+                                    : AppColors.primary.withValues(alpha: 0.0),
+                            width: 1.0,
+                          ),
                         ),
                         child:
                             isMoreActive
@@ -2201,11 +2255,11 @@ class _ProfileRightDropdownMenu extends StatelessWidget {
 
     return GlassSurface(
       customBorderRadius: radius,
-      borderColor: AppColors.navGlassBorder,
+      borderColor: AppColors.cardGlassBorder,
       useBlur: true,
       blur: 24,
-      opacity: AppColors.navGlassOpacity,
-      boxShadow: AppColors.navShadow,
+      opacity: 0.96,
+      boxShadow: AppColors.elevatedShadow,
       padding: EdgeInsets.zero,
       child: ConstrainedBox(
         constraints: BoxConstraints(

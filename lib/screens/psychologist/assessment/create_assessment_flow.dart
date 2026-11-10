@@ -80,8 +80,9 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
         grade.contains('2') ||
         grade.contains('3') ||
         grade.contains('4')) {
-      if (ageText.contains('1-4') || ageText.contains('boshlang‘ich'))
+      if (ageText.contains('1-4') || ageText.contains('boshlang‘ich')) {
         return true;
+      }
     }
     return false;
   }
@@ -281,8 +282,9 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
         currentStep: _currentStep,
         onStepTapped: (step) {
           if (step == 1 && _selectedStudent == null) return;
-          if (step == 2 && _selectedQuestions.isEmpty && _currentStep < 2)
+          if (step == 2 && _selectedQuestions.isEmpty && _currentStep < 2) {
             return;
+          }
           setState(() => _currentStep = step);
         },
         onStepContinue: () {
@@ -414,7 +416,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
 
         // Bola tanlash
         DropdownButtonFormField<StudentModel>(
-          value:
+          initialValue:
               _selectedStudent != null &&
                       students.any((s) => s.id == _selectedStudent!.id)
                   ? _selectedStudent
@@ -504,7 +506,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
 
         // Yo'nalish
         DropdownButtonFormField<String>(
-          value: _selectedCategory,
+          initialValue: _selectedCategory,
           isExpanded: true,
           decoration: const InputDecoration(
             labelText: 'Diagnostika yo‘nalishi *',
@@ -632,7 +634,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
             Expanded(
               flex: 2,
               child: DropdownButtonFormField<String?>(
-                value: _questionDomainFilter,
+                initialValue: _questionDomainFilter,
                 isExpanded: true,
                 decoration: InputDecoration(
                   labelText: 'Yo‘nalish',
@@ -863,6 +865,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
           child: ReorderableListView.builder(
             shrinkWrap: true,
             itemCount: _selectedQuestions.length,
+            // ignore: deprecated_member_use
             onReorder: _reorderQuestion,
             itemBuilder: (ctx, i) {
               final q = _selectedQuestions[i];
@@ -870,9 +873,9 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                 key: ValueKey(q.id),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  side: BorderSide(color: AppColors.border),
-                ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
                   leading: Container(

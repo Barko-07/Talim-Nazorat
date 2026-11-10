@@ -108,9 +108,9 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.border),
-            ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: TextField(
@@ -157,19 +157,21 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
               return Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: AppColors.border),
-                ),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+      ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
+                  child: LayoutBuilder(
+                    builder: (context, cardConstraints) {
+                      final isCompact = cardConstraints.maxWidth < 560;
+
+                      final iconBadge = Container(
+                        width: 34,
+                        height: 34,
                         decoration: BoxDecoration(
                           color: AppColors.warningBg,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: AppColors.warning.withValues(alpha: 0.25),
                           ),
@@ -179,102 +181,100 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                             grade,
                             style: TextStyle(
                               color: AppColors.warning,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12.5,
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 6,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(
-                                  '$grade sinf',
+                      );
+
+                      final classInfo = Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                '$grade sinf',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15.5,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryLight,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  '$studentsCount nafar ATEB bola',
                                   style: TextStyle(
+                                    fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 15.5,
-                                    color: AppColors.textPrimary,
+                                    color: AppColors.primary,
                                   ),
                                 ),
-                                const SizedBox(width: 10),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryLight,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    '$studentsCount nafar ATEB bola',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '$instName',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Mas’ul sinf rahbari: $teacherName',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textMuted,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            if (needs.isNotEmpty) ...[
-                              const SizedBox(height: 6),
-                              Wrap(
-                                spacing: 6,
-                                children:
-                                    needs
-                                        .map(
-                                          (n) => Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 6,
-                                              vertical: 1,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.surfaceMuted,
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                            ),
-                                            child: Text(
-                                              n,
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                color: AppColors.textSecondary,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
                               ),
                             ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            instName,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Mas’ul sinf rahbari: $teacherName',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          if (needs.isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              children:
+                                  needs
+                                      .map(
+                                        (n) => Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 1,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.surfaceMuted,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            n,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: AppColors.textSecondary,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                            ),
                           ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      OutlinedButton.icon(
+                        ],
+                      );
+
+                      final actionBtn = OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primary,
                           side: BorderSide(color: AppColors.primary),
@@ -294,8 +294,36 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                         },
                         icon: const Icon(LucideIcons.users, size: 16),
                         label: const Text('O‘quvchilar ro‘yxati'),
-                      ),
-                    ],
+                      );
+
+                      if (isCompact) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                iconBadge,
+                                const SizedBox(width: 14),
+                                Expanded(child: classInfo),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            SizedBox(width: double.infinity, child: actionBtn),
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          iconBadge,
+                          const SizedBox(width: 16),
+                          Expanded(child: classInfo),
+                          const SizedBox(width: 16),
+                          actionBtn,
+                        ],
+                      );
+                    },
                   ),
                 ),
               );
