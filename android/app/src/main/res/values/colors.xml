@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Opening screen colour: the same as the first frame of the app's intro
+         animation (lib/screens/entry/intro_screen.dart), so the system splash
+         and the animation look like one screen. -->
+    <color name="splash_background">#FFFFFFFF</color>
+</resources>
