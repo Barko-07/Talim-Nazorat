@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:device_preview/presets.dart';
 
@@ -26,6 +27,8 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Ekranlar ushlamagan saqlash/ruxsat xatolari ham foydalanuvchiga ko'rsatiladi.
   PlatformDispatcher.instance.onError = reportUncaughtError;
+  // Golos Text ilova ichida (assets/google_fonts) - internetdan olinmaydi.
+  GoogleFonts.config.allowRuntimeFetching = false;
   // Qurilmalar ko'rinishini sinash vositasi - faqat ishlab chiqishda; jonli
   // saytda va Play'dagi ilovada hech qachon yoqilmaydi.
   if (kDebugMode) {
@@ -126,6 +129,9 @@ class _AppEntryState extends State<AppEntry> {
   // kadri bilan bir xil rangli bo'sh ekran - foydalanuvchi bitta animatsiyani
   // ko'radi.
   bool _introDone = false;
+  // Asosiy sahifa animatsiya tugab, logotip jim turgan paytda chiziladi -
+  // og'ir birinchi chizish animatsiyani qotirmaydi.
+  bool _entranceDone = false;
 
   Widget _buildDestination(AuthProvider auth) {
     if (auth.initializationError != null) {
@@ -149,13 +155,18 @@ class _AppEntryState extends State<AppEntry> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        auth.isInitializing
+        auth.isInitializing || !(_entranceDone || _introDone)
             ? const SizedBox.shrink()
             : _buildDestination(auth),
         if (showIntro)
           IntroScreen(
             key: const ValueKey('individ_brand_intro'),
             canFinish: !auth.isInitializing,
+            onEntranceDone: () {
+              if (mounted && !_entranceDone) {
+                setState(() => _entranceDone = true);
+              }
+            },
             onDone: () {
               if (mounted) {
                 setState(() => _introDone = true);

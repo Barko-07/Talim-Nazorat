@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_brand.dart';
 import '../../core/constants/app_colors.dart';
@@ -16,9 +16,14 @@ class IntroScreen extends StatefulWidget {
   final VoidCallback? onDone;
   final bool canFinish;
 
+  /// Kirish animatsiyasi tugadi, logotip jim turibdi - orqadagi sahifani
+  /// endi chizish mumkin (chiqish undan keyingi kadrlarda boshlanadi).
+  final VoidCallback? onEntranceDone;
+
   const IntroScreen({
     super.key,
     this.onDone,
+    this.onEntranceDone,
     this.canFinish = true,
   });
 
@@ -43,6 +48,7 @@ class _IntroScreenState extends State<IntroScreen>
   ImageStream? _markStream;
   ImageStreamListener? _markListener;
   Timer? _fallbackTimer;
+  Timer? _holdTimer;
 
   bool _entranceStarted = false;
   bool _exitStarted = false;
@@ -58,7 +64,8 @@ class _IntroScreenState extends State<IntroScreen>
       duration: IntroScreen.entranceDuration,
     )..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          _tryStartExit();
+          widget.onEntranceDone?.call();
+          _exitAfterFrames();
         }
       });
 
@@ -91,11 +98,17 @@ class _IntroScreenState extends State<IntroScreen>
     );
     _markStream = stream;
     _markListener = ImageStreamListener(
-      (_, _) => _beginEntrance(),
-      onError: (_, _) => _beginEntrance(),
+      (_, _) => _markReady(),
+      onError: (_, _) => _markReady(),
     );
     stream.addListener(_markListener!);
-    _fallbackTimer = Timer(const Duration(milliseconds: 90), _beginEntrance);
+    // "Individ" harflari Golos shriftida chizilishi kerak: shrift tayyor
+    // bo'lmasa, harflar animatsiya o'rtasida boshqa shriftdan almashib sakraydi.
+    GoogleFonts.pendingFonts().then(
+      (_) => _fontReady(),
+      onError: (_) => _fontReady(),
+    );
+    _fallbackTimer = Timer(const Duration(milliseconds: 700), _beginEntrance);
   }
 
   @override
@@ -103,12 +116,32 @@ class _IntroScreenState extends State<IntroScreen>
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.canFinish && widget.canFinish) {
       if (_entranceController.isCompleted && !_exitStarted) {
-        // Orqa fondagi asosiy sahifa birinchi kadrini chizib olishi uchun 1 kadr kutamiz.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) _tryStartExit();
-        });
+        _exitAfterFrames();
       }
     }
+  }
+
+  bool _markLoaded = false;
+  bool _fontLoaded = false;
+
+  void _markReady() {
+    _markLoaded = true;
+    if (_fontLoaded) _beginEntrance();
+  }
+
+  void _fontReady() {
+    _fontLoaded = true;
+    if (_markLoaded) _beginEntrance();
+  }
+
+  /// Logotip qisqa jim turadi; shu paytda orqadagi sahifa o'zining eng
+  /// og'ir birinchi kadrlarini chizib oladi (jim rasmda bu ko'rinmaydi),
+  /// keyin chiqish silliq boshlanadi.
+  void _exitAfterFrames() {
+    _holdTimer?.cancel();
+    _holdTimer = Timer(const Duration(milliseconds: 260), () {
+      if (mounted) _tryStartExit();
+    });
   }
 
   void _beginEntrance() {
@@ -150,6 +183,7 @@ class _IntroScreenState extends State<IntroScreen>
   @override
   void dispose() {
     _fallbackTimer?.cancel();
+    _holdTimer?.cancel();
     _detachImageListener();
     _entranceController.dispose();
     _exitController.dispose();
@@ -238,7 +272,11 @@ class _IntroScreenState extends State<IntroScreen>
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => _tryStartExit(fast: true),
+      onTap: () {
+        // Bosib o'tkazib yuborilsa ham orqadagi sahifa tayyor bo'lsin.
+        widget.onEntranceDone?.call();
+        _tryStartExit(fast: true);
+      },
       child: AnimatedBuilder(
         animation: Listenable.merge([_entranceController, _exitController]),
         builder: (context, _) {
@@ -251,15 +289,8 @@ class _IntroScreenState extends State<IntroScreen>
           // 1-bosqich: Belgining optik fokus bilan markazda paydo bo‘lishi
           final markOpacity = _intervalValue(t, 0.00, 0.20, Curves.easeOut);
           final markMotion = _intervalValue(t, 0.00, 0.34, _easeOutExpo);
-          final markBlurProgress = _intervalValue(
-            t,
-            0.00,
-            0.28,
-            Curves.easeOutCubic,
-          );
           final markScale = 0.86 + (0.14 * markMotion);
           final markTranslateY = 8.0 * (1.0 - markMotion);
-          final markBlurSigma = 7.0 * (1.0 - markBlurProgress);
 
           // 2-bosqich: Belgining chapga silliq siljishi va "Individ" uchun joy ochilishi
           final glideProgress = _intervalValue(t, 0.20, 0.56, _easeOutQuint);
@@ -273,6 +304,8 @@ class _IntroScreenState extends State<IntroScreen>
           );
           final applySheen = sheenProgress > 0.0 && sheenProgress < 1.0;
 
+          // Blur effekti yo'q: brauzer uni birinchi ishlatganda bir necha
+          // kadr qotib qoladi; shaffoflik + masshtab o'zi silliq.
           Widget markWidget = SizedBox(
             width: markWidth,
             height: markHeight,
@@ -286,17 +319,6 @@ class _IntroScreenState extends State<IntroScreen>
               semanticLabel: AppBrand.name,
             ),
           );
-
-          if (markBlurSigma > 0.05) {
-            markWidget = ImageFiltered(
-              imageFilter: ImageFilter.blur(
-                sigmaX: markBlurSigma,
-                sigmaY: markBlurSigma,
-                tileMode: TileMode.decal,
-              ),
-              child: markWidget,
-            );
-          }
 
           markWidget = Opacity(
             opacity: markOpacity,
@@ -329,34 +351,16 @@ class _IntroScreenState extends State<IntroScreen>
                   start + 0.16,
                   Curves.easeOut,
                 );
-                final charBlurProgress = _intervalValue(
-                  t,
-                  start,
-                  start + 0.19,
-                  Curves.easeOutCubic,
-                );
 
                 final charTranslateY = 10.0 * (1.0 - charProgress);
                 final charScale = 0.92 + (0.08 * charProgress);
-                final charBlurSigma = 3.5 * (1.0 - charBlurProgress);
                 final isGreenI = index == 3 || index == 5;
 
-                Widget glyph = Text(
+                final Widget glyph = Text(
                   _word[index],
                   textScaler: TextScaler.noScaling,
                   style: isGreenI ? greenGlyphStyle : baseGlyphStyle,
                 );
-
-                if (charBlurSigma > 0.05) {
-                  glyph = ImageFiltered(
-                    imageFilter: ImageFilter.blur(
-                      sigmaX: charBlurSigma,
-                      sigmaY: charBlurSigma,
-                      tileMode: TileMode.decal,
-                    ),
-                    child: glyph,
-                  );
-                }
 
                 return Positioned(
                   left: metrics.glyphOffsets[index],

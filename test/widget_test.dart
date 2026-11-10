@@ -172,8 +172,11 @@ void main() {
         expect(find.text('Ma’lumotlar yuklanmoqda…'), findsNothing);
 
         // Animatsiya to'liq o'ynab bo'lishi (kirish + silliq chiqish)
-        await tester.pump(const Duration(milliseconds: 100));
+        // Belgi va shrift tayyor bo'lishini kutish (testda - 700 ms zaxira),
+        // kirish, so'ng logotipning qisqa jim turishi.
+        await tester.pump(const Duration(milliseconds: 700));
         await tester.pump(const Duration(milliseconds: 1800));
+        await tester.pump(const Duration(milliseconds: 300));
         await tester.pumpAndSettle();
 
         expect(finished, isTrue);

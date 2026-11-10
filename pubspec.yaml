@@ -71,6 +71,9 @@ flutter:
   assets:
     - assets/images/individ_mark.png
     - assets/images/individ_logo.png
+    # Golos Text shrifti ilova ichida: internetdan kutilmaydi, ochilish
+    # animatsiyasida harflar boshqa shriftga almashib sakramaydi.
+    - assets/google_fonts/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
