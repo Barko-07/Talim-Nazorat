@@ -42,8 +42,9 @@ class AssessmentsListScreen extends StatelessWidget {
       MaterialPageRoute(builder: (_) => const NewAssessmentScreen()),
     );
 
+    // Ramka telefondagi pastki menyu ustida tugaydi: oxiri yashirinmaydi.
     final body = ResponsivePageContainer(
-      bottomPadding: 0,
+      bottomPadding: width < 920 ? 92 + bottomInset : 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -100,12 +101,11 @@ class AssessmentsListScreen extends StatelessWidget {
                         ),
                       )
                       : ListView.separated(
-                        padding: EdgeInsets.only(
-                          bottom: width < 920 ? 84 + bottomInset : 8,
-                        ),
+                        padding: EdgeInsets.only(bottom: 8),
                         itemCount: items.length,
                         separatorBuilder:
-                            (_, _) => Divider(height: 1, color: AppColors.border),
+                            (_, _) =>
+                                Divider(height: 1, color: AppColors.border),
                         itemBuilder: (context, i) => _AssessmentRow(items[i]),
                       ),
             ),
@@ -132,7 +132,9 @@ class _AssessmentRow extends StatelessWidget {
     final pct = a.maxScore > 0 ? (a.totalScore / a.maxScore * 100).round() : 0;
     final dyn = DynamicsIcon.fromTrend(a.trend);
     final dynText =
-        dyn == DynamicsStatus.insufficientData ? 'Birinchi' : DynamicsIcon.shortLabel(dyn);
+        dyn == DynamicsStatus.insufficientData
+            ? 'Birinchi'
+            : DynamicsIcon.shortLabel(dyn);
     return InkWell(
       onTap:
           () => Navigator.push(
@@ -190,14 +192,21 @@ class _AssessmentRow extends StatelessWidget {
                     const SizedBox(width: 5),
                     Text(
                       dynText,
-                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
             const SizedBox(width: 8),
-            Icon(LucideIcons.chevronRight, size: 18, color: AppColors.textSubtle),
+            Icon(
+              LucideIcons.chevronRight,
+              size: 18,
+              color: AppColors.textSubtle,
+            ),
           ],
         ),
       ),

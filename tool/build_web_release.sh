@@ -36,6 +36,9 @@ if grep -q '{{' "$OUT/privacy.html" 2>/dev/null; then
   echo "note: privacy.html has unfilled {{...}} fields - left out of this release"
 fi
 
+# Fonts get content-hashed names so a cached old icon font never shows blank icons.
+python "$(dirname "$0")/version_fonts.py" "$OUT" || fail "fonts could not be versioned"
+
 # Open it in Chromium with the production CSP; the Flutter view must appear.
 python "$(dirname "$0")/check_web_bundle.py" "$OUT" server/deploy/nginx/individ_headers.conf \
   || fail "the page does not start under the production CSP"

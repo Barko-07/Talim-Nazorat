@@ -32,7 +32,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
         if (s.status != 'Arxivlangan' && s.grade.trim().isNotEmpty)
           s.grade.trim(),
     };
-    int num(String g) => int.tryParse(RegExp(r'\d+').stringMatch(g) ?? '') ?? 99;
+    int num(String g) =>
+        int.tryParse(RegExp(r'\d+').stringMatch(g) ?? '') ?? 99;
     return set.toList()..sort((a, b) {
       final c = num(a).compareTo(num(b));
       return c != 0 ? c : a.compareTo(b);
@@ -68,8 +69,9 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
 
     String chipName(StatusColor? c) => c == null ? 'Hammasi' : c.short;
 
+    // Ramka telefondagi pastki menyu ustida tugaydi: oxiri yashirinmaydi.
     final body = ResponsivePageContainer(
-      bottomPadding: 0,
+      bottomPadding: width < 920 ? 92 + bottomInset : 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -204,9 +206,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                                   _status != null,
                             )
                             : ListView.separated(
-                              padding: EdgeInsets.only(
-                                bottom: width < 920 ? 84 + bottomInset : 8,
-                              ),
+                              padding: EdgeInsets.only(bottom: 8),
                               itemCount: students.length,
                               separatorBuilder:
                                   (_, _) => Divider(
@@ -403,7 +403,11 @@ class _ChildRow extends StatelessWidget {
               ),
             ],
             const SizedBox(width: 8),
-            Icon(LucideIcons.chevronRight, size: 18, color: AppColors.textSubtle),
+            Icon(
+              LucideIcons.chevronRight,
+              size: 18,
+              color: AppColors.textSubtle,
+            ),
           ],
         ),
       ),
@@ -435,7 +439,9 @@ class _Empty extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              searching ? 'Boshqa ism yoki sinfni tanlang' : 'Bolalar shu yerda ko‘rinadi',
+              searching
+                  ? 'Boshqa ism yoki sinfni tanlang'
+                  : 'Bolalar shu yerda ko‘rinadi',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 13, color: AppColors.textMuted),
             ),

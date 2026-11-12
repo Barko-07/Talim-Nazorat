@@ -17,6 +17,7 @@ import '../iep/iep_list_screen.dart';
 import '../monitoring/monitoring_screen.dart';
 import '../reports/reports_screen.dart';
 import '../sessions/sessions_screen.dart';
+import '../settings/settings_screen.dart';
 import '../students/add_student_screen.dart';
 import '../students/student_detail_screen.dart';
 import '../students/students_list_screen.dart';
@@ -321,6 +322,11 @@ class DashboardScreen extends StatelessWidget {
             ),
           );
 
+          final subStyle = TextStyle(
+            fontSize: 13,
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.w500,
+          );
           final userInfo = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -346,17 +352,31 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
-                [roleLabel, if (institutionName.isNotEmpty) institutionName]
-                    .join(' · '),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w500,
+              // Telefonda rol va maktab alohida qatorda: kesilib qolmaydi.
+              if (isCompact) ...[
+                Text(
+                  roleLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: subStyle,
                 ),
-              ),
+                if (institutionName.isNotEmpty)
+                  Text(
+                    institutionName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: subStyle,
+                  ),
+              ] else
+                Text(
+                  [
+                    roleLabel,
+                    if (institutionName.isNotEmpty) institutionName,
+                  ].join(' · '),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: subStyle,
+                ),
             ],
           );
 
@@ -383,9 +403,25 @@ class DashboardScreen extends StatelessWidget {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              monogram,
-              const SizedBox(width: 14),
-              Expanded(child: userInfo),
+              // Ism va rasm — Sozlamalarga (shaxsiy ma'lumotlar) o'tadi.
+              Expanded(
+                child: Semantics(
+                  button: true,
+                  label: 'Sozlamalar',
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap:
+                        () => _openModule(context, 9, const SettingsScreen()),
+                    child: Row(
+                      children: [
+                        monogram,
+                        const SizedBox(width: 14),
+                        Expanded(child: userInfo),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
               if (canAddStudent) ...[const SizedBox(width: 12), addCompact],
             ],
           );
@@ -442,7 +478,11 @@ class DashboardScreen extends StatelessWidget {
                   color: AppColors.primary,
                 ),
               ),
-              Icon(LucideIcons.chevronRight, size: 16, color: AppColors.primary),
+              Icon(
+                LucideIcons.chevronRight,
+                size: 16,
+                color: AppColors.primary,
+              ),
             ],
           ),
           const SizedBox(height: 6),
@@ -531,7 +571,6 @@ class DashboardScreen extends StatelessWidget {
                         color: AppColors.textSecondary,
                       ),
                     ),
-
                   ],
                 ),
               ),

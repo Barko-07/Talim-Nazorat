@@ -125,8 +125,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         const SizedBox(height: 3),
+                        // Telefon bo'lmasa — "Ko'rsatilmagan" emas, lavozim.
                         Text(
-                          _maskPhone(phone),
+                          phone.isEmpty
+                              ? (user?.role.label ?? '')
+                              : _maskPhone(phone),
                           style: _myGovFont(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
