@@ -24,7 +24,7 @@ flutter build web --release --no-web-resources-cdn --dart-define=SERVER_MODE=tru
 fail() { echo "BUILD REFUSED: $1" >&2; rm -f "$ARCHIVE"; exit 1; }
 
 for f in index.html main.dart.js flutter_bootstrap.js assets/AssetManifest.bin.json \
-         assets/FontManifest.json canvaskit/canvaskit.wasm robots.txt sitemap.xml account-deletion.html about.html splash.js; do
+         assets/FontManifest.json canvaskit/canvaskit.wasm robots.txt sitemap.xml account-deletion.html about.html googlec822c439aafb08dc.html splash.js; do
   [ -f "$OUT/$f" ] || fail "$f missing"
 done
 grep -q '"useLocalCanvasKit":true' "$OUT/flutter_bootstrap.js" || fail "CanvasKit would load from gstatic.com"
