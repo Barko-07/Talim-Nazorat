@@ -361,7 +361,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     if (_isPsychologist) {
       final psychScreen = _buildPsychologistScreen();
       if (psychScreen != null) {
-        return psychScreen;
+        // To'liq balandlik: aks holda o'tish animatsiyasi qisqa sahifani
+        // ekran o'rtasiga qo'yib, tepada bo'sh joy qoldiradi.
+        return SizedBox.expand(
+          key: ValueKey('psy_wrap_$_selectedIndex'),
+          child: psychScreen,
+        );
       }
     }
     switch (_selectedIndex) {
@@ -1359,7 +1364,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                     ),
                                     SizedBox(width: 8),
                                     Text(
-                                      'O‘quvchi qidirish...',
+                                      'Bola qidirish',
                                       style: TextStyle(
                                         fontSize: 13,
                                         color: AppColors.textMuted,

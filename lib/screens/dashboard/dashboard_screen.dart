@@ -199,8 +199,11 @@ class DashboardScreen extends StatelessWidget {
                       ),
                       _buildKpiCard(
                         title: 'O‘rtacha o‘sish',
+                        // Baholash bo'lmasa "+0.0 ball" emas, "—".
                         value:
-                            '${app.averageDevelopmentGrowth >= 0 ? '+' : ''}${app.averageDevelopmentGrowth.toStringAsFixed(1)} ball',
+                            app.assessments.isEmpty
+                                ? '—'
+                                : '${app.averageDevelopmentGrowth >= 0 ? '+' : ''}${app.averageDevelopmentGrowth.toStringAsFixed(1)} ball',
                         icon: LucideIcons.trendingUp,
                         color: AppColors.success,
                         onTap:

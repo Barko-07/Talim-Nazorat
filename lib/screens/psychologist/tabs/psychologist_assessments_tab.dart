@@ -182,7 +182,7 @@ class _PsychologistAssessmentsTabState
                 );
 
                 final newAssessmentBtn = HeaderActionButton(
-                  label: 'Yangi Baholash Boshlash',
+                  label: 'Yangi baholash',
                   compactLabel: 'Yangi baholash',
                   icon: LucideIcons.listPlus,
                   onPressed: () => _startNewAssessment(),
@@ -203,7 +203,7 @@ class _PsychologistAssessmentsTabState
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Psixologik Baholash Tizimi',
+                      'Psixologik baholash',
                       style: TextStyle(
                         fontSize: isCompact ? 18.5 : 21,
                         fontWeight: FontWeight.w700,
@@ -213,7 +213,7 @@ class _PsychologistAssessmentsTabState
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Kutubxona savollari asosida psixologik diagnostika va monitoring o‘tkazish',
+                      'Savollar kutubxonasi asosida diagnostika',
                       style: TextStyle(
                         fontSize: 12.5,
                         color: AppColors.textMuted,
@@ -290,7 +290,7 @@ class _PsychologistAssessmentsTabState
                   final searchField = TextField(
                     onChanged: (v) => setState(() => _search = v.trim()),
                     decoration: inputDeco(
-                      hint: 'O‘quvchi F.I.SH yoki mavzu...',
+                      hint: 'Bola yoki mavzu',
                       prefixIcon: const Icon(LucideIcons.search, size: 18),
                     ),
                   );
@@ -454,7 +454,7 @@ class _PsychologistAssessmentsTabState
                       ),
                       const SizedBox(height: 12),
                       const Text(
-                        'Mos keluvchi baholashlar topilmadi',
+                        'Baholash topilmadi',
                         style: TextStyle(
                           fontSize: 15.5,
                           fontWeight: FontWeight.w600,
@@ -462,7 +462,7 @@ class _PsychologistAssessmentsTabState
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Yangi baholash boshlash uchun yuqoridagi tugmadan foydalaning',
+                        'Yangi baholashni tepadagi tugmadan boshlang',
                         style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textMuted,

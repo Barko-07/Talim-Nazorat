@@ -104,7 +104,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                 // Asosiy ma'lumotlar
                 final titleText =
                     user != null
-                        ? 'Xush kelibsiz, ${user.fullName}!'
+                        ? 'Xush kelibsiz, ${user.fullName}'
                         : 'Psixolog ish stoli';
 
                 return Column(
