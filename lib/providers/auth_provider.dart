@@ -372,6 +372,22 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
     return {'success': true, 'message': 'Muvaffaqiyatli ro‘yxatdan o‘tdingiz!'};
   }
 
+  /// Foydalanuvchi o'z hisobini o'chiradi (Google Play talabi). Shaxsiy
+  /// ma'lumotlar serverda darhol o'chiriladi, keyin ilovadan chiqiladi.
+  Future<Map<String, dynamic>> deleteAccount(String password) async {
+    if (_currentUser == null || !AppConfig.serverMode) {
+      return {'success': false, 'message': 'Foydalanuvchi tizimga kirmagan.'};
+    }
+    try {
+      await _authApi.deleteAccount(password);
+    } on ApiException catch (e) {
+      return _apiFail(e);
+    }
+    await _saveRememberedLogin(null);
+    await logout();
+    return _ok('Hisobingiz o‘chirildi');
+  }
+
   Future<Map<String, dynamic>> changePassword(
     String currentPassword,
     String newPassword, {

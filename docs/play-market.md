@@ -1,6 +1,6 @@
 # Individ — Google Play'ga chiqarish tayyorgarligi
 
-Holat: 2026-11-06. ✅ — tayyor, ⏳ — sizdan kerak, 🛠 — keyingi ish (ilova ekranlari).
+Holat: 2026-11-12. ✅ — tayyor, ⏳ — sizdan kerak, 🛠 — keyingi ish (ilova ekranlari).
 
 ## 1. Texnik tayyorgarlik
 
@@ -11,17 +11,17 @@ Holat: 2026-11-06. ✅ — tayyor, ⏳ — sizdan kerak, 🛠 — keyingi ish (i
 | ✅ | Shifrlanmagan HTTP taqiqlangan, Google zaxirasiga nusxa olinmaydi (`allowBackup=false`) | `AndroidManifest.xml` |
 | ✅ | Yuklash kaliti (upload key) yaratildi: `C:\Users\user\.individ\individ-upload.jks`, parol `android/key.properties` da (git’ga kirmaydi) | — |
 | ⏳ | **Kalit nusxasi:** `individ-upload.jks` va `android/key.properties` ni fleshkaga ko‘chirib, xavfsiz joyda saqlang. Yo‘qolsa, Google’dan kalitni almashtirishni so‘rash kerak bo‘ladi (Play App Signing yoqilgan bo‘lsa mumkin) | — |
-| ⏳ | **Android NDK o‘rnatish** (bir marta): Android Studio → Settings → Languages & Frameworks → Android SDK → SDK Tools → “NDK (Side by side)” **28.2.13676358** → Apply. Avtomatik yuklab olish tarmoq sababli to‘xtab qolgan | — |
-| ⏳ | Yig‘ish: `flutter build appbundle --release --dart-define=SERVER_MODE=true` → `build/app/outputs/bundle/release/app-release.aab` | NDK’dan keyin |
-| 🛠 | Seans cookie’sini telefonning himoyalangan xotirasiga (flutter_secure_storage) o‘tkazish — hozir oddiy xotirada | ilova kodi |
-| 🛠 | Ilova ichida “Hisobni o‘chirish” tugmasi (server tayyor: `POST /api/auth/account/delete`) | ilova ekrani |
+| ✅ | Android NDK 28.2.13676358 o‘rnatilgan | — |
+| ✅ | Yig‘ish: `flutter build appbundle --release --dart-define=SERVER_MODE=true` → `build/app/outputs/bundle/release/app-release.aab`. Release ilova API_BASE_URL berilmasa ham https://individ.uz ga ulanadi | — |
+| ✅ | Seans cookie’si release ilovada himoyalangan xotirada (flutter_secure_storage, Android Keystore) | `api_client.dart` |
+| ✅ | Ilova ichida “Hisobni o‘chirish”: Sozlamalar → Hisobni o‘chirish (parol bilan) | `settings_screen.dart` |
 
 ## 2. Google Play talablari
 
 | | Talab | Holat |
 |---|---|---|
 | ✅ | Hisobni o‘chirish — **veb orqali**: https://individ.uz/account-deletion.html | ishlaydi |
-| 🛠 | Hisobni o‘chirish — **ilova ichida** | yuqoridagi 🛠 |
+| ✅ | Hisobni o‘chirish — **ilova ichida** (Sozlamalar) | ishlaydi |
 | ⏳ | Maxfiylik siyosati sahifasi: `web/privacy.html` tayyor, manzili https://individ.uz/privacy.html. Operator (mijoz tashkiloti) nomi, STIR, manzil, email kerak — `{{...}}` joylari to‘ldirilgach e’lon qilinadi | sizdan |
 | ✅ | Google Play Developer hisobi ochilgan (to‘langan). Topshirishda ilova mijoz hisobiga App transfer orqali o‘tadi — `docs/handover.md` | — |
 | ⏳ | Ilova sahifasi: qisqa/to‘liq tavsif, ikonka 512×512, kamida 2 ta skrinshot, feature graphic 1024×500 | keyin (store-screenshots skill bilan tayyorlayman) |
@@ -36,7 +36,7 @@ Holat: 2026-11-06. ✅ — tayyor, ⏳ — sizdan kerak, 🛠 — keyingi ish (i
 - **Uchinchi tomonlarga beriladimi?** Yo‘q. Reklama, analitika SDK yo‘q.
 - Yig‘iladigan turlar:
   - *Shaxsiy ma’lumot:* ism, email, telefon — hisob yuritish uchun, majburiy.
-  - *Kasbiy ma’lumot:* mutaxassislik, malaka, ish staji, maktab — majburiy emas.
+  - *Kasbiy ma’lumot:* rol (mutaxassislik) va maktab — hisob uchun.
   - *Sog‘liq va boshqa sezgir ma’lumot (bolalar haqida):* tashxis, baholash natijalari, kuzatuvlar — ilova funksiyasi uchun, faqat mutaxassislar kiritadi, serverda AES-256 bilan shifrlangan, faqat bolaning jamoasi ko‘radi.
   - *Ilova faolligi:* kirishlar va o‘zgarishlar jurnali — xavfsizlik uchun.
 - Joylashuv, kontaktlar, fotosuratlar, mikrofon — **yig‘ilmaydi**.

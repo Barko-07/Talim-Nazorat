@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,14 +34,18 @@ class ApiException implements Exception {
 /// yuboradi (JavaScript, demak XSS ham, uni o'qiy olmaydi). Telefon ilovasida
 /// cookie'ni shu sinf boshqaradi va ilovaning shaxsiy xotirasida saqlaydi —
 /// "Eslab qolish" ilova qayta ochilganda ham ishlashi uchun. Muddati serverda
-/// tekshiriladi. (Play Market'dan oldin: flutter_secure_storage'ga o'tkazish.)
+/// tekshiriladi. Telefonda u himoyalangan xotirada (Keystore/Keychain) turadi.
 class ApiClient {
   ApiClient({http.Client? client, String? baseUrl})
     : _client = client ?? http.Client(),
-      _baseUrl = (baseUrl ?? AppConfig.apiBaseUrl).replaceAll(
-        RegExp(r'/+$'),
-        '',
-      );
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/+$'), '');
+
+  /// Saytda — o'sha domen (bo'sh). Telefon ilovasida, API_BASE_URL berilmasa,
+  /// release ilova asosiy serverga ulanadi (yig'ishda esdan chiqsa ham).
+  static String get _defaultBaseUrl =>
+      AppConfig.apiBaseUrl.isNotEmpty
+          ? AppConfig.apiBaseUrl
+          : (kIsWeb || !kReleaseMode ? '' : 'https://individ.uz');
 
   static ApiClient _instance = ApiClient();
 
@@ -71,10 +76,8 @@ class ApiClient {
     Map<String, dynamic>? body,
   ]) => _send('POST', path, body);
 
-  Future<Map<String, dynamic>> put(
-    String path, [
-    Map<String, dynamic>? body,
-  ]) => _send('PUT', path, body);
+  Future<Map<String, dynamic>> put(String path, [Map<String, dynamic>? body]) =>
+      _send('PUT', path, body);
 
   Future<Map<String, dynamic>> patch(String path, Map<String, dynamic> body) =>
       _send('PATCH', path, body);
@@ -172,11 +175,62 @@ class ApiClient {
 
   // ---------------------------------------------------------------- cookies (mobile/desktop)
 
+  static const _secure = FlutterSecureStorage();
+
+  /// Release ilovada (Play Market) — himoyalangan xotira. Debug va testlarda
+  /// oddiy xotira (testlarda himoyalangan xotira plagini yo'q).
+  static const _useSecure = kReleaseMode;
+
+  /// Telefonda sessiya himoyalangan xotirada (Android Keystore / iOS Keychain)
+  /// turadi. Himoyalangan xotira bo'lmasa (masalan testlarda) — oddiy xotira.
+  Future<String?> _readSaved() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!_useSecure) return prefs.getString(_sessionCookiePrefs);
+    try {
+      final v = await _secure.read(key: _sessionCookiePrefs);
+      final old = prefs.getString(_sessionCookiePrefs);
+      if (v == null && old != null) {
+        // Eski versiyadan: oddiy xotiradagini himoyalanganga ko'chiramiz.
+        await _secure.write(key: _sessionCookiePrefs, value: old);
+        await prefs.remove(_sessionCookiePrefs);
+        return old;
+      }
+      return v;
+    } catch (_) {
+      return prefs.getString(_sessionCookiePrefs);
+    }
+  }
+
+  Future<void> _writeSaved(String? value) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!_useSecure) {
+      if (value == null) {
+        await prefs.remove(_sessionCookiePrefs);
+      } else {
+        await prefs.setString(_sessionCookiePrefs, value);
+      }
+      return;
+    }
+    try {
+      if (value == null) {
+        await _secure.delete(key: _sessionCookiePrefs);
+      } else {
+        await _secure.write(key: _sessionCookiePrefs, value: value);
+      }
+      await prefs.remove(_sessionCookiePrefs);
+    } catch (_) {
+      if (value == null) {
+        await prefs.remove(_sessionCookiePrefs);
+      } else {
+        await prefs.setString(_sessionCookiePrefs, value);
+      }
+    }
+  }
+
   Future<void> _loadCookies() async {
     if (kIsWeb || _cookiesLoaded) return;
     _cookiesLoaded = true;
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString(_sessionCookiePrefs);
+    final saved = await _readSaved();
     final eq = saved?.indexOf('=') ?? -1;
     if (saved != null && eq > 0) {
       _cookies[saved.substring(0, eq)] = saved.substring(eq + 1);
@@ -204,12 +258,7 @@ class ApiClient {
         _cookies[name] = value;
       }
       if (name.endsWith('individ_session')) {
-        final prefs = await SharedPreferences.getInstance();
-        if (deleted) {
-          await prefs.remove(_sessionCookiePrefs);
-        } else {
-          await prefs.setString(_sessionCookiePrefs, '$name=$value');
-        }
+        await _writeSaved(deleted ? null : '$name=$value');
       }
     }
   }
@@ -218,9 +267,6 @@ class ApiClient {
   Future<void> clearSession() async {
     _csrfToken = '';
     _cookies.clear();
-    if (!kIsWeb) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_sessionCookiePrefs);
-    }
+    if (!kIsWeb) await _writeSaved(null);
   }
 }

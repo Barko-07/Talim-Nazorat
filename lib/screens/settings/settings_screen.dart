@@ -73,8 +73,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final user = auth.currentUser;
     final canPop = Navigator.canPop(context);
     final region = user?.region ?? 'Namangan viloyati';
-    final district =
-        (user?.district ?? '').isEmpty ? '—' : user!.district!;
+    final district = (user?.district ?? '').isEmpty ? '—' : user!.district!;
     final fullName = user?.fullName ?? 'Mutaxassis';
     final phone = user?.phone ?? '';
     final schoolName = user?.institutionName ?? '';
@@ -217,6 +216,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     subtitle: 'Chortoq tumani MMTB',
                     onTap: () => _showContactSheet(context, region, district),
                   ),
+                  if (AppConfig.serverMode)
+                    _buildMyGovMenuItem(
+                      icon: LucideIcons.userX,
+                      title: 'Hisobni o‘chirish',
+                      subtitle: 'Shaxsiy ma’lumotlaringiz o‘chiriladi',
+                      onTap: () => _confirmDeleteAccount(context),
+                    ),
                   _buildMyGovMenuItem(
                     icon: LucideIcons.logOut,
                     title: 'Profildan chiqish',
@@ -276,6 +282,89 @@ class _SettingsScreenState extends State<SettingsScreen> {
               : null,
       body: canPop ? AmbientMeshBackground(child: scrollBody) : scrollBody,
     );
+  }
+
+  Future<void> _confirmDeleteAccount(BuildContext context) async {
+    final pw = TextEditingController();
+    String? error;
+    var busy = false;
+    final auth = context.read<AuthProvider>();
+    await showDialog<void>(
+      context: context,
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setD) => AlertDialog(
+                  title: const Text('Hisobni o‘chirish'),
+                  content: SizedBox(
+                    width: 420,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Ismingiz, email, telefon va profilingiz o‘chiriladi, '
+                          'tizimga qayta kira olmaysiz. Bolalar bo‘yicha '
+                          'kiritgan ish yozuvlaringiz maktab hujjati sifatida '
+                          'qoladi. Buni qaytarib bo‘lmaydi.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            height: 1.45,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: pw,
+                          obscureText: true,
+                          autofocus: true,
+                          decoration: InputDecoration(
+                            labelText: 'Parolingiz',
+                            errorText: error,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: busy ? null : () => Navigator.pop(ctx),
+                      child: const Text('Bekor qilish'),
+                    ),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.error,
+                      ),
+                      onPressed:
+                          busy
+                              ? null
+                              : () async {
+                                if (pw.text.isEmpty) {
+                                  setD(() => error = 'Parolni kiriting');
+                                  return;
+                                }
+                                setD(() {
+                                  busy = true;
+                                  error = null;
+                                });
+                                final r = await auth.deleteAccount(pw.text);
+                                if (!ctx.mounted) return;
+                                if (r['success'] == true) {
+                                  Navigator.pop(ctx);
+                                } else {
+                                  setD(() {
+                                    busy = false;
+                                    error = '${r['message']}';
+                                  });
+                                }
+                              },
+                      child: const Text('O‘chirish'),
+                    ),
+                  ],
+                ),
+          ),
+    );
+    pw.dispose();
   }
 
   Widget _buildMyGovMenuItem({
