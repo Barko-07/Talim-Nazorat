@@ -6,4 +6,9 @@ class AppBrand {
 
   static const String markAsset = 'assets/images/individ_mark.png';
   static const String logoAsset = 'assets/images/individ_logo.png';
+
+  // Bog'lanish (Sozlamalar → Bog'lanish)
+  static const String supportOrg = 'Namangan viloyati Chortoq tumani MMTB';
+  static const String supportPhone = '+998 99 922 22 10';
+  static const String supportEmail = 'info@individ.uz';
 }

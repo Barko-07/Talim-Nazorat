@@ -99,7 +99,11 @@ class Screen:
             await self.page.keyboard.press("Backspace")
             await self.page.keyboard.type(text, delay=25)
             await self.page.wait_for_timeout(200)
-            if await f.input_value() == text:
+            value = await f.input_value()
+            # Telefon maydoni raqamni o'zi guruhlaydi ("+998 94 429 73 72"):
+            # raqamlar bir xil bo'lsa — to'g'ri yozilgan.
+            digits = lambda x: re.sub(r"\D", "", x)
+            if value == text or (label == "Telefon" and digits(value).endswith(digits(text)[-9:])):
                 return
         raise AssertionError(f"could not type into {label!r}")
 
@@ -244,7 +248,7 @@ async def journey_reset(b):
     time.sleep(6)
     await login(s2, email, NEW_PW)
     await s2.shot("in")
-    check("Parolni tiklash: yangi parol bilan kirildi", await s2.sees("Boshqaruv"))
+    check("Parolni tiklash: yangi parol bilan kirildi", await s2.sees("Bosh sahifa"))
 
 
 async def journey_register(b):
@@ -288,7 +292,7 @@ async def journey_register(b):
     await s.probe("after registration code")
     await s.shot("reg_done")
     # No administrator approval: the code signs the person straight in.
-    check("Ro‘yxatdan o‘tish: kod bilan darhol o‘z ish sahifasiga kirdi", await s.sees("Boshqaruv markazi"))
+    check("Ro‘yxatdan o‘tish: kod bilan darhol o‘z ish sahifasiga kirdi", await s.sees("Bosh sahifa"))
     check("Ro‘yxatdan o‘tish: tanlangan maktab hisobga yozildi", await s.sees("14-sonli maktab"))
 
     # The administrator sees the new colleague among the accounts (and could block them).
@@ -304,7 +308,7 @@ async def journey_register(b):
     await login(g, REG_EMAIL)
     await g.probe("new user home")
     await g.shot("home")
-    check("Yangi xodim keyin odatdagidek (parol + kod) kiradi", await g.sees("Boshqaruv markazi"))
+    check("Yangi xodim keyin odatdagidek (parol + kod) kiradi", await g.sees("Bosh sahifa"))
 
 
 async def journey_add_child(b):
@@ -316,6 +320,7 @@ async def journey_add_child(b):
     await s.shot("form")
     await s.type("Familiyasi *", "Rustamov")
     await s.type("Ismi *", "Sanjar")
+    await s.type("Sinfi *", "1-A")
     check("Bola qo‘shish: maktab o‘qituvchining o‘z maktabi (tanlanmaydi)", await s.sees("14-sonli maktab"))
     await s.press(re.compile("^Ta’lim shakli"))
     await s.choose("Uyda yakka tartibda")
@@ -326,7 +331,7 @@ async def journey_add_child(b):
     await s.page.mouse.wheel(0, 4000)
     await s.page.wait_for_timeout(900)
     await s.semantics()
-    box = await s.page.get_by_role("button", name="O‘quvchini tizimga saqlash", exact=True).first.bounding_box()
+    box = await s.page.get_by_role("button", name="Saqlash", exact=True).first.bounding_box()
     await s.page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
     await s.page.wait_for_timeout(2500)
     await s.semantics()
@@ -340,15 +345,15 @@ async def journey_add_child(b):
         await s.page.mouse.wheel(0, 3000)
         await s.page.wait_for_timeout(800)
         await s.shot("saved_bottom")
-    await s.press(re.compile("^Bolalar bazasi"))
+    await s.press(re.compile(r"^Bolalar(\s+\d+)?$"))
     await s.page.wait_for_timeout(1500)
     await s.shot("list")
-    check("Bola qo‘shildi va 'Bolalar bazasi'da ko‘rinadi", await s.sees("Rustamov Sanjar") or await s.sees("Sanjar"))
+    check("Bola qo‘shildi va 'Bolalar'da ko‘rinadi", await s.sees("Rustamov Sanjar") or await s.sees("Sanjar"))
     # Saved on the server: another session of the same teacher sees it too.
     s2 = Screen(await b.new_page(viewport={"width": 1280, "height": 900}), "child_again")
     time.sleep(6)
     await login(s2, "oqituvchi@maktab.uz")
-    await s2.press(re.compile("^Bolalar bazasi"))
+    await s2.press(re.compile(r"^Bolalar(\s+\d+)?$"))
     await s2.page.wait_for_timeout(1500)
     check("Bola serverda saqlangan (boshqa brauzerda ham bor)", await s2.sees("Sanjar"))
     await s2.page.get_by_text("Sanjar", exact=False).or_(s2.page.locator('[aria-label*="Sanjar"]')).first.click()
@@ -367,7 +372,7 @@ async def journey_add_child(b):
     await login(p, "psixolog@maktab.uz")
     await p.page.wait_for_timeout(1500)
     await p.shot("home")
-    await p.press(re.compile("^Bolalar bazasi"))
+    await p.press(re.compile(r"^Bolalar(\s+\d+)?$"))
     await p.page.wait_for_timeout(1500)
     await p.shot("children")
     check("Bog‘langan psixolog bolani ko‘radi", await p.sees("Sanjar") or await p.sees("Rustamov"))

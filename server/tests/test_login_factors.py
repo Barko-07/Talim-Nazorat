@@ -58,7 +58,10 @@ def test_a_partial_sign_in_is_never_kept_for_days(api, app):
 
 def test_without_eslab_qolish_the_session_ends_after_30_idle_minutes(api, app):
     add_user(app, "short@maktab.uz")
-    api.login("short@maktab.uz")
+    r = api.login("short@maktab.uz")
+    # Website: closing the browser ends it (no persistent cookie).
+    cookie = r.headers["set-cookie"].lower()
+    assert "max-age" not in cookie and "expires" not in cookie
     assert _live_session(app).remember is False
     with db_session(app) as db:
         db.execute(update(AuthSession).values(last_seen_at=utcnow() - timedelta(minutes=31)))

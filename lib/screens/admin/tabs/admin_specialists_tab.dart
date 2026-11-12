@@ -18,7 +18,6 @@ class AdminSpecialistsTab extends StatefulWidget {
 class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
   String _search = '';
   UserRole? _filterRole;
-  String? _filterCategory;
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +43,6 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
             if (!matchName && !matchSpec && !matchInst) return false;
           }
           if (_filterRole != null && s.role != _filterRole) return false;
-          if (_filterCategory != null &&
-              _filterCategory!.isNotEmpty &&
-              s.qualificationCategory != _filterCategory) {
-            return false;
-          }
           return true;
         }).toList();
 
@@ -186,47 +180,6 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                       onChanged: (v) => setState(() => _filterRole = v),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: DropdownButtonFormField<String?>(
-                      isExpanded: true,
-                      initialValue: _filterCategory,
-                      decoration: InputDecoration(
-                        labelText: 'Toifasi',
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: null,
-                          child: Text('Barcha toifalar'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Oliy toifa',
-                          child: Text('Oliy toifa'),
-                        ),
-                        DropdownMenuItem(
-                          value: '1-toifa',
-                          child: Text('1-toifa'),
-                        ),
-                        DropdownMenuItem(
-                          value: '2-toifa',
-                          child: Text('2-toifa'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Mutaxassis',
-                          child: Text('Mutaxassis'),
-                        ),
-                      ],
-                      onChanged: (v) => setState(() => _filterCategory = v),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -312,33 +265,7 @@ class _AdminSpecialistsTabState extends State<AdminSpecialistsTab> {
                                   ),
                                 ),
                               ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.surfaceMuted,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  sp.qualificationCategory ?? 'Mutaxassis',
-                                  style: TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
                             ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Mutaxassislik: ${sp.specialization ?? sp.role.professionTitle} • Ish staji: ${sp.experienceYears} yil',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(

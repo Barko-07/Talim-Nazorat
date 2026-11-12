@@ -6,9 +6,10 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/monitoring_alert_model.dart';
-import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
-import '../../services/child_status_service.dart';
+import '../../services/child_changes.dart';
+import '../../core/widgets/status_badge.dart';
+import '../../services/dynamics_service.dart';
 import '../students/student_detail_screen.dart';
 
 class MonitoringScreen extends StatefulWidget {
@@ -19,30 +20,7 @@ class MonitoringScreen extends StatefulWidget {
 }
 
 class _MonitoringScreenState extends State<MonitoringScreen> {
-  bool _showOnlyUnresolved = true;
-  StatusColor? _selectedSvetoforFilter;
-
-  static Color _colorFor(StatusColor c) {
-    switch (c) {
-      case StatusColor.red:
-        return AppColors.error;
-      case StatusColor.yellow:
-        return AppColors.warning;
-      case StatusColor.green:
-        return AppColors.success;
-    }
-  }
-
-  static Color _bgFor(StatusColor c) {
-    switch (c) {
-      case StatusColor.red:
-        return AppColors.errorBg;
-      case StatusColor.yellow:
-        return AppColors.warningBg;
-      case StatusColor.green:
-        return AppColors.successBg;
-    }
-  }
+  DynamicsStatus? _filter;
 
   void _showResolveDialog(BuildContext context, MonitoringAlertModel alert) {
     final notesCtrl = TextEditingController(
@@ -160,238 +138,118 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
-    final alerts = app.getAlerts(onlyUnresolved: _showOnlyUnresolved);
-    final allAlertsCount = app.getAlerts(onlyUnresolved: false).length;
-    final unresolvedCount = app.unresolvedAlerts.length;
+    final alerts = app.getAlerts(onlyUnresolved: true);
     final canPop = Navigator.canPop(context);
+    final changes = childChanges(app.assessments);
+    final shown =
+        _filter == null
+            ? changes
+            : changes.where((c) => c.result.status == _filter).toList();
+    int count(DynamicsStatus? s) =>
+        s == null ? changes.length : changes.where((c) => c.result.status == s).length;
 
-    const rules = [
-      (
-        'Qoida 1',
-        'O‘tkazib yuborilgan mashg‘ulotlar',
-        'Ketma-ket 2+ marta qoldirilgan yoki bekor qilingan darslar',
+    Widget sectionTitle(String t) => Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+      child: Text(
+        t,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textPrimary,
+        ),
       ),
-      (
-        'Qoida 2',
-        'Kechikkan davriy baholashlar',
-        'Davriy nazorat muddati 60 kundan oshib ketganda',
-      ),
-      (
-        'Qoida 3',
-        'Rivojlanish turg‘unligi (Stagnatsiya)',
-        'Oxirgi 3 ta qiyosiy baholashda siljish kuzatilmasa',
-      ),
-      (
-        'Qoida 4',
-        'Ko‘rsatkichlar pasayishi (Regressiya)',
-        'O‘xshash mezonlar bo‘yicha >15% ko‘rsatkich tushishi',
-      ),
-      (
-        'Qoida 5',
-        'Muddati o‘tgan ITR maqsadlari',
-        'Belgilangan muddatda bajarilmagan ta’limiy maqsadlar',
-      ),
-      (
-        'Qoida 6',
-        'Dars kuzatuvi kiritilmaganligi',
-        'Bajarilgan mashg‘ulotda pedagogik xulosa qoldirilmagan',
-      ),
-    ];
-
-    final summary = app.monitoringSummary;
-    final filteredStatuses =
-        summary == null
-            ? const <ChildStatus>[]
-            : (_selectedSvetoforFilter == null
-                ? summary.statuses
-                : summary.byColor(_selectedSvetoforFilter!));
+    );
 
     final scrollBody = SingleChildScrollView(
       child: ResponsivePageContainer(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AdaptivePageHeader(
-              title: 'Monitoring tizimi',
+            const AdaptivePageHeader(
+              title: 'Monitoring',
               icon: LucideIcons.activity,
-              subtitle:
-                  'Xavfli tendensiyalarni erta aniqlash va nazorat qilish',
-              inlineActionOnMobile: false,
-              action: ModernPillFilterBar(
-                items: const ['Faqat ochiqlar', 'Barcha signallar'],
-                selectedItem:
-                    _showOnlyUnresolved ? 'Faqat ochiqlar' : 'Barcha signallar',
-                counts: {
-                  'Faqat ochiqlar': unresolvedCount,
-                  'Barcha signallar': allAlertsCount,
-                },
-                onSelected:
-                    (v) => setState(
-                      () => _showOnlyUnresolved = v == 'Faqat ochiqlar',
+              subtitle: 'Oxirgi natija oldingisiga nisbatan',
+            ),
+            const SizedBox(height: 12),
+            SurfaceCard(
+              borderRadius: 20,
+              padding: EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  sectionTitle('O‘sish va pasayish'),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final f in <DynamicsStatus?>[
+                          null,
+                          DynamicsStatus.decline,
+                          DynamicsStatus.ineffective,
+                          DynamicsStatus.growth,
+                          DynamicsStatus.stable,
+                        ])
+                          _FilterChip(
+                            label: f == null ? 'Hammasi' : _label(f),
+                            status: f,
+                            count: count(f),
+                            selected: _filter == f,
+                            onTap: () => setState(() => _filter = f),
+                          ),
+                      ],
                     ),
+                  ),
+                  Divider(height: 1, color: AppColors.border),
+                  if (shown.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(28),
+                      child: Text(
+                        changes.isEmpty
+                            ? 'Baholashlar bo‘lgach, o‘zgarishlar shu yerda ko‘rinadi'
+                            : 'Bu toifada bola yo‘q',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                      ),
+                    )
+                  else
+                    for (var i = 0; i < shown.length; i++) ...[
+                      if (i > 0) Divider(height: 1, indent: 20, color: AppColors.border),
+                      _changeRow(context, shown[i]),
+                    ],
+                ],
               ),
             ),
-            const SizedBox(height: 18),
-
-            // SVETOFOR: QIZIL / SARIQ / YASHIL MONITORING PANELI
-            if (summary != null) ...[
-              SurfaceCard(
-                borderRadius: 26,
-                padding: const EdgeInsets.all(22),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Bolalar bilan ishlash holati (Svetofor monitoringi)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15.5,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Qizil: bola bilan ishlanmagan yoki 30+ kun yozuv kiritilmagan • Sariq: pasayish/samarasiz yoki to‘liq ishlanmagan • Yashil: ijobiy dinamika',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    ModernPillFilterBar(
-                      items: const [
-                        'Barchasi',
-                        'Qizil (Ishlanmagan)',
-                        'Sariq (E’tibor talab)',
-                        'Yashil (Ijobiy)',
-                      ],
-                      selectedItem:
-                          _selectedSvetoforFilter == StatusColor.red
-                              ? 'Qizil (Ishlanmagan)'
-                              : _selectedSvetoforFilter == StatusColor.yellow
-                              ? 'Sariq (E’tibor talab)'
-                              : _selectedSvetoforFilter == StatusColor.green
-                              ? 'Yashil (Ijobiy)'
-                              : 'Barchasi',
-                      counts: {
-                        'Barchasi': summary.total,
-                        'Qizil (Ishlanmagan)': summary.count(StatusColor.red),
-                        'Sariq (E’tibor talab)': summary.count(
-                          StatusColor.yellow,
-                        ),
-                        'Yashil (Ijobiy)': summary.count(StatusColor.green),
-                      },
-                      itemColors: {
-                        'Qizil (Ishlanmagan)': AppColors.error,
-                        'Sariq (E’tibor talab)': AppColors.warning,
-                        'Yashil (Ijobiy)': AppColors.success,
-                      },
-                      onSelected: (v) {
-                        setState(() {
-                          if (v == 'Qizil (Ishlanmagan)') {
-                            _selectedSvetoforFilter = StatusColor.red;
-                          } else if (v == 'Sariq (E’tibor talab)') {
-                            _selectedSvetoforFilter = StatusColor.yellow;
-                          } else if (v == 'Yashil (Ijobiy)') {
-                            _selectedSvetoforFilter = StatusColor.green;
-                          } else {
-                            _selectedSvetoforFilter = null;
-                          }
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    ...filteredStatuses.map(
-                      (st) => _buildChildStatusTile(context, st),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
-            ],
-
-            // 6 ta nazorat qoidalari bloki (Responsive 2-col desktop/tablet, 1-col mobile)
+            const SizedBox(height: 16),
             SurfaceCard(
-              borderRadius: 26,
-              padding: const EdgeInsets.all(22),
+              borderRadius: 20,
+              padding: EdgeInsets.zero,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    '6 ta doimiy ishlovchi avtomatik nazorat algoritmi',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15.5,
-                      color: AppColors.textPrimary,
+                  sectionTitle(
+                    alerts.isEmpty ? 'Ogohlantirishlar' : 'Ogohlantirishlar · ${alerts.length}',
+                  ),
+                  if (alerts.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                      child: Text(
+                        'Hozircha ogohlantirish yo‘q',
+                        style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                      ),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                      child: Column(
+                        children: [for (final alt in alerts) _buildAlertCard(context, alt)],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  ResponsiveGlassGrid(
-                    mobileColumns: 1,
-                    tabletColumns: 2,
-                    desktopColumns: 2,
-                    spacing: 12,
-                    children:
-                        rules
-                            .map((r) => _buildRuleTile(r.$1, r.$2, r.$3))
-                            .toList(),
-                  ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-
-            Text(
-              'Aniqlangan signallar (${alerts.length} ta)',
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 15.5,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 14),
-
-            if (alerts.isEmpty)
-              SurfaceCard(
-                borderRadius: 26,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 38,
-                  horizontal: 24,
-                ),
-                child: Center(
-                  child: Column(
-                    children: [
-                      Icon(
-                        LucideIcons.shieldCheck,
-                        size: 38,
-                        color: AppColors.success,
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        'Ochiq monitoring signallari yo‘q',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15.5,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'Barcha o‘quvchilar ko‘rsatkichlari me’yorida ketmoqda.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textMuted,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              ...alerts.map((alt) => _buildAlertCard(context, alt)),
           ],
         ),
       ),
@@ -404,229 +262,100 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
     );
   }
 
-  Widget _buildChildStatusTile(BuildContext context, ChildStatus st) {
-    final c = _colorFor(st.color);
-    final bg = _bgFor(st.color);
-    final df = DateFormat('dd.MM.yyyy');
-    final isRed = st.color == StatusColor.red;
+  static String _label(DynamicsStatus s) => switch (s) {
+    DynamicsStatus.growth => 'O‘sish',
+    DynamicsStatus.decline => 'Pasayish',
+    DynamicsStatus.stable => 'Barqaror',
+    DynamicsStatus.ineffective => 'Samarasiz',
+    DynamicsStatus.insufficientData => 'Bitta natija',
+  };
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: () {
-          Navigator.push(
+  Widget _changeRow(BuildContext context, ChildChange c) {
+    final r = c.result;
+    final pct = r.changePercent;
+    final significant =
+        r.status == DynamicsStatus.growth || r.status == DynamicsStatus.decline;
+    final deltaColor =
+        r.status == DynamicsStatus.growth
+            ? const Color(0xFF1F8A55)
+            : r.status == DynamicsStatus.decline
+            ? const Color(0xFFD23C41)
+            : AppColors.textMuted;
+    final df = DateFormat('dd.MM');
+    final detail = [
+      c.last.category,
+      if (r.previous != null)
+        '${r.previous!.value.round()}% → ${r.latest!.value.round()}%'
+      else
+        '${(c.last.totalScore / c.last.maxScore * 100).round()}%',
+      df.format(c.last.assessmentDate),
+    ].join(' · ');
+    return InkWell(
+      onTap:
+          () => Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => StudentDetailScreen(studentId: st.student.id),
-            ),
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: isRed ? AppColors.errorBg : AppColors.surfaceMuted,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: c.withValues(alpha: isRed ? 0.55 : 0.3),
-              width: isRed ? 1.4 : 1.0,
+              builder: (_) => StudentDetailScreen(studentId: c.last.studentId),
             ),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: bg,
-                child: Text(
-                  st.student.firstName.isNotEmpty
-                      ? st.student.firstName[0]
-                      : '?',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: c,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      crossAxisAlignment: WrapCrossAlignment.center,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text.rich(
+                    TextSpan(
                       children: [
-                        Text(
-                          st.student.fullName,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        StatusPill(
-                          label: '${st.student.grade}-sinf',
-                          color: AppColors.primary,
-                          backgroundColor: AppColors.primaryLight,
-                        ),
-                        StatusPill(
-                          label: '${st.color.label} — ${st.color.meaning}',
-                          color: c,
-                          backgroundColor: bg,
-                          showDot: true,
-                        ),
-                      ],
-                    ),
-                    if (st.reasons.isNotEmpty) ...[
-                      const SizedBox(height: 6),
-                      ...st.reasons.map(
-                        (r) => Padding(
-                          padding: const EdgeInsets.only(bottom: 2),
-                          child: Text(
-                            '• $r',
+                        TextSpan(text: c.last.studentName),
+                        if (pct != null)
+                          TextSpan(
+                            text: '   ${pct >= 0 ? '▲' : '▼'} ${pct.abs().round()}%',
                             style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: c,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: significant ? deltaColor : AppColors.textMuted,
+                              fontFeatures: const [FontFeature.tabularFigures()],
                             ),
                           ),
-                        ),
-                      ),
-                    ],
-                    if (st.specialistsNotStarted.isNotEmpty ||
-                        st.lastWorkAt != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        [
-                          if (st.lastWorkAt != null)
-                            'Oxirgi ish: ${df.format(st.lastWorkAt!)}'
-                          else
-                            'Oxirgi ish: kiritilmagan',
-                          if (st.specialistsNotStarted.isNotEmpty)
-                            'Ish boshlamagan: ${st.specialistsNotStarted.join(", ")}',
-                        ].join(' • '),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                    ],
-                    if (st.specialistWorkStatuses.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        'Mutaxassislar bo‘yicha ish holati',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children:
-                            st.specialistWorkStatuses.map((work) {
-                              final color = _colorFor(work.color);
-                              final bg = _bgFor(work.color);
-                              final stateLabel =
-                                  work.lastWorkAt == null
-                                      ? 'Ish boshlanmagan'
-                                      : work.color == StatusColor.yellow
-                                      ? '30 kundan ortiq'
-                                      : 'Faol';
-                              return Tooltip(
-                                message:
-                                    work.lastWorkAt == null
-                                        ? '${work.specialist.fullName}: ish qayd etilmagan'
-                                        : '${work.specialist.fullName}: oxirgi ish ${df.format(work.lastWorkAt!)}',
-                                child: Container(
-                                  constraints: const BoxConstraints(
-                                    maxWidth: 240,
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: bg,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: color.withValues(alpha: 0.3),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    '${work.specialist.role.label}: $stateLabel',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: color,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                      ),
-                    ],
-                  ],
-                ),
+                      ],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    detail,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                  ),
+                ],
               ),
-              Icon(
-                LucideIcons.chevronRight,
-                size: 16,
-                color: AppColors.textSubtle,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRuleTile(String code, String title, String condition) {
-    return GlassWell(
-      borderRadius: 12,
-      padding: const EdgeInsets.all(14),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          StatusPill(
-            label: code,
-            color: AppColors.primary,
-            backgroundColor: AppColors.primaryLight,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+            const SizedBox(width: 12),
+            Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
+                DynamicsIcon(r.status),
+                const SizedBox(width: 6),
                 Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  condition,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textMuted,
-                    height: 1.35,
-                  ),
+                  _label(r.status),
+                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(width: 6),
+            Icon(LucideIcons.chevronRight, size: 18, color: AppColors.textSubtle),
+          ],
+        ),
       ),
     );
   }
@@ -809,3 +538,67 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
     );
   }
 }
+
+/// Filtr: tanlanganda faqat chegara qalinlashadi, rang o'zgarmaydi.
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final DynamicsStatus? status;
+  final int count;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _FilterChip({
+    required this.label,
+    required this.status,
+    required this.count,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          height: 34,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: selected ? AppColors.textPrimary : AppColors.border,
+              width: selected ? 1.4 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (status != null) ...[
+                DynamicsIcon(status!, size: 14),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '$count',
+                style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+

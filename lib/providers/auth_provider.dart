@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../core/config/app_config.dart';
 import '../models/user_model.dart';
+import '../services/install_mode.dart';
 import '../services/api_client.dart';
 import '../services/auth_api.dart';
 import '../services/local_db_service.dart';
@@ -788,7 +789,13 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   ) async {
     try {
       // Kod tasdiqlandi - hisob tanlangan maktabda ochildi va kirildi.
-      await _apply(await _authApi.verifyRegistration(id, code));
+      await _apply(
+        await _authApi.verifyRegistration(
+          id,
+          code,
+          remember: runsAsInstalledApp,
+        ),
+      );
       return _ok('Xush kelibsiz! Hisobingiz tayyor');
     } on ApiException catch (e) {
       return _apiFail(e);

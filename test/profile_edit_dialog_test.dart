@@ -52,17 +52,20 @@ void main() {
 
       expect(find.widgetWithText(TextFormField, 'Karimova'), findsOneWidget);
       expect(find.widgetWithText(TextFormField, 'Dilnoza'), findsOneWidget);
-      expect(find.widgetWithText(TextFormField, 'Matematika'), findsOneWidget);
+      // Mutaxassislik, malaka toifasi va ish staji so'ralmaydi.
+      expect(find.widgetWithText(TextFormField, 'Matematika'), findsNothing);
+      expect(find.text('Malaka toifasi'), findsNothing);
+      expect(find.text('Ish staji (yil)'), findsNothing);
       // Email is not editable here.
       expect(find.text('dilnoza@maktab.uz'), findsNothing);
 
-      await tester.enterText(
-        find.widgetWithText(TextFormField, '+998901112233'),
-        'abc',
-      );
+      // Raqam O'zbekiston ko'rinishida; to'liq bo'lmagan raqam qabul qilinmaydi.
+      final phone = find.widgetWithText(TextFormField, '+998 90 111 22 33');
+      expect(phone, findsOneWidget);
+      await tester.enterText(phone, '90 12');
       await tester.tap(find.text('Saqlash'));
       await tester.pumpAndSettle();
-      expect(find.text('Telefon raqam noto‘g‘ri'), findsOneWidget);
+      expect(find.text('Faqat O‘zbekiston raqami: +998 XX XXX XX XX'), findsOneWidget);
 
       await tester.pumpWidget(const SizedBox());
       auth.dispose();

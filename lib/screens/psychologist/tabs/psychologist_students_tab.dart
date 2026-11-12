@@ -459,14 +459,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                       backgroundColor: AppColors.surfaceMuted,
                                     ),
                                     if (st != null)
-                                      StatusBadge.child(
-                                        st.color,
-                                        '${st.color.label}: ${st.color == StatusColor.red
-                                            ? "Ishlanmagan"
-                                            : st.color == StatusColor.yellow
-                                            ? "E’tibor talab"
-                                            : "Ijobiy"}',
-                                      ),
+                                      ChildStatusLabel(st.color),
                                     if (isAssigned)
                                       const StatusBadge(
                                         'Sizga biriktirilgan',

@@ -58,7 +58,10 @@ def issue(
     response.set_cookie(
         cookie_name(settings),
         token,
-        max_age=settings.remember_me_days * 86400 if remember else settings.session_absolute_hours * 3600,
+        # Without "Eslab qolish" (the website) it is a browser-session cookie:
+        # closing the browser signs the person out; the server still ends it
+        # after the idle/absolute limits.
+        max_age=settings.remember_me_days * 86400 if remember else None,
         path="/",
         secure=settings.cookie_secure,
         httponly=True,  # JavaScript (and so XSS) cannot read it

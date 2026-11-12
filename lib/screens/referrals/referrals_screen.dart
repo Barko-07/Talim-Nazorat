@@ -77,7 +77,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
           (ctx) => StatefulBuilder(
             builder:
                 (ctx, setDlgState) => AlertDialog(
-                  title: const Text('Yangi yo‘naltirish yaratish'),
+                  title: const Text('Mutaxassisga yuborish'),
                   content: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 460),
                     child: SingleChildScrollView(
@@ -89,7 +89,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                             initialValue: selectedStdId,
                             isExpanded: true,
                             decoration: const InputDecoration(
-                              labelText: 'O‘quvchini tanlang *',
+                              labelText: 'Bola *',
                             ),
                             items:
                                 students
@@ -111,7 +111,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                             initialValue: toService,
                             isExpanded: true,
                             decoration: const InputDecoration(
-                              labelText: 'Qaysi mutaxassis / xizmatga *',
+                              labelText: 'Kimga *',
                             ),
                             items: const [
                               DropdownMenuItem(
@@ -157,20 +157,20 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                             initialValue: priority,
                             isExpanded: true,
                             decoration: const InputDecoration(
-                              labelText: 'Muhimlik darajasi',
+                              labelText: 'Muhimligi',
                             ),
                             items: const [
                               DropdownMenuItem(
                                 value: 'Rejali',
-                                child: Text('Rejali (Reja asosida ko‘rik)'),
+                                child: Text('Rejali'),
                               ),
                               DropdownMenuItem(
                                 value: 'Shoshilinch',
-                                child: Text('Shoshilinch (Zudlik bilan)'),
+                                child: Text('Shoshilinch'),
                               ),
                               DropdownMenuItem(
                                 value: 'Konsultatsiya',
-                                child: Text('Konsultatsiya (Qisqa tavsiya)'),
+                                child: Text('Maslahat'),
                               ),
                             ],
                             onChanged: (v) => setDlgState(() => priority = v!),
@@ -180,9 +180,9 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                             controller: reasonCtrl,
                             maxLines: 2,
                             decoration: const InputDecoration(
-                              labelText: 'Yo‘naltirish sababi va zarurati *',
+                              labelText: 'Sabab *',
                               hintText:
-                                  'Nima uchun ushbu mutaxassis ko‘rigi talab qilinmoqda...',
+                                  'Nima uchun kerak',
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -190,9 +190,9 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                             controller: obsCtrl,
                             maxLines: 2,
                             decoration: const InputDecoration(
-                              labelText: 'Sinfdagi kuzatuvlar va dalillar',
+                              labelText: 'Kuzatuvlar (ixtiyoriy)',
                               hintText:
-                                  'Qanday belgilar yoki qiyinchiliklar qayd etildi...',
+                                  'Nimalar sezildi',
                             ),
                           ),
                         ],
@@ -211,7 +211,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'Qabul qiluvchi mutaxassis va yo‘naltirish sababini tanlang yoki kiriting.',
+                                'Kimga va nima uchun yuborilishini kiriting',
                               ),
                               backgroundColor: AppColors.warning,
                             ),
@@ -247,7 +247,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'Yo‘naltirish muvaffaqiyatli jo‘natildi!',
+                                'Yuborildi',
                               ),
                               backgroundColor: AppColors.success,
                             ),
@@ -277,7 +277,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
       context: context,
       builder:
           (ctx) => AlertDialog(
-            title: Text('${referral.studentName} — Xulosa va natija'),
+            title: Text('Javob · ${referral.studentName}'),
             content: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 460),
               child: SingleChildScrollView(
@@ -306,15 +306,15 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                       maxLines: 3,
                       decoration: const InputDecoration(
                         labelText:
-                            'O‘tkazilgan ko‘rik va mutaxassis xulosasi *',
-                        hintText: 'Tekshiruv natijasida nimalar aniqlandi...',
+                            'Xulosa *',
+                        hintText: 'Nimalar aniqlandi',
                       ),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: followUpCtrl,
                       decoration: const InputDecoration(
-                        labelText: 'Tavsiya etilgan keyingi chora-tadbirlar',
+                        labelText: 'Keyingi qadam',
                         hintText:
                             'Masalan: ITRga 2 ta nutqiy maqsad qo‘shish...',
                       ),
@@ -337,7 +337,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Iltimos, tekshiruv xulosasini kiriting!',
+                          'Xulosani kiriting',
                         ),
                         backgroundColor: AppColors.error,
                       ),
@@ -361,7 +361,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Yo‘naltirish muvaffaqiyatli yakunlandi!',
+                          'Yakunlandi',
                         ),
                         backgroundColor: AppColors.success,
                       ),
@@ -401,23 +401,26 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
-            title: 'Yo‘naltirishlar',
-            icon: LucideIcons.gitPullRequest,
-            subtitle:
-                'Konsilium va PMPK yo‘llanmalari • ${referrals.length} ta',
+            title: 'Mutaxassisga yuborish',
+            icon: LucideIcons.send,
+            subtitle: '${referrals.length} ta',
             action: HeaderActionButton(
-              icon: LucideIcons.plus,
-              label: 'Yangi yo‘naltirish',
+              icon: LucideIcons.send,
+              label: 'Bolani yuborish',
               onPressed: () => _showAddReferralDialog(context),
             ),
           ),
           const SizedBox(height: 9),
 
-          ModernPillFilterBar(
-            items: _statuses,
-            selectedItem: _statusFilter,
-            counts: counts,
-            onSelected: (val) => setState(() => _statusFilter = val),
+          SurfaceCard(
+            borderRadius: 20,
+            padding: const EdgeInsets.all(12),
+            child: ModernPillFilterBar(
+              items: _statuses,
+              selectedItem: _statusFilter,
+              counts: counts,
+              onSelected: (val) => setState(() => _statusFilter = val),
+            ),
           ),
           const SizedBox(height: 9),
 
@@ -435,13 +438,13 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              LucideIcons.arrowLeftRight,
-                              size: 34,
-                              color: AppColors.primary,
+                              LucideIcons.send,
+                              size: 32,
+                              color: AppColors.textSubtle,
                             ),
                             SizedBox(height: 14),
                             Text(
-                              'Ushbu holatda yo‘naltirishlar mavjud emas',
+                              'Hozircha yo‘q',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
@@ -451,7 +454,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Boshqa holat filtrini tanlang yoki yangi yo‘naltirish yarating.',
+                              'Bolani psixolog, logoped yoki shifokorga yuborish shu yerda',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 13,
@@ -700,7 +703,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                                               );
                                             },
                                             child: const Text(
-                                              'Jarayonga o‘tkazish',
+                                              'Ishni boshlash',
                                               style: TextStyle(fontSize: 13),
                                             ),
                                           ),
@@ -746,7 +749,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
 
     return Scaffold(
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
-      appBar: canPop ? AppBar(title: const Text('Yo‘naltirishlar')) : null,
+      appBar: canPop ? AppBar(title: const Text('Mutaxassisga yuborish')) : null,
       body: canPop ? AmbientMeshBackground(child: pageBody) : pageBody,
     );
   }

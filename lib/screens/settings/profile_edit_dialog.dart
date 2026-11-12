@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/uz_phone.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 
-/// O'z profilini tahrirlash: ism, telefon va kasbiy ma'lumotlar. Email (login),
+/// O'z profilini tahrirlash: ism, telefon va hudud. Email (login),
 /// rol va maktabni faqat administrator o'zgartiradi — ular bu yerda yo'q.
 Future<void> showProfileEditDialog(BuildContext context, UserModel user) {
   return showDialog<void>(
@@ -28,15 +30,10 @@ class _ProfileEditDialogState extends State<_ProfileEditDialog> {
   late final TextEditingController _first;
   late final TextEditingController _last;
   late final TextEditingController _phone;
-  late final TextEditingController _specialization;
-  late final TextEditingController _experience;
   late final TextEditingController _region;
   late final TextEditingController _district;
-  late String? _category;
   bool _saving = false;
   String? _error;
-
-  static const _categories = ['Mutaxassis', '2-toifa', '1-toifa', 'Oliy toifa'];
 
   @override
   void initState() {
@@ -47,15 +44,9 @@ class _ProfileEditDialogState extends State<_ProfileEditDialog> {
     _first = TextEditingController(
       text: parts.length > 1 ? parts.sublist(1).join(' ') : '',
     );
-    _phone = TextEditingController(text: u.phone ?? '');
-    _specialization = TextEditingController(text: u.specialization ?? '');
-    _experience = TextEditingController(text: '${u.experienceYears}');
+    _phone = TextEditingController(text: UzPhone.initial(u.phone));
     _region = TextEditingController(text: u.region);
     _district = TextEditingController(text: u.district ?? '');
-    _category =
-        _categories.contains(u.qualificationCategory)
-            ? u.qualificationCategory
-            : null;
   }
 
   @override
@@ -64,8 +55,6 @@ class _ProfileEditDialogState extends State<_ProfileEditDialog> {
       _first,
       _last,
       _phone,
-      _specialization,
-      _experience,
       _region,
       _district,
     ]) {
@@ -87,18 +76,10 @@ class _ProfileEditDialogState extends State<_ProfileEditDialog> {
 
     put('first_name', _first.text, oldFirst);
     put('last_name', _last.text, oldLast);
-    put('specialization', _specialization.text, u.specialization);
     put('region', _region.text, u.region);
     put('district', _district.text, u.district);
-    final phone = _phone.text.trim();
-    if (phone != (u.phone ?? '') && phone.isNotEmpty) out['phone'] = phone;
-    final years = int.tryParse(_experience.text.trim());
-    if (years != null && years != u.experienceYears) {
-      out['experience_years'] = years;
-    }
-    if (_category != null && _category != u.qualificationCategory) {
-      out['qualification_category'] = _category;
-    }
+    final phone = UzPhone.normalize(_phone.text);
+    if (phone != null && phone != u.phone) out['phone'] = phone;
     return out;
   }
 
@@ -135,10 +116,20 @@ class _ProfileEditDialogState extends State<_ProfileEditDialog> {
 
   @override
   Widget build(BuildContext context) {
-    InputDecoration deco(String label, {String? hint}) =>
-        InputDecoration(labelText: label, hintText: hint);
+    InputDecoration deco(String label, IconData icon, {String? hint}) =>
+        InputDecoration(
+          labelText: label,
+          hintText: hint,
+          prefixIcon: Icon(icon, size: 20),
+        );
     return AlertDialog(
-      title: const Text('Profilni tahrirlash'),
+      title: const Row(
+        children: [
+          Icon(LucideIcons.idCard, size: 22),
+          SizedBox(width: 10),
+          Expanded(child: Text('Shaxsiy ma’lumotlar')),
+        ],
+      ),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 460),
         child: Form(
@@ -149,68 +140,35 @@ class _ProfileEditDialogState extends State<_ProfileEditDialog> {
               children: [
                 TextFormField(
                   controller: _last,
-                  decoration: deco('Familiya'),
+                  decoration: deco('Familiya', LucideIcons.user),
                   validator: _name,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _first,
-                  decoration: deco('Ism'),
+                  decoration: deco('Ism', LucideIcons.userRound),
                   validator: _name,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _phone,
                   keyboardType: TextInputType.phone,
-                  decoration: deco('Telefon', hint: '+998 90 123-45-67'),
+                  inputFormatters: [UzPhone.formatter],
+                  decoration: deco('Telefon', LucideIcons.phone, hint: UzPhone.hint),
                   validator: (v) {
-                    final t = (v ?? '').trim();
-                    if (t.isEmpty) return null;
-                    return RegExp(r'^\+?[0-9 ()-]{7,20}$').hasMatch(t)
-                        ? null
-                        : 'Telefon raqam noto‘g‘ri';
+                    final t = v ?? '';
+                    if (UzPhone.isEmpty(t)) return null;
+                    return UzPhone.isValid(t) ? null : UzPhone.error;
                   },
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
-                  controller: _specialization,
-                  decoration: deco('Mutaxassislik'),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  initialValue: _category,
-                  isExpanded: true,
-                  decoration: deco('Malaka toifasi'),
-                  items: [
-                    for (final c in _categories)
-                      DropdownMenuItem(value: c, child: Text(c)),
-                  ],
-                  onChanged: (v) => setState(() => _category = v),
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _experience,
-                  keyboardType: TextInputType.number,
-                  decoration: deco('Ish staji (yil)'),
-                  validator: (v) {
-                    final n = int.tryParse((v ?? '').trim());
-                    return n == null || n < 0 || n > 60
-                        ? '0 dan 60 gacha son'
-                        : null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(controller: _region, decoration: deco('Viloyat')),
+                TextFormField(controller: _region, decoration: deco('Viloyat', LucideIcons.map)),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _district,
-                  decoration: deco('Tuman / shahar'),
+                  decoration: deco('Tuman / shahar', LucideIcons.mapPin),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  'Email, rol va maktabni administrator o‘zgartiradi.',
-                  style: TextStyle(fontSize: 13, color: AppColors.textMuted),
-                ),
                 if (_error != null) ...[
                   const SizedBox(height: 8),
                   Text(

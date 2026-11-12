@@ -69,21 +69,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   static const List<_NavItemData> _baseNavItems = [
     _NavItemData(
       index: 0,
-      title: 'Boshqaruv markazi',
-      shortLabel: 'Boshqaruv',
+      title: 'Bosh sahifa',
+      shortLabel: 'Asosiy',
       group: 'ASOSIY ISH MAYDONI',
       icon: LucideIcons.layoutDashboard,
     ),
     _NavItemData(
       index: 1,
-      title: 'Bolalar bazasi',
+      title: 'Bolalar',
       shortLabel: 'Bolalar',
       group: 'ASOSIY ISH MAYDONI',
       icon: LucideIcons.users,
     ),
     _NavItemData(
       index: 2,
-      title: 'Baholashlar',
+      title: 'Baholash',
       shortLabel: 'Baholash',
       group: 'ASOSIY ISH MAYDONI',
       icon: LucideIcons.clipboardCheck,
@@ -125,10 +125,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     ),
     _NavItemData(
       index: 8,
-      title: 'Yo‘naltirishlar',
-      shortLabel: 'Yo‘naltirish',
+      title: 'Mutaxassisga yuborish',
+      shortLabel: 'Yuborish',
       group: 'REJA VA NAZORAT',
-      icon: LucideIcons.arrowLeftRight,
+      icon: LucideIcons.send,
     ),
     _NavItemData(
       index: 9,
@@ -1290,8 +1290,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     child: Row(
                       children: [
                         if (showMenuIsland) ...[
-                          const BrandMark(height: 26),
-                          const SizedBox(width: 9),
+                          BrandMark(height: isDesktop ? 26 : 34),
+                          const SizedBox(width: 10),
                         ],
                         Expanded(
                           child: Column(
@@ -1311,18 +1311,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                   ),
                                 )
                               else
-                                const BrandWordmark(fontSize: 15.5),
-                              Text(
-                                user?.institutionName ??
-                                    '9-sonli inklyuziv ta’lim tayanch maktabi',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.textMuted,
-                                  fontWeight: FontWeight.w500,
+                                const BrandWordmark(fontSize: 20),
+                              // Kompyuterda sahifa nomi ostida - foydalanuvchi
+                              // maktabi (faqat haqiqatan biriktirilgan bo'lsa).
+                              if (isDesktop &&
+                                  (user?.institutionName ?? '').isNotEmpty)
+                                Text(
+                                  user!.institutionName!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.textMuted,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
@@ -1847,7 +1850,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             );
 
                             return Expanded(
-                              flex: isSelected ? 22 : 10,
+                              // Faol tab nomi to'liq sig'sin (kesilmasin).
+                              flex: isSelected ? 32 : 9,
                               child: TactileBounce(
                                 onTap: () => _selectTab(item.index),
                                 pressedScale: 0.92,
@@ -1855,7 +1859,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                                   duration: const Duration(milliseconds: 220),
                                   curve: Curves.easeOutCubic,
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: isSelected ? 12 : 4,
+                                    horizontal: isSelected ? 10 : 4,
                                   ),
                                   decoration: BoxDecoration(
                                     color:

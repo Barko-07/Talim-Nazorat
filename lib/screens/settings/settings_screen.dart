@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/config/app_config.dart';
+import '../../core/constants/app_brand.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../core/widgets/theme_picker.dart';
@@ -72,9 +73,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final user = auth.currentUser;
     final canPop = Navigator.canPop(context);
     final region = user?.region ?? 'Namangan viloyati';
-    final district = user?.district ?? 'Chortoq tumani';
+    final district =
+        (user?.district ?? '').isEmpty ? '—' : user!.district!;
     final fullName = user?.fullName ?? 'Mutaxassis';
-    final phone = user?.phone ?? '+998 90 123-45-67';
+    final phone = user?.phone ?? '';
     final schoolName = user?.institutionName ?? '';
 
     final scrollBody = SingleChildScrollView(
@@ -169,25 +171,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  if (AppConfig.serverMode && user != null)
-                    _buildMyGovMenuItem(
-                      icon: LucideIcons.userPen,
-                      title: 'Profilni tahrirlash',
-                      subtitle: 'Ism, telefon va kasbiy ma’lumotlar',
-                      onTap: () => showProfileEditDialog(context, user),
-                    ),
                   _buildMyGovMenuItem(
                     icon: LucideIcons.idCard,
                     title: 'Shaxsiy ma’lumotlar',
-                    subtitle: 'F.I.Sh, aloqa va identifikatsiya ma’lumotlari',
-                    onTap: () => _showPersonalDetailsSheet(context, user),
-                  ),
-                  _buildMyGovMenuItem(
-                    icon: LucideIcons.briefcase,
-                    title: 'Mehnat faoliyati',
-                    subtitle: user?.role.label ?? 'Mutaxassis',
-                    badgeText: 'Faol',
-                    onTap: () => _showProfessionSheet(context, user),
+                    subtitle: 'Ism, telefon va hudud',
+                    onTap:
+                        () =>
+                            AppConfig.serverMode && user != null
+                                ? showProfileEditDialog(context, user)
+                                : _showPersonalDetailsSheet(context, user),
                   ),
                   _buildMyGovMenuItem(
                     icon: LucideIcons.house,
@@ -214,15 +206,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onTap: () => showThemePicker(context),
                   ),
                   _buildMyGovMenuItem(
-                    icon: LucideIcons.circleAlert,
+                    icon: LucideIcons.info,
                     title: 'Ilova haqida',
-                    subtitle: 'Tizim ma’lumotlari va huquqiy me’yorlar',
+                    subtitle: 'Ilova nima qila oladi',
                     onTap: () => _showAboutAppSheet(context),
                   ),
                   _buildMyGovMenuItem(
                     icon: LucideIcons.contact,
                     title: 'Bog‘lanish',
-                    subtitle: 'Texnik yordam va hududiy koordinator',
+                    subtitle: 'Chortoq tumani MMTB',
                     onTap: () => _showContactSheet(context, region, district),
                   ),
                   _buildMyGovMenuItem(
@@ -383,22 +375,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       title: 'Shaxsiy ma’lumotlar',
       rows: [
         ('F.I.Sh', user?.fullName ?? 'Ko‘rsatilmagan'),
+        ('Lavozim', user?.role.label ?? '—'),
         ('Telefon raqam', user?.phone ?? 'Ko‘rsatilmagan'),
         ('Elektron pochta', user?.email ?? 'Ko‘rsatilmagan'),
-        ('Foydalanuvchi ID', user?.id ?? '—'),
-      ],
-    );
-  }
-
-  void _showProfessionSheet(BuildContext context, UserModel? user) {
-    _showMyGovModal(
-      context: context,
-      title: 'Mehnat faoliyati',
-      rows: [
-        ('Mutaxassislik', user?.role.label ?? 'Mutaxassis'),
-        ('Lavozim', user?.role.professionTitle ?? '—'),
-        ('Malaka toifasi', user?.qualificationCategory ?? 'Mutaxassis'),
-        ('Vakolat doirasi', user?.role.domainDescription ?? '—'),
       ],
     );
   }
@@ -416,7 +395,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ('Muassasa nomi', school),
         ('Viloyat', region),
         ('Tuman / shahar', district),
-        ('Yo‘nalish', 'Inklyuziv va korreksion ta’lim sektori'),
       ],
     );
   }
@@ -426,15 +404,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       title: 'Ilova haqida',
       rows: const [
-        ('Platforma nomi', 'Individ'),
-        ('Talqin', '1.0.0'),
-        (
-          'Ma’lumotlar saqlanadi',
-          AppConfig.serverMode
-              ? 'Individ serveri (O‘zbekiston), shifrlangan'
-              : 'Shu qurilma (sinov rejimi)',
-        ),
-        ('Huquqiy me’yor', 'O‘RQ-547 ("Shaxsga doir ma’lumotlar to‘g‘risida")'),
+        ('Baholash', 'Bolaning rivojlanishini o‘lchash'),
+        ('Monitoring', 'O‘sish va pasayishni kuzatish'),
+        ('ITR rejasi', 'Maqsadlar va ularning bajarilishi'),
+        ('Jamoa', 'Mutaxassislar bitta bola ustida birga ishlaydi'),
+        ('Darslar', 'Jadval va davomat'),
+        ('Hisobotlar', 'Excel’ga yuklash'),
+        ('Versiya', '1.0.0'),
       ],
     );
   }
@@ -443,11 +419,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _showMyGovModal(
       context: context,
       title: 'Bog‘lanish',
-      rows: [
-        ('Hududiy boshqarma', '$region MMTB'),
-        ('Mas’ul tuman', district),
-        ('Ishonch telefoni', '+998 (69) 227-00-00'),
-        ('Elektron manzil', 'info@talim-nazorat.uz'),
+      rows: const [
+        ('Tashkilot', AppBrand.supportOrg),
+        ('Ishonch telefoni', AppBrand.supportPhone),
+        ('Email', AppBrand.supportEmail),
       ],
     );
   }

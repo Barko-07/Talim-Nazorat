@@ -16,6 +16,13 @@ enum StatusColor {
   final String label;
   final String meaning;
   const StatusColor(this.label, this.meaning);
+
+  /// Rangli nuqta yonidagi qisqa nom (rang nomi emas, ma'nosi).
+  String get short => switch (this) {
+    StatusColor.red => 'Ishlanmagan',
+    StatusColor.yellow => 'E’tibor kerak',
+    StatusColor.green => 'Ijobiy',
+  };
 }
 
 class ChildStatus {
@@ -163,7 +170,7 @@ class ChildStatusService {
     }
     if (lastWork == null) {
       red.add(
-        'Bola bilan hali hech qanday ish (baholash, mashg‘ulot, kuzatuv, o‘lchov) qayd etilmagan.',
+        'Hali hech qanday ish qayd etilmagan',
       );
     } else {
       final days = today.difference(lastWork).inDays;
@@ -264,7 +271,7 @@ class ChildStatusService {
       reasons = [
         ...yellow,
         if (positives.isEmpty)
-          'Ish olib borilmoqda, lekin ijobiy natija hali qayd etilmagan (taqqoslash uchun natijalar yetarli emas).',
+          'Ish bor, lekin natija hali yetarli emas',
       ];
     } else {
       color = StatusColor.green;

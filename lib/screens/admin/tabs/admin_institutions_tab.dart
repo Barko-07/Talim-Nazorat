@@ -601,15 +601,6 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                                           subtitle: Text(
                                             '${u.role.label} • ${u.phone ?? ''}',
                                           ),
-                                          trailing: Text(
-                                            u.qualificationCategory ??
-                                                'Mutaxassis',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: AppColors.purple,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
                                         );
                                       },
                                     ),

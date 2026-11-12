@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/widgets/status_badge.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/glass_widgets.dart';
 import '../../../models/user_model.dart';
@@ -26,28 +27,6 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
   String? _filterStatus;
   String? _filterLevel;
   StatusColor? _filterColor;
-
-  static Color _colorFor(StatusColor c) {
-    switch (c) {
-      case StatusColor.red:
-        return AppColors.error;
-      case StatusColor.yellow:
-        return AppColors.warning;
-      case StatusColor.green:
-        return AppColors.success;
-    }
-  }
-
-  static Color _bgFor(StatusColor c) {
-    switch (c) {
-      case StatusColor.red:
-        return AppColors.errorBg;
-      case StatusColor.yellow:
-        return AppColors.warningBg;
-      case StatusColor.green:
-        return AppColors.successBg;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -294,36 +273,36 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
             ModernPillFilterBar(
               items: const [
                 'Barchasi',
-                'Qizil — Ishlanmagan',
-                'Sariq — E’tibor',
-                'Yashil — Ijobiy',
+                'Ishlanmagan',
+                'E’tibor kerak',
+                'Ijobiy',
               ],
               selectedItem:
                   _filterColor == StatusColor.red
-                      ? 'Qizil — Ishlanmagan'
+                      ? 'Ishlanmagan'
                       : _filterColor == StatusColor.yellow
-                      ? 'Sariq — E’tibor'
+                      ? 'E’tibor kerak'
                       : _filterColor == StatusColor.green
-                      ? 'Yashil — Ijobiy'
+                      ? 'Ijobiy'
                       : 'Barchasi',
               counts: {
                 'Barchasi': allStudents.length,
-                'Qizil — Ishlanmagan': summary.count(StatusColor.red),
-                'Sariq — E’tibor': summary.count(StatusColor.yellow),
-                'Yashil — Ijobiy': summary.count(StatusColor.green),
+                'Ishlanmagan': summary.count(StatusColor.red),
+                'E’tibor kerak': summary.count(StatusColor.yellow),
+                'Ijobiy': summary.count(StatusColor.green),
               },
               itemColors: {
-                'Qizil — Ishlanmagan': AppColors.error,
-                'Sariq — E’tibor': AppColors.warning,
-                'Yashil — Ijobiy': AppColors.success,
+                'Ishlanmagan': AppColors.error,
+                'E’tibor kerak': AppColors.warning,
+                'Ijobiy': AppColors.success,
               },
               onSelected: (v) {
                 setState(() {
-                  if (v == 'Qizil — Ishlanmagan') {
+                  if (v == 'Ishlanmagan') {
                     _filterColor = StatusColor.red;
-                  } else if (v == 'Sariq — E’tibor') {
+                  } else if (v == 'E’tibor kerak') {
                     _filterColor = StatusColor.yellow;
-                  } else if (v == 'Yashil — Ijobiy') {
+                  } else if (v == 'Ijobiy') {
                     _filterColor = StatusColor.green;
                   } else {
                     _filterColor = null;
@@ -344,22 +323,12 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
               final s = filtered[i];
               final isArchived = s.status == 'Arxivlangan';
               final st = statusByStudentId[s.id];
-              final isRed = !isArchived && st?.color == StatusColor.red;
-              final stColor = st != null ? _colorFor(st.color) : null;
-              final stBg = st != null ? _bgFor(st.color) : null;
-
               return Card(
                 elevation: 0,
-                color: isRed ? AppColors.errorBg : AppColors.surface,
+                color: AppColors.surface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  side: BorderSide(
-                    color:
-                        !isArchived && stColor != null
-                            ? stColor.withValues(alpha: isRed ? 0.55 : 0.35)
-                            : AppColors.cardGlassBorder,
-                    width: isRed ? 1.5 : 1.0,
-                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(color: AppColors.cardGlassBorder),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -375,14 +344,14 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                             backgroundColor:
                                 isArchived
                                     ? Colors.grey.shade200
-                                    : (stBg ?? AppColors.primaryLight),
+                                    : AppColors.primaryLight,
                             child: Text(
                               s.firstName.isNotEmpty ? s.firstName[0] : 'B',
                               style: TextStyle(
                                 color:
                                     isArchived
                                         ? AppColors.textMuted
-                                        : (stColor ?? AppColors.primary),
+                                        : AppColors.primary,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 17,
                               ),
@@ -429,36 +398,12 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                     ),
                                     _buildStatusPill(s.status),
                                     if (!isArchived && st != null)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: stBg,
-                                          borderRadius: BorderRadius.circular(4),
-                                          border: Border.all(
-                                            color: stColor!.withValues(alpha: 0.35),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          '${st.color.label}: ${st.color == StatusColor.red
-                                              ? "Ishlanmagan"
-                                              : st.color == StatusColor.yellow
-                                              ? "E’tibor talab"
-                                              : "Ijobiy"}',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            color: stColor,
-                                          ),
-                                        ),
-                                      ),
+                                      ChildStatusLabel(st.color),
                                   ],
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Ehtiyoj toifasi: ${s.primaryNeed} • Qo‘llab-quvvatlash: ${s.supportLevel}',
+                                  s.primaryNeed,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textSecondary,
@@ -469,11 +414,10 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                     st.reasons.isNotEmpty) ...[
                                   const SizedBox(height: 3),
                                   Text(
-                                    'Svetofor sababi: ${st.reasons.first}',
+                                    st.reasons.first,
                                     style: TextStyle(
                                       fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: stColor,
+                                      color: AppColors.textMuted,
                                     ),
                                   ),
                                 ],

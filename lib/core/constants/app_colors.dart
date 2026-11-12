@@ -245,6 +245,21 @@ class AppColors {
   static Color get errorBg => _p.errorBg;
   static Color get errorBorder => _p.errorBorder;
   static Color get info => _p.info;
+
+  // Holat nuqtalari: qizil / sariq / yashil holat matn rangi bilan emas,
+  // yonidagi kichik dumaloq nuqta bilan ko'rsatiladi. Yorug' va qorong'i
+  // mavzuda ham bir xil yaxshi ko'rinadigan yumshoq ranglar.
+  static const Color dotRed = Color(0xFFE5484D);
+  static const Color dotAmber = Color(0xFFF5A524);
+  static const Color dotGreen = Color(0xFF30A46C);
+
+  /// [c] qizil/sariq/yashil holat rangi bo'lsa - uning nuqta rangi, aks holda null.
+  static Color? statusDotFor(Color c) {
+    if (c == error || c == dotRed) return dotRed;
+    if (c == warning || c == dotAmber) return dotAmber;
+    if (c == success || c == dotGreen) return dotGreen;
+    return null;
+  }
   static Color get infoBg => _p.infoBg;
   static Color get infoBorder => _p.infoBorder;
   static Color get purple => _p.purple;

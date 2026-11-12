@@ -879,6 +879,7 @@ def register_verify(body: RegistrationVerifyIn, request: Request, response: Resp
                         f"{user.full_name} ({data['profile'].get('institution_name', '')}) ro‘yxatdan o‘tdi va "
                         "tizimga kirdi. Agar u sizning muassasangizda ishlamasa, administrator panelidagi "
                         "“Foydalanuvchilar” bo‘limida hisobini bloklang.", admin.id)
-    sess = sessions.issue(db, s, user, request, response, mfa_verified=True, ip=ip, factor="email")
+    sess = sessions.issue(db, s, user, request, response, mfa_verified=True, ip=ip, factor="email",
+                          remember=body.remember)
     audit.record(db, "LOGIN_OK", user_id=user.id, ip=ip, detail="sign-up email code")
     return _user_out(ctx, sess, user, message="Xush kelibsiz! Hisobingiz tayyor")

@@ -54,3 +54,45 @@ List<MonthlyAverage> monthlyAverages(
       ),
   ];
 }
+
+/// So'nggi [days] kun ichidagi baholashlar — haftalar bo'yicha o'rtacha
+/// (foizda). Bosh sahifadagi "So'nggi 1 oy" grafigi uchun. Ma'lumoti yo'q
+/// haftalar qo'shilmaydi.
+class WeeklyAverage {
+  final DateTime weekStart; // dushanba
+  final double percent;
+  final int count;
+
+  const WeeklyAverage(this.weekStart, this.percent, this.count);
+
+  String get shortLabel =>
+      '${weekStart.day.toString().padLeft(2, '0')}.${weekStart.month.toString().padLeft(2, '0')}';
+}
+
+List<WeeklyAverage> weeklyAverages(
+  Iterable<AssessmentModel> assessments, {
+  required DateTime now,
+  int days = 30,
+}) {
+  final today = DateTime(now.year, now.month, now.day);
+  final from = today.subtract(Duration(days: days));
+  final buckets = <DateTime, List<double>>{};
+  for (final a in assessments) {
+    if (!a.isCompleted || a.maxScore <= 0) continue;
+    final d = DateTime(a.assessmentDate.year, a.assessmentDate.month, a.assessmentDate.day);
+    if (d.isBefore(from) || d.isAfter(today)) continue;
+    final monday = d.subtract(Duration(days: d.weekday - 1));
+    buckets
+        .putIfAbsent(monday, () => [])
+        .add((a.totalScore / a.maxScore * 100).clamp(0.0, 100.0));
+  }
+  final keys = buckets.keys.toList()..sort();
+  return [
+    for (final k in keys)
+      WeeklyAverage(
+        k,
+        buckets[k]!.reduce((a, b) => a + b) / buckets[k]!.length,
+        buckets[k]!.length,
+      ),
+  ];
+}

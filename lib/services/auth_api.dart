@@ -187,9 +187,9 @@ class AuthApi {
   /// Ro'yxatdan o'tish formasi uchun maktablar (faqat nomlari) — serverdagi
   /// haqiqiy muassasalar, shunda so'rov o'sha maktab administratoriga boradi.
   Future<List<String>> institutionNames() async =>
-      (await _api.getList('/api/auth/institutions'))
-          .map((e) => (e as Map<String, dynamic>)['name'] as String)
-          .toList();
+      (await _api.getList(
+        '/api/auth/institutions',
+      )).map((e) => (e as Map<String, dynamic>)['name'] as String).toList();
 
   Future<void> requestPasswordChangeCode() =>
       _api.post('/api/auth/password/change/request');
@@ -264,11 +264,13 @@ class AuthApi {
   /// Kod to'g'ri bo'lsa hisob yaratiladi va foydalanuvchi darhol kiradi.
   Future<AuthResult> verifyRegistration(
     String registrationId,
-    String code,
-  ) async => AuthResult.fromJson(
+    String code, {
+    bool remember = false,
+  }) async => AuthResult.fromJson(
     await _api.post('/api/auth/register/verify', {
       'registration_id': registrationId,
       'code': code,
+      'remember': remember,
     }),
   );
 

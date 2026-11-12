@@ -412,13 +412,6 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                     color: AppColors.textMuted,
                                   ),
                                 ),
-                                Text(
-                                  '${u.qualificationCategory ?? 'Mutaxassis'} (${u.experienceYears} yil staj)',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textMuted,
-                                  ),
-                                ),
                               ],
                             ),
                           ),

@@ -10,6 +10,7 @@ import '../../core/widgets/brand_logo.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/install_mode.dart';
 import '../../services/auth_api.dart';
 import 'verification_screens.dart';
 import '../../core/utils/uz_phone.dart';
@@ -31,7 +32,6 @@ class _LoginScreenState extends State<LoginScreen>
   final _loginIdentifierCtrl = TextEditingController();
   final _loginPasswordCtrl = TextEditingController();
   bool _loginObscure = true;
-  bool _rememberMe = false;
 
   // --- SIGN UP STEP MANAGEMENT ---
   int _signUpStep = 0;
@@ -112,7 +112,6 @@ class _LoginScreenState extends State<LoginScreen>
         if (!mounted) return;
         setState(() {
           _loginIdentifierCtrl.text = saved;
-          _rememberMe = true;
         });
       });
     });
@@ -346,7 +345,10 @@ class _LoginScreenState extends State<LoginScreen>
     final result = await auth.login(
       _loginIdentifierCtrl.text.trim(),
       _loginPasswordCtrl.text.trim(),
-      remember: _rememberMe,
+      // Ilovada (va bosh ekrandagi saytda) oddiy foydalanuvchi o'zi
+      // chiqmaguncha qayta so'ralmaydi; brauzerda yopilganda so'raladi.
+      // Administratorlarga server buni baribir bermaydi.
+      remember: runsAsInstalledApp,
     );
 
     if (mounted) {
@@ -783,36 +785,6 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         const SizedBox(height: 6),
 
-        // "Eslab qolish" — har safar email va parol kiritilmasin
-        InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: () => setState(() => _rememberMe = !_rememberMe),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: Checkbox(
-                    value: _rememberMe,
-                    onChanged: (v) => setState(() => _rememberMe = v ?? false),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Eslab qolish',
-                  style: _myGovFont(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(

@@ -4,33 +4,17 @@ import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
+import '../../core/widgets/status_badge.dart';
 import '../../models/student_model.dart';
 import '../../providers/app_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../services/access_control_service.dart';
 import '../../services/child_status_service.dart';
-import '../../providers/auth_provider.dart';
 import 'add_student_screen.dart';
 import 'student_detail_screen.dart';
-import '../../core/widgets/status_badge.dart';
 
-// Sinf filtri variantlari. Tanlangan qiymat ro'yxatda bo'lmasa, DropdownButton xato beradi —
-// shuning uchun qiymat shu ro'yxat bo'yicha tekshiriladi.
-const _gradeOptions = [
-  '1-A',
-  '1-B',
-  '2-A',
-  '2-B',
-  '3-A',
-  '3-B',
-  '4-A',
-  '4-B',
-  '5-A',
-  '6-A',
-  '7-A',
-  '8-A',
-  '9-A',
-];
-
+/// "Bolalar": foydalanuvchi ko'ra oladigan bolalar ro'yxati. Holat (svetofor)
+/// har bolada bitta nuqta va qisqa nom bilan; filtr va ro'yxat bitta ramkada.
 class StudentsListScreen extends StatefulWidget {
   const StudentsListScreen({super.key});
 
@@ -39,497 +23,424 @@ class StudentsListScreen extends StatefulWidget {
 }
 
 class _StudentsListScreenState extends State<StudentsListScreen> {
-  StatusColor? _selectedStatusColor;
+  StatusColor? _status;
 
-  static Color _colorFor(StatusColor c) {
-    switch (c) {
-      case StatusColor.red:
-        return AppColors.error;
-      case StatusColor.yellow:
-        return AppColors.warning;
-      case StatusColor.green:
-        return AppColors.success;
-    }
-  }
-
-  static Color _bgFor(StatusColor c) {
-    switch (c) {
-      case StatusColor.red:
-        return AppColors.errorBg;
-      case StatusColor.yellow:
-        return AppColors.warningBg;
-      case StatusColor.green:
-        return AppColors.successBg;
-    }
+  /// Sinflar ro'yxati — bolalarga kiritilgan haqiqiy sinflardan ("3-B", "5-A"…).
+  static List<String> _gradesOf(List<StudentModel> all) {
+    final set = {
+      for (final s in all)
+        if (s.status != 'Arxivlangan' && s.grade.trim().isNotEmpty)
+          s.grade.trim(),
+    };
+    int num(String g) => int.tryParse(RegExp(r'\d+').stringMatch(g) ?? '') ?? 99;
+    return set.toList()..sort((a, b) {
+      final c = num(a).compareTo(num(b));
+      return c != 0 ? c : a.compareTo(b);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
-    final rawStudents = app.students;
     final summary = app.monitoringSummary;
-    final statusByStudentId = <String, ChildStatus>{
+    final statusById = <String, ChildStatus>{
       if (summary != null)
         for (final st in summary.statuses) st.student.id: st,
     };
-
+    final found = app.students;
     final students =
-        _selectedStatusColor == null
-            ? rawStudents
-            : rawStudents
-                .where(
-                  (s) => statusByStudentId[s.id]?.color == _selectedStatusColor,
-                )
-                .toList();
+        _status == null
+            ? found
+            : found.where((s) => statusById[s.id]?.color == _status).toList();
+    final grades = _gradesOf(app.allStudentsIncludingArchived);
 
     final canPop = Navigator.canPop(context);
     final width = MediaQuery.sizeOf(context).width;
-    final mediaPadding = MediaQuery.paddingOf(context);
-    final currentUser = context.watch<AuthProvider>().currentUser;
-    final canAddStudent =
-        currentUser != null &&
-        AccessControlService().canEditStudent(currentUser, null);
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final me = context.watch<AuthProvider>().currentUser;
+    final canAdd =
+        me != null && AccessControlService().canEditStudent(me, null);
 
-    final bodyContent = ResponsivePageContainer(
+    int count(StatusColor? c) =>
+        c == null
+            ? found.length
+            : found.where((s) => statusById[s.id]?.color == c).length;
+
+    String chipName(StatusColor? c) => c == null ? 'Hammasi' : c.short;
+
+    final body = ResponsivePageContainer(
       bottomPadding: 0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
-            title: 'Bolalar reyestri',
+            title: 'Bolalar',
             icon: LucideIcons.users,
-            subtitle:
-                'Ro‘yxatda ${students.length} nafar inklyuziv ta’lim o‘quvchisi',
-            // Yangi o'quvchini faqat koordinator va rahbariyat ro'yxatga oladi
+            subtitle: '${found.length} nafar',
             action:
-                !canAddStudent
+                !canAdd
                     ? null
                     : HeaderActionButton(
                       icon: LucideIcons.userPlus,
-                      label: 'Yangi o‘quvchi',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AddStudentScreen(),
+                      label: 'Bola qo‘shish',
+                      onPressed:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const AddStudentScreen(),
+                            ),
                           ),
-                        );
-                      },
                     ),
           ),
-          const SizedBox(height: 9),
-
-          // Kesib olingan shisha qidiruv va sinf filtri paneli (Mobil va desktopga mos)
-          SurfaceCard(
-            borderRadius: 22,
-            padding: const EdgeInsets.all(14),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isCompact = constraints.maxWidth < 520;
-
-                final searchField = TextField(
-                  decoration: InputDecoration(
-                    hintText:
-                        'F.I.Sh. yoki ta’lim ehtiyoji bo‘yicha qidirish...',
-                    prefixIcon: Icon(
-                      LucideIcons.search,
-                      size: 18,
-                      color: AppColors.primary,
-                    ),
-                    fillColor: AppColors.surfaceMuted,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 15,
-                      vertical: 13,
-                    ),
-                    suffixIcon:
-                        app.searchQuery.isNotEmpty
-                            ? IconButton(
-                              icon: const Icon(LucideIcons.x, size: 16),
-                              onPressed: () => app.setSearchQuery(''),
-                            )
-                            : null,
-                  ),
-                  onChanged: (val) => app.setSearchQuery(val),
-                );
-
-                final gradeFilter = DropdownButtonHideUnderline(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceMuted,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border, width: 1.0),
-                    ),
-                    child: DropdownButton<String?>(
-                      value:
-                          _gradeOptions.contains(app.selectedGrade)
-                              ? app.selectedGrade
-                              : null,
-                      isExpanded: isCompact,
-                      borderRadius: BorderRadius.circular(14),
-                      dropdownColor: AppColors.surfaceRaised,
-                      icon: Padding(
-                        padding: EdgeInsets.only(left: 6),
-                        child: Icon(
-                          LucideIcons.chevronDown,
-                          size: 16,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                      hint: Text(
-                        'Barcha sinflar',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      items: [
-                        const DropdownMenuItem(
-                          value: null,
-                          child: Text(
-                            'Barcha sinflar',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
+          const SizedBox(height: 12),
+          Expanded(
+            child: SurfaceCard(
+              borderRadius: 20,
+              padding: EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                    child: LayoutBuilder(
+                      builder: (context, c) {
+                        final narrow = c.maxWidth < 520;
+                        final search = TextField(
+                          onChanged: app.setSearchQuery,
+                          decoration: InputDecoration(
+                            hintText: 'Ism yoki familiya',
+                            isDense: true,
+                            prefixIcon: Icon(
+                              LucideIcons.search,
+                              size: 18,
+                              color: AppColors.textMuted,
                             ),
+                            suffixIcon:
+                                app.searchQuery.isEmpty
+                                    ? null
+                                    : IconButton(
+                                      tooltip: 'Tozalash',
+                                      icon: const Icon(LucideIcons.x, size: 16),
+                                      onPressed: () => app.setSearchQuery(''),
+                                    ),
                           ),
-                        ),
-                        ..._gradeOptions.map(
-                          (g) => DropdownMenuItem(
-                            value: g,
-                            child: Text(
-                              '$g sinf',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
+                        );
+                        final grade = SizedBox(
+                          width: narrow ? double.infinity : 180,
+                          child: DropdownButtonFormField<String?>(
+                            initialValue:
+                                grades.contains(app.selectedGrade)
+                                    ? app.selectedGrade
+                                    : null,
+                            isExpanded: true,
+                            isDense: true,
+                            decoration: const InputDecoration(isDense: true),
+                            items: [
+                              const DropdownMenuItem(
+                                value: null,
+                                child: Text('Barcha sinflar'),
                               ),
-                            ),
+                              for (final g in grades)
+                                DropdownMenuItem(
+                                  value: g,
+                                  child: Text('$g sinf'),
+                                ),
+                            ],
+                            onChanged: app.setFilterGrade,
                           ),
-                        ),
-                      ],
-                      onChanged: (val) => app.setFilterGrade(val),
+                        );
+                        return narrow
+                            ? Column(
+                              children: [
+                                search,
+                                const SizedBox(height: 8),
+                                grade,
+                              ],
+                            )
+                            : Row(
+                              children: [
+                                Expanded(child: search),
+                                const SizedBox(width: 12),
+                                grade,
+                              ],
+                            );
+                      },
                     ),
                   ),
-                );
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (isCompact) ...[
-                      searchField,
-                      const SizedBox(height: 10),
-                      gradeFilter,
-                    ] else
-                      Row(
+                  if (summary != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
-                          Expanded(child: searchField),
-                          const SizedBox(width: 12),
-                          gradeFilter,
+                          for (final c in <StatusColor?>[
+                            null,
+                            StatusColor.red,
+                            StatusColor.yellow,
+                            StatusColor.green,
+                          ])
+                            _StatusChip(
+                              label: chipName(c),
+                              dot:
+                                  c == null
+                                      ? null
+                                      : ChildStatusLabel.dotColor(c),
+                              count: count(c),
+                              selected: _status == c,
+                              onTap: () => setState(() => _status = c),
+                            ),
                         ],
                       ),
-                    if (summary != null) ...[
-                      const SizedBox(height: 10),
-                      ModernPillFilterBar(
-                        items: const [
-                          'Barchasi',
-                          'Qizil — Ishlanmagan',
-                          'Sariq — E’tibor',
-                          'Yashil — Ijobiy',
-                        ],
-                        selectedItem:
-                            _selectedStatusColor == StatusColor.red
-                                ? 'Qizil — Ishlanmagan'
-                                : _selectedStatusColor == StatusColor.yellow
-                                ? 'Sariq — E’tibor'
-                                : _selectedStatusColor == StatusColor.green
-                                ? 'Yashil — Ijobiy'
-                                : 'Barchasi',
-                        counts: {
-                          'Barchasi': rawStudents.length,
-                          'Qizil — Ishlanmagan': summary.count(StatusColor.red),
-                          'Sariq — E’tibor': summary.count(StatusColor.yellow),
-                          'Yashil — Ijobiy': summary.count(StatusColor.green),
-                        },
-                        itemColors: {
-                          'Qizil — Ishlanmagan': AppColors.error,
-                          'Sariq — E’tibor': AppColors.warning,
-                          'Yashil — Ijobiy': AppColors.success,
-                        },
-                        onSelected: (v) {
-                          setState(() {
-                            if (v == 'Qizil — Ishlanmagan') {
-                              _selectedStatusColor = StatusColor.red;
-                            } else if (v == 'Sariq — E’tibor') {
-                              _selectedStatusColor = StatusColor.yellow;
-                            } else if (v == 'Yashil — Ijobiy') {
-                              _selectedStatusColor = StatusColor.green;
-                            } else {
-                              _selectedStatusColor = null;
-                            }
-                          });
-                        },
-                      ),
-                    ],
-                  ],
-                );
-              },
+                    ),
+                  Divider(height: 1, color: AppColors.border),
+                  Expanded(
+                    child:
+                        students.isEmpty
+                            ? _Empty(
+                              searching:
+                                  app.searchQuery.isNotEmpty ||
+                                  app.selectedGrade != null ||
+                                  _status != null,
+                            )
+                            : ListView.separated(
+                              padding: EdgeInsets.only(
+                                bottom: width < 920 ? 84 + bottomInset : 8,
+                              ),
+                              itemCount: students.length,
+                              separatorBuilder:
+                                  (_, _) => Divider(
+                                    height: 1,
+                                    indent: 72,
+                                    color: AppColors.border,
+                                  ),
+                              itemBuilder:
+                                  (context, i) => _ChildRow(
+                                    student: students[i],
+                                    status: statusById[students[i].id],
+                                    wide: width >= 720,
+                                  ),
+                            ),
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 9),
-
-          // Bolalar ro'yxati
-          Expanded(
-            child:
-                students.isEmpty
-                    ? Center(
-                      child: SurfaceCard(
-                        borderRadius: 26,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 34,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              LucideIcons.userSearch,
-                              size: 36,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(height: 14),
-                            Text(
-                              'O‘quvchilar topilmadi',
-                              style: TextStyle(
-                                fontSize: 15.5,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              'Qidiruv so‘zini yoki sinf filtrini o‘zgartirib ko‘ring',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                    : ListView.separated(
-                      padding: EdgeInsets.fromLTRB(
-                        0,
-                        0,
-                        0,
-                        width < 920 ? (84.0 + mediaPadding.bottom) : 24.0,
-                      ),
-                      itemCount: students.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        final student = students[index];
-                        return _buildStudentCard(
-                          context,
-                          student,
-                          statusByStudentId[student.id],
-                        );
-                      },
-                    ),
-          ),
+          SizedBox(height: width < 920 ? 0 : 16),
         ],
       ),
     );
 
     return Scaffold(
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
-      appBar:
-          canPop
-              ? AppBar(title: const Text('Bolalar elektron reyestri'))
-              : null,
-      body: canPop ? AmbientMeshBackground(child: bodyContent) : bodyContent,
+      appBar: canPop ? AppBar(title: const Text('Bolalar')) : null,
+      body: canPop ? AmbientMeshBackground(child: body) : body,
     );
   }
+}
 
-  Widget _buildStudentCard(
-    BuildContext context,
-    StudentModel s,
-    ChildStatus? status,
-  ) {
-    final guardianText =
-        s.guardians.isNotEmpty
-            ? '${s.guardians.first.relationship}: ${s.guardians.first.fullName}'
-            : 'Vasiy kiritilmagan';
-    final statusColor = status != null ? _colorFor(status.color) : null;
-    final statusBg = status != null ? _bgFor(status.color) : null;
-    final isRed = status?.color == StatusColor.red;
+/// Holat filtri: tanlanganda faqat chegara va matn qalinlashadi —
+/// rang o'zgarmaydi (rang faqat nuqtada).
+class _StatusChip extends StatelessWidget {
+  final String label;
+  final Color? dot;
+  final int count;
+  final bool selected;
+  final VoidCallback onTap;
 
-    return SurfaceCard(
-      borderRadius: 16,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      backgroundColor: isRed ? AppColors.errorBg : null,
-      borderColor:
-          statusColor?.withValues(alpha: isRed ? 0.55 : 0.32),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => StudentDetailScreen(studentId: s.id),
-          ),
-        );
-      },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: statusBg ?? AppColors.primaryLight,
-              borderRadius: BorderRadius.circular(10),
+  const _StatusChip({
+    required this.label,
+    required this.dot,
+    required this.count,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          height: 34,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: selected ? AppColors.textPrimary : AppColors.border,
+              width: selected ? 1.4 : 1,
             ),
-            alignment: Alignment.center,
-            child: Text(
-              s.firstName.isNotEmpty ? s.firstName.substring(0, 1) : '?',
-              style: TextStyle(
-                color: statusColor ?? AppColors.primary,
-                fontWeight: FontWeight.w700,
-                fontSize: 17,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (dot != null) ...[
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 7),
+              ],
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '$count',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textMuted,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChildRow extends StatelessWidget {
+  final StudentModel student;
+  final ChildStatus? status;
+  final bool wide;
+
+  const _ChildRow({
+    required this.student,
+    required this.status,
+    required this.wide,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final s = student;
+    final initials =
+        s.fullName
+            .split(RegExp(r'\s+'))
+            .where((p) => p.isNotEmpty)
+            .take(2)
+            .map((p) => p[0])
+            .join()
+            .toUpperCase();
+    return InkWell(
+      onTap:
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => StudentDetailScreen(studentId: s.id),
+            ),
+          ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.primaryLight,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                initials,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Ism to'liq kenglikda; holat belgilari uning ostida (telefonda
-                // ism belgilar orasida bitta harfgacha siqilib qolardi).
-                Text(
-                  s.fullName,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                    letterSpacing: -0.25,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    s.fullName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    if (status != null)
-                      StatusBadge.child(
-                        status.color,
-                        '${status.color.label}: ${status.color == StatusColor.red
-                            ? "Ishlanmagan"
-                            : status.color == StatusColor.yellow
-                            ? "E’tibor talab"
-                            : "Ijobiy"}',
-                      ),
-                    StatusPill(
-                      label: '${s.grade}-sinf',
-                      color: AppColors.primary,
-                      backgroundColor: AppColors.primaryLight,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  s.primaryNeed,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                    height: 1.35,
-                  ),
-                ),
-                if (status != null && status.reasons.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: statusBg,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: statusColor!.withValues(alpha: 0.25),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          isRed
-                              ? LucideIcons.circleAlert
-                              : status.color == StatusColor.yellow
-                              ? LucideIcons.triangleAlert
-                              : LucideIcons.circleCheck,
-                          size: 14,
-                          color: statusColor,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            status.reasons.first,
-                            style: TextStyle(
-                              fontSize: 11.8,
-                              fontWeight: FontWeight.w600,
-                              color: statusColor,
-                              height: 1.3,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  const SizedBox(height: 2),
+                  Text(
+                    [
+                      '${s.grade} sinf',
+                      '${s.age} yosh',
+                      if (s.primaryNeed.isNotEmpty) s.primaryNeed,
+                    ].join(' · '),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 13, color: AppColors.textMuted),
                   ),
                 ],
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 6,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    StatusPill(
-                      label: s.supportLevel,
-                      color: AppColors.info,
-                      backgroundColor: AppColors.infoBg,
-                      maxWidth: 230,
-                    ),
-                    Text(
-                      '${s.age} yosh • $guardianText',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Padding(
-            padding: EdgeInsets.only(top: 4),
-            child: Icon(
-              LucideIcons.chevronRight,
-              size: 18,
-              color: AppColors.textSubtle,
+            if (status != null) ...[
+              const SizedBox(width: 12),
+              ChildStatusLabel(
+                status!.color,
+                reason:
+                    wide && status!.reasons.isNotEmpty
+                        ? status!.reasons.first
+                        : null,
+                align: CrossAxisAlignment.end,
+              ),
+            ],
+            const SizedBox(width: 8),
+            Icon(LucideIcons.chevronRight, size: 18, color: AppColors.textSubtle),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Empty extends StatelessWidget {
+  final bool searching;
+  const _Empty({required this.searching});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(LucideIcons.userSearch, size: 32, color: AppColors.textSubtle),
+            const SizedBox(height: 12),
+            Text(
+              searching ? 'Bola topilmadi' : 'Hali bola qo‘shilmagan',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              searching ? 'Boshqa ism yoki sinfni tanlang' : 'Bolalar shu yerda ko‘rinadi',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+            ),
+          ],
+        ),
       ),
     );
   }

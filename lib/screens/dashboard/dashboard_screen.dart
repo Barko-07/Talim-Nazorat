@@ -6,19 +6,17 @@ import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
+import '../../core/widgets/status_badge.dart';
 import '../../models/user_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/access_control_service.dart';
 import '../../services/child_status_service.dart';
 import '../../services/monthly_trend.dart';
-import '../assessments/new_assessment_screen.dart';
 import '../iep/iep_list_screen.dart';
 import '../monitoring/monitoring_screen.dart';
-import '../referrals/referrals_screen.dart';
 import '../reports/reports_screen.dart';
 import '../sessions/sessions_screen.dart';
-import '../specialists/specialists_screen.dart';
 import '../students/add_student_screen.dart';
 import '../students/student_detail_screen.dart';
 import '../students/students_list_screen.dart';
@@ -170,9 +168,8 @@ class DashboardScreen extends StatelessWidget {
                     spacing: 9,
                     children: [
                       _buildKpiCard(
-                        title: 'Jami o‘quvchilar',
+                        title: 'Bolalar',
                         value: '${app.totalStudentsCount}',
-                        subtitle: 'Inklyuziv ro‘yxatda',
                         icon: LucideIcons.users,
                         color: AppColors.primary,
                         onTap:
@@ -185,7 +182,6 @@ class DashboardScreen extends StatelessWidget {
                       _buildKpiCard(
                         title: 'Faol ITR rejalari',
                         value: '${app.activeIepCount}',
-                        subtitle: 'Ijro etilayotgan',
                         icon: LucideIcons.bookOpenCheck,
                         color: AppColors.info,
                         onTap:
@@ -195,7 +191,6 @@ class DashboardScreen extends StatelessWidget {
                       _buildKpiCard(
                         title: 'Bu oygi darslar',
                         value: '${app.thisMonthSessionsCount}',
-                        subtitle: 'O‘tkazilgan va rejada',
                         icon: LucideIcons.calendarCheck2,
                         color: AppColors.purple,
                         onTap:
@@ -206,7 +201,6 @@ class DashboardScreen extends StatelessWidget {
                         title: 'O‘rtacha o‘sish',
                         value:
                             '${app.averageDevelopmentGrowth >= 0 ? '+' : ''}${app.averageDevelopmentGrowth.toStringAsFixed(1)} ball',
-                        subtitle: 'Oldingi baholashlarga nisbatan',
                         icon: LucideIcons.trendingUp,
                         color: AppColors.success,
                         onTap:
@@ -232,10 +226,6 @@ class DashboardScreen extends StatelessWidget {
 
               // 3.5. SVETOFOR VA ISHLANMAGAN BOLALAR NAZORAT PANELI
               _buildSvetoforOverviewStrip(context, app),
-              const SizedBox(height: 10),
-
-              // 4. KASBIY ISH MAYDONI
-              _buildRoleSpecificWorkspace(context, user),
               const SizedBox(height: 10),
 
               // 5. GRAFIK: OYLIK RIVOJLANISH DINAMIKASI
@@ -308,18 +298,6 @@ class DashboardScreen extends StatelessWidget {
           // Bola qo'shish faqat ruxsati bor rollarga (koordinator, rahbariyat)
           final canAddStudent =
               user != null && AccessControlService().canEditStudent(user, null);
-          final addBtn = HeaderActionButton(
-            icon: LucideIcons.plus,
-            label: 'Bola qo‘shish',
-            compactLabel: 'Qo‘shish',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AddStudentScreen()),
-              );
-            },
-          );
-
           final monogram = Container(
             width: 44,
             height: 44,
@@ -344,30 +322,30 @@ class DashboardScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Text(
-                    fullName,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  StatusPill(
-                    label: roleLabel,
-                    color: AppColors.primary,
-                    backgroundColor: AppColors.primaryLight,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 3),
               Text(
-                institutionName,
+                'Xush kelibsiz',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                fullName,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                [roleLabel, if (institutionName.isNotEmpty) institutionName]
+                    .join(' · '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -379,29 +357,33 @@ class DashboardScreen extends StatelessWidget {
             ],
           );
 
-          if (isCompact) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    monogram,
-                    const SizedBox(width: 13),
-                    Expanded(child: userInfo),
-                  ],
-                ),
-                if (canAddStudent) ...[const SizedBox(height: 14), addBtn],
-              ],
-            );
-          }
+          // Bola qo'shish — tez-tez kerak bo'ladigan amal, lekin asosiy emas:
+          // ism yonida ixcham ikkinchi darajali tugma.
+          final addCompact = Tooltip(
+            message: 'Bola qo‘shish',
+            child: OutlinedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddStudentScreen()),
+                );
+              },
+              icon: const Icon(LucideIcons.userPlus, size: 18),
+              label: Text(isCompact ? 'Bola' : 'Bola qo‘shish'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(0, 40),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+              ),
+            ),
+          );
 
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               monogram,
-              const SizedBox(width: 15),
+              const SizedBox(width: 14),
               Expanded(child: userInfo),
-              if (canAddStudent) ...[const SizedBox(width: 16), addBtn],
+              if (canAddStudent) ...[const SizedBox(width: 12), addCompact],
             ],
           );
         },
@@ -411,79 +393,59 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildSvetoforOverviewStrip(BuildContext context, AppProvider app) {
     final summary = app.monitoringSummary;
-    final redCount = summary?.count(StatusColor.red) ?? 0;
-    final yellowCount = summary?.count(StatusColor.yellow) ?? 0;
-    final greenCount = summary?.count(StatusColor.green) ?? 0;
-    final pendingReferrals =
-        app.referrals
-            .where(
-              (r) =>
-                  r.status == 'Ko‘rib chiqilmoqda' ||
-                  r.status == 'Qabul qilindi',
-            )
-            .length;
+    Widget row(StatusColor c) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          ChildStatusLabel(c),
+          const Spacer(),
+          Text(
+            '${summary?.count(c) ?? 0}',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
 
     return SurfaceCard(
       borderRadius: 22,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+      onTap: () => _openModule(context, 1, const StudentsListScreen()),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(LucideIcons.activity, size: 19, color: AppColors.primary),
-              const SizedBox(width: 9),
               Expanded(
                 child: Text(
-                  'Bolalar bilan ishlash holati (Svetofor nazorati)',
+                  'Bolalar holati',
                   style: TextStyle(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
               ),
-              InkWell(
-                onTap:
-                    () => _openModule(context, 1, const StudentsListScreen()),
-                child: Text(
-                  'Ro‘yxatni ochish →',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                  ),
+              Text(
+                'Hammasi',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
                 ),
               ),
+              Icon(LucideIcons.chevronRight, size: 16, color: AppColors.primary),
             ],
           ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 10,
-            runSpacing: 8,
-            children: [
-              StatusPill(
-                label: 'Ishlanmagan / kechikkan: $redCount nafar',
-                color: AppColors.error,
-                backgroundColor: AppColors.errorBg,
-              ),
-              StatusPill(
-                label: 'E’tibor talab: $yellowCount nafar',
-                color: AppColors.warning,
-                backgroundColor: AppColors.warningBg,
-              ),
-              StatusPill(
-                label: 'Ijobiy dinamika: $greenCount nafar',
-                color: AppColors.success,
-                backgroundColor: AppColors.successBg,
-              ),
-              StatusPill(
-                label: '↗ Faol yo‘naltirishlar: $pendingReferrals ta',
-                color: AppColors.info,
-                backgroundColor: AppColors.primaryLight,
-              ),
-            ],
-          ),
+          const SizedBox(height: 6),
+          row(StatusColor.red),
+          row(StatusColor.yellow),
+          row(StatusColor.green),
         ],
       ),
     );
@@ -491,7 +453,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildAnalyticsChartCard(AppProvider app) {
     // Faqat haqiqiy baholashlar: ma'lumot bo'lmasa grafik o'rniga bo'sh holat.
-    final points = monthlyAverages(app.assessments, now: DateTime.now());
+    final points = weeklyAverages(app.assessments, now: DateTime.now());
     final months = [for (final p in points) p.shortLabel];
     final dynamicSpots = [
       for (var i = 0; i < points.length; i++)
@@ -511,24 +473,18 @@ class DashboardScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Oylik rivojlanish dinamikasi',
+                    'Rivojlanish dinamikasi',
                     style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
-                      letterSpacing: -0.2,
                     ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'Yakunlangan baholashlarning oylik o‘rtacha natijasi, %',
-                    style: TextStyle(fontSize: 13, color: AppColors.textMuted),
                   ),
                 ],
               );
 
               final pill = StatusPill(
-                label: 'So‘nggi 6 oy',
+                label: 'So‘nggi 1 oy',
                 color: AppColors.primary,
                 backgroundColor: AppColors.primaryLight,
               );
@@ -565,22 +521,14 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      'Hozircha ma’lumot yo‘q',
+                      'So‘nggi oyda baholash yo‘q',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Baholashlar yakunlangach, oylik natijalar shu yerda ko‘rinadi.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
+
                   ],
                 ),
               ),
@@ -963,302 +911,16 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRoleSpecificWorkspace(BuildContext context, UserModel? user) {
-    final role = user?.role ?? UserRole.psychologist;
-
-    String sectionTitle;
-    String sectionSubtitle;
-    List<Map<String, dynamic>> actions;
-
-    switch (role) {
-      case UserRole.psychologist:
-        sectionTitle = 'Amaliyotchi psixolog ish maydoni';
-        sectionSubtitle =
-            'Kognitiv, hissiy-irodaviy sohalarni baholash va korreksion mashg‘ulotlar';
-        actions = [
-          {
-            'title': 'Yangi baholash (Rubrika)',
-            'desc':
-                'Bola rivojlanish darajasini standart mezonlar bo‘yicha baholash',
-            'icon': LucideIcons.brain,
-            'color': AppColors.primary,
-            'screen': const NewAssessmentScreen(),
-          },
-          {
-            'title': 'Bolalar ruhiy xaritasi',
-            'desc': 'Biriktirilgan inklyuziv bolalar dinamikasi va profili',
-            'icon': LucideIcons.users,
-            'color': AppColors.info,
-            'tabIndex': 1,
-            'screen': const StudentsListScreen(),
-          },
-          {
-            'title': 'Korreksion mashg‘ulotlar',
-            'desc': 'Yakka va kichik guruhdagi psixologik seanslar jurnali',
-            'icon': LucideIcons.calendarDays,
-            'color': AppColors.purple,
-            'tabIndex': 3,
-            'screen': const SessionsScreen(),
-          },
-        ];
-        break;
-
-      case UserRole.speechTherapist:
-        sectionTitle = 'Logoped-defektolog ish maydoni';
-        sectionSubtitle =
-            'Nutq nuqsonlari korreksiyasi, fonematik eshitish va artikulyatsion tahlil';
-        actions = [
-          {
-            'title': 'Nutq diagnostikasi',
-            'desc': 'Tovush talaffuzi va fonematik idrokni baholash testi',
-            'icon': LucideIcons.mic,
-            'color': AppColors.primary,
-            'screen': const NewAssessmentScreen(),
-          },
-          {
-            'title': 'Artikulyatsion darslar',
-            'desc': 'Rejalashtirilgan logopedik mashg‘ulotlar davomati',
-            'icon': LucideIcons.calendarCheck2,
-            'color': AppColors.info,
-            'tabIndex': 3,
-            'screen': const SessionsScreen(),
-          },
-          {
-            'title': 'Logopedik ITR rejalari',
-            'desc': 'Individual ta’lim dasturidagi nutqiy maqsadlar ijrosi',
-            'icon': LucideIcons.bookOpenCheck,
-            'color': AppColors.purple,
-            'tabIndex': 4,
-            'screen': const IepListScreen(),
-          },
-        ];
-        break;
-
-      case UserRole.specialEducation:
-        sectionTitle = 'Maxsus pedagog (Defektolog) ish maydoni';
-        sectionSubtitle =
-            'Sensor, motorika va aqliy rivojlanishni moslashtirilgan ta’lim bilan qo‘llab-quvvatlash';
-        actions = [
-          {
-            'title': 'Defektologik test',
-            'desc': 'Sensomotorik va kognitiv qobiliyatlarni baholash',
-            'icon': LucideIcons.puzzle,
-            'color': AppColors.primary,
-            'screen': const NewAssessmentScreen(),
-          },
-          {
-            'title': 'Yakka tartibdagi dars',
-            'desc': 'Maxsus metodik mashg‘ulotlar jadvali va davomat',
-            'icon': LucideIcons.calendarDays,
-            'color': AppColors.info,
-            'tabIndex': 3,
-            'screen': const SessionsScreen(),
-          },
-          {
-            'title': 'Moslashtirilgan ITR',
-            'desc': 'Bolaga moslashtirilgan o‘quv rejasi va mezonlari',
-            'icon': LucideIcons.bookOpenCheck,
-            'color': AppColors.purple,
-            'tabIndex': 4,
-            'screen': const IepListScreen(),
-          },
-        ];
-        break;
-
-      case UserRole.specialEdTeacher:
-      case UserRole.teacher:
-        sectionTitle = 'Fan o‘qituvchisi / Maxsus pedagog ish maydoni';
-        sectionSubtitle =
-            'O‘quvchining haqiqiy DTS bilim darajasini aniqlash (masalan: 7-sinf → 3-sinf darajasi), topshiriqlar va dars davomati';
-        actions = [
-          {
-            'title': 'DTS darajasi va fan topshiriqlari',
-            'desc':
-                'O‘quvchi profilida matematika, o‘qish va ona tili bo‘yicha haqiqiy darajani belgilash',
-            'icon': LucideIcons.graduationCap,
-            'color': AppColors.primary,
-            'tabIndex': 1,
-            'screen': const StudentsListScreen(),
-          },
-          {
-            'title': 'Dars davomati va mashg‘ulotlar',
-            'desc':
-                'Inklyuziv o‘quvchilarning darslardagi ishtiroki va davomati',
-            'icon': LucideIcons.clipboardCheck,
-            'color': AppColors.info,
-            'tabIndex': 3,
-            'screen': const SessionsScreen(),
-          },
-          {
-            'title': 'Mutaxassisga yo‘naltirish (Referral)',
-            'desc': 'Bolani psixolog, logoped yoki defektologga yo‘naltirish',
-            'icon': LucideIcons.arrowLeftRight,
-            'color': AppColors.purple,
-            'screen': const ReferralsScreen(),
-          },
-        ];
-        break;
-
-      case UserRole.institutionAdmin:
-      case UserRole.reviewer:
-      case UserRole.superAdmin:
-      default:
-        sectionTitle = 'Boshqaruv va Monitoring maydoni';
-        sectionSubtitle =
-            'Muassasa bo‘yicha tahliliy ko‘rsatkichlar, xavflar va mutaxassislar yuklamasi';
-        actions = [
-          {
-            'title': 'Tahliliy hisobotlar',
-            'desc':
-                'Maktab inklyuziv ta’lim holati, choraklik natijalar va CSV eksport',
-            'icon': LucideIcons.chartColumn,
-            'color': AppColors.primary,
-            'tabIndex': 6,
-            'screen': const ReportsScreen(),
-          },
-          {
-            'title': 'Monitoring signallari',
-            'desc':
-                'Rivojlanish regressiyasi va to‘xtab qolish xavfi ogohlantirishlari',
-            'icon': LucideIcons.shieldAlert,
-            'color': AppColors.warning,
-            'tabIndex': 5,
-            'screen': const MonitoringScreen(),
-          },
-          {
-            'title': 'Mutaxassislar shtati',
-            'desc': 'Psixolog, logoped va pedagoglar yuklamasi va bolalari',
-            'icon': LucideIcons.userCheck,
-            'color': AppColors.purple,
-            'tabIndex': 7,
-            'screen': const SpecialistsScreen(),
-          },
-        ];
-        break;
-    }
-
-    return SurfaceCard(
-      borderRadius: 26,
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                sectionTitle,
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
-                ),
-              ),
-              const SizedBox(height: 2.5),
-              Text(
-                sectionSubtitle,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textMuted,
-                  height: 1.35,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ResponsiveGlassGrid(
-            mobileColumns: 1,
-            tabletColumns: 1,
-            desktopColumns: 3,
-            spacing: 14,
-            children:
-                actions.map((act) => _buildActionTile(context, act)).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionTile(BuildContext context, Map<String, dynamic> act) {
-    final accent = act['color'] as Color;
-    final tabIdx = act['tabIndex'] as int?;
-
-    return SurfaceCard(
-      elevated: false,
-      borderRadius: 14,
-      padding: const EdgeInsets.all(16),
-      backgroundColor: AppColors.glassWellFill,
-      borderColor: AppColors.glassInnerBorder,
-      onTap: () {
-        if (tabIdx != null && onNavigateTab != null) {
-          onNavigateTab!(tabIdx);
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => act['screen'] as Widget),
-          );
-        }
-      },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Icon(act['icon'] as IconData, color: accent, size: 22),
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  act['title'] as String,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  act['desc'] as String,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textMuted,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 6),
-          Padding(
-            padding: EdgeInsets.only(top: 2),
-            child: Icon(
-              LucideIcons.chevronRight,
-              size: 16,
-              color: AppColors.textSubtle,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildKpiCard({
     required String title,
     required String value,
-    required String subtitle,
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
   }) {
     return SurfaceCard(
-      borderRadius: 26,
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+      borderRadius: 22,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1298,17 +960,6 @@ class DashboardScreen extends StatelessWidget {
                   color: AppColors.textPrimary,
                   letterSpacing: -0.7,
                   fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                subtitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],

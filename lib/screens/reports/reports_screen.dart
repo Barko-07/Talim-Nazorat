@@ -1,166 +1,82 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../providers/app_provider.dart';
+import '../../core/widgets/status_badge.dart';
+import '../../services/child_changes.dart';
 import '../../services/child_status_service.dart';
 import '../../services/dynamics_service.dart';
 import '../../services/report_service.dart';
 import '../../services/file_download_service.dart';
+import '../../services/xlsx_export.dart';
 import '../students/student_detail_screen.dart';
 
 class ReportsScreen extends StatelessWidget {
   const ReportsScreen({super.key});
 
-  void _showCsvExportDialog(BuildContext context) {
+  void _showExcelDialog(BuildContext context) {
     final app = context.read<AppProvider>();
-
+    final options = <(IconData, String, String, String Function())>[
+      (LucideIcons.users, 'Bolalar ro‘yxati', 'Bolalar', app.exportStudentsCsv),
+      (
+        LucideIcons.clipboardCheck,
+        'Baholashlar',
+        'Baholashlar',
+        app.exportAssessmentsCsv,
+      ),
+      (
+        LucideIcons.calendarDays,
+        'Darslar va davomat',
+        'Darslar',
+        app.exportSessionsCsv,
+      ),
+      (LucideIcons.bookOpenCheck, 'ITR rejalari', 'ITR', app.exportIepCsv),
+      (
+        LucideIcons.activity,
+        'Bolalar holati va o‘zgarish',
+        'Holat',
+        app.exportMonitoringReportCsv,
+      ),
+      (
+        LucideIcons.shieldAlert,
+        'Ogohlantirishlar',
+        'Ogohlantirishlar',
+        app.exportAlertsCsv,
+      ),
+      (
+        LucideIcons.send,
+        'Mutaxassisga yuborishlar',
+        'Yuborishlar',
+        app.exportReferralsCsv,
+      ),
+      (
+        LucideIcons.userCheck,
+        'Mutaxassislar ishi',
+        'Mutaxassislar',
+        app.exportSpecialistActivityCsv,
+      ),
+    ];
     showDialog(
       context: context,
       builder:
           (ctx) => AlertDialog(
-            title: Row(
-              children: [
-                Icon(
-                  LucideIcons.fileSpreadsheet,
-                  color: AppColors.primary,
-                  size: 21,
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Excel / CSV formatida eksport',
-                    style: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            title: const Text('Excel’ga yuklash'),
             content: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 460),
+              constraints: const BoxConstraints(maxWidth: 440),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Qaysi toifadagi hisobotni eksport qilmoqchisiz? Barcha ma’lumotlar UTF-8 BOM bilan rasmiylashtiriladi (Excel o‘zbekcha harflarni to‘g‘ri ochadi).',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
-                        height: 1.4,
+                    for (final o in options)
+                      _buildExportOption(
+                        ctx,
+                        icon: o.$1,
+                        title: o.$2,
+                        onTap: () => _downloadExcel(context, o.$3, o.$4()),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildExportOption(
-                      ctx,
-                      icon: LucideIcons.users,
-                      title: 'O‘quvchilar ro‘yxati (${app.students.length} ta)',
-                      onTap:
-                          () => _displayCsvPreview(
-                            context,
-                            'O‘quvchilar_hisoboti.csv',
-                            app.exportStudentsCsv(),
-                          ),
-                    ),
-                    _buildExportOption(
-                      ctx,
-                      icon: LucideIcons.clipboardCheck,
-                      title:
-                          'Baholashlar hisoboti (${app.assessments.length} ta)',
-                      onTap:
-                          () => _displayCsvPreview(
-                            context,
-                            'Baholashlar_hisoboti.csv',
-                            app.exportAssessmentsCsv(),
-                          ),
-                    ),
-                    _buildExportOption(
-                      ctx,
-                      icon: LucideIcons.calendarDays,
-                      title:
-                          'Korreksion darslar va davomat (${app.sessions.length} ta)',
-                      onTap:
-                          () => _displayCsvPreview(
-                            context,
-                            'Mashgulotlar_davomat.csv',
-                            app.exportSessionsCsv(),
-                          ),
-                    ),
-                    _buildExportOption(
-                      ctx,
-                      icon: LucideIcons.bookOpenCheck,
-                      title:
-                          'ITR rejalari va maqsadlar (${app.iepPlans.length} ta)',
-                      onTap:
-                          () => _displayCsvPreview(
-                            context,
-                            'ITR_rejalari.csv',
-                            app.exportIepCsv(),
-                          ),
-                    ),
-                    _buildExportOption(
-                      ctx,
-                      icon: LucideIcons.shieldAlert,
-                      title: 'Monitoring signallari (${app.alerts.length} ta)',
-                      onTap:
-                          () => _displayCsvPreview(
-                            context,
-                            'Monitoring_signallari.csv',
-                            app.exportAlertsCsv(),
-                          ),
-                    ),
-                    _buildExportOption(
-                      ctx,
-                      icon: LucideIcons.arrowLeftRight,
-                      title:
-                          'Yo‘naltirishlar jurnali (${app.referrals.length} ta)',
-                      onTap:
-                          () => _displayCsvPreview(
-                            context,
-                            'Yonaltirishlar_jurnali.csv',
-                            app.exportReferralsCsv(),
-                          ),
-                    ),
-                    _buildExportOption(
-                      ctx,
-                      icon: LucideIcons.activity,
-                      title:
-                          'Monitoring va Svetofor hisoboti (Oxirgi 30 kun CSV)',
-                      onTap:
-                          () => _displayCsvPreview(
-                            context,
-                            'Monitoring_va_Svetofor_hisoboti.csv',
-                            app.exportMonitoringReportCsv(),
-                          ),
-                    ),
-                    _buildExportOption(
-                      ctx,
-                      icon: LucideIcons.userCheck,
-                      title: 'Mutaxassislar faolligi va qamrov jadvali (CSV)',
-                      onTap:
-                          () => _displayCsvPreview(
-                            context,
-                            'Mutaxassislar_faolligi.csv',
-                            app.exportSpecialistActivityCsv(),
-                          ),
-                    ),
-                    _buildExportOption(
-                      ctx,
-                      icon: LucideIcons.databaseBackup,
-                      title: 'To‘liq ma’lumotlar bazasi zaxirasi (JSON Backup)',
-                      onTap:
-                          () => _displayCsvPreview(
-                            context,
-                            'database_backup.json',
-                            app.exportDatabaseBackupJson(),
-                          ),
-                    ),
                   ],
                 ),
               ),
@@ -181,139 +97,45 @@ class ReportsScreen extends StatelessWidget {
     required String title,
     required VoidCallback onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: SurfaceCard(
-        elevated: false,
-        borderRadius: 12,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        backgroundColor: AppColors.glassWellFill,
-        borderColor: AppColors.glassInnerBorder,
-        onTap: () {
-          Navigator.pop(ctx);
-          onTap();
-        },
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: () {
+        Navigator.pop(ctx);
+        onTap();
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.primary, size: 19),
+            Icon(icon, color: AppColors.textSecondary, size: 18),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
+                style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
               ),
             ),
-            Icon(
-              LucideIcons.chevronRight,
-              size: 16,
-              color: AppColors.textSubtle,
-            ),
+            Icon(LucideIcons.download, size: 16, color: AppColors.textSubtle),
           ],
         ),
       ),
     );
   }
 
-  void _displayCsvPreview(
-    BuildContext context,
-    String filename,
-    String csvData,
-  ) {
-    showDialog(
-      context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: Text(
-              'CSV fayli tayyor: $filename',
-              style: const TextStyle(
-                fontSize: 15.5,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            content: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Fayl mazmuni muvaffaqiyatli shakllantirildi. Ma’lumotlarni xotiraga nusxalab Excel dasturida ochishingiz mumkin:',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  GlassWell(
-                    borderRadius: 12,
-                    padding: const EdgeInsets.all(14),
-                    child: SizedBox(
-                      height: 220,
-                      width: double.maxFinite,
-                      child: SingleChildScrollView(
-                        child: Text(
-                          csvData,
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 12,
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Yopish'),
-              ),
-              OutlinedButton.icon(
-                icon: const Icon(LucideIcons.copy, size: 15),
-                label: const Text('Nusxa olish'),
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: csvData));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('$filename mazmuni xotiraga nusxalandi!'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
-                },
-              ),
-              FilledButton.icon(
-                icon: const Icon(LucideIcons.download, size: 15),
-                label: const Text('Yuklab olish'),
-                onPressed: () {
-                  downloadFile(
-                    filename,
-                    csvData,
-                    mimeType:
-                        filename.endsWith('.json')
-                            ? 'application/json;charset=utf-8'
-                            : 'text/csv;charset=utf-8',
-                  );
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        '$filename fayli kompyuteringizga yuklab olindi!',
-                      ),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+  void _downloadExcel(BuildContext context, String name, String csv) {
+    final now = DateTime.now();
+    final date =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final file = '${name}_$date.xlsx';
+    downloadBytes(
+      file,
+      csvToXlsx(csv, sheetName: name),
+      mimeType:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('Yuklab olindi: $file')));
   }
 
   @override
@@ -337,13 +159,13 @@ class ReportsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AdaptivePageHeader(
-              title: 'Tahliliy hisobotlar',
+              title: 'Hisobotlar',
               icon: LucideIcons.chartBar,
-              subtitle: 'Pedagogik monitoring bo‘yicha rasmiy ko‘rsatkichlar',
+              subtitle: 'Ko‘rsatkichlar va Excel',
               action: HeaderActionButton(
-                icon: LucideIcons.download,
-                label: 'CSV / JSON eksport',
-                onPressed: () => _showCsvExportDialog(context),
+                icon: LucideIcons.fileSpreadsheet,
+                label: 'Excel’ga yuklash',
+                onPressed: () => _showExcelDialog(context),
               ),
             ),
             const SizedBox(height: 18),
@@ -356,26 +178,26 @@ class ReportsScreen extends StatelessWidget {
               spacing: 16,
               children: [
                 _buildSummaryStatCard(
-                  label: 'Jami ro‘yxatdagi bolalar',
+                  label: 'Bolalar',
                   value: '${students.length}',
                   caption:
                       report != null
-                          ? '${report.childrenWorkedWith} tasi bilan ishlangan • ${report.childrenNotWorkedWith} tasi kutilmoqda'
-                          : '100% inklyuziv qamrovda',
+                          ? '${report.childrenWorkedWith} tasi bilan ish qilingan'
+                          : '',
                   icon: LucideIcons.users,
                   accent: AppColors.primary,
                 ),
                 _buildSummaryStatCard(
-                  label: 'O‘tkazilgan baholashlar',
+                  label: 'Baholashlar',
                   value: '${assessments.length}',
-                  caption: 'Barcha diagnostik yo‘nalishlar',
+                  caption: '',
                   icon: LucideIcons.clipboardCheck,
                   accent: AppColors.info,
                 ),
                 _buildSummaryStatCard(
-                  label: 'Korreksion darslar',
+                  label: 'Darslar',
                   value: '${sessions.length}',
-                  caption: 'Davomat va kuzatuv nazoratida',
+                  caption: '',
                   icon: LucideIcons.calendarCheck2,
                   accent: AppColors.purple,
                 ),
@@ -384,7 +206,11 @@ class ReportsScreen extends StatelessWidget {
             const SizedBox(height: 22),
 
             if (report != null) ...[
-              _buildMonitoringReportSection(report),
+              _buildMonitoringReportSection(
+                context,
+                report,
+                childChanges(assessments),
+              ),
               const SizedBox(height: 22),
               _buildSpecialistActivitySection(report),
               const SizedBox(height: 22),
@@ -407,7 +233,7 @@ class ReportsScreen extends StatelessWidget {
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'Individual ta’lim rejalari (ITR) monitoring hisoboti',
+                          'ITR rejalari',
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 15.5,
@@ -422,7 +248,7 @@ class ReportsScreen extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 18),
                       child: Text(
-                        'ITR rejalari mavjud emas.',
+                        'Reja yo‘q',
                         style: TextStyle(color: AppColors.textMuted),
                       ),
                     )
@@ -544,120 +370,208 @@ class ReportsScreen extends StatelessWidget {
             value,
             style: TextStyle(
               fontSize: 30,
-              fontWeight: FontWeight.w700,
-              color: accent,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
               letterSpacing: -0.8,
               height: 1.05,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
-          const SizedBox(height: 6),
-          Text(
-            caption,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 12,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w500,
-              height: 1.35,
+          if (caption.isNotEmpty) const SizedBox(height: 6),
+          if (caption.isNotEmpty)
+            Text(
+              caption,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+                height: 1.35,
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildMonitoringReportSection(MonitoringReport report) {
-    final redCount = report.statusCounts[StatusColor.red] ?? 0;
-    final yellowCount = report.statusCounts[StatusColor.yellow] ?? 0;
-    final greenCount = report.statusCounts[StatusColor.green] ?? 0;
-    final growthCount = report.dynamicsCounts[DynamicsStatus.growth] ?? 0;
-    final stagnantCount = report.dynamicsCounts[DynamicsStatus.stable] ?? 0;
-    final declineCount = report.dynamicsCounts[DynamicsStatus.decline] ?? 0;
-    final ineffectiveCount =
-        report.dynamicsCounts[DynamicsStatus.ineffective] ?? 0;
+  Widget _buildMonitoringReportSection(
+    BuildContext context,
+    MonitoringReport report,
+    List<ChildChange> changes,
+  ) {
+    Widget countRow(Widget label, int n) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        children: [
+          label,
+          const Spacer(),
+          Text(
+            '$n',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
+    Widget subTitle(String t) => Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        t,
+        style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+      ),
+    );
+
+    final holat = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        subTitle('Holat'),
+        for (final c in StatusColor.values)
+          countRow(ChildStatusLabel(c), report.statusCounts[c] ?? 0),
+      ],
+    );
+    final ozgarish = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        subTitle('O‘zgarish'),
+        countRow(
+          const DynamicsLabel(DynamicsStatus.growth),
+          report.dynamicsCounts[DynamicsStatus.growth] ?? 0,
+        ),
+        countRow(
+          const DynamicsLabel(DynamicsStatus.stable),
+          report.dynamicsCounts[DynamicsStatus.stable] ?? 0,
+        ),
+        countRow(
+          const DynamicsLabel(DynamicsStatus.decline),
+          report.dynamicsCounts[DynamicsStatus.decline] ?? 0,
+        ),
+        countRow(
+          const DynamicsLabel(DynamicsStatus.ineffective),
+          report.dynamicsCounts[DynamicsStatus.ineffective] ?? 0,
+        ),
+      ],
+    );
+    final withChange =
+        changes.where((c) => c.percent != null).take(10).toList();
 
     return SurfaceCard(
-      borderRadius: 26,
-      padding: const EdgeInsets.all(22),
+      borderRadius: 20,
+      padding: const EdgeInsets.all(20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Icon(LucideIcons.activity, size: 20, color: AppColors.primary),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Svetofor holati va rivojlanish dinamikasi hisoboti (oxirgi 30 kun)',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15.5,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-            ],
+          Text(
+            'Bolalar holati va o‘zgarish',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              color: AppColors.textPrimary,
+            ),
           ),
-          const SizedBox(height: 14),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              StatusPill(
-                label: 'Qizil (Ishlanmagan): $redCount ta',
-                color: AppColors.error,
-                backgroundColor: AppColors.errorBg,
-              ),
-              StatusPill(
-                label: 'Sariq (E’tibor talab): $yellowCount ta',
-                color: AppColors.warning,
-                backgroundColor: AppColors.warningBg,
-              ),
-              StatusPill(
-                label: 'Yashil (Ijobiy natija): $greenCount ta',
-                color: AppColors.success,
-                backgroundColor: AppColors.successBg,
-              ),
-              StatusPill(
-                label: 'O‘sish: $growthCount',
-                color: AppColors.success,
-              ),
-              StatusPill(
-                label: '⏸ Barqaror: $stagnantCount',
-                color: AppColors.warning,
-              ),
-              StatusPill(
-                label:
-                    'Pasayish / Samarasiz: ${declineCount + ineffectiveCount}',
-                color: AppColors.error,
-              ),
-            ],
+          const SizedBox(height: 2),
+          Text(
+            'So‘nggi 30 kun',
+            style: TextStyle(fontSize: 13, color: AppColors.textMuted),
           ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder:
+                (context, c) =>
+                    c.maxWidth < 560
+                        ? Column(
+                          children: [
+                            holat,
+                            const SizedBox(height: 16),
+                            ozgarish,
+                          ],
+                        )
+                        : Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: holat),
+                            const SizedBox(width: 32),
+                            Expanded(child: ozgarish),
+                          ],
+                        ),
+          ),
+          if (withChange.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Divider(height: 1, color: AppColors.border),
+            const SizedBox(height: 12),
+            subTitle('Bolalar bo‘yicha'),
+            for (final ch in withChange) _changeLine(context, ch),
+          ],
           if (report.notWorkedWithNames.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.errorBg,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppColors.error.withValues(alpha: 0.35),
-                ),
-              ),
-              child: Text(
-                'Oxirgi 30 kunda hech qanday ish qayd etilmagan o‘quvchilar (${report.notWorkedWithNames.length} nafar): ${report.notWorkedWithNames.join(", ")}',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.error,
-                ),
-              ),
+            const SizedBox(height: 12),
+            Text(
+              '30 kunda ish qayd etilmagan: ${report.notWorkedWithNames.join(", ")}',
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _changeLine(BuildContext context, ChildChange ch) {
+    final pct = ch.percent!;
+    final st = ch.result.status;
+    final color =
+        st == DynamicsStatus.growth
+            ? const Color(0xFF1F8A55)
+            : st == DynamicsStatus.decline
+            ? const Color(0xFFD23C41)
+            : AppColors.textMuted;
+    return InkWell(
+      onTap:
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => StudentDetailScreen(studentId: ch.last.studentId),
+            ),
+          ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: ch.last.studentName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '  ·  ${ch.last.category}',
+                      style: TextStyle(color: AppColors.textMuted),
+                    ),
+                  ],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+            Text(
+              '${pct >= 0 ? '▲' : '▼'} ${pct.abs().round()}%',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: color,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -675,7 +589,7 @@ class ReportsScreen extends StatelessWidget {
               SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Mutaxassislar faolligi va qamrov jadvali',
+                  'Mutaxassislar ishi',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 15.5,
@@ -687,10 +601,7 @@ class ReportsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           if (report.specialists.isEmpty)
-            Text(
-              'Mutaxassislar ma’lumotlari topilmadi.',
-              style: TextStyle(color: AppColors.textMuted),
-            )
+            Text('Ma’lumot yo‘q', style: TextStyle(color: AppColors.textMuted))
           else
             ...report.specialists.map((sp) {
               final pct = (sp.coverage * 100).round();
@@ -718,7 +629,7 @@ class ReportsScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 3),
                             Text(
-                              '${sp.role} • Biriktirilgan: ${sp.childrenAssigned} nafar • Ishlangan: ${sp.childrenWorkedWith} nafar • Jami yozuvlar: ${sp.totalRecords} ta',
+                              '${sp.role} · ${sp.childrenWorkedWith} / ${sp.childrenAssigned} bola bilan ishlagan · ${sp.totalRecords} ta yozuv',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
@@ -728,15 +639,18 @@ class ReportsScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      StatusPill(
-                        label: 'Qamrov: $pct%',
-                        color:
-                            pct >= 70
-                                ? AppColors.success
-                                : pct >= 30
-                                ? AppColors.warning
-                                : AppColors.error,
-                      ),
+                      if (sp.childrenAssigned == 0)
+                        Text('—', style: TextStyle(color: AppColors.textMuted))
+                      else
+                        StatusPill(
+                          label: '$pct%',
+                          color:
+                              pct >= 70
+                                  ? AppColors.success
+                                  : pct >= 30
+                                  ? AppColors.warning
+                                  : AppColors.error,
+                        ),
                     ],
                   ),
                 ),

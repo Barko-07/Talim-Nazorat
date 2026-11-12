@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../core/config/app_config.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/namangan_data.dart';
+import '../../core/utils/uz_phone.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/student_model.dart';
 import '../../models/user_model.dart';
@@ -26,42 +27,31 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   final _firstNameCtrl = TextEditingController();
   final _lastNameCtrl = TextEditingController();
   final _middleNameCtrl = TextEditingController();
-  final _guardianNameCtrl = TextEditingController();
-  final _guardianPhoneCtrl = TextEditingController();
+  final _otherNeedCtrl = TextEditingController();
+  final List<_GuardianInput> _guardians = [_GuardianInput()];
   final _addressCtrl = TextEditingController();
   final _medicalNotesCtrl = TextEditingController();
   final _psychNotesCtrl = TextEditingController();
 
   String _gender = 'Erkak';
-  String _grade = '1-A';
+  // Sinf erkin kiritiladi: "3-B", "5-V", "Tayyorlov".
+  final _gradeCtrl = TextEditingController();
   String _supportLevel = '2-daraja (O‘rta yordam - doimiy korreksiya)';
   String _primaryNeed =
       'Nutqiy rivojlanishdan orqada qolish (Fonetik-fonematik)';
-  String _guardianRelation = 'Onasi';
   DateTime _dob = DateTime(2018, 5, 10);
   String _selectedDistrict = NamanganData.defaultDistrict;
   String _educationForm = StudentModel.educationForms.first;
   String _selectedInstitution = '';
 
-  static const List<String> _grades = [
-    'Tayyorlov guruhi',
-    '1-A',
-    '1-B',
-    '2-A',
-    '2-B',
-    '3-A',
-    '3-B',
-    '4-A',
-    '4-B',
-    '5-A',
-    '5-B',
-    '6-A',
-    '7-A',
-    '8-A',
-    '9-A',
-    '10-A',
-    '11-A',
-  ];
+  /// "3b", "3 B", "3-b" -> "3-B"; boshqa yozuv o'zgarishsiz qoladi.
+  static String _normalizeGrade(String v) {
+    final t = v.trim();
+    final m = RegExp(
+      r'^(\d{1,2})\s*[-\s]?\s*([A-Za-z\u0400-\u04FF])$',
+    ).firstMatch(t);
+    return m == null ? t : '${m.group(1)}-${m.group(2)!.toUpperCase()}';
+  }
 
   final List<String> _needs = [
     'Nutqiy rivojlanishdan orqada qolish (Fonetik-fonematik)',
@@ -71,7 +61,11 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     'Autizm spektri buzilishi (Yengil / O‘rta)',
     'Eshitish zaifligi (1-2 daraja)',
     'Bolalar serebral falaji (Harakat tayanch tizimi)',
+    _otherNeed,
   ];
+
+  static const _otherNeed = 'Boshqa';
+  static const _maxGuardians = 4;
 
   final List<String> _supportLevels = [
     '1-daraja (Yengil - minimal moslashtirish)',
@@ -115,9 +109,12 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     _firstNameCtrl.dispose();
     _lastNameCtrl.dispose();
     _middleNameCtrl.dispose();
-    _guardianNameCtrl.dispose();
-    _guardianPhoneCtrl.dispose();
+    _otherNeedCtrl.dispose();
+    for (final g in _guardians) {
+      g.dispose();
+    }
     _addressCtrl.dispose();
+    _gradeCtrl.dispose();
     _medicalNotesCtrl.dispose();
     _psychNotesCtrl.dispose();
     super.dispose();
@@ -147,8 +144,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                   user?.institutionId != null)
               ? user!.institutionId!
               : 'inst_${schoolName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_')}';
-      final guardianName = _guardianNameCtrl.text.trim();
-      final guardianPhone = _guardianPhoneCtrl.text.trim();
+      final address = _addressCtrl.text.trim();
       final newStudent = StudentModel(
         id: 'std_${const Uuid().v4().substring(0, 8)}',
         institutionId: schoolId,
@@ -161,9 +157,12 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                 : _middleNameCtrl.text.trim(),
         dateOfBirth: _dob,
         gender: _gender,
-        grade: _grade,
+        grade: _normalizeGrade(_gradeCtrl.text),
         status: 'Faol',
-        primaryNeed: _primaryNeed,
+        primaryNeed:
+            _primaryNeed == _otherNeed
+                ? _otherNeedCtrl.text.trim()
+                : _primaryNeed,
         supportLevel: _supportLevel,
         educationForm: _educationForm,
         medicalNotes:
@@ -176,18 +175,18 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                 : _psychNotesCtrl.text.trim(),
         // Vasiy faqat ma'lumot kiritilgan bo'lsa saqlanadi (soxta telefon yoki ism yozilmaydi)
         guardians: [
-          if (guardianName.isNotEmpty || guardianPhone.isNotEmpty)
-            GuardianModel(
-              id: 'g_${const Uuid().v4().substring(0, 6)}',
-              fullName:
-                  guardianName.isNotEmpty ? guardianName : _guardianRelation,
-              relationship: _guardianRelation,
-              phone: guardianPhone,
-              address:
-                  _addressCtrl.text.trim().isEmpty
-                      ? null
-                      : _addressCtrl.text.trim(),
-            ),
+          for (final g in _guardians)
+            if (g.hasData)
+              GuardianModel(
+                id: 'g_${const Uuid().v4().substring(0, 6)}',
+                fullName:
+                    g.name.text.trim().isNotEmpty
+                        ? g.name.text.trim()
+                        : g.relation,
+                relationship: g.relation,
+                phone: UzPhone.normalize(g.phone.text) ?? '',
+                address: address.isEmpty ? null : address,
+              ),
         ],
         createdAt: DateTime.now(),
       );
@@ -209,9 +208,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              '${newStudent.fullName} muvaffaqiyatli ro‘yxatga olindi!',
-            ),
+            content: Text('${newStudent.fullName} qo‘shildi'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -223,23 +220,12 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   Widget _buildSectionTitle({
     required IconData icon,
     required String title,
-    required String subtitle,
+    String? subtitle,
   }) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: AppColors.glassWellFill,
-            borderRadius: BorderRadius.circular(11),
-            border: Border.all(color: AppColors.glassInnerBorder, width: 1.0),
-          ),
-          alignment: Alignment.center,
-          child: Icon(icon, size: 18, color: AppColors.primary),
-        ),
-        const SizedBox(width: 13),
+        Icon(icon, size: 18, color: AppColors.textSecondary),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,25 +233,121 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               Text(
                 title,
                 style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15.5,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  height: 1.3,
                   color: AppColors.textPrimary,
-                  letterSpacing: -0.1,
-                  wordSpacing: 0.35,
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textMuted,
-                  height: 1.35,
+              if (subtitle != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.35,
+                    color: AppColors.textMuted,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _guardianBlock(int index, bool isCompact) {
+    final g = _guardians[index];
+    final relation = DropdownButtonFormField<String>(
+      key: ObjectKey(g),
+      initialValue: g.relation,
+      isExpanded: true,
+      decoration: const InputDecoration(labelText: 'Kim bo‘ladi'),
+      items: [
+        for (final r in _GuardianInput.relations)
+          DropdownMenuItem(value: r, child: Text(r)),
+      ],
+      onChanged: (v) => setState(() => g.relation = v!),
+    );
+    final phone = TextFormField(
+      controller: g.phone,
+      keyboardType: TextInputType.phone,
+      inputFormatters: [UzPhone.formatter],
+      decoration: InputDecoration(
+        labelText: 'Telefon',
+        hintText: UzPhone.hint,
+        prefixIcon: Icon(
+          LucideIcons.phone,
+          size: 17,
+          color: AppColors.textMuted,
+        ),
+      ),
+      validator:
+          (v) =>
+              UzPhone.isEmpty(v ?? '') || UzPhone.isValid(v ?? '')
+                  ? null
+                  : UzPhone.error,
+    );
+    return Column(
+      key: ObjectKey(g),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (_guardians.length > 1)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Text(
+                  '${index + 1}-vasiy',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed:
+                      () => setState(() {
+                        _guardians.removeAt(index).dispose();
+                      }),
+                  icon: const Icon(LucideIcons.x, size: 16),
+                  label: const Text('Olib tashlash'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textMuted,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        TextFormField(
+          controller: g.name,
+          textCapitalization: TextCapitalization.words,
+          decoration: InputDecoration(
+            labelText: 'F.I.Sh.',
+            prefixIcon: Icon(
+              LucideIcons.userCheck,
+              size: 18,
+              color: AppColors.textMuted,
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        if (isCompact) ...[
+          relation,
+          const SizedBox(height: 14),
+          phone,
+        ] else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: relation),
+              const SizedBox(width: 14),
+              Expanded(child: phone),
+            ],
+          ),
       ],
     );
   }
@@ -274,7 +356,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Yangi o‘quvchini ro‘yxatga olish')),
+      appBar: AppBar(title: const Text('Yangi bola')),
       body: AmbientMeshBackground(
         child: Form(
           key: _formKey,
@@ -296,9 +378,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                           children: [
                             _buildSectionTitle(
                               icon: LucideIcons.userRoundPlus,
-                              title: '1. O‘quvchining Shaxsiy Ma’lumotlari',
-                              subtitle:
-                                  'Asosiy F.I.Sh., jinsi va biriktirilgan sinf',
+                              title: 'Shaxsiy ma’lumotlar',
                             ),
                             const SizedBox(height: 20),
                             TextFormField(
@@ -371,23 +451,20 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                                 ),
                                 const SizedBox(width: 14),
                                 Expanded(
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _grade,
-                                    isExpanded: true,
+                                  child: TextFormField(
+                                    controller: _gradeCtrl,
+                                    textCapitalization:
+                                        TextCapitalization.characters,
                                     decoration: const InputDecoration(
-                                      labelText: 'Sinfi',
+                                      labelText: 'Sinfi *',
+                                      hintText: 'Masalan: 3-B',
                                     ),
-                                    items:
-                                        _grades
-                                            .map(
-                                              (g) => DropdownMenuItem(
-                                                value: g,
-                                                child: Text(g),
-                                              ),
-                                            )
-                                            .toList(),
-                                    onChanged:
-                                        (v) => setState(() => _grade = v!),
+                                    validator: (v) {
+                                      final t = (v ?? '').trim();
+                                      if (t.isEmpty) return 'Sinfni kiriting';
+                                      if (t.length > 20) return 'Juda uzun';
+                                      return null;
+                                    },
                                   ),
                                 ),
                               ],
@@ -532,16 +609,14 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                           children: [
                             _buildSectionTitle(
                               icon: LucideIcons.heartHandshake,
-                              title: '2. Alohida Ta’limiy Ehtiyoj',
-                              subtitle:
-                                  'Ehtiyoj toifasi, qo‘llab-quvvatlash darajasi va tavsiyalar',
+                              title: 'Ta’lim ehtiyoji',
                             ),
                             const SizedBox(height: 20),
                             DropdownButtonFormField<String>(
                               initialValue: _primaryNeed,
                               isExpanded: true,
                               decoration: const InputDecoration(
-                                labelText: 'Asosiy ta’limiy ehtiyoj toifasi',
+                                labelText: 'Asosiy ehtiyoj',
                               ),
                               items:
                                   _needs
@@ -561,6 +636,25 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               onChanged:
                                   (v) => setState(() => _primaryNeed = v!),
                             ),
+                            if (_primaryNeed == _otherNeed) ...[
+                              const SizedBox(height: 14),
+                              TextFormField(
+                                controller: _otherNeedCtrl,
+                                autofocus: true,
+                                textCapitalization:
+                                    TextCapitalization.sentences,
+                                decoration: const InputDecoration(
+                                  labelText: 'Ehtiyojni yozing *',
+                                  hintText: 'Masalan: Ko‘rish zaifligi',
+                                ),
+                                validator: (v) {
+                                  final t = (v ?? '').trim();
+                                  if (t.isEmpty) return 'Ehtiyojni yozing';
+                                  if (t.length > 120) return 'Juda uzun';
+                                  return null;
+                                },
+                              ),
+                            ],
                             const SizedBox(height: 14),
                             DropdownButtonFormField<String>(
                               initialValue: _supportLevel,
@@ -591,9 +685,8 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                               controller: _medicalNotesCtrl,
                               maxLines: 2,
                               decoration: const InputDecoration(
-                                labelText: 'Tibbiy xulosalar va cheklovlar',
-                                hintText:
-                                    'Masalan: Eshitish apparati taqqan, jismoniy zo‘riqish taqiqlangan',
+                                labelText: 'Tibbiy cheklovlar (ixtiyoriy)',
+                                hintText: 'Masalan: eshitish apparati taqadi',
                               ),
                             ),
                           ],
@@ -610,115 +703,37 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                           children: [
                             _buildSectionTitle(
                               icon: LucideIcons.usersRound,
-                              title: '3. Qonuniy Vasiy (Ota-ona)',
-                              subtitle:
-                                  'Bog‘lanish uchun aloqa va manzil ma’lumotlari',
+                              title: 'Vasiylar',
+                              subtitle: 'Ota-ona yoki boshqa vasiy',
                             ),
                             const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _guardianNameCtrl,
-                              decoration: InputDecoration(
-                                labelText: 'Vasiy to‘liq F.I.Sh.',
-                                prefixIcon: Icon(
-                                  LucideIcons.userCheck,
-                                  size: 18,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            if (isCompact) ...[
-                              DropdownButtonFormField<String>(
-                                initialValue: _guardianRelation,
-                                isExpanded: true,
-                                decoration: const InputDecoration(
-                                  labelText: 'Qarindoshligi',
-                                ),
-                                items:
-                                    [
-                                          'Onasi',
-                                          'Otasi',
-                                          'Bobosi',
-                                          'Buvasi',
-                                          'Vasiy',
-                                        ]
-                                        .map(
-                                          (r) => DropdownMenuItem(
-                                            value: r,
-                                            child: Text(r),
-                                          ),
-                                        )
-                                        .toList(),
-                                onChanged:
-                                    (v) =>
-                                        setState(() => _guardianRelation = v!),
-                              ),
-                              const SizedBox(height: 14),
-                              TextFormField(
-                                controller: _guardianPhoneCtrl,
-                                decoration: InputDecoration(
-                                  labelText: 'Telefon raqami',
-                                  hintText: '+998 90 123-45-67',
-                                  prefixIcon: Icon(
-                                    LucideIcons.phone,
-                                    size: 17,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                            ] else
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: DropdownButtonFormField<String>(
-                                      initialValue: _guardianRelation,
-                                      isExpanded: true,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Qarindoshligi',
+                            for (var i = 0; i < _guardians.length; i++) ...[
+                              if (i > 0) ...[
+                                const SizedBox(height: 16),
+                                Divider(height: 1, color: AppColors.border),
+                                const SizedBox(height: 12),
+                              ],
+                              _guardianBlock(i, isCompact),
+                            ],
+                            if (_guardians.length < _maxGuardians) ...[
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: OutlinedButton.icon(
+                                  onPressed:
+                                      () => setState(
+                                        () => _guardians.add(_GuardianInput()),
                                       ),
-                                      items:
-                                          [
-                                                'Onasi',
-                                                'Otasi',
-                                                'Bobosi',
-                                                'Buvasi',
-                                                'Vasiy',
-                                              ]
-                                              .map(
-                                                (r) => DropdownMenuItem(
-                                                  value: r,
-                                                  child: Text(r),
-                                                ),
-                                              )
-                                              .toList(),
-                                      onChanged:
-                                          (v) => setState(
-                                            () => _guardianRelation = v!,
-                                          ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: _guardianPhoneCtrl,
-                                      decoration: InputDecoration(
-                                        labelText: 'Telefon raqami',
-                                        hintText: '+998 90 123-45-67',
-                                        prefixIcon: Icon(
-                                          LucideIcons.phone,
-                                          size: 17,
-                                          color: AppColors.primary,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                  icon: const Icon(LucideIcons.plus, size: 16),
+                                  label: const Text('Vasiy qo‘shish'),
+                                ),
                               ),
+                            ],
                             const SizedBox(height: 14),
                             TextFormField(
                               controller: _addressCtrl,
                               decoration: InputDecoration(
-                                labelText: 'Yashash manzili',
+                                labelText: 'Yashash manzili (ixtiyoriy)',
                                 prefixIcon: Icon(
                                   LucideIcons.mapPin,
                                   size: 17,
@@ -737,10 +752,10 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                         ),
                         icon: const Icon(LucideIcons.circleCheck, size: 18),
                         label: const Text(
-                          'O‘quvchini tizimga saqlash',
+                          'Saqlash',
                           style: TextStyle(
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         onPressed: _saveStudent,
@@ -780,5 +795,29 @@ class _OwnSchoolField extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
     );
+  }
+}
+
+/// Bitta vasiy maydonlari (ism, kim bo'ladi, telefon).
+class _GuardianInput {
+  static const relations = [
+    'Onasi',
+    'Otasi',
+    'Bobosi',
+    'Buvisi',
+    'Akasi / opasi',
+    'Vasiy',
+  ];
+
+  final name = TextEditingController();
+  final phone = TextEditingController(text: UzPhone.prefix);
+  String relation = relations.first;
+
+  bool get hasData =>
+      name.text.trim().isNotEmpty || !UzPhone.isEmpty(phone.text);
+
+  void dispose() {
+    name.dispose();
+    phone.dispose();
   }
 }

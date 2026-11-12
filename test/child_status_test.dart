@@ -123,7 +123,7 @@ void main() {
     await measure('c_once', psy, 2, DateTime.now());
     final s = status('c_once');
     expect(s.color, StatusColor.yellow);
-    expect(s.reasons.join(), contains('ijobiy natija hali qayd etilmagan'));
+    expect(s.reasons.join(), contains('natija hali yetarli emas'));
   });
 
   test('YELLOW: decline in a measurement', () async {

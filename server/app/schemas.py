@@ -124,6 +124,7 @@ class RegistrationIdIn(Strict):
 
 class RegistrationVerifyIn(RegistrationIdIn):
     code: str = Field(pattern=r"^\d{6}$")
+    remember: bool = False  # phone app: stay signed in (ignored for admin roles)
 
 
 class ResetRequestIn(Strict):

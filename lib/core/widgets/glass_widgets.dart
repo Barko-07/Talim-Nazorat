@@ -940,37 +940,53 @@ class ModernPillFilterBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = AppColors.isDark;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      clipBehavior: Clip.none,
-      child: Container(
-        padding: const EdgeInsets.all(3.5),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceMuted : const Color(0xFFF1F5F9),
-          borderRadius: BorderRadius.circular(13),
-          border: Border.all(
-            color: isDark ? AppColors.border : const Color(0xFFE2E8F0),
-            width: 1.0,
-          ),
+    final wraps = items.length <= 4;
+    final pills = [
+      for (final item in items)
+        _ModernFilterPillItem(
+          item: item,
+          isSelected: item == selectedItem,
+          count: counts?[item],
+          accentColor: itemColors?[item],
+          onTap: () => onSelected(item),
+          bounded: wraps,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children:
-              items.map((item) {
-                final isSelected = item == selectedItem;
-                final count = counts?[item];
-                final accentColor = itemColors?[item];
+    ];
 
-                return _ModernFilterPillItem(
-                  item: item,
-                  isSelected: isSelected,
-                  count: count,
-                  accentColor: accentColor,
-                  onTap: () => onSelected(item),
-                );
-              }).toList(),
+    // Ramka joyida turadi, matn hech qachon ramka yoki ekran chetidan
+    // chiqmaydi: 4 tagacha variant sig'masa keyingi qatorga o'tadi; ko'p
+    // variantli ro'yxat ramka ichida suriladi va o'ng chetida xiralashadi.
+    final Widget content =
+        wraps
+            ? Wrap(spacing: 2, runSpacing: 2, children: pills)
+            : ShaderMask(
+              blendMode: BlendMode.dstIn,
+              shaderCallback:
+                  (r) => const LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    stops: [0.0, 0.88, 1.0],
+                    colors: [Colors.black, Colors.black, Colors.transparent],
+                  ).createShader(r),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(right: 24),
+                child: Row(mainAxisSize: MainAxisSize.min, children: pills),
+              ),
+            );
+
+    return Container(
+      padding: const EdgeInsets.all(3.5),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceMuted : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(
+          color: isDark ? AppColors.border : const Color(0xFFE2E8F0),
+          width: 1.0,
         ),
       ),
+      child: content,
     );
   }
 }
@@ -981,6 +997,7 @@ class _ModernFilterPillItem extends StatefulWidget {
   final int? count;
   final Color? accentColor;
   final VoidCallback onTap;
+  final bool bounded;
 
   const _ModernFilterPillItem({
     required this.item,
@@ -988,6 +1005,7 @@ class _ModernFilterPillItem extends StatefulWidget {
     required this.count,
     this.accentColor,
     required this.onTap,
+    this.bounded = false,
   });
 
   @override
@@ -997,6 +1015,17 @@ class _ModernFilterPillItem extends StatefulWidget {
 class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
   bool _hovered = false;
   bool _pressed = false;
+
+  Widget _label(Color activeTextColor) => AnimatedDefaultTextStyle(
+    duration: const Duration(milliseconds: 180),
+    curve: Curves.easeOutCubic,
+    style: TextStyle(
+      fontSize: 13,
+      fontWeight: widget.isSelected ? FontWeight.w700 : FontWeight.w600,
+      color: widget.isSelected ? activeTextColor : AppColors.textMuted,
+    ),
+    child: Text(widget.item, maxLines: 1, overflow: TextOverflow.ellipsis),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -1017,9 +1046,7 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
 
     // Chegara (Border) ranglari: xuddi shunday alpha orqali toza o'tadi
     final baseActiveBorder =
-        accent != null
-            ? accent.withValues(alpha: isDark ? 0.45 : 0.32)
-            : (isDark ? const Color(0x35FFFFFF) : AppColors.cardGlassBorder);
+        isDark ? const Color(0x35FFFFFF) : AppColors.cardGlassBorder;
     final baseInactiveBorder = baseActiveBorder.withValues(alpha: 0.0);
     final baseHoverBorder =
         baseActiveBorder.withValues(alpha: isDark ? 0.15 : 0.25);
@@ -1057,12 +1084,10 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
       ),
     ];
 
-    final activeTextColor = accent ?? AppColors.textPrimary;
-    final badgeAccent = accent ?? AppColors.primary;
-    final badgeActiveBg =
-        accent != null
-            ? accent.withValues(alpha: isDark ? 0.22 : 0.14)
-            : AppColors.primaryLight;
+    // Holat rangi faqat nuqtada; matn va hisoblagich doim neytral.
+    final activeTextColor = AppColors.textPrimary;
+    final badgeAccent = AppColors.primary;
+    final badgeActiveBg = AppColors.primaryLight;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -1095,26 +1120,17 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
                     width: 7,
                     height: 7,
                     decoration: BoxDecoration(
-                      color: accent,
+                      color: AppColors.statusDotFor(accent) ?? accent,
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 6),
                 ],
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 180),
-                  curve: Curves.easeOutCubic,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight:
-                        widget.isSelected ? FontWeight.w700 : FontWeight.w600,
-                    color:
-                        widget.isSelected
-                            ? activeTextColor
-                            : AppColors.textMuted,
-                  ),
-                  child: Text(widget.item),
-                ),
+                // Tor joyda (qatorga o'tgan ro'yxat) uzun nom "…" bilan
+                // qisqaradi; surilgan ro'yxatda to'liq turadi.
+                widget.bounded
+                    ? Flexible(child: _label(activeTextColor))
+                    : _label(activeTextColor),
                 if (widget.count != null) ...[
                   const SizedBox(width: 6),
                   AnimatedContainer(
@@ -1153,6 +1169,50 @@ class _ModernFilterPillItemState extends State<_ModernFilterPillItem> {
   }
 }
 
+/// Holat belgisi: neytral fon, neytral matn va oldida rangli dumaloq nuqta.
+class StatusDotLabel extends StatelessWidget {
+  final String label;
+  final Color dotColor;
+
+  const StatusDotLabel({super.key, required this.label, required this.dotColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppColors.border, width: 0.85),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                height: 1.2,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Minimalist holat nishoni (8px radius + 0.85px nozik chegara)
 class StatusPill extends StatelessWidget {
   final String label;
@@ -1176,6 +1236,14 @@ class StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Qizil/sariq/yashil holat: neytral belgi + rangli nuqta (rangli matn emas).
+    final dot = AppColors.statusDotFor(color);
+    if (dot != null) {
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: StatusDotLabel(label: label, dotColor: dot),
+      );
+    }
     final bg =
         backgroundColor ??
         color.withValues(alpha: AppColors.isDark ? 0.16 : 0.10);

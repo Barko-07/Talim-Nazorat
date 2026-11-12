@@ -1009,7 +1009,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               const SizedBox(width: 9),
               Expanded(
                 child: Text(
-                  'Bolalar holati (Svetofor nazorati)',
+                  'Bolalar holati',
                   style: TextStyle(
                     fontSize: 15.5,
                     fontWeight: FontWeight.w700,
@@ -1036,23 +1036,23 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
             runSpacing: 8,
             children: [
               StatusPill(
-                label: 'Qizil: $redCount nafar',
+                label: 'Ishlanmagan: $redCount',
                 color: AppColors.error,
                 backgroundColor: AppColors.errorBg,
               ),
               StatusPill(
-                label: 'Sariq: $yellowCount nafar',
+                label: 'E’tibor kerak: $yellowCount',
                 color: AppColors.warning,
                 backgroundColor: AppColors.warningBg,
               ),
               StatusPill(
-                label: 'Yashil: $greenCount nafar',
+                label: 'Ijobiy: $greenCount',
                 color: AppColors.success,
                 backgroundColor: AppColors.successBg,
               ),
               if (unassignedCount > 0)
                 StatusPill(
-                  label: 'Mutaxassissiz: $unassignedCount nafar',
+                  label: 'Mutaxassissiz: $unassignedCount',
                   color: AppColors.textSecondary,
                   backgroundColor: AppColors.surfaceMuted,
                 ),
@@ -1570,7 +1570,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                       onTap: () => widget.onNavigateTab(7),
                     ),
                     _buildMonitoringTile(
-                      title: 'Kutilayotgan Yo‘naltirishlar',
+                      title: 'Kutilayotgan yuborishlar',
                       value: '$pendingReferralsCount ta',
                       description:
                           'Mutaxassis tomonidan javob berilmagan yo‘llanmalar',

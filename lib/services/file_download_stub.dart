@@ -10,3 +10,7 @@ void downloadFile(
 void triggerBrowserPrint() {
   // Non-web stub
 }
+
+void downloadBytes(String filename, List<int> bytes, {required String mimeType}) {
+  // Non-web stub
+}

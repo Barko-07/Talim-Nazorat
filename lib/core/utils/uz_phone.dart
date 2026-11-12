@@ -12,21 +12,32 @@ class UzPhone {
 
   static final _local = RegExp(r'^[2-9][0-9]{8}$');
 
-  /// Kiritilgan matndagi mahalliy raqamlar (998 siz, ko'pi bilan 9 ta).
-  static String _localDigits(String input) {
+  /// Kiritilgan matndagi mahalliy raqamlar (998 siz, kesilmagan).
+  static String _strip(String input) {
     var d = input.replaceAll(RegExp(r'\D'), '');
+    // "+998 " allaqachon turgan maydonga to'liq raqam yozilsa yoki qo'yilsa,
+    // 998 ikki marta keladi — ortiqchasini olib tashlaymiz.
     if (d.startsWith('998')) d = d.substring(3);
+    while (d.length > 9 && d.startsWith('998')) {
+      d = d.substring(3);
+    }
+    return d;
+  }
+
+  /// Maydon uchun: ko'pi bilan 9 ta mahalliy raqam.
+  static String _localDigits(String input) {
+    final d = _strip(input);
     return d.length > 9 ? d.substring(0, 9) : d;
   }
 
   /// `+998` dan keyin hech narsa terilmagan.
   static bool isEmpty(String input) => _localDigits(input).isEmpty;
 
-  static bool isValid(String input) => _local.hasMatch(_localDigits(input));
+  static bool isValid(String input) => _local.hasMatch(_strip(input));
 
   /// "+998 90 123 45 67" - to'g'ri raqam bo'lsa, aks holda null.
   static String? normalize(String input) =>
-      isValid(input) ? _group(_localDigits(input)) : null;
+      isValid(input) ? _group(_strip(input)) : null;
 
   /// Saqlangan raqam maydonga: to'g'ri bo'lsa chiroyli ko'rinishda, bo'lmasa
   /// bo'sh prefiks (foydalanuvchi qaytadan teradi).

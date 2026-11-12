@@ -147,9 +147,19 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Yangi o‘quvchini ro‘yxatga olish'), findsOneWidget);
+        expect(find.text('Yangi bola'), findsOneWidget);
         expect(find.text('Familiyasi *'), findsOneWidget);
         expect(find.text('Qo‘llab-quvvatlash darajasi'), findsOneWidget);
+
+        // Bir nechta vasiy qo'shiladi va olib tashlanadi.
+        final addGuardian = find.text('Vasiy qo‘shish');
+        await tester.ensureVisible(addGuardian);
+        await tester.tap(addGuardian);
+        await tester.pumpAndSettle();
+        expect(find.text('2-vasiy'), findsOneWidget);
+        await tester.tap(find.text('Olib tashlash').last);
+        await tester.pumpAndSettle();
+        expect(find.text('2-vasiy'), findsNothing);
 
         // Sessiya taymeri to'xtatiladi (ilovada provayderni ChangeNotifierProvider yopadi)
         await tester.pumpWidget(const SizedBox());

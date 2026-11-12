@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../core/widgets/status_badge.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/glass_widgets.dart';
 import '../../models/achievement_model.dart';
@@ -52,7 +53,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     'Mashg‘ulotlar tarixi',
     'Individual ta’lim rejasi',
     'Rivojlanish dinamikasi',
-    'Yo‘naltirishlar',
+    'Yuborishlar',
     'Hujjatlar',
     'Faoliyat tarixi',
   ];
@@ -769,22 +770,12 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                               if (childSt == null) {
                                 return const SizedBox.shrink();
                               }
-                              final stColor = switch (childSt.color) {
-                                StatusColor.red => AppColors.error,
-                                StatusColor.yellow => AppColors.warning,
-                                StatusColor.green => AppColors.success,
-                              };
-                              final stBg = switch (childSt.color) {
-                                StatusColor.red => AppColors.errorBg,
-                                StatusColor.yellow => AppColors.warningBg,
-                                StatusColor.green => AppColors.successBg,
-                              };
-                              return StatusPill(
-                                label:
-                                    'Svetofor: ${childSt.color.label} (${childSt.color.meaning})',
-                                color: stColor,
-                                backgroundColor: stBg,
-                                showDot: true,
+                              return ChildStatusLabel(
+                                childSt.color,
+                                reason:
+                                    childSt.reasons.isNotEmpty
+                                        ? childSt.reasons.first
+                                        : null,
                               );
                             },
                           ),
@@ -1301,10 +1292,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                           color: AppColors.primary,
                           backgroundColor: AppColors.primaryLight,
                         ),
-                        StatusPill(
-                          label: p.dynamics.status.label,
-                          color: _dynamicsColor(p.dynamics.status),
-                          backgroundColor: _dynamicsBg(p.dynamics.status),
+                        DynamicsLabel(
+                          p.dynamics.status,
+                          text: p.dynamics.status.label,
                         ),
                       ],
                     ),
@@ -2301,21 +2291,6 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
     }
   }
 
-  static Color _dynamicsBg(DynamicsStatus st) {
-    switch (st) {
-      case DynamicsStatus.growth:
-        return AppColors.successBg;
-      case DynamicsStatus.decline:
-        return AppColors.errorBg;
-      case DynamicsStatus.stable:
-        return AppColors.primaryLight;
-      case DynamicsStatus.ineffective:
-        return AppColors.warningBg;
-      case DynamicsStatus.insufficientData:
-        return AppColors.surfaceMuted;
-    }
-  }
-
   Widget _buildDynamicsTab(
     StudentModel student,
     List<AssessmentModel> assessments,
@@ -2420,16 +2395,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 2),
-                    child: Icon(
-                      overallAssessmentDyn.status == DynamicsStatus.growth
-                          ? LucideIcons.trendingUp
-                          : overallAssessmentDyn.status ==
-                              DynamicsStatus.decline
-                          ? LucideIcons.trendingDown
-                          : LucideIcons.activity,
-                      color: _dynamicsColor(overallAssessmentDyn.status),
-                      size: 24,
-                    ),
+                    child: DynamicsIcon(overallAssessmentDyn.status, size: 24),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -2449,15 +2415,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                            StatusPill(
-                              label: overallAssessmentDyn.status.label,
-                              color: _dynamicsColor(
-                                overallAssessmentDyn.status,
-                              ),
-                              backgroundColor: _dynamicsBg(
-                                overallAssessmentDyn.status,
-                              ),
-                              showDot: true,
+                            DynamicsLabel(
+                              overallAssessmentDyn.status,
+                              text: overallAssessmentDyn.status.label,
                             ),
                           ],
                         ),
@@ -2512,7 +2472,6 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     );
                     if (records.isEmpty) return const SizedBox.shrink();
                     final c = _dynamicsColor(dyn.status);
-                    final bg = _dynamicsBg(dyn.status);
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 10),
@@ -2542,11 +2501,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
-                                    StatusPill(
-                                      label: dyn.status.label,
-                                      color: c,
-                                      backgroundColor: bg,
-                                      showDot: true,
+                                    DynamicsLabel(
+                                      dyn.status,
+                                      text: dyn.status.label,
                                     ),
                                   ],
                                 ),

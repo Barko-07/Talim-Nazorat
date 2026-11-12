@@ -112,7 +112,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
       if (_criteriaList.any((criterion) => criterion['rated'] != true)) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Saqlashdan oldin har bir mezonni baholang.'),
+            content: Text('Har bir mezonga daraja qo‘ying'),
             backgroundColor: AppColors.warning,
           ),
         );
@@ -126,7 +126,7 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
       if (_selectedStudentId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Iltimos, o‘quvchini tanlang!'),
+            content: Text('Bolani tanlang'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -226,7 +226,6 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
     final user = auth.currentUser;
     final role = user?.role ?? UserRole.psychologist;
     final students = app.students;
-    final roleIcon = premiumRoleIcon(role);
 
     if (role == UserRole.psychologist) {
       final initialStudent =
@@ -241,47 +240,38 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
     if (!role.canCreateAssessments) {
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('Baholash Huquqi Cheklangan')),
+        appBar: AppBar(title: const Text('Baholash')),
         body: AmbientMeshBackground(
           child: Center(
             child: ResponsivePageContainer(
               maxWidth: 520,
               child: SurfaceCard(
-                borderRadius: 26,
+                borderRadius: 20,
                 padding: const EdgeInsets.all(28),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      LucideIcons.shieldAlert,
-                      size: 40,
-                      color: AppColors.warning,
-                    ),
-                    const SizedBox(height: 16),
+                    Icon(LucideIcons.lock, size: 32, color: AppColors.textSubtle),
+                    const SizedBox(height: 12),
                     Text(
-                      '${role.label} hisobida baholash kiritish huquqi yo‘q',
+                      'Baholash kiritish huquqi yo‘q',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text(
-                      'Kuzatuvchi va metodistlar tizimda faqat o‘qish va monitoring hisobotlarini tahlil qilish vakolatiga ega.',
+                      'Sizning rolingiz faqat ko‘rish uchun',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: 13,
-                        height: 1.45,
-                      ),
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 13),
                     ),
-                    const SizedBox(height: 22),
-                    FilledButton.icon(
-                      icon: const Icon(LucideIcons.arrowLeft, size: 16),
+                    const SizedBox(height: 20),
+                    OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      label: const Text('Orqaga qaytish'),
+                      child: const Text('Orqaga'),
                     ),
                   ],
                 ),
@@ -303,210 +293,89 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
       _category = categories.first;
     }
 
+    Widget sectionTitle(String text, {Widget? trailing}) => Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          if (trailing != null) trailing,
+        ],
+      ),
+    );
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: Text('${role.label} Baholashi')),
+      appBar: AppBar(title: const Text('Yangi baholash')),
       body: AmbientMeshBackground(
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: ResponsivePageContainer(
-              maxWidth: 840,
+              maxWidth: 760,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 1. MUTAXASSISLIKNING RASMIY KASBIY VAKOLAT BANNERI
-                  GlassSurface(
-                    padding: const EdgeInsets.all(18),
-                    borderRadius: 26,
-                    opacity: 0.96,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: role.color.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: role.color.withValues(alpha: 0.18),
-                              width: 1.0,
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Icon(roleIcon, color: role.color, size: 19),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Wrap(
-                                spacing: 10,
-                                runSpacing: 6,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: [
-                                  StatusPill(
-                                    label: role.label,
-                                    color: role.color,
-                                    icon: LucideIcons.lock,
-                                  ),
-                                  Text(
-                                    user?.fullName ?? '',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 7),
-                              Text(
-                                'Ushbu baholash faqat sizning kasbiy sohangiz doirasida rasmiylashtiriladi.',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.textMuted,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Tibbiy tashxis emasligi haqida rasmiy eslatma
-                  GlassWell(
-                    borderRadius: 12,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 15,
-                      vertical: 12,
-                    ),
-                    tintColor: AppColors.infoBg,
-                    borderColor: AppColors.infoBorder,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 1),
-                          child: Icon(
-                            LucideIcons.info,
-                            color: AppColors.info,
-                            size: 18,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Eslatma: Ushbu baholash kasbiy pedagogik-psixologik kuzatuv hisoblanadi va tibbiy tashxis qo‘yish uchun asos bo‘lmaydi.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textPrimary,
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // 2. O'QUVCHI VA MA'LUMOTLAR
+                  // 1. Bola
                   SurfaceCard(
-                    borderRadius: 26,
-                    padding: const EdgeInsets.all(24),
+                    borderRadius: 20,
+                    padding: const EdgeInsets.all(20),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              LucideIcons.userRoundCheck,
-                              size: 20,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                'Baholanayotgan O‘quvchi',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 15.5,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 18),
-
+                        sectionTitle('Bola'),
                         DropdownButtonFormField<String>(
                           initialValue: _selectedStudentId,
                           isExpanded: true,
                           decoration: const InputDecoration(
-                            labelText: 'O‘quvchini tanlang *',
-                            prefixIcon: Icon(LucideIcons.userSearch, size: 18),
+                            labelText: 'Bola *',
+                            prefixIcon: Icon(LucideIcons.user, size: 18),
                           ),
-                          items:
-                              students
-                                  .map(
-                                    (s) => DropdownMenuItem(
-                                      value: s.id,
-                                      child: Text(
-                                        '${s.fullName} (${s.grade} - ${s.primaryNeed})',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
+                          items: [
+                            for (final st in students)
+                              DropdownMenuItem(
+                                value: st.id,
+                                child: Text(
+                                  '${st.fullName} · ${st.grade} sinf',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                          ],
                           onChanged:
                               (v) => setState(() => _selectedStudentId = v),
-                          validator:
-                              (v) => v == null ? 'O‘quvchini tanlang' : null,
+                          validator: (v) => v == null ? 'Bolani tanlang' : null,
                         ),
-                        const SizedBox(height: 14),
-
-                        DropdownButtonFormField<String>(
-                          initialValue: _category,
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            labelText: 'Kasbiy diagnostika yo‘nalishi *',
-                            prefixIcon: Icon(
-                              roleIcon,
-                              size: 19,
-                              color: role.color,
+                        if (categories.length > 1) ...[
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(
+                            initialValue: _category,
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Yo‘nalish',
                             ),
+                            items: [
+                              for (final c in categories)
+                                DropdownMenuItem(
+                                  value: c,
+                                  child: Text(c, overflow: TextOverflow.ellipsis),
+                                ),
+                            ],
+                            onChanged: (v) => setState(() => _category = v!),
                           ),
-                          items:
-                              categories
-                                  .map(
-                                    (c) => DropdownMenuItem(
-                                      value: c,
-                                      child: Text(
-                                        c,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged: (v) => setState(() => _category = v!),
-                        ),
-                        const SizedBox(height: 14),
-
+                        ],
+                        const SizedBox(height: 12),
                         TextFormField(
                           controller: _titleCtrl,
                           decoration: const InputDecoration(
-                            labelText: 'Baholash mavzusi / Test nomi *',
-                            prefixIcon: Icon(
-                              LucideIcons.clipboardList,
-                              size: 18,
-                            ),
+                            labelText: 'Baholash nomi *',
                           ),
                           validator:
                               (v) =>
@@ -517,249 +386,99 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
-                  // 3. SOHAGA MOS RUBRIKA MEZONLARI
+                  // 2. Mezonlar: har biri 0–5 daraja (bir daraja = max/5 ball)
                   SurfaceCard(
-                    borderRadius: 26,
-                    padding: const EdgeInsets.all(24),
+                    borderRadius: 20,
+                    padding: const EdgeInsets.all(20),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 10,
-                          alignment: WrapAlignment.spaceBetween,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  LucideIcons.slidersHorizontal,
-                                  size: 20,
-                                  color: role.color,
-                                ),
-                                const SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    'Kasbiy Rubrika Mezonlari',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 15.5,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                        sectionTitle(
+                          'Mezonlar',
+                          trailing: Text(
+                            '${_totalScore.toInt()} / ${_maxTotalScore.toInt()} ball',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondary,
+                              fontFeatures: const [FontFeature.tabularFigures()],
                             ),
-                            StatusPill(
-                              label:
-                                  'Jami: ${_totalScore.toInt()} / ${_maxTotalScore.toInt()} ball',
-                              color: role.color,
-                              backgroundColor: role.color.withValues(
-                                alpha: 0.08,
-                              ),
-                              icon: LucideIcons.award,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Har bir mezon bo‘yicha bolaning haqiqiy o‘zlashtirish darajasini belgilang:',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textMuted,
-                            height: 1.4,
                           ),
                         ),
-                        const SizedBox(height: 6),
                         Text(
-                          'Bu ichki pedagogik kuzatuv rubrikasi; standartlashtirilgan test yoki tibbiy tashxis o‘rnini bosmaydi. Faqat o‘tkazilgan kuzatuv natijalarini kiriting.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.warning,
-                            height: 1.4,
-                          ),
+                          '0 — shakllanmagan, 5 — to‘liq mustaqil',
+                          style: TextStyle(fontSize: 13, color: AppColors.textMuted),
                         ),
-                        const SizedBox(height: 18),
-
-                        // Dinamik mezon slayderlari
-                        ...List.generate(_criteriaList.length, (index) {
-                          final item = _criteriaList[index];
-                          final score = item['score'] as double;
-                          final max = item['max'] as double;
-                          final name = item['name'] as String;
-                          final rated = item['rated'] as bool;
-
-                          return GlassWell(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            borderRadius: 12,
-                            padding: const EdgeInsets.fromLTRB(15, 13, 15, 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        '${index + 1}. $name',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 14,
-                                          color: AppColors.textPrimary,
-                                          height: 1.35,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 11,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.surface,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: AppColors.border,
-                                          width: 0.85,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        rated
-                                            ? '${score.toInt()} / ${max.toInt()} ball'
-                                            : 'Baholanmagan',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 12,
-                                          color: role.color,
-                                          fontFeatures: const [
-                                            FontFeature.tabularFigures(),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                SliderTheme(
-                                  data: SliderTheme.of(context).copyWith(
-                                    trackHeight: 5.5,
-                                    thumbShape: const RoundSliderThumbShape(
-                                      enabledThumbRadius: 8,
-                                    ),
-                                  ),
-                                  child: Slider(
-                                    value: score,
-                                    min: 0,
-                                    max: max,
-                                    divisions: max.toInt(),
-                                    activeColor: role.color,
-                                    inactiveColor: role.color.withValues(
-                                      alpha: 0.16,
-                                    ),
-                                    label: '${score.toInt()}',
-                                    onChangeStart: (_) {
-                                      setState(() => item['rated'] = true);
-                                    },
-                                    onChanged: (v) {
-                                      setState(() {
-                                        item['score'] = v;
-                                        item['rated'] = true;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
+                        const SizedBox(height: 12),
+                        for (var i = 0; i < _criteriaList.length; i++)
+                          _CriterionLevels(
+                            name: _criteriaList[i]['name'] as String,
+                            max: _criteriaList[i]['max'] as double,
+                            score: _criteriaList[i]['score'] as double,
+                            rated: _criteriaList[i]['rated'] as bool,
+                            onPick: (level) => setState(() {
+                              final max = _criteriaList[i]['max'] as double;
+                              _criteriaList[i]['score'] = max * level / 5;
+                              _criteriaList[i]['rated'] = true;
+                            }),
+                          ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
-                  // 4. MUTAXASSIS XULOSASI VA TAVSIYALARI
+                  // 3. Xulosa
                   SurfaceCard(
-                    borderRadius: 26,
-                    padding: const EdgeInsets.all(24),
+                    borderRadius: 20,
+                    padding: const EdgeInsets.all(20),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              LucideIcons.sparkles,
-                              size: 20,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                'Mutaxassis Xulosasi va Pedagogik Tavsiyalar',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 15.5,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 18),
+                        sectionTitle('Xulosa'),
                         TextFormField(
                           controller: _notesCtrl,
                           maxLines: 3,
                           decoration: const InputDecoration(
-                            labelText:
-                                'Diagnostik pedagogik-psixologik xulosa *',
-                            hintText:
-                                'Bola erishgan natijalar, dinamika va xususiyatlar...',
+                            labelText: 'Xulosa *',
+                            alignLabelWithHint: true,
                           ),
                           validator:
                               (v) =>
                                   v == null || v.trim().isEmpty
-                                      ? 'Xulosa matnini kiriting'
+                                      ? 'Xulosani kiriting'
                                       : null,
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
                         TextFormField(
                           controller: _recommendationsCtrl,
                           maxLines: 2,
                           decoration: const InputDecoration(
-                            labelText:
-                                'Ota-ona va fan o‘qituvchilariga tavsiyalar *',
-                            hintText:
-                                'Uyda va darslarda qo‘llanilishi lozim bo‘lgan uslublar...',
+                            labelText: 'Tavsiyalar (ixtiyoriy)',
+                            hintText: 'Jamoa va o‘qituvchi uchun',
+                            alignLabelWithHint: true,
                           ),
-                          validator:
-                              (v) =>
-                                  v == null || v.trim().isEmpty
-                                      ? 'Tavsiyalarni kiriting'
-                                      : null,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-
-                  // SAQLASH TUGMASI
-                  FilledButton.icon(
+                  const SizedBox(height: 20),
+                  FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: role.color,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    icon: const Icon(LucideIcons.circleCheck, size: 18),
-                    label: Text(
-                      '${role.label} Baholashini Saqlash',
-                      style: const TextStyle(
-                        fontSize: 15.5,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      minimumSize: const Size.fromHeight(52),
                     ),
                     onPressed: _saveAssessment,
+                    child: const Text(
+                      'Saqlash',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Pedagogik kuzatuv, tibbiy tashxis emas',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
                 ],
               ),
@@ -770,3 +489,95 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
     );
   }
 }
+
+/// Bitta mezon: nomi va 0–5 daraja tugmalari (tanlangani ajralib turadi).
+class _CriterionLevels extends StatelessWidget {
+  final String name;
+  final double max;
+  final double score;
+  final bool rated;
+  final ValueChanged<int> onPick;
+
+  const _CriterionLevels({
+    required this.name,
+    required this.max,
+    required this.score,
+    required this.rated,
+    required this.onPick,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final level = rated && max > 0 ? (score / max * 5).round() : -1;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              Text(
+                rated ? '${score.toInt()} / ${max.toInt()}' : '—',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textMuted,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              for (var l = 0; l <= 5; l++) ...[
+                if (l > 0) const SizedBox(width: 6),
+                Expanded(
+                  child: Semantics(
+                    button: true,
+                    selected: l == level,
+                    label: '$name: $l',
+                    child: InkWell(
+                      onTap: () => onPick(l),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        height: 44,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: l == level ? AppColors.primaryLight : AppColors.surface,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: l == level ? AppColors.primary : AppColors.border,
+                            width: l == level ? 1.6 : 1,
+                          ),
+                        ),
+                        child: Text(
+                          '$l',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: l == level ? AppColors.primary : AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
