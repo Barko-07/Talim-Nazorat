@@ -11,6 +11,7 @@ import '../../core/widgets/glass_widgets.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/install_mode.dart';
+import '../../services/privacy_link.dart';
 import '../../services/auth_api.dart';
 import 'verification_screens.dart';
 import '../../core/utils/uz_phone.dart';
@@ -32,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen>
   final _loginIdentifierCtrl = TextEditingController();
   final _loginPasswordCtrl = TextEditingController();
   bool _loginObscure = true;
+  bool _privacyAccepted = false;
 
   // --- SIGN UP STEP MANAGEMENT ---
   int _signUpStep = 0;
@@ -446,6 +448,15 @@ class _LoginScreenState extends State<LoginScreen>
 
   void _handleSignUp() async {
     setState(() => _errorMessage = null);
+
+    if (!_privacyAccepted) {
+      setState(
+        () =>
+            _errorMessage =
+                'Ro‘yxatdan o‘tish uchun maxfiylik siyosatiga rozilik bering',
+      );
+      return;
+    }
 
     if (!_hasMinLength || !_hasUppercase || !_hasLowercase || !_hasDigit) {
       setState(
@@ -1003,6 +1014,10 @@ class _LoginScreenState extends State<LoginScreen>
           },
           child: _buildCurrentStepContent(auth),
         ),
+        if (_signUpStep == 3) ...[
+          const SizedBox(height: 16),
+          _buildPrivacyConsent(),
+        ],
         const SizedBox(height: 20),
         _buildStepActionButtons(auth),
         const SizedBox(height: 8),
@@ -1623,6 +1638,71 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
       ],
+    );
+  }
+
+  /// Shaxsga doir ma'lumotlarni qayta ishlashga rozilik (O'RQ-547): belgisiz
+  /// ro'yxatdan o'tib bo'lmaydi; server rozilik vaqtini qayd etadi.
+  Widget _buildPrivacyConsent() {
+    final linkStyle = _myGovFont(
+      fontSize: 13,
+      fontWeight: FontWeight.w600,
+      color: AppColors.primary,
+    );
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 10, 14, 10),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Checkbox(
+            value: _privacyAccepted,
+            onChanged: (v) => setState(() => _privacyAccepted = v ?? false),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap:
+                        () => setState(
+                          () => _privacyAccepted = !_privacyAccepted,
+                        ),
+                    child: Text(
+                      'Shaxsga doir ma’lumotlarimni qayta ishlashga roziman',
+                      style: _myGovFont(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  InkWell(
+                    onTap: openPrivacyPolicy,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Text(
+                        'Maxfiylik siyosatini o‘qish',
+                        style: linkStyle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

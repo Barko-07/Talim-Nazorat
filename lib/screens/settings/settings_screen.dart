@@ -11,6 +11,7 @@ import '../../core/widgets/theme_picker.dart';
 import '../../providers/theme_provider.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/privacy_link.dart';
 import '../auth/logout_dialog.dart';
 import '../auth/verification_screens.dart';
 import 'profile_edit_dialog.dart';
@@ -218,6 +219,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: 'Bog‘lanish',
                     subtitle: 'Chortoq tumani MMTB',
                     onTap: () => _showContactSheet(context, region, district),
+                  ),
+                  _buildMyGovMenuItem(
+                    icon: LucideIcons.fileLock2,
+                    title: 'Maxfiylik siyosati',
+                    subtitle: 'Ma’lumotlaringiz qanday saqlanadi',
+                    onTap: openPrivacyPolicy,
                   ),
                   if (AppConfig.serverMode)
                     _buildMyGovMenuItem(

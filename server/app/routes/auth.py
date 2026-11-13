@@ -680,6 +680,8 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
     s = ctx.settings
     ip = client_ip(request)
     _too_many(ctx, db, f"register-ip:{ip}", 5, 3600, ip, "registrations per IP")
+    if not body.privacy_accepted:
+        raise ApiError(422, "privacy_required", "Maxfiylik siyosatiga rozilik bering")
     email = body.email.lower()
     full_name = f"{body.last_name} {body.first_name}"
     problems = passwords.password_problems(body.password, email=email, full_name=full_name)
@@ -726,6 +728,8 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db),
                 "experience_years": body.experience_years,
                 "region": body.region, "district": body.district,
                 "institution_name": body.institution_name,
+                # When the person agreed to the privacy policy (proof of consent).
+                "privacy_accepted_at": now.isoformat(),
             },
         })
         db.commit()

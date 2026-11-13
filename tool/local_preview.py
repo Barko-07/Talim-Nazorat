@@ -123,7 +123,7 @@ assert r.status_code == 200, r.text
 r = c.post("/api/auth/register", json={
     "first_name": "Laylo", "last_name": "Ergasheva", "email": "laylo@maktab.uz",
     "phone": "+998 90 555 44 33", "role": "SPECIAL_EDUCATION", "institution_name": "14-sonli maktab",
-    "password": PASSWORD,
+    "password": PASSWORD, "privacy_accepted": True,
 }, headers=H)
 reg = r.json()["registration_id"]
 r = c.post("/api/auth/register/verify", json={"registration_id": reg, "code": last_code("laylo@maktab.uz")},

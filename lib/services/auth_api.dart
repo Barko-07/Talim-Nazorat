@@ -246,6 +246,8 @@ class AuthApi {
       'district': district,
       'institution_name': institutionName,
       'password': password,
+      // Forma faqat "Maxfiylik siyosatiga roziman" belgilangach yuboriladi.
+      'privacy_accepted': true,
     });
     return RegistrationStarted(
       r['registration_id'] as String,

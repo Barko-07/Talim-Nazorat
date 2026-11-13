@@ -280,6 +280,10 @@ async def journey_register(b):
     await s.shot("step4")
     await s.type("Parol", PW)
     await s.type("Parolni takrorlang", PW)
+    # Without the privacy consent the form is not sent.
+    await s.page.get_by_role("checkbox").last.click()
+    await s.page.wait_for_timeout(500)
+    await s.shot("consent")
     await s.press("Ro‘yxatdan o‘tish", last=True)
     await s.page.wait_for_timeout(2500)
     await s.semantics()

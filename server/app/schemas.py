@@ -109,6 +109,8 @@ class RegisterIn(Strict):
     district: PlainStr = Field(default="", max_length=100)
     institution_name: PlainStr = Field(min_length=2, max_length=200)
     password: str = Field(min_length=1, max_length=128)
+    # "Maxfiylik siyosatiga va ma'lumotlarimni qayta ishlashga roziman" (O'RQ-547)
+    privacy_accepted: bool = False
 
     @field_validator("role")
     @classmethod

@@ -11,7 +11,7 @@ from conftest import PASSWORD, Api, add_institution, add_user, db_session, last_
 FORM = {
     "first_name": "Dilnoza", "last_name": "Karimova", "email": "new.person@maktab.uz",
     "phone": "+998 90 111-22-33", "role": "TEACHER", "institution_name": "14-sonli maktab",
-    "password": "Yangi-Mustahkam-Parol-77",
+    "password": "Yangi-Mustahkam-Parol-77", "privacy_accepted": True,
 }
 
 

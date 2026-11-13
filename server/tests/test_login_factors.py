@@ -223,6 +223,7 @@ FORM = {
     "phone": "+998901112233", "role": "PSYCHOLOGIST", "specialization": "Psixolog",
     "qualification_category": "Birinchi", "experience_years": 4, "region": "Namangan viloyati",
     "district": "Namangan shahri", "institution_name": "14-sonli maktab", "password": NEW,
+    "privacy_accepted": True,
 }
 
 
@@ -375,3 +376,15 @@ def test_the_sign_up_form_lists_schools_by_name_only(api, app):
     assert r.status_code == 200
     assert [x["name"] for x in r.json()] == ["14-sonli maktab", "15-sonli maktab"]
     assert all(set(x) == {"id", "name"} for x in r.json())  # nothing else leaks
+
+
+def test_sign_up_needs_privacy_consent_and_records_when_it_was_given(api, app, _school):
+    r = api.post("/api/auth/register", {**FORM, "privacy_accepted": False})
+    assert r.status_code == 422 and r.json()["code"] == "privacy_required"
+    assert not [m for m in app.state.ctx.mailer.outbox if m.to == FORM["email"]]
+    r = api.post("/api/auth/register", FORM)
+    assert r.status_code == 202
+    with db_session(app) as db:
+        reg = db.scalars(select(PendingRegistration)).one()
+        import json as _json
+        assert _json.loads(reg.data)["profile"]["privacy_accepted_at"]
