@@ -51,13 +51,7 @@ class _ProfileEditDialogState extends State<_ProfileEditDialog> {
 
   @override
   void dispose() {
-    for (final c in [
-      _first,
-      _last,
-      _phone,
-      _region,
-      _district,
-    ]) {
+    for (final c in [_first, _last, _phone, _region, _district]) {
       c.dispose();
     }
     super.dispose();
@@ -154,7 +148,11 @@ class _ProfileEditDialogState extends State<_ProfileEditDialog> {
                   controller: _phone,
                   keyboardType: TextInputType.phone,
                   inputFormatters: [UzPhone.formatter],
-                  decoration: deco('Telefon', LucideIcons.phone, hint: UzPhone.hint),
+                  decoration: deco(
+                    'Telefon',
+                    LucideIcons.phone,
+                    hint: UzPhone.hint,
+                  ),
                   validator: (v) {
                     final t = v ?? '';
                     if (UzPhone.isEmpty(t)) return null;
@@ -162,7 +160,10 @@ class _ProfileEditDialogState extends State<_ProfileEditDialog> {
                   },
                 ),
                 const SizedBox(height: 12),
-                TextFormField(controller: _region, decoration: deco('Viloyat', LucideIcons.map)),
+                TextFormField(
+                  controller: _region,
+                  decoration: deco('Viloyat', LucideIcons.map),
+                ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _district,

@@ -13,6 +13,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../services/child_status_service.dart';
 import '../../students/student_detail_screen.dart';
 import '../../students/add_student_screen.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class AdminStudentsTab extends StatefulWidget {
   const AdminStudentsTab({super.key});
@@ -113,10 +114,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                   const SizedBox(height: 4),
                   Text(
                     'Viloyat va muassasalar kesimida ATEB bolalar hisobi, ta’limiy ehtiyojlari va individual profillari',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
                 ],
               );
@@ -146,11 +144,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
               if (isCompact) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    headerTexts,
-                    const SizedBox(height: 12),
-                    addBtn,
-                  ],
+                  children: [headerTexts, const SizedBox(height: 12), addBtn],
                 );
               }
 
@@ -170,9 +164,9 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -188,7 +182,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -206,7 +200,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -239,7 +233,7 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -487,9 +481,8 @@ class _AdminStudentsTabState extends State<AdminStudentsTab> {
                                 context,
                                 MaterialPageRoute(
                                   builder:
-                                      (_) => StudentDetailScreen(
-                                        studentId: s.id,
-                                      ),
+                                      (_) =>
+                                          StudentDetailScreen(studentId: s.id),
                                 ),
                               );
                             },

@@ -502,7 +502,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               unselectedLabelColor: AppColors.textMuted,
               indicatorSize: TabBarIndicatorSize.tab,
               indicator: BoxDecoration(
-                color: AppColors.isDark ? AppColors.surfaceRaised : Colors.white,
+                color:
+                    AppColors.isDark ? AppColors.surfaceRaised : Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color:

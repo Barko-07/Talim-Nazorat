@@ -1,6 +1,8 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'box_input_border.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../constants/app_colors.dart';
@@ -137,33 +139,39 @@ class AppTheme {
         filled: true,
         fillColor: AppColors.surfaceMuted,
         hoverColor: Colors.transparent,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 13.5,
-        ),
-        border: OutlineInputBorder(
+        // Nom doim ramka ichida, tepada: bosilganda sakramaydi va chiziqqa
+        // chiqmaydi.
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        contentPadding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+        border: BoxInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: AppColors.border, width: 1.0),
         ),
-        enabledBorder: OutlineInputBorder(
+        enabledBorder: BoxInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: AppColors.border, width: 1.0),
         ),
-        focusedBorder: OutlineInputBorder(
+        focusedBorder: BoxInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: AppColors.primary, width: 1.3),
         ),
-        errorBorder: OutlineInputBorder(
+        errorBorder: BoxInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: AppColors.errorBorder, width: 1.0),
         ),
-        focusedErrorBorder: OutlineInputBorder(
+        focusedErrorBorder: BoxInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: AppColors.error, width: 1.3),
         ),
         labelStyle: TextStyle(
           color: AppColors.textSecondary,
           fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+        // Tepadagi nom 75% ga kichraytiriladi: 16 -> ~12 px, o'qish qulay.
+        floatingLabelStyle: TextStyle(
+          color: AppColors.textSecondary,
+          fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
         hintStyle: TextStyle(color: AppColors.textSubtle, fontSize: 13),
@@ -259,7 +267,8 @@ class AppTheme {
         overlayColor: WidgetStateProperty.all(Colors.transparent),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: dark ? AppColors.surfaceMuted : const Color(0xFFF1F5F9),
+        backgroundColor:
+            dark ? AppColors.surfaceMuted : const Color(0xFFF1F5F9),
         selectedColor: AppColors.primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -281,10 +290,7 @@ class AppTheme {
         dividerColor: AppColors.hairlineBorder,
         overlayColor: WidgetStateProperty.all(Colors.transparent),
         splashFactory: NoSplash.splashFactory,
-        labelStyle: const TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 13,
-        ),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
         unselectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 13,

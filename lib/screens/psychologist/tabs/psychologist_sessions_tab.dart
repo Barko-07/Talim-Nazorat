@@ -11,6 +11,7 @@ import '../../../models/user_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../core/widgets/glass_widgets.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class PsychologistSessionsTab extends StatefulWidget {
   final VoidCallback? onScheduleNew;
@@ -155,10 +156,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                           height: 1.4,
                         ),
                       ),
-                      if (isCompact) ...[
-                        const SizedBox(height: 12),
-                        actionBtn,
-                      ],
+                      if (isCompact) ...[const SizedBox(height: 12), actionBtn],
                     ],
                   );
                 },
@@ -245,11 +243,11 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                         horizontal: 14,
                         vertical: 11,
                       ),
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.border),
                       ),
-                      enabledBorder: OutlineInputBorder(
+                      enabledBorder: BoxInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.border),
                       ),
@@ -812,7 +810,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                             horizontal: 14,
                             vertical: 10,
                           ),
-                          border: OutlineInputBorder(
+                          border: BoxInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
@@ -848,7 +846,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                               'Masalan: Xavotir darajasini pasaytirish mashg‘uloti',
                           filled: true,
                           fillColor: AppColors.surfaceMuted,
-                          border: OutlineInputBorder(
+                          border: BoxInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
@@ -872,7 +870,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                               'Masalan: O‘z-o‘zini nazorat qilish va irodaviy zo‘riqishni bartaraf etish',
                           filled: true,
                           fillColor: AppColors.surfaceMuted,
-                          border: OutlineInputBorder(
+                          border: BoxInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
@@ -901,7 +899,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: AppColors.surfaceMuted,
-                                    border: OutlineInputBorder(
+                                    border: BoxInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
@@ -941,7 +939,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: AppColors.surfaceMuted,
-                                    border: OutlineInputBorder(
+                                    border: BoxInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
@@ -1230,7 +1228,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                           'O‘quvchining reaksiyasi, mashqlarni bajarishi, xulq-atvori va dinamikasini tavsiflang...',
                       filled: true,
                       fillColor: AppColors.surfaceMuted,
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -1255,7 +1253,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                           'Navbatdagi uchrashuv rejasi, uyga mashqlar yoki tavsiyalar...',
                       filled: true,
                       fillColor: AppColors.surfaceMuted,
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -1351,7 +1349,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: AppColors.surfaceMuted,
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -1374,7 +1372,7 @@ class _PsychologistSessionsTabState extends State<PsychologistSessionsTab> {
                     controller: notesController,
                     decoration: const InputDecoration(
                       hintText: 'Sababi / Izoh (ixtiyoriy)',
-                      border: OutlineInputBorder(),
+                      border: BoxInputBorder(),
                     ),
                   ),
                 ],

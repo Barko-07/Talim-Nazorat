@@ -181,8 +181,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                             maxLines: 2,
                             decoration: const InputDecoration(
                               labelText: 'Sabab *',
-                              hintText:
-                                  'Nima uchun kerak',
+                              hintText: 'Nima uchun kerak',
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -191,8 +190,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                             maxLines: 2,
                             decoration: const InputDecoration(
                               labelText: 'Kuzatuvlar (ixtiyoriy)',
-                              hintText:
-                                  'Nimalar sezildi',
+                              hintText: 'Nimalar sezildi',
                             ),
                           ),
                         ],
@@ -246,9 +244,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(
-                                'Yuborildi',
-                              ),
+                              content: Text('Yuborildi'),
                               backgroundColor: AppColors.success,
                             ),
                           );
@@ -305,8 +301,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                       controller: outcomeCtrl,
                       maxLines: 3,
                       decoration: const InputDecoration(
-                        labelText:
-                            'Xulosa *',
+                        labelText: 'Xulosa *',
                         hintText: 'Nimalar aniqlandi',
                       ),
                     ),
@@ -336,9 +331,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                   if (outcomeCtrl.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          'Xulosani kiriting',
-                        ),
+                        content: Text('Xulosani kiriting'),
                         backgroundColor: AppColors.error,
                       ),
                     );
@@ -360,9 +353,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          'Yakunlandi',
-                        ),
+                        content: Text('Yakunlandi'),
                         backgroundColor: AppColors.success,
                       ),
                     );
@@ -749,7 +740,8 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
 
     return Scaffold(
       backgroundColor: canPop ? AppColors.background : Colors.transparent,
-      appBar: canPop ? AppBar(title: const Text('Mutaxassisga yuborish')) : null,
+      appBar:
+          canPop ? AppBar(title: const Text('Mutaxassisga yuborish')) : null,
       body: canPop ? AmbientMeshBackground(child: pageBody) : pageBody,
     );
   }

@@ -7,6 +7,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../models/assessment_question_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class QuestionEditorDialog extends StatefulWidget {
   final AssessmentQuestionModel? existingQuestion;
@@ -649,7 +650,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                           horizontal: 10,
                           vertical: 9,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -677,7 +678,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
                           horizontal: 10,
                           vertical: 9,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),

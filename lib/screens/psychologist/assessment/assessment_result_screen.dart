@@ -96,9 +96,12 @@ class AssessmentResultScreen extends StatelessWidget {
                 Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+                    borderRadius: BorderRadius.circular(22),
+                    side: BorderSide(
+                      color: AppColors.cardGlassBorder,
+                      width: 1.0,
+                    ),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -258,9 +261,12 @@ class AssessmentResultScreen extends StatelessWidget {
                   elevation: 0,
                   color: AppColors.surfaceMuted,
                   shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+                    borderRadius: BorderRadius.circular(22),
+                    side: BorderSide(
+                      color: AppColors.cardGlassBorder,
+                      width: 1.0,
+                    ),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -322,9 +328,12 @@ class AssessmentResultScreen extends StatelessWidget {
                   Card(
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+                      borderRadius: BorderRadius.circular(22),
+                      side: BorderSide(
+                        color: AppColors.cardGlassBorder,
+                        width: 1.0,
+                      ),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(18),
                       child: Column(
@@ -386,9 +395,12 @@ class AssessmentResultScreen extends StatelessWidget {
                 Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+                    borderRadius: BorderRadius.circular(22),
+                    side: BorderSide(
+                      color: AppColors.cardGlassBorder,
+                      width: 1.0,
+                    ),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -683,9 +695,12 @@ class AssessmentResultScreen extends StatelessWidget {
                       elevation: 0,
                       margin: const EdgeInsets.only(bottom: 10),
                       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+                        borderRadius: BorderRadius.circular(22),
+                        side: BorderSide(
+                          color: AppColors.cardGlassBorder,
+                          width: 1.0,
+                        ),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(14),
                         child: Column(

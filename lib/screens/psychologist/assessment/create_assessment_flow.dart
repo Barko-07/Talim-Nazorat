@@ -11,6 +11,7 @@ import '../../../models/student_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
 import 'conduct_assessment_screen.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class CreateAssessmentFlow extends StatefulWidget {
   final StudentModel? initialStudent;
@@ -624,7 +625,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                     horizontal: 10,
                     vertical: 9,
                   ),
-                  border: OutlineInputBorder(
+                  border: BoxInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -643,7 +644,7 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                     horizontal: 10,
                     vertical: 9,
                   ),
-                  border: OutlineInputBorder(
+                  border: BoxInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -873,9 +874,12 @@ class _CreateAssessmentFlowState extends State<CreateAssessmentFlow> {
                 key: ValueKey(q.id),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+                  borderRadius: BorderRadius.circular(22),
+                  side: BorderSide(
+                    color: AppColors.cardGlassBorder,
+                    width: 1.0,
+                  ),
+                ),
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
                   leading: Container(

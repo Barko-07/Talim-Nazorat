@@ -69,9 +69,9 @@ class AdminReportsTab extends StatelessWidget {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -145,9 +145,9 @@ class AdminReportsTab extends StatelessWidget {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -250,9 +250,9 @@ class AdminReportsTab extends StatelessWidget {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(

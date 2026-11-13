@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/namangan_data.dart';
 import '../../../providers/app_provider.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class AdminInstitutionsTab extends StatefulWidget {
   const AdminInstitutionsTab({super.key});
@@ -116,9 +117,9 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -135,7 +136,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -153,7 +154,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -184,7 +185,7 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -250,9 +251,12 @@ class _AdminInstitutionsTabState extends State<AdminInstitutionsTab> {
               return Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+                  borderRadius: BorderRadius.circular(22),
+                  side: BorderSide(
+                    color: AppColors.cardGlassBorder,
+                    width: 1.0,
+                  ),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
                   child: LayoutBuilder(

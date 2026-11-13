@@ -56,9 +56,8 @@ class _LoginScreenState extends State<LoginScreen>
   // Qadam 2: Kasbiy mutaxassislik va tuman/maktab
   UserRole _selectedRole = UserRole.psychologist;
   String _selectedDistrict = 'Chortoq tumani';
-  final _institutionCtrl = TextEditingController(
-    text: '9-sonli inklyuziv ta’lim tayanch maktabi',
-  );
+  // Maktab oldindan tanlanmaydi: xodim ro'yxatdan o'zi tanlaydi.
+  final _institutionCtrl = TextEditingController();
   final _specializationCtrl = TextEditingController();
 
   // Qadam 3: Aloqa ma'lumotlari
@@ -491,10 +490,7 @@ class _LoginScreenState extends State<LoginScreen>
       role: roleToRegister,
       region: NamanganData.defaultRegion,
       district: _selectedDistrict,
-      institutionName:
-          _institutionCtrl.text.trim().isNotEmpty
-              ? _institutionCtrl.text.trim()
-              : '9-sonli inklyuziv ta’lim tayanch maktabi',
+      institutionName: _institutionCtrl.text.trim(),
       specialization:
           _specializationCtrl.text.trim().isNotEmpty
               ? _specializationCtrl.text.trim()

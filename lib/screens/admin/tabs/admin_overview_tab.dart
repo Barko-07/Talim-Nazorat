@@ -15,6 +15,7 @@ import '../../../services/dynamics_service.dart';
 import '../../students/student_detail_screen.dart';
 import '../../../core/widgets/status_badge.dart';
 import 'admin_home_blocks.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class _AttentionItem {
   final StudentModel student;
@@ -742,7 +743,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         horizontal: 10,
                         vertical: 8,
                       ),
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
@@ -788,7 +789,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         horizontal: 10,
                         vertical: 8,
                       ),
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
@@ -834,7 +835,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         horizontal: 10,
                         vertical: 8,
                       ),
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
@@ -872,7 +873,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         horizontal: 10,
                         vertical: 8,
                       ),
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
@@ -927,7 +928,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                         horizontal: 10,
                         vertical: 8,
                       ),
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
@@ -1155,24 +1156,27 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                   ],
                 );
 
-                final toggleBtn = attentionCases.length > 5
-                    ? TextButton(
-                        onPressed: () {
-                          setState(
-                            () => _showAllAttentionCases = !_showAllAttentionCases,
-                          );
-                        },
-                        child: Text(
-                          _showAllAttentionCases
-                              ? 'Qisqartirish'
-                              : 'Barchasini ko‘rish (${attentionCases.length})',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                final toggleBtn =
+                    attentionCases.length > 5
+                        ? TextButton(
+                          onPressed: () {
+                            setState(
+                              () =>
+                                  _showAllAttentionCases =
+                                      !_showAllAttentionCases,
+                            );
+                          },
+                          child: Text(
+                            _showAllAttentionCases
+                                ? 'Qisqartirish'
+                                : 'Barchasini ko‘rish (${attentionCases.length})',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      )
-                    : null;
+                        )
+                        : null;
 
                 if (isCompact) {
                   return Column(
@@ -1293,9 +1297,7 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                                   decoration: BoxDecoration(
                                     color: AppColors.surface,
                                     borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(
-                                      color: AppColors.border,
-                                    ),
+                                    border: Border.all(color: AppColors.border),
                                   ),
                                   child: Text(
                                     '${item.student.grade} • ${item.student.institutionName}',
@@ -1476,7 +1478,11 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(LucideIcons.shield, color: AppColors.primary, size: 22),
+                    Icon(
+                      LucideIcons.shield,
+                      color: AppColors.primary,
+                      size: 22,
+                    ),
                     const SizedBox(width: 10),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 220),

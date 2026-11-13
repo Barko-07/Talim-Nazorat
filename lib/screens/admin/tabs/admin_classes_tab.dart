@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../models/user_model.dart';
 import '../../../providers/app_provider.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class AdminClassesTab extends StatefulWidget {
   const AdminClassesTab({super.key});
@@ -108,9 +109,9 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: TextField(
@@ -123,7 +124,7 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                     horizontal: 12,
                     vertical: 10,
                   ),
-                  border: OutlineInputBorder(
+                  border: BoxInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -157,9 +158,12 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
               return Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+                  borderRadius: BorderRadius.circular(22),
+                  side: BorderSide(
+                    color: AppColors.cardGlassBorder,
+                    width: 1.0,
+                  ),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
                   child: LayoutBuilder(
@@ -256,8 +260,9 @@ class _AdminClassesTabState extends State<AdminClassesTab> {
                                           ),
                                           decoration: BoxDecoration(
                                             color: AppColors.surfaceMuted,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
                                           ),
                                           child: Text(
                                             n,

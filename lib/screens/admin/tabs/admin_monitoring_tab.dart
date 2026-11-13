@@ -198,9 +198,9 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child:
                 filtered.isEmpty
                     ? Padding(
@@ -274,9 +274,7 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                           vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: color.withValues(
-                                            alpha: 0.12,
-                                          ),
+                                          color: color.withValues(alpha: 0.12),
                                           borderRadius: BorderRadius.circular(
                                             4,
                                           ),
@@ -367,40 +365,44 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                 ],
                               );
 
-                              final actionBtn = !a.isResolved
-                                  ? ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.success,
-                                      foregroundColor: AppColors.onPrimary,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 8,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      _showResolveAlertModal(
-                                        context,
-                                        a,
-                                        currentUser,
-                                      );
-                                    },
-                                    child: const Text(
-                                      'Chora ko‘rish / Hal etish',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  )
-                                  : null;
+                              final actionBtn =
+                                  !a.isResolved
+                                      ? ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.success,
+                                          foregroundColor: AppColors.onPrimary,
+                                          elevation: 0,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          _showResolveAlertModal(
+                                            context,
+                                            a,
+                                            currentUser,
+                                          );
+                                        },
+                                        child: const Text(
+                                          'Chora ko‘rish / Hal etish',
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      )
+                                      : null;
 
                               if (isCompact) {
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         iconBadge,
                                         const SizedBox(width: 14),
@@ -409,7 +411,10 @@ class _AdminMonitoringTabState extends State<AdminMonitoringTab> {
                                     ),
                                     if (actionBtn != null) ...[
                                       const SizedBox(height: 14),
-                                      SizedBox(width: double.infinity, child: actionBtn),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: actionBtn,
+                                      ),
                                     ],
                                   ],
                                 );

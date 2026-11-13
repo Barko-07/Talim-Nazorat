@@ -9,6 +9,7 @@ import '../../../providers/app_provider.dart';
 import '../assessment/assessment_compare_dialog.dart';
 import '../assessment/create_assessment_flow.dart';
 import '../../../core/widgets/glass_widgets.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class PsychologistDevelopmentMapTab extends StatefulWidget {
   final StudentModel? initialStudent;
@@ -135,11 +136,11 @@ class _PsychologistDevelopmentMapTabState
                       horizontal: 14,
                       vertical: 11,
                     ),
-                    border: OutlineInputBorder(
+                    border: BoxInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppColors.border),
                     ),
-                    enabledBorder: OutlineInputBorder(
+                    enabledBorder: BoxInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppColors.border),
                     ),
@@ -437,7 +438,10 @@ class _PsychologistDevelopmentMapTabState
                       'Tizim sun’iy yoki taxminiy ko‘rsatkichlarni yaratmaydi. '
                       'Haqiqiy tahlil uchun bolaga psixologik baholash o‘tkazing.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                     const SizedBox(height: 14),
                     HeaderActionButton(
@@ -475,8 +479,7 @@ class _PsychologistDevelopmentMapTabState
                         statusText = 'Maxsus korreksion yordam talab etiladi';
                       } else {
                         color = AppColors.info;
-                        statusText =
-                            'Rivojlanish bosqichida / Qisman mustaqil';
+                        statusText = 'Rivojlanish bosqichida / Qisman mustaqil';
                       }
 
                       return Padding(

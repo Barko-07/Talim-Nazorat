@@ -82,3 +82,21 @@ def test_rotate_key_reencrypts_everything_and_old_key_then_fails(monkeypatch, tm
     crypto.configure(old, "s")
     with pytest.raises(InvalidTag):
         crypto.decrypt(raw, "records.data")
+
+
+def test_add_schools_is_idempotent_and_keeps_existing_names(monkeypatch, tmp_path):
+    from app.models import Institution
+    url = f"sqlite:///{tmp_path / 's.db'}"
+    monkeypatch.setenv("DATABASE_URL", url)
+    db = Database(url)
+    db.create_all()
+    with db.sessionmaker() as s:
+        s.add(Institution(name="40-sonli maktab", region=""))
+        s.commit()
+    assert cli.main(["add-schools", "--region", "Chortoq tumani", "--last", "59"]) == 0
+    assert cli.main(["add-schools", "--region", "Chortoq tumani", "--last", "59"]) == 0
+    with db.sessionmaker() as s:
+        names = list(s.scalars(select(Institution.name)))
+    assert len(names) == 59 and names.count("40-sonli maktab") == 1
+    assert "1-sonli maktab" in names and "59-sonli maktab" in names
+    assert cli.main(["add-schools", "--region", "X", "--first", "5", "--last", "2"]) == 1

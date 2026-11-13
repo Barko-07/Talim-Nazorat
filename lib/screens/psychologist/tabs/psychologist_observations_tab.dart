@@ -10,6 +10,7 @@ import '../../../models/student_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../core/widgets/glass_widgets.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class PsychologistObservationsTab extends StatefulWidget {
   final StudentModel? preselectedStudent;
@@ -390,10 +391,7 @@ class _PsychologistObservationsTabState
                             icon: LucideIcons.bookOpen,
                           ),
                         ),
-                        if (!isCompact) ...[
-                          const SizedBox(width: 12),
-                          addBtn,
-                        ],
+                        if (!isCompact) ...[const SizedBox(width: 12), addBtn],
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -415,10 +413,7 @@ class _PsychologistObservationsTabState
                         height: 1.4,
                       ),
                     ),
-                    if (isCompact) ...[
-                      const SizedBox(height: 12),
-                      addBtn,
-                    ],
+                    if (isCompact) ...[const SizedBox(height: 12), addBtn],
                   ],
                 );
               },
@@ -447,11 +442,11 @@ class _PsychologistObservationsTabState
                       horizontal: 14,
                       vertical: 11,
                     ),
-                    border: OutlineInputBorder(
+                    border: BoxInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppColors.border),
                     ),
-                    enabledBorder: OutlineInputBorder(
+                    enabledBorder: BoxInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppColors.border),
                     ),
@@ -556,7 +551,10 @@ class _PsychologistObservationsTabState
                     const SizedBox(height: 4),
                     Text(
                       'Yangi kuzatuv qaydini kiritish uchun yuqoridagi tugmadan foydalaning',
-                      style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ],
                 ),

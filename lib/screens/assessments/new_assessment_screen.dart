@@ -251,7 +251,11 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(LucideIcons.lock, size: 32, color: AppColors.textSubtle),
+                    Icon(
+                      LucideIcons.lock,
+                      size: 32,
+                      color: AppColors.textSubtle,
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       'Baholash kiritish huquqi yo‘q',
@@ -266,7 +270,10 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                     Text(
                       'Sizning rolingiz faqat ko‘rish uchun',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 13,
+                      ),
                     ),
                     const SizedBox(height: 20),
                     OutlinedButton(
@@ -365,7 +372,10 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                               for (final c in categories)
                                 DropdownMenuItem(
                                   value: c,
-                                  child: Text(c, overflow: TextOverflow.ellipsis),
+                                  child: Text(
+                                    c,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                             ],
                             onChanged: (v) => setState(() => _category = v!),
@@ -403,13 +413,18 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textSecondary,
-                              fontFeatures: const [FontFeature.tabularFigures()],
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
                             ),
                           ),
                         ),
                         Text(
                           '0 — shakllanmagan, 5 — to‘liq mustaqil',
-                          style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textMuted,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         for (var i = 0; i < _criteriaList.length; i++)
@@ -418,11 +433,12 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                             max: _criteriaList[i]['max'] as double,
                             score: _criteriaList[i]['score'] as double,
                             rated: _criteriaList[i]['rated'] as bool,
-                            onPick: (level) => setState(() {
-                              final max = _criteriaList[i]['max'] as double;
-                              _criteriaList[i]['score'] = max * level / 5;
-                              _criteriaList[i]['rated'] = true;
-                            }),
+                            onPick:
+                                (level) => setState(() {
+                                  final max = _criteriaList[i]['max'] as double;
+                                  _criteriaList[i]['score'] = max * level / 5;
+                                  _criteriaList[i]['rated'] = true;
+                                }),
                           ),
                       ],
                     ),
@@ -471,7 +487,10 @@ class _NewAssessmentScreenState extends State<NewAssessmentScreen> {
                     onPressed: _saveAssessment,
                     child: const Text(
                       'Saqlash',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -553,10 +572,16 @@ class _CriterionLevels extends StatelessWidget {
                         height: 44,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: l == level ? AppColors.primaryLight : AppColors.surface,
+                          color:
+                              l == level
+                                  ? AppColors.primaryLight
+                                  : AppColors.surface,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: l == level ? AppColors.primary : AppColors.border,
+                            color:
+                                l == level
+                                    ? AppColors.primary
+                                    : AppColors.border,
                             width: l == level ? 1.6 : 1,
                           ),
                         ),
@@ -565,7 +590,10 @@ class _CriterionLevels extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: l == level ? AppColors.primary : AppColors.textPrimary,
+                            color:
+                                l == level
+                                    ? AppColors.primary
+                                    : AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -580,4 +608,3 @@ class _CriterionLevels extends StatelessWidget {
     );
   }
 }
-

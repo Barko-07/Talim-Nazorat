@@ -10,6 +10,7 @@ import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/password_hasher.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class AdminUsersTab extends StatefulWidget {
   const AdminUsersTab({super.key});
@@ -111,10 +112,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                   const SizedBox(height: 4),
                   Text(
                     'Tizim xodimlarini ro‘yxatga olish, rollarini belgilash, ma’lumotlarini tahrirlash va hisoblarini faollashtirish/bloklash',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
                 ],
               );
@@ -139,11 +137,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
               if (isCompact) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    headerTexts,
-                    const SizedBox(height: 12),
-                    addBtn,
-                  ],
+                  children: [headerTexts, const SizedBox(height: 12), addBtn],
                 );
               }
 
@@ -163,9 +157,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -187,11 +181,11 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               horizontal: 12,
                               vertical: 10,
                             ),
-                            border: OutlineInputBorder(
+                            border: BoxInputBorder(
                               borderRadius: BorderRadius.circular(8),
                               borderSide: BorderSide(color: AppColors.border),
                             ),
-                            enabledBorder: OutlineInputBorder(
+                            enabledBorder: BoxInputBorder(
                               borderRadius: BorderRadius.circular(8),
                               borderSide: BorderSide(color: AppColors.border),
                             ),
@@ -210,7 +204,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               horizontal: 12,
                               vertical: 10,
                             ),
-                            border: OutlineInputBorder(
+                            border: BoxInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
@@ -244,7 +238,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               horizontal: 12,
                               vertical: 10,
                             ),
-                            border: OutlineInputBorder(
+                            border: BoxInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
@@ -293,9 +287,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child:
                 filteredUsers.isEmpty
                     ? Padding(

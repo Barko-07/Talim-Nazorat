@@ -186,10 +186,24 @@ class AuthApi {
 
   /// Ro'yxatdan o'tish formasi uchun maktablar (faqat nomlari) — serverdagi
   /// haqiqiy muassasalar, shunda so'rov o'sha maktab administratoriga boradi.
-  Future<List<String>> institutionNames() async =>
-      (await _api.getList(
-        '/api/auth/institutions',
-      )).map((e) => (e as Map<String, dynamic>)['name'] as String).toList();
+  /// Ro'yxatdan o'tish uchun maktablar: raqam bo'yicha tartibda
+  /// ("2-sonli" "10-sonli"dan oldin), raqamsizlari oxirida alifbo bo'yicha.
+  Future<List<String>> institutionNames() async {
+    final names =
+        (await _api.getList('/api/auth/institutions'))
+            .map((e) => (e as Map<String, dynamic>)['name'] as String)
+            .toList();
+    int? numberOf(String n) =>
+        int.tryParse(RegExp(r'^\s*(\d+)').firstMatch(n)?.group(1) ?? '');
+    names.sort((a, b) {
+      final na = numberOf(a), nb = numberOf(b);
+      if (na != null && nb != null && na != nb) return na.compareTo(nb);
+      if (na != null && nb == null) return -1;
+      if (na == null && nb != null) return 1;
+      return a.toLowerCase().compareTo(b.toLowerCase());
+    });
+    return names;
+  }
 
   Future<void> requestPasswordChangeCode() =>
       _api.post('/api/auth/password/change/request');

@@ -8,6 +8,7 @@ import '../../../models/assessment_question_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
 import 'question_editor_dialog.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class QuestionLibraryView extends StatefulWidget {
   final bool isEmbedded;
@@ -540,7 +541,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
@@ -562,7 +563,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
@@ -578,7 +579,10 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                         ..._domains.map(
                           (d) => DropdownMenuItem(
                             value: d,
-                            child: Text(d, style: const TextStyle(fontSize: 12)),
+                            child: Text(
+                              d,
+                              style: const TextStyle(fontSize: 12),
+                            ),
                           ),
                         ),
                       ],
@@ -600,7 +604,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
@@ -641,7 +645,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
@@ -649,7 +653,10 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                       items: const [
                         DropdownMenuItem(
                           value: null,
-                          child: Text('Barchasi', style: TextStyle(fontSize: 12)),
+                          child: Text(
+                            'Barchasi',
+                            style: TextStyle(fontSize: 12),
+                          ),
                         ),
                         DropdownMenuItem(
                           value: 'ready',
@@ -657,7 +664,10 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
                         ),
                         DropdownMenuItem(
                           value: 'draft',
-                          child: Text('Qoralama', style: TextStyle(fontSize: 12)),
+                          child: Text(
+                            'Qoralama',
+                            style: TextStyle(fontSize: 12),
+                          ),
                         ),
                       ],
                       onChanged: (v) => setState(() => _selectedStatus = v),
@@ -827,9 +837,7 @@ class _QuestionLibraryViewState extends State<QuestionLibraryView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                q.isStandard
-                    ? 'Standart metodika'
-                    : 'Muallif: ${q.authorName}',
+                q.isStandard ? 'Standart metodika' : 'Muallif: ${q.authorName}',
                 style: TextStyle(fontSize: 11, color: AppColors.textMuted),
               ),
               Row(

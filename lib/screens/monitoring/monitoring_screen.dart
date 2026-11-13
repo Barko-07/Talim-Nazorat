@@ -146,7 +146,9 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
             ? changes
             : changes.where((c) => c.result.status == _filter).toList();
     int count(DynamicsStatus? s) =>
-        s == null ? changes.length : changes.where((c) => c.result.status == s).length;
+        s == null
+            ? changes.length
+            : changes.where((c) => c.result.status == s).length;
 
     Widget sectionTitle(String t) => Padding(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
@@ -210,12 +212,16 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                             ? 'Baholashlar bo‘lgach, o‘zgarishlar shu yerda ko‘rinadi'
                             : 'Bu toifada bola yo‘q',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     )
                   else
                     for (var i = 0; i < shown.length; i++) ...[
-                      if (i > 0) Divider(height: 1, indent: 20, color: AppColors.border),
+                      if (i > 0)
+                        Divider(height: 1, indent: 20, color: AppColors.border),
                       _changeRow(context, shown[i]),
                     ],
                 ],
@@ -229,21 +235,29 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   sectionTitle(
-                    alerts.isEmpty ? 'Ogohlantirishlar' : 'Ogohlantirishlar · ${alerts.length}',
+                    alerts.isEmpty
+                        ? 'Ogohlantirishlar'
+                        : 'Ogohlantirishlar · ${alerts.length}',
                   ),
                   if (alerts.isEmpty)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                       child: Text(
                         'Hozircha ogohlantirish yo‘q',
-                        style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     )
                   else
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
                       child: Column(
-                        children: [for (final alt in alerts) _buildAlertCard(context, alt)],
+                        children: [
+                          for (final alt in alerts)
+                            _buildAlertCard(context, alt),
+                        ],
                       ),
                     ),
                 ],
@@ -312,12 +326,18 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                         TextSpan(text: c.last.studentName),
                         if (pct != null)
                           TextSpan(
-                            text: '   ${pct >= 0 ? '▲' : '▼'} ${pct.abs().round()}%',
+                            text:
+                                '   ${pct >= 0 ? '▲' : '▼'} ${pct.abs().round()}%',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: significant ? deltaColor : AppColors.textMuted,
-                              fontFeatures: const [FontFeature.tabularFigures()],
+                              color:
+                                  significant
+                                      ? deltaColor
+                                      : AppColors.textMuted,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
                             ),
                           ),
                       ],
@@ -348,12 +368,19 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                 const SizedBox(width: 6),
                 Text(
                   _label(r.status),
-                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
             const SizedBox(width: 6),
-            Icon(LucideIcons.chevronRight, size: 18, color: AppColors.textSubtle),
+            Icon(
+              LucideIcons.chevronRight,
+              size: 18,
+              color: AppColors.textSubtle,
+            ),
           ],
         ),
       ),
@@ -601,4 +628,3 @@ class _FilterChip extends StatelessWidget {
     );
   }
 }
-

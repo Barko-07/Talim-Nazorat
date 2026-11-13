@@ -13,6 +13,7 @@ import '../assessment/conduct_assessment_screen.dart';
 import '../assessment/create_assessment_flow.dart';
 import '../assessment/question_library_view.dart';
 import '../../../core/widgets/glass_widgets.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class PsychologistAssessmentsTab extends StatefulWidget {
   final StudentModel? preselectedStudent;
@@ -276,11 +277,11 @@ class _PsychologistAssessmentsTabState
                         horizontal: 14,
                         vertical: 11,
                       ),
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.border),
                       ),
-                      enabledBorder: OutlineInputBorder(
+                      enabledBorder: BoxInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.border),
                       ),
@@ -365,10 +366,7 @@ class _PsychologistAssessmentsTabState
                       ),
                       DropdownMenuItem(
                         value: 'draft',
-                        child: Text(
-                          'Qoralama',
-                          style: TextStyle(fontSize: 13),
-                        ),
+                        child: Text('Qoralama', style: TextStyle(fontSize: 13)),
                       ),
                     ],
                     onChanged: (v) => setState(() => _statusFilter = v),

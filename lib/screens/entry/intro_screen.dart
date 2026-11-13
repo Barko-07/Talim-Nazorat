@@ -63,20 +63,20 @@ class _IntroScreenState extends State<IntroScreen>
       vsync: this,
       duration: IntroScreen.entranceDuration,
     )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          widget.onEntranceDone?.call();
-          _exitAfterFrames();
-        }
-      });
+      if (status == AnimationStatus.completed) {
+        widget.onEntranceDone?.call();
+        _exitAfterFrames();
+      }
+    });
 
     _exitController = AnimationController(
       vsync: this,
       duration: IntroScreen.exitDuration,
     )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _fireDone();
-        }
-      });
+      if (status == AnimationStatus.completed) {
+        _fireDone();
+      }
+    });
   }
 
   @override
@@ -93,9 +93,9 @@ class _IntroScreenState extends State<IntroScreen>
     }
 
     // Belgini birinchi kadrdanoq tiniq chizish uchun tekstura tayyor bo‘lishini kutamiz.
-    final stream = const AssetImage(AppBrand.markAsset).resolve(
-      createLocalImageConfiguration(context),
-    );
+    final stream = const AssetImage(
+      AppBrand.markAsset,
+    ).resolve(createLocalImageConfiguration(context));
     _markStream = stream;
     _markListener = ImageStreamListener(
       (_, _) => _markReady(),
@@ -324,10 +324,7 @@ class _IntroScreenState extends State<IntroScreen>
             opacity: markOpacity,
             child: Transform.translate(
               offset: Offset(0, markTranslateY),
-              child: Transform.scale(
-                scale: markScale,
-                child: markWidget,
-              ),
+              child: Transform.scale(scale: markScale, child: markWidget),
             ),
           );
 
@@ -411,12 +408,13 @@ class _IntroScreenState extends State<IntroScreen>
 
             lockup = ShaderMask(
               blendMode: BlendMode.srcATop,
-              shaderCallback: (bounds) => LinearGradient(
-                begin: Alignment(sweep - 0.55, -0.35),
-                end: Alignment(sweep + 0.55, 0.35),
-                colors: [zeroWhite, peakWhite, zeroWhite],
-                stops: const [0.0, 0.5, 1.0],
-              ).createShader(bounds),
+              shaderCallback:
+                  (bounds) => LinearGradient(
+                    begin: Alignment(sweep - 0.55, -0.35),
+                    end: Alignment(sweep + 0.55, 0.35),
+                    colors: [zeroWhite, peakWhite, zeroWhite],
+                    stops: const [0.0, 0.5, 1.0],
+                  ).createShader(bounds),
               child: lockup,
             );
           }
@@ -427,10 +425,7 @@ class _IntroScreenState extends State<IntroScreen>
               color: bgColor,
               child: SafeArea(
                 child: Center(
-                  child: Transform.scale(
-                    scale: exitScale,
-                    child: lockup,
-                  ),
+                  child: Transform.scale(scale: exitScale, child: lockup),
                 ),
               ),
             ),

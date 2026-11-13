@@ -6,6 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/psychological_methods_data.dart';
 import '../../../providers/app_provider.dart';
 import '../../../core/widgets/glass_widgets.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class PsychologistMethodsTab extends StatefulWidget {
   final Function(int tabIndex)? onNavigateToTab;
@@ -178,11 +179,11 @@ class _PsychologistMethodsTabState extends State<PsychologistMethodsTab> {
                         horizontal: 14,
                         vertical: 11,
                       ),
-                      border: OutlineInputBorder(
+                      border: BoxInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.border),
                       ),
-                      enabledBorder: OutlineInputBorder(
+                      enabledBorder: BoxInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.border),
                       ),

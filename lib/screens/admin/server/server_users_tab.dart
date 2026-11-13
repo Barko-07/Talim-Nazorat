@@ -356,9 +356,7 @@ class _ServerUsersTabState extends State<ServerUsersTab> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _loading
-                        ? 'Yuklanmoqda…'
-                        : '${_users.length} ta hisob',
+                    _loading ? 'Yuklanmoqda…' : '${_users.length} ta hisob',
                     style: TextStyle(fontSize: 14, color: AppColors.textMuted),
                   ),
                 ],
@@ -474,7 +472,6 @@ class _Notice extends StatelessWidget {
     ),
   );
 }
-
 
 class _UserRow extends StatelessWidget {
   const _UserRow({
@@ -692,7 +689,8 @@ class _CreateUserDialogState extends State<_CreateUserDialog> {
                   labelText: 'Telefon (ixtiyoriy)',
                   hintText: UzPhone.hint,
                   errorText:
-                      UzPhone.isEmpty(_phone.text) || UzPhone.isValid(_phone.text)
+                      UzPhone.isEmpty(_phone.text) ||
+                              UzPhone.isValid(_phone.text)
                           ? null
                           : UzPhone.error,
                 ),

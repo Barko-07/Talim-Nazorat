@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../providers/app_provider.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class AdminAuditTab extends StatefulWidget {
   const AdminAuditTab({super.key});
@@ -87,10 +88,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                   const SizedBox(height: 4),
                   Text(
                     'Barcha ma’muriy o‘zgarishlar, tizimga kirishlar, ma’lumotlarni tahrirlash va xavfsizlik hodisalari to‘liq qaydnomasi',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
                 ],
               );
@@ -142,9 +140,9 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -161,7 +159,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -179,7 +177,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -236,7 +234,7 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
                           horizontal: 12,
                           vertical: 10,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -279,9 +277,9 @@ class _AdminAuditTabState extends State<AdminAuditTab> {
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+              borderRadius: BorderRadius.circular(22),
+              side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
+            ),
             child:
                 filtered.isEmpty
                     ? const Padding(

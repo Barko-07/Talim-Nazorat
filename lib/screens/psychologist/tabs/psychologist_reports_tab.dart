@@ -294,11 +294,7 @@ class _PsychologistReportsTabState extends State<PsychologistReportsTab> {
               borderColor: AppColors.primaryTint,
               child: Row(
                 children: [
-                  Icon(
-                    LucideIcons.shield,
-                    color: AppColors.primary,
-                    size: 18,
-                  ),
+                  Icon(LucideIcons.shield, color: AppColors.primary, size: 18),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(

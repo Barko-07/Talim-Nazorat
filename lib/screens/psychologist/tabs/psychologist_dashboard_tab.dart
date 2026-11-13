@@ -349,11 +349,7 @@ class PsychologistDashboardTab extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                LucideIcons.clock,
-                color: AppColors.primary,
-                size: 20,
-              ),
+              Icon(LucideIcons.clock, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -369,10 +365,7 @@ class PsychologistDashboardTab extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () => onNavigateToTab?.call(7),
-                child: const Text(
-                  'Barchasi →',
-                  style: TextStyle(fontSize: 12),
-                ),
+                child: const Text('Barchasi →', style: TextStyle(fontSize: 12)),
               ),
             ],
           ),
@@ -391,10 +384,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Bugunga rejalashtirilgan mashg‘ulotlar yo‘q',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
                 ],
               ),
@@ -533,10 +523,7 @@ class PsychologistDashboardTab extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Hozircha kuzatuvlar kiritilmagan',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
                 ],
               ),

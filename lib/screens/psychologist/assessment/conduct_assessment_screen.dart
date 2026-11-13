@@ -669,9 +669,12 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                 Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: AppColors.cardGlassBorder, width: 1.0),
-      ),
+                    borderRadius: BorderRadius.circular(22),
+                    side: BorderSide(
+                      color: AppColors.cardGlassBorder,
+                      width: 1.0,
+                    ),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(
@@ -731,7 +734,7 @@ class _ConductAssessmentScreenState extends State<ConductAssessmentScreen> {
                                   value: !currentResponse.isEvaluated,
                                   activeThumbColor: AppColors.warning,
                                   // ignore: deprecated_member_use
-                  onChanged: (val) {
+                                  onChanged: (val) {
                                     setState(() {
                                       currentResponse.isEvaluated = !val;
                                       if (val) {

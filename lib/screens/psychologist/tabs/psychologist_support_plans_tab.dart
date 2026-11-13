@@ -10,6 +10,7 @@ import '../../../models/student_model.dart';
 import '../../../providers/app_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../core/widgets/glass_widgets.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class PsychologistSupportPlansTab extends StatefulWidget {
   final StudentModel? preselectedStudent;
@@ -351,11 +352,11 @@ class _PsychologistSupportPlansTabState
                       horizontal: 14,
                       vertical: 11,
                     ),
-                    border: OutlineInputBorder(
+                    border: BoxInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppColors.border),
                     ),
-                    enabledBorder: OutlineInputBorder(
+                    enabledBorder: BoxInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppColors.border),
                     ),
@@ -589,7 +590,8 @@ class _PsychologistSupportPlansTabState
                             compactLabel: 'Qo‘shish',
                             icon: LucideIcons.plus,
                             variant: HeaderActionVariant.secondary,
-                            onPressed: () => _showAddObjectiveDialog(context, p),
+                            onPressed:
+                                () => _showAddObjectiveDialog(context, p),
                           ),
                         ],
                       ),

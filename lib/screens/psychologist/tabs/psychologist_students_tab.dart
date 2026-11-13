@@ -10,6 +10,7 @@ import '../../../services/child_status_service.dart';
 import '../../students/student_detail_screen.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../core/widgets/glass_widgets.dart';
+import '../../../core/theme/box_input_border.dart';
 
 class PsychologistStudentsTab extends StatefulWidget {
   final Function(StudentModel student)? onSelectStudentForObservation;
@@ -182,11 +183,11 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                           horizontal: 14,
                           vertical: 11,
                         ),
-                        border: OutlineInputBorder(
+                        border: BoxInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: AppColors.border),
                         ),
-                        enabledBorder: OutlineInputBorder(
+                        enabledBorder: BoxInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: AppColors.border),
                         ),
@@ -209,26 +210,11 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                           value: null,
                           child: Text('Barcha sinflar'),
                         ),
-                        DropdownMenuItem(
-                          value: '1-A',
-                          child: Text('1-A sinf'),
-                        ),
-                        DropdownMenuItem(
-                          value: '2-B',
-                          child: Text('2-B sinf'),
-                        ),
-                        DropdownMenuItem(
-                          value: '3-A',
-                          child: Text('3-A sinf'),
-                        ),
-                        DropdownMenuItem(
-                          value: '4-A',
-                          child: Text('4-A sinf'),
-                        ),
-                        DropdownMenuItem(
-                          value: '5-A',
-                          child: Text('5-A sinf'),
-                        ),
+                        DropdownMenuItem(value: '1-A', child: Text('1-A sinf')),
+                        DropdownMenuItem(value: '2-B', child: Text('2-B sinf')),
+                        DropdownMenuItem(value: '3-A', child: Text('3-A sinf')),
+                        DropdownMenuItem(value: '4-A', child: Text('4-A sinf')),
+                        DropdownMenuItem(value: '5-A', child: Text('5-A sinf')),
                       ],
                       onChanged: (v) => setState(() => _gradeFilter = v),
                     );
@@ -289,10 +275,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     ModernPillFilterBar(
-                      items: const [
-                        'Barcha bolalar',
-                        'Menga biriktirilganlar',
-                      ],
+                      items: const ['Barcha bolalar', 'Menga biriktirilganlar'],
                       selectedItem:
                           _onlyAssignedToMe
                               ? 'Menga biriktirilganlar'
@@ -386,7 +369,10 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                     const SizedBox(height: 4),
                     Text(
                       'Qidiruv so‘zini o‘zgartiring yoki filtrlarni tozalang',
-                      style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ],
                 ),
@@ -458,8 +444,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                       color: AppColors.textSecondary,
                                       backgroundColor: AppColors.surfaceMuted,
                                     ),
-                                    if (st != null)
-                                      ChildStatusLabel(st.color),
+                                    if (st != null) ChildStatusLabel(st.color),
                                     if (isAssigned)
                                       const StatusBadge(
                                         'Sizga biriktirilgan',
@@ -500,10 +485,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                         children: [
                           IconButton.outlined(
                             tooltip: 'Kuzatuv qayd etish',
-                            icon: const Icon(
-                              LucideIcons.notebookPen,
-                              size: 17,
-                            ),
+                            icon: const Icon(LucideIcons.notebookPen, size: 17),
                             onPressed:
                                 () => widget.onSelectStudentForObservation
                                     ?.call(s),
@@ -512,8 +494,9 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                             tooltip: 'Diagnostika o‘tkazish',
                             icon: const Icon(LucideIcons.brain, size: 17),
                             onPressed:
-                                () => widget.onSelectStudentForAssessment
-                                    ?.call(s),
+                                () => widget.onSelectStudentForAssessment?.call(
+                                  s,
+                                ),
                           ),
                           IconButton.outlined(
                             tooltip: 'Mashg‘ulot rejalashtirish',
@@ -522,8 +505,7 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                               size: 17,
                             ),
                             onPressed:
-                                () =>
-                                    widget.onSelectStudentForSession?.call(s),
+                                () => widget.onSelectStudentForSession?.call(s),
                           ),
                           HeaderActionButton(
                             label: 'Profil',
@@ -534,9 +516,8 @@ class _PsychologistStudentsTabState extends State<PsychologistStudentsTab> {
                                 context,
                                 MaterialPageRoute(
                                   builder:
-                                      (_) => StudentDetailScreen(
-                                        studentId: s.id,
-                                      ),
+                                      (_) =>
+                                          StudentDetailScreen(studentId: s.id),
                                 ),
                               );
                             },
