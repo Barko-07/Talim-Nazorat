@@ -292,140 +292,165 @@ class DashboardScreen extends StatelessWidget {
     final institutionName = user?.institutionName ?? '';
     final initials = _initialsFor(user?.fullName);
 
+    // Yashil to'lqin — boshqa sahifalar sarlavhasi bilan bir xil uslub.
     return SurfaceCard(
       borderRadius: 26,
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isCompact = constraints.maxWidth < 560;
+      padding: EdgeInsets.zero,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
+        child: Stack(
+          children: [
+            const Positioned(right: 0, bottom: 0, child: PageHeaderHill()),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isCompact = constraints.maxWidth < 560;
 
-          // Bola qo'shish faqat ruxsati bor rollarga (koordinator, rahbariyat)
-          final canAddStudent =
-              user != null && AccessControlService().canEditStudent(user, null);
-          final monogram = Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppColors.primaryLight,
-              borderRadius: BorderRadius.circular(13),
-              border: Border.all(color: AppColors.primaryTint, width: 1.0),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              initials,
-              style: TextStyle(
-                fontSize: 15.5,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primary,
-                letterSpacing: 0.2,
-              ),
-            ),
-          );
-
-          final subStyle = TextStyle(
-            fontSize: 13,
-            color: AppColors.textMuted,
-            fontWeight: FontWeight.w500,
-          );
-          final userInfo = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Xush kelibsiz',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textMuted,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                fullName,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              const SizedBox(height: 2),
-              // Telefonda rol va maktab alohida qatorda: kesilib qolmaydi.
-              if (isCompact) ...[
-                Text(
-                  roleLabel,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: subStyle,
-                ),
-                if (institutionName.isNotEmpty)
-                  Text(
-                    institutionName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: subStyle,
-                  ),
-              ] else
-                Text(
-                  [
-                    roleLabel,
-                    if (institutionName.isNotEmpty) institutionName,
-                  ].join(' · '),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: subStyle,
-                ),
-            ],
-          );
-
-          // Bola qo'shish — tez-tez kerak bo'ladigan amal, lekin asosiy emas:
-          // ism yonida ixcham ikkinchi darajali tugma.
-          final addCompact = Tooltip(
-            message: 'Bola qo‘shish',
-            child: OutlinedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AddStudentScreen()),
-                );
-              },
-              icon: const Icon(LucideIcons.userPlus, size: 18),
-              label: Text(isCompact ? 'Bola' : 'Bola qo‘shish'),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(0, 40),
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-              ),
-            ),
-          );
-
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Ism va rasm — Sozlamalarga (shaxsiy ma'lumotlar) o'tadi.
-              Expanded(
-                child: Semantics(
-                  button: true,
-                  label: 'Sozlamalar',
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(14),
-                    onTap:
-                        () => _openModule(context, 9, const SettingsScreen()),
-                    child: Row(
-                      children: [
-                        monogram,
-                        const SizedBox(width: 14),
-                        Expanded(child: userInfo),
-                      ],
+                  // Bola qo'shish faqat ruxsati bor rollarga (koordinator, rahbariyat)
+                  final canAddStudent =
+                      user != null &&
+                      AccessControlService().canEditStudent(user, null);
+                  final monogram = Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(13),
+                      border: Border.all(
+                        color: AppColors.primaryTint,
+                        width: 1.0,
+                      ),
                     ),
-                  ),
-                ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      initials,
+                      style: TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  );
+
+                  final subStyle = TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w500,
+                  );
+                  final userInfo = Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Xush kelibsiz',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        fullName,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      // Telefonda rol va maktab alohida qatorda: kesilib qolmaydi.
+                      if (isCompact) ...[
+                        Text(
+                          roleLabel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: subStyle,
+                        ),
+                        if (institutionName.isNotEmpty)
+                          Text(
+                            institutionName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: subStyle,
+                          ),
+                      ] else
+                        Text(
+                          [
+                            roleLabel,
+                            if (institutionName.isNotEmpty) institutionName,
+                          ].join(' · '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: subStyle,
+                        ),
+                    ],
+                  );
+
+                  // Bola qo'shish — tez-tez kerak bo'ladigan amal, lekin asosiy emas:
+                  // ism yonida ixcham ikkinchi darajali tugma.
+                  final addCompact = Tooltip(
+                    message: 'Bola qo‘shish',
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AddStudentScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(LucideIcons.userPlus, size: 18),
+                      label: Text(isCompact ? 'Bola' : 'Bola qo‘shish'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(0, 40),
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                      ),
+                    ),
+                  );
+
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Ism va rasm — Sozlamalarga (shaxsiy ma'lumotlar) o'tadi.
+                      Expanded(
+                        child: Semantics(
+                          button: true,
+                          label: 'Sozlamalar',
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap:
+                                () => _openModule(
+                                  context,
+                                  9,
+                                  const SettingsScreen(),
+                                ),
+                            child: Row(
+                              children: [
+                                monogram,
+                                const SizedBox(width: 14),
+                                Expanded(child: userInfo),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (canAddStudent) ...[
+                        const SizedBox(width: 12),
+                        addCompact,
+                      ],
+                    ],
+                  );
+                },
               ),
-              if (canAddStudent) ...[const SizedBox(width: 12), addCompact],
-            ],
-          );
-        },
+            ),
+          ],
+        ),
       ),
     );
   }

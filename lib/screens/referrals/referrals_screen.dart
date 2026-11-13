@@ -392,6 +392,7 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
+            art: PageArtKind.referral,
             title: 'Mutaxassisga yuborish',
             icon: LucideIcons.send,
             subtitle: '${referrals.length} ta',
@@ -418,42 +419,22 @@ class _ReferralsScreenState extends State<ReferralsScreen> {
           Expanded(
             child:
                 referrals.isEmpty
-                    ? Center(
-                      child: SurfaceCard(
-                        borderRadius: 26,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 36,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              LucideIcons.send,
-                              size: 32,
-                              color: AppColors.textSubtle,
-                            ),
-                            SizedBox(height: 14),
-                            Text(
-                              'Hozircha yo‘q',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 15.5,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              'Bolani psixolog, logoped yoki shifokorga yuborish shu yerda',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textMuted,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
+                    ? SurfaceCard(
+                      borderRadius: 20,
+                      padding: EdgeInsets.zero,
+                      margin: EdgeInsets.only(
+                        bottom: width < 920 ? 92 + mediaPadding.bottom : 20,
+                      ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ArtEmptyState(
+                          kind: PageArtKind.referral,
+                          title: 'Hali yuborish yo‘q',
+                          message:
+                              'Bolani psixolog, logoped yoki shifokorga yuborish uchun tugmani bosing',
+                          actionLabel: 'Bolani yuborish',
+                          actionIcon: LucideIcons.send,
+                          onAction: () => _showAddReferralDialog(context),
                         ),
                       ),
                     )

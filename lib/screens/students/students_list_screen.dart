@@ -76,6 +76,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
+            art: PageArtKind.children,
             title: 'Bolalar',
             icon: LucideIcons.users,
             subtitle: '${found.length} nafar',
@@ -204,6 +205,16 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                                   app.searchQuery.isNotEmpty ||
                                   app.selectedGrade != null ||
                                   _status != null,
+                              onAdd:
+                                  !canAdd
+                                      ? null
+                                      : () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (_) => const AddStudentScreen(),
+                                        ),
+                                      ),
                             )
                             : ListView.separated(
                               padding: EdgeInsets.only(bottom: 8),
@@ -268,11 +279,11 @@ class _StatusChip extends StatelessWidget {
           height: 34,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: selected ? AppColors.primaryLight : AppColors.surface,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: selected ? AppColors.textPrimary : AppColors.border,
-              width: selected ? 1.4 : 1,
+              color: selected ? AppColors.primary : AppColors.border,
+              width: selected ? 1.5 : 1,
             ),
           ),
           child: Row(
@@ -417,37 +428,25 @@ class _ChildRow extends StatelessWidget {
 
 class _Empty extends StatelessWidget {
   final bool searching;
-  const _Empty({required this.searching});
+  final VoidCallback? onAdd;
+  const _Empty({required this.searching, this.onAdd});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(LucideIcons.userSearch, size: 32, color: AppColors.textSubtle),
-            const SizedBox(height: 12),
-            Text(
-              searching ? 'Bola topilmadi' : 'Hali bola qo‘shilmagan',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              searching
-                  ? 'Boshqa ism yoki sinfni tanlang'
-                  : 'Bolalar shu yerda ko‘rinadi',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: AppColors.textMuted),
-            ),
-          ],
-        ),
-      ),
+    if (searching) {
+      return const ArtEmptyState(
+        kind: PageArtKind.children,
+        title: 'Bola topilmadi',
+        message: 'Boshqa ism yoki sinfni tanlang',
+      );
+    }
+    return ArtEmptyState(
+      kind: PageArtKind.children,
+      title: 'Hali bola qo‘shilmagan',
+      message: 'Bolalarni qo‘shing va ularning rivojlanishini kuzating',
+      actionLabel: onAdd == null ? null : 'Bola qo‘shish',
+      actionIcon: LucideIcons.userPlus,
+      onAction: onAdd,
     );
   }
 }

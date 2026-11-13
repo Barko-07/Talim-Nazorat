@@ -456,6 +456,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
+            art: PageArtKind.sessions,
             title: 'Mashg‘ulotlar jadvali',
             icon: LucideIcons.calendar,
             subtitle:
@@ -479,42 +480,22 @@ class _SessionsScreenState extends State<SessionsScreen> {
           Expanded(
             child:
                 filtered.isEmpty
-                    ? Center(
-                      child: SurfaceCard(
-                        borderRadius: 26,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 36,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              LucideIcons.calendarX,
-                              size: 34,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(height: 14),
-                            Text(
-                              'Mashg‘ulotlar topilmadi',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 15.5,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              'Boshqa holat filtrini tanlang yoki yangi dars rejalashtiring.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textMuted,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
+                    ? SurfaceCard(
+                      borderRadius: 20,
+                      padding: EdgeInsets.zero,
+                      margin: EdgeInsets.only(
+                        bottom: width < 920 ? 92 + mediaPadding.bottom : 20,
+                      ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ArtEmptyState(
+                          kind: PageArtKind.sessions,
+                          title: 'Mashg‘ulotlar topilmadi',
+                          message:
+                              'Boshqa holatni tanlang yoki yangi mashg‘ulot rejalashtiring',
+                          actionLabel: 'Yangi mashg‘ulot',
+                          actionIcon: LucideIcons.calendarPlus,
+                          onAction: () => _showAddSessionDialog(context),
                         ),
                       ),
                     )

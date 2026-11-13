@@ -173,7 +173,7 @@ class ChildStatusLabel extends StatelessWidget {
 }
 
 /// Natija o'zgarishi (dinamika) — svetofor nuqtasidan farqli, yo'nalish
-/// ikonkasi bilan: O'sish ↗, Pasayish ↘, Barqaror →, Samarasiz ⊘.
+/// ikonkasi bilan: O'sish ↗, Pasayish ↘, Barqaror →, Samarasiz ⊖.
 class DynamicsIcon extends StatelessWidget {
   final DynamicsStatus status;
   final double size;
@@ -183,7 +183,7 @@ class DynamicsIcon extends StatelessWidget {
     DynamicsStatus.growth => LucideIcons.trendingUp,
     DynamicsStatus.decline => LucideIcons.trendingDown,
     DynamicsStatus.stable => LucideIcons.moveRight,
-    DynamicsStatus.ineffective => LucideIcons.circleSlash,
+    DynamicsStatus.ineffective => LucideIcons.circleMinus,
     DynamicsStatus.insufficientData => LucideIcons.circleDashed,
   };
 

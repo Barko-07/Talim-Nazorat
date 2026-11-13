@@ -49,6 +49,7 @@ class AssessmentsListScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
+            art: PageArtKind.assessment,
             title: 'Baholash',
             icon: LucideIcons.clipboardCheck,
             subtitle: '${items.length} ta',
@@ -68,37 +69,13 @@ class AssessmentsListScreen extends StatelessWidget {
               padding: EdgeInsets.zero,
               child:
                   items.isEmpty
-                      ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                LucideIcons.clipboardList,
-                                size: 32,
-                                color: AppColors.textSubtle,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Hali baholash yo‘q',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Baholashlar shu yerda ko‘rinadi',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      ? ArtEmptyState(
+                        kind: PageArtKind.assessment,
+                        title: 'Hali baholash yo‘q',
+                        message: 'Bolaning rivojlanishini baholash uchun yangi baholash yarating',
+                        actionLabel:
+                            role.canCreateAssessments ? 'Yangi baholash' : null,
+                        onAction: role.canCreateAssessments ? openNew : null,
                       )
                       : ListView.separated(
                         padding: EdgeInsets.only(bottom: 8),

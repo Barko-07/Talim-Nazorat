@@ -159,6 +159,7 @@ class ReportsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AdaptivePageHeader(
+              art: PageArtKind.reports,
               title: 'Hisobotlar',
               icon: LucideIcons.chartBar,
               subtitle: 'Ko‘rsatkichlar va Excel',
@@ -172,10 +173,10 @@ class ReportsScreen extends StatelessWidget {
 
             // 1. Moslashuvchan statistika kartalari (0% overflow, erkin ikonkalar va kesib olingan shisha)
             ResponsiveGlassGrid(
-              mobileColumns: 1,
+              mobileColumns: 3,
               tabletColumns: 3,
               desktopColumns: 3,
-              spacing: 16,
+              spacing: 12,
               children: [
                 _buildSummaryStatCard(
                   label: 'Bolalar',
@@ -331,6 +332,7 @@ class ReportsScreen extends StatelessWidget {
     );
   }
 
+  /// Ikonka, nom, katta raqam: telefonda ham uchtasi bir qatorda sig'adi.
   Widget _buildSummaryStatCard({
     required String label,
     required String value,
@@ -339,57 +341,48 @@ class ReportsScreen extends StatelessWidget {
     required Color accent,
   }) {
     return SurfaceCard(
-      borderRadius: 26,
-      padding: const EdgeInsets.all(20),
+      borderRadius: 20,
+      padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textMuted,
-                    height: 1.3,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Icon(icon, color: accent, size: 22),
-            ],
+          Icon(icon, color: accent, size: 22),
+          const SizedBox(height: 10),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 4),
           Text(
             value,
             style: TextStyle(
-              fontSize: 30,
+              fontSize: 26,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
-              letterSpacing: -0.8,
-              height: 1.05,
+              letterSpacing: -0.6,
+              height: 1.1,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
-          if (caption.isNotEmpty) const SizedBox(height: 6),
-          if (caption.isNotEmpty)
+          if (caption.isNotEmpty) ...[
+            const SizedBox(height: 4),
             Text(
               caption,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
-                height: 1.35,
+                fontSize: 11.5,
+                color: AppColors.textMuted,
+                height: 1.3,
               ),
             ),
+          ],
         ],
       ),
     );

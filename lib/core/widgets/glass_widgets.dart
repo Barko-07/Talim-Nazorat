@@ -5,6 +5,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../models/user_model.dart';
 import '../constants/app_colors.dart';
+import 'page_art.dart';
+export 'page_art.dart';
 
 /// Rollar uchun minimalistik vektor ikonkalar (models/ ni o'zgartirmasdan)
 IconData premiumRoleIcon(UserRole role) {
@@ -760,6 +762,9 @@ class AdaptivePageHeader extends StatelessWidget {
   final double borderRadius;
   final EdgeInsetsGeometry? padding;
 
+  /// Sahifaning o'z rasmi (o'ng tomonda, yashil to'lqin ustida).
+  final PageArtKind? art;
+
   const AdaptivePageHeader({
     super.key,
     required this.title,
@@ -771,6 +776,7 @@ class AdaptivePageHeader extends StatelessWidget {
     this.boxed = true,
     this.borderRadius = 24,
     this.padding,
+    this.art,
   });
 
   @override
@@ -876,6 +882,11 @@ class AdaptivePageHeader extends StatelessWidget {
                 const SizedBox(width: 15),
               ],
               Expanded(child: textBlock),
+              if (art != null) ...[
+                const SizedBox(width: 12),
+                PageArtFigure(art!, size: 56),
+                const SizedBox(width: 20),
+              ],
               if (action != null) ...[
                 const SizedBox(width: 16),
                 action!,
@@ -896,6 +907,10 @@ class AdaptivePageHeader extends StatelessWidget {
                   const SizedBox(width: 13),
                 ],
                 Expanded(child: textBlock),
+                if (art != null) ...[
+                  const SizedBox(width: 8),
+                  PageArtFigure(art!, size: 50),
+                ],
               ],
             ),
             if (action != null) ...[
@@ -909,12 +924,28 @@ class AdaptivePageHeader extends StatelessWidget {
 
     if (!boxed) return content;
 
+    final inner =
+        padding ?? const EdgeInsets.symmetric(horizontal: 22, vertical: 18);
+    if (art == null) {
+      return SurfaceCard(
+        borderRadius: borderRadius,
+        padding: inner,
+        child: content,
+      );
+    }
+    // Rasm bilan: yashil to'lqin kartaning o'ng pastki burchagida.
     return SurfaceCard(
       borderRadius: borderRadius,
-      padding:
-          padding ??
-          const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-      child: content,
+      padding: EdgeInsets.zero,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Stack(
+          children: [
+            const Positioned(right: 0, bottom: 0, child: PageHeaderHill()),
+            Padding(padding: inner, child: content),
+          ],
+        ),
+      ),
     );
   }
 }

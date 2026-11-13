@@ -275,6 +275,7 @@ class SpecialistsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
+            art: PageArtKind.team,
             title: 'Mutaxassislar shtati',
             icon: LucideIcons.userCheck,
             subtitle:

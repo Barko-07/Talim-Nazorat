@@ -235,6 +235,7 @@ class _IepListScreenState extends State<IepListScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AdaptivePageHeader(
+            art: PageArtKind.plan,
             title: 'ITR rejalari',
             icon: LucideIcons.fileText,
             subtitle: '${allPlans.length} ta reja',
@@ -259,56 +260,28 @@ class _IepListScreenState extends State<IepListScreen> {
           Expanded(
             child:
                 plans.isEmpty
-                    ? Center(
-                      child: SurfaceCard(
-                        borderRadius: 26,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 36,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              LucideIcons.bookOpen,
-                              size: 34,
-                              color: AppColors.primary,
-                            ),
-                            const SizedBox(height: 14),
-                            Text(
+                    ? SurfaceCard(
+                      borderRadius: 20,
+                      padding: EdgeInsets.zero,
+                      margin: EdgeInsets.only(
+                        bottom: width < 920 ? 92 + mediaPadding.bottom : 20,
+                      ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ArtEmptyState(
+                          kind: PageArtKind.plan,
+                          title:
                               allPlans.isEmpty
                                   ? 'Hali reja yo‘q'
                                   : 'Bu holatda reja yo‘q',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 15.5,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              'Bola uchun maqsad va muddatlarni yozing',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textMuted,
-                                height: 1.4,
-                              ),
-                            ),
-                            if (canCreateIep) ...[
-                              const SizedBox(height: 18),
-                              OutlinedButton.icon(
-                                icon: const Icon(LucideIcons.plus, size: 16),
-                                label: const Text('Reja tuzish'),
-                                onPressed:
-                                    () => _showCreateIepDialog(
-                                      context,
-                                      currentUser,
-                                    ),
-                              ),
-                            ],
-                          ],
+                          message:
+                              'Bola uchun maqsad va muddatlarni yozib, ITR rejasini tuzing',
+                          actionLabel: canCreateIep ? 'Reja tuzish' : null,
+                          onAction:
+                              canCreateIep
+                                  ? () =>
+                                      _showCreateIepDialog(context, currentUser)
+                                  : null,
                         ),
                       ),
                     )

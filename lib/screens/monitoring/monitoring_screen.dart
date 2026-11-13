@@ -168,6 +168,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const AdaptivePageHeader(
+              art: PageArtKind.monitoring,
               title: 'Monitoring',
               icon: LucideIcons.activity,
               subtitle: 'Oxirgi natija oldingisiga nisbatan',
@@ -205,18 +206,16 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                   ),
                   Divider(height: 1, color: AppColors.border),
                   if (shown.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(28),
-                      child: Text(
-                        changes.isEmpty
-                            ? 'Baholashlar bo‘lgach, o‘zgarishlar shu yerda ko‘rinadi'
-                            : 'Bu toifada bola yo‘q',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
+                    ArtEmptyState(
+                      kind: PageArtKind.monitoring,
+                      title:
+                          changes.isEmpty
+                              ? 'Ma’lumot hali yo‘q'
+                              : 'Bu toifada bola yo‘q',
+                      message:
+                          changes.isEmpty
+                              ? 'Baholashlar bo‘yicha o‘zgarishlar shu yerda ko‘rinadi'
+                              : 'Boshqa toifani tanlang',
                     )
                   else
                     for (var i = 0; i < shown.length; i++) ...[
@@ -591,23 +590,24 @@ class _FilterChip extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(999),
         child: Container(
-          height: 34,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          height: 40,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: selected ? AppColors.primaryLight : AppColors.surface,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: selected ? AppColors.textPrimary : AppColors.border,
-              width: selected ? 1.4 : 1,
+              color: selected ? AppColors.primary : AppColors.border,
+              width: selected ? 1.5 : 1,
             ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (status != null) ...[
-                DynamicsIcon(status!, size: 14),
-                const SizedBox(width: 6),
-              ],
+              if (status != null)
+                DynamicsIcon(status!, size: 18)
+              else
+                Icon(LucideIcons.layers, size: 18, color: AppColors.primary),
+              const SizedBox(width: 8),
               Text(
                 label,
                 style: TextStyle(
