@@ -57,7 +57,10 @@ def _send(self, to, subject, body):
         f.write(f"{to}\t{code.group(1) if code else '-'}\t{subject}\n")
     if code:
         # The newest code alone: the file holds just the 6 digits.
-        (Path.home() / "Desktop" / "KOD.txt").write_text(code.group(1), encoding="utf-8")
+        # Desktop/KOD.txt: just the newest code, who it is for and when.
+        from datetime import datetime
+        (Path.home() / "Desktop" / "KOD.txt").write_text(
+            f"{code.group(1)}\n{to}\n{datetime.now():%H:%M:%S}\n", encoding="utf-8")
 
 
 mailer_mod.Mailer.send = _send

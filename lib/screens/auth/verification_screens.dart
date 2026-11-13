@@ -250,12 +250,15 @@ class _CodeFieldState extends State<CodeField> {
                 maxLength: 6,
                 autofillHints: const [AutofillHints.oneTimeCode],
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                style: const TextStyle(fontSize: 1, color: Colors.transparent),
+                // 16 px: iPhone kichik shriftli maydonga bosilganda sahifani
+                // kattalashtirib yuboradi. Matn baribir ko'rinmaydi.
+                style: const TextStyle(fontSize: 16, color: Colors.transparent),
+                cursorColor: Colors.transparent,
                 decoration: const InputDecoration(
                   counterText: '',
                   semanticCounterText: '',
                   hintText: 'Tasdiqlash kodi',
-                  hintStyle: TextStyle(fontSize: 1, color: Colors.transparent),
+                  hintStyle: TextStyle(fontSize: 16, color: Colors.transparent),
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
