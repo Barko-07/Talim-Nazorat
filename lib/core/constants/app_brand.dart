@@ -10,5 +10,5 @@ class AppBrand {
   // Bog'lanish (Sozlamalar → Bog'lanish)
   static const String supportOrg = 'Namangan viloyati Chortoq tumani MMTB';
   static const String supportPhone = '+998 99 922 22 10';
-  static const String supportEmail = 'info@individ.uz';
+  static const String supportEmail = 'chortoq_mmtb@xtv.uz';
 }
